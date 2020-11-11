@@ -33,11 +33,11 @@ workflows:
   version: 2.1
   build_test_and_deploy:
     jobs:
-      - build_and_test:
-          filters:
-            branches:
-              only:
-                - master
+      - build_and_test
+          # filters:
+          #   branches:
+          #     only:
+          #       - master
       - hold:
           type: approval
           requires:
