@@ -113,7 +113,6 @@ const styles = StyleSheet.create({
   },
   widget: {
     width: 300,
-    height: 0,
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#94F1FF',

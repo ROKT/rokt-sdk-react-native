@@ -113,9 +113,8 @@ Cmd+D or shake for dev menu
       Object {
         "alignItems": "center",
         "backgroundColor": "#94F1FF",
-        "height": 100,
         "justifyContent": "center",
-        "width": 100,
+        "width": 300,
       }
     }
   />
