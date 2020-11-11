@@ -30,7 +30,7 @@ jobs:
           command: cd ./Rokt.Widget && npm publish
 
 workflows:
-  version: 2
+  version: 2.1
   build_test_and_deploy:
     jobs:
       - build_and_test:
