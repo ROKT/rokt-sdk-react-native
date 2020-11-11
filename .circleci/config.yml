@@ -1,10 +1,5 @@
 version: 2.1
 jobs: 
-  # build:
-  #   docker:
-  #    - image: circleci/node:8.15-jessie
-  #   steps:
-  #     - checkout
   build_and_test:
     docker:
       - image: circleci/node:9.11.2-jessie
@@ -34,23 +29,19 @@ workflows:
   build_test_and_deploy:
     jobs:
       - build_and_test
-          # filters:
-          #   branches:
-          #     only:
-          #       - master
       - hold:
           type: approval
           requires:
             - build_and_test
           filters:
             branches:
-              only: master
+              only: /release-(.*)/
       - deploy:
           requires:
             - hold
           filters:
             branches:
               only:
-                - master
+                - /release-(.*)/
 
 
