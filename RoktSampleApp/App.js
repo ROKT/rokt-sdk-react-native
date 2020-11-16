@@ -9,7 +9,7 @@
 import React, {Component} from 'react';
 import {Platform, StyleSheet, Text, View, Button,findNodeHandle, TouchableOpacity} from 'react-native';
 import Rokt from './native-modules/rokt-module'
-import RoktWidget from './widget'
+import RoktWidget from './Widget'
 const instructions = Platform.select({
   ios: 'Press Cmd+R to reload,\n' + 'Cmd+D or shake for dev menu',
   android:
@@ -62,6 +62,8 @@ export default class App extends Component<Props> {
 
   render() {
     return (
+          <SafeAreaView style={styles.containerScroll}>
+      <ScrollView style={styles.scrollView}>
       <View style={styles.container}>
         <Text style={styles.welcome}>Welcome to React Native</Text>
         <Text style={styles.roktMessage}>Rokt Widget Integration!</Text>
@@ -75,9 +77,12 @@ export default class App extends Component<Props> {
           <Text style={styles.button}>Execute</Text>
         </TouchableOpacity>
 
-        <RoktWidget ref={this.myRef} style={styles.widget}></RoktWidget>
       </View>
-    );
+      <RoktWidget ref={this.myRef} ></RoktWidget>
+
+
+      </ScrollView>
+    </SafeAreaView>);
   }
 }
 
@@ -110,11 +115,5 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     padding: 12,
     textAlign:'center',
-  },
-  widget: {
-    width: 300,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#94F1FF',
-  },
+  }
 });
