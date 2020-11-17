@@ -74,6 +74,7 @@ export default class App extends Component<Props> {
 
       </View>
       <RoktWidget ref={this.myRef} ></RoktWidget>
+      <View style={styles.afterWidget}/>
 
 
       </ScrollView>
@@ -110,5 +111,9 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     padding: 12,
     textAlign:'center',
+  },
+  afterWidget: {
+    height: 10,
+    backgroundColor: '#121212'
   }
 });

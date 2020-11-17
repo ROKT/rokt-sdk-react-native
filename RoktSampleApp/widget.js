@@ -1,8 +1,23 @@
 // Widget.js
-import { requireNativeComponent , StyleSheet} from 'react-native';
+import { requireNativeComponent , StyleSheet,NativeEventEmitter, NativeModules} from 'react-native';
 import React, {Component} from 'react';
+const { RoktEventManager } = NativeModules;
+
+const eventManagerEmitter = new NativeEventEmitter(RoktEventManager);
+
+
 
 class RoktWidget extends Component {
+
+
+  subscription = eventManagerEmitter.addListener(
+    'WidgetHeightChanges',
+    (reminder) => {
+      console.log(reminder);
+      this.state.height = parseInt(reminder.height);
+      this.forceUpdate();
+    }
+  );
 
     constructor(props){
         super(props);
@@ -20,6 +35,9 @@ class RoktWidget extends Component {
           <WidgetNativeComponent style={[styles.widget, {height: this.state.height}]} onWidgetHeightChanged={this.onWidgetHeightChanged}/>
       );
     }
+
+    // Don't forget to unsubscribe, typically in componentWillUnmount
+// subscription.remove();
   }
 
   const WidgetNativeComponent = requireNativeComponent('RoktNativeWidget')
@@ -30,4 +48,5 @@ class RoktWidget extends Component {
     });
   
   export default RoktWidget;
+
 

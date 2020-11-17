@@ -7,6 +7,7 @@
 #import <React/RCTUIManager.h>
 #import <React/RCTLog.h>
 #import <React/RCTBridge.h>
+#import "RoktEventManager.h"
 
 
 @implementation RNRoktWidget
@@ -25,7 +26,7 @@ RCT_EXPORT_METHOD(initialize:(NSString *)roktTagId appVersion: (NSString * _Null
 {
     [Rokt initWithRoktTagId:roktTagId];
 }
-RCT_EXPORT_METHOD(execute:(NSString *)viewName 
+RCT_EXPORT_METHOD(execute:(NSString *)viewName
                   attributes:(NSDictionary *)attributes
                   placeholders:(NSDictionary *)placeholders
                   callback:(RCTResponseSenderBlock)callback
@@ -55,11 +56,9 @@ RCT_EXPORT_METHOD(execute:(NSString *)viewName
         
         
         RCTLog(@"at last #%@", nativePlaceholders.description);
-//            if (!view || ![view isKindOfClass:[RoktEmbeddedView class]]) {
-//                RCTLogError(@"Cannot find NativeView with tag #%@", "123");
-////                RCTLogError(@"Cannot find NativeView with tag #%@", reactTag);
-//                return;
-//    }
+
+        RoktEventManager *event = [RoktEventManager allocWithZone: nil];
+
         
             [Rokt executeWithViewName:viewName attributes:attributes
                            placements:nativePlaceholders
@@ -69,7 +68,11 @@ RCT_EXPORT_METHOD(execute:(NSString *)viewName
                              }
          onShouldShowLoadingIndicator:nil
          onShouldHideLoadingIndicator:nil
-                 onEmbeddedSizeChange:nil];
+                 onEmbeddedSizeChange:^(NSString *selectedPlacement, CGFloat widgetHeight){
+                
+                [event onWidgetHeightChanges:widgetHeight];
+    
+            }];
         
     }];
     

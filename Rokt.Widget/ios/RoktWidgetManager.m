@@ -10,29 +10,17 @@
 #import "RoktWidget.h"
 #import <Rokt_Widget/Rokt-Widget-umbrella.h>
 
-@interface RoktWidgetManager : RCTViewManager
+@interface RoktNativeWidgetManager : RCTViewManager
 @end
 
-@implementation RoktWidgetManager
+@implementation RoktNativeWidgetManager
 
-RCT_EXPORT_MODULE(RoktWidget)
+RCT_EXPORT_MODULE(RoktNativeWidget)
 
 - (UIView *)view
 {
   return [[RoktEmbeddedView alloc] init];
 //    return [RoktWidget new];
 }
-
-//RCT_EXPORT_METHOD(callNativeMethod:(nonnull NSNumber*) reactTag) {
-//    [self.bridge.uiManager addUIBlock:^(RCTUIManager *uiManager, NSDictionary<NSNumber *,UIView *> *viewRegistry) {
-//        RoktEmbeddedView *view = viewRegistry[reactTag];
-//        if (!view || ![view isKindOfClass:[RoktEmbeddedView class]]) {
-//            RCTLogError(@"Cannot find NativeView with tag #%@", reactTag);
-//            return;
-//        }
-//
-//    }];
-//
-//}
 
 @end
