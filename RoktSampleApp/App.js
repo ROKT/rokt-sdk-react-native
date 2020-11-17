@@ -7,9 +7,9 @@
  */
 
 import React, {Component} from 'react';
-import {Platform, StyleSheet, Text, View, Button,findNodeHandle, TouchableOpacity} from 'react-native';
+import {Platform, StyleSheet, Text, View, Button,findNodeHandle, TouchableOpacity, SafeAreaView, ScrollView} from 'react-native';
 import Rokt from './native-modules/rokt-module'
-import RoktWidget from './Widget'
+import RoktWidget from './widget'
 const instructions = Platform.select({
   ios: 'Press Cmd+R to reload,\n' + 'Cmd+D or shake for dev menu',
   android:
@@ -19,13 +19,12 @@ const instructions = Platform.select({
 
 type Props = {};
 const embeddedAndLightbox = "testiOS";
-const embedded = "testAndroidLightbox";
+const embeddedAndroid = "testAndroidLboxAndE";
 
 export default class App extends Component<Props> {
 
   constructor(props){
     super(props);
-    // this.view1 = React.createRef();
     this.myRef = React.createRef();
   }
 
@@ -44,11 +43,7 @@ export default class App extends Component<Props> {
       "postcode": "90210",
       "country": "AU"
     }
-
-    console.log("Thisview1 = " + JSON.stringify(this.view1));
-    
-    //this.view1.getNativeParent()
-    
+        
     placeholders = {
       "Location1": findNodeHandle(this.myRef.current)
     }
