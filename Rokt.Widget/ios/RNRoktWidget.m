@@ -70,7 +70,7 @@ RCT_EXPORT_METHOD(execute:(NSString *)viewName
          onShouldHideLoadingIndicator:nil
                  onEmbeddedSizeChange:^(NSString *selectedPlacement, CGFloat widgetHeight){
                 
-                [event onWidgetHeightChanges:widgetHeight];
+                [event onWidgetHeightChanges:widgetHeight placement:selectedPlacement];
     
             }];
         

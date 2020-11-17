@@ -26,9 +26,11 @@ RCT_EXPORT_MODULE();
   return @[@"WidgetHeightChanges"];
 }
 
-- (void)onWidgetHeightChanges:(CGFloat)widgetHeight
+- (void)onWidgetHeightChanges:(CGFloat)widgetHeight placement:(NSString*) selectedPlacement
 {
-    [self sendEventWithName:@"WidgetHeightChanges" body:@{@"height": [NSNumber numberWithDouble: widgetHeight]}];
+    [self sendEventWithName:@"WidgetHeightChanges" body:@{@"height": [NSNumber numberWithDouble: widgetHeight],
+                                                          @"selectedPlacement": selectedPlacement
+    }];
 }
 
 @end

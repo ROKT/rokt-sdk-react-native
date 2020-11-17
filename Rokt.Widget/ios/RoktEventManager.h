@@ -10,5 +10,5 @@
 
 @interface RoktEventManager : RCTEventEmitter <RCTBridgeModule>
 + (id)allocWithZone:(NSZone *)zone;
-- (void)onWidgetHeightChanges:(CGFloat)widgetHeight;
+- (void)onWidgetHeightChanges:(CGFloat)widgetHeight placement:(NSString*) selectedPlacement;
 @end
