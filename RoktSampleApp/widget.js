@@ -13,7 +13,8 @@ class RoktWidget extends Component {
   subscription = eventManagerEmitter.addListener(
     'WidgetHeightChanges',
     (widgetChanges) => {
-      if (widgetChanges.selectedPlacement == this.state.viewName) {
+      console.log
+      if (widgetChanges.selectedPlacement == this.state.palcementName) {
         this.state.height = parseInt(widgetChanges.height);
         this.forceUpdate();
       } 
@@ -22,8 +23,9 @@ class RoktWidget extends Component {
 
     constructor(props){
         super(props);
-        this.state = { height: 0,
-        viewName: this.props.viewName};
+        this.state = { 
+          height: 0,
+          palcementName: this.props.palcementName};
         this.onWidgetHeightChanged = this.onWidgetHeightChanged.bind(this);
     }
 
