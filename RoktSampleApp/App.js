@@ -48,7 +48,7 @@ export default class App extends Component<Props> {
       "Location1": findNodeHandle(this.myRef.current)
     }
 
-    Rokt.execute(embeddedAndLightbox, jenny, placeholders,
+    Rokt.execute(embeddedAndroid, jenny, placeholders,
     x => {
       console.log("Widget OnLoad Callback");
     });

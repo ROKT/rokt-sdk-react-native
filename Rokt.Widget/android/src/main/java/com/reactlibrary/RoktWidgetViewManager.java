@@ -24,6 +24,8 @@ public class RoktWidgetViewManager extends ViewGroupManager<Widget> {
         return MapBuilder.<String, Object>builder()
                 .put("onWidgetHeightChanged",
                         MapBuilder.of("registrationName", "onWidgetHeightChanged"))
+                .put("onWidgetMarginChanged",
+                        MapBuilder.of("registrationName", "onWidgetMarginChanged"))
                 .build();
     }
 
