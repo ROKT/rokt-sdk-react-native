@@ -7,7 +7,7 @@
  */
 
 import React, {Component} from 'react';
-import {Platform, StyleSheet, Text, View, Button,findNodeHandle, TouchableOpacity, SafeAreaView, ScrollView} from 'react-native';
+import {Platform, StyleSheet, Text, View,findNodeHandle, TouchableOpacity, SafeAreaView, ScrollView} from 'react-native';
 import Rokt from './native-modules/rokt-module'
 import RoktWidget from './widget'
 const instructions = Platform.select({
@@ -17,15 +17,15 @@ const instructions = Platform.select({
     'Shake or press menu button for dev menu',
 });
 
-type Props = {};
 const embeddedAndLightbox = "testiOS";
 const embeddedAndroid = "testAndroidLboxAndE";
+const androidMultipleEmbedded = "testTwoEmbedded"
 
-export default class App extends Component<Props> {
-
+export default class App extends Component {
   constructor(props){
     super(props);
-    this.myRef = React.createRef();
+    this.widgetRef1 = React.createRef();
+    this.widgetRef2 = React.createRef();
   }
 
   onInitHandler = () => {
@@ -45,10 +45,11 @@ export default class App extends Component<Props> {
     }
         
     placeholders = {
-      "Location1": findNodeHandle(this.myRef.current)
+      "Location1": findNodeHandle(this.widgetRef1.current),
+      "Location2": findNodeHandle(this.widgetRef2.current),
     }
 
-    Rokt.execute(embeddedAndroid, jenny, placeholders,
+    Rokt.execute(androidMultipleEmbedded, jenny, placeholders,
     x => {
       console.log("Widget OnLoad Callback");
     });
@@ -56,29 +57,26 @@ export default class App extends Component<Props> {
   }
 
   render() {
-    return (
-          <SafeAreaView style={styles.containerScroll}>
-      <ScrollView style={styles.scrollView}>
-      <View style={styles.container}>
-        <Text style={styles.welcome}>Welcome to React Native</Text>
-        <Text style={styles.roktMessage}>Rokt Widget Integration!</Text>
-        <Text style={styles.instructions}>{instructions}</Text>
-
-        <TouchableOpacity onPress={this.onInitHandler}>
-          <Text style={styles.button}>Initialize</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity onPress={this.onExecuteHandler}>
-          <Text style={styles.button}>Execute</Text>
-        </TouchableOpacity>
-
-      </View>
-      <RoktWidget ref={this.myRef} palcementName={"Location1"} ></RoktWidget>
-      <View style={styles.afterWidget}/>
-
-
-      </ScrollView>
-    </SafeAreaView>);
+    return (              
+      
+	<SafeAreaView style={styles.containerScroll}>
+		<ScrollView style={styles.scrollView}>
+			<View style={styles.container}>
+				<Text style={styles.welcome}>Welcome to React Native</Text>
+				<Text style={styles.roktMessage}>Rokt Widget Integration!</Text>
+				<Text style={styles.instructions}>{instructions}</Text>
+				<TouchableOpacity onPress={this.onInitHandler}>
+					<Text style={styles.button}>Initialize</Text>
+				</TouchableOpacity>
+				<TouchableOpacity onPress={this.onExecuteHandler}>
+					<Text style={styles.button}>Execute</Text>
+				</TouchableOpacity>
+			</View>
+			<RoktWidget ref={this.widgetRef1} palcementName={"Location1"} ></RoktWidget>
+			<RoktWidget ref={this.widgetRef2} palcementName={"Location"} ></RoktWidget>
+			<View style={styles.afterWidget}/>
+		</ScrollView>
+	</SafeAreaView>);
   }
 }
 
