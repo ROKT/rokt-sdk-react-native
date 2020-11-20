@@ -8,6 +8,9 @@
 #import "RoktEventManager.h"
 
 @implementation RoktEventManager
+{
+  bool hasListeners;
+}
 
 RCT_EXPORT_MODULE();
 
@@ -21,6 +24,18 @@ RCT_EXPORT_MODULE();
 }
 
 
+
+// Will be called when this module's first listener is added.
+-(void)startObserving {
+    hasListeners = YES;
+}
+
+// Will be called when this module's last listener is removed, or on dealloc.
+-(void)stopObserving {
+    hasListeners = NO;
+}
+
+
 - (NSArray<NSString *> *)supportedEvents
 {
   return @[@"WidgetHeightChanges"];
@@ -28,9 +43,11 @@ RCT_EXPORT_MODULE();
 
 - (void)onWidgetHeightChanges:(CGFloat)widgetHeight placement:(NSString*) selectedPlacement
 {
-    [self sendEventWithName:@"WidgetHeightChanges" body:@{@"height": [NSNumber numberWithDouble: widgetHeight],
-                                                          @"selectedPlacement": selectedPlacement
-    }];
+    if (hasListeners) {
+        [self sendEventWithName:@"WidgetHeightChanges" body:@{@"height": [NSNumber numberWithDouble: widgetHeight],
+                                                              @"selectedPlacement": selectedPlacement
+        }];
+    }
 }
 
 @end

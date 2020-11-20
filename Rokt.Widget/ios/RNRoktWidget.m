@@ -32,8 +32,6 @@ RCT_EXPORT_METHOD(execute:(NSString *)viewName
                   callback:(RCTResponseSenderBlock)callback
                 )
 {
-    RCTLog(@"haha #%@", placeholders.description);
-    RCTLog(@"Something #%@", self.bridge.uiManager.description);
     
     NSMutableDictionary *nativePlaceholders = [[NSMutableDictionary alloc]initWithCapacity:10];
     
@@ -54,9 +52,6 @@ RCT_EXPORT_METHOD(execute:(NSString *)viewName
             
         }
         
-        
-        RCTLog(@"at last #%@", nativePlaceholders.description);
-
         RoktEventManager *event = [RoktEventManager allocWithZone: nil];
 
         

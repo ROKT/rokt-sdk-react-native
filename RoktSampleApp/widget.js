@@ -55,6 +55,10 @@ class RoktWidget extends Component {
 
     // Don't forget to unsubscribe, typically in componentWillUnmount
 // subscription.remove();
+    componentWillUnmount(){
+      this.subscription.remove();
+    }
+
   }
 
   const WidgetNativeComponent = requireNativeComponent('RoktNativeWidget')

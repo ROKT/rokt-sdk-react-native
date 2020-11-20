@@ -73,7 +73,7 @@ export default class App extends Component {
 				</TouchableOpacity>
 			</View>
 			<RoktWidget ref={this.widgetRef1} palcementName={"Location1"} ></RoktWidget>
-			<RoktWidget ref={this.widgetRef2} palcementName={"Location"} ></RoktWidget>
+			<RoktWidget ref={this.widgetRef2} palcementName={"Location2"} ></RoktWidget>
 			<View style={styles.afterWidget}/>
 		</ScrollView>
 	</SafeAreaView>);
