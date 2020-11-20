@@ -21,9 +21,7 @@ class RoktWidget extends Component {
     constructor(props){
         super(props);
 
-        this.state = { height: 0,  palcementName: this.props.palcementName, marginTop: 0, marginRight: 0, marginLeft: 0, marginBottom: 0};
-        this.onWidgetHeightChanged = this.onWidgetHeightChanged.bind(this);
-        this.onWidgetMarginChanged = this.onWidgetMarginChanged.bind(this);
+         this.state = { height: 0,  palcementName: this.props.palcementName};
     }
 
     render() {
@@ -32,8 +30,6 @@ class RoktWidget extends Component {
       );
     }
 
-    // Don't forget to unsubscribe, typically in componentWillUnmount
-// subscription.remove();
     componentWillUnmount(){
       this.subscription.remove();
     }
