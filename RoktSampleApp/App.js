@@ -9,7 +9,7 @@
 import React, {Component} from 'react';
 import {Platform, StyleSheet, Text, View,findNodeHandle, TouchableOpacity, SafeAreaView, ScrollView} from 'react-native';
 import Rokt from './native-modules/rokt-module'
-import RoktWidget from './widget'
+import RoktWidget from './widget.android'
 const instructions = Platform.select({
   ios: 'Press Cmd+R to reload,\n' + 'Cmd+D or shake for dev menu',
   android:

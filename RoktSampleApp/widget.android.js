@@ -1,25 +1,9 @@
 // Widget.js
-import { requireNativeComponent , StyleSheet, NativeEventEmitter, NativeModules} from 'react-native';
+import { requireNativeComponent , StyleSheet, NativeModules} from 'react-native';
 import React, {Component} from 'react';
 const { RoktEventManager } = NativeModules;
 
-const eventManagerEmitter = new NativeEventEmitter(RoktEventManager);
-
-
-
 class RoktWidget extends Component {
-
-
-  subscription = eventManagerEmitter.addListener(
-    'WidgetHeightChanges',
-    (widgetChanges) => {
-      console.log
-      if (widgetChanges.selectedPlacement == this.state.palcementName) {
-        this.state.height = parseInt(widgetChanges.height);
-        this.forceUpdate();
-      } 
-    }
-  );
 
     constructor(props){
         super(props);
@@ -34,10 +18,7 @@ class RoktWidget extends Component {
          this.forceUpdate();
      }
 
-
      onWidgetMarginChanged(event: Event) {   
-
-      console.log("marginTop " +  event.nativeEvent.marginTop);
       this.state.marginTop = parseInt(event.nativeEvent.marginTop);
       this.state.marginLeft = parseInt(event.nativeEvent.marginLeft);
       this.state.marginRight = parseInt(event.nativeEvent.marginRight);
@@ -52,13 +33,6 @@ class RoktWidget extends Component {
           onWidgetMarginChanged={this.onWidgetMarginChanged}/>
       );
     }
-
-    // Don't forget to unsubscribe, typically in componentWillUnmount
-// subscription.remove();
-    componentWillUnmount(){
-      this.subscription.remove();
-    }
-
   }
 
   const WidgetNativeComponent = requireNativeComponent('RoktNativeWidget')
