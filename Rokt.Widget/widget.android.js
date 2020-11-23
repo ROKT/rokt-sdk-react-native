@@ -1,7 +1,6 @@
 // Widget.js
-import { requireNativeComponent , StyleSheet, NativeModules} from 'react-native';
+import { requireNativeComponent , StyleSheet} from 'react-native';
 import React, {Component} from 'react';
-const { RoktEventManager } = NativeModules;
 
 class RoktWidget extends Component {
 

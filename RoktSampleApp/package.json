@@ -13,7 +13,7 @@
   "dependencies": {
     "react": "16.11.0",
     "react-native": "^0.62.2",
-    "react-native-rokt-widget": "file:../Rokt.Widget"
+    "react-native-rokt-widget": "file:../Rokt.Widget/react-native-rokt-widget-1.0.7.tgz"
   },
   "devDependencies": {
     "@babel/core": "^7.6.2",
