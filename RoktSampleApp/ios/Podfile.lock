@@ -243,7 +243,7 @@ PODS:
     - ReactCommon/callinvoker (= 0.62.2)
   - rokt-sdk-react-native (2.0.0-alpha.2):
     - React
-    - Rokt-Widget
+    - Rokt-Widget (~> 3.3.0)
   - Rokt-Widget (3.3.0)
   - Yoga (1.14.0)
 
@@ -276,7 +276,6 @@ DEPENDENCIES:
   - ReactCommon/callinvoker (from `../node_modules/react-native/ReactCommon`)
   - ReactCommon/turbomodule/core (from `../node_modules/react-native/ReactCommon`)
   - rokt-sdk-react-native (from `../../Rokt.Widget`)
-  - Rokt-Widget (= 3.3.0)
   - Yoga (from `../node_modules/react-native/ReactCommon/yoga`)
 
 SPEC REPOS:
@@ -364,10 +363,10 @@ SPEC CHECKSUMS:
   React-RCTText: fae545b10cfdb3d247c36c56f61a94cfd6dba41d
   React-RCTVibration: 4356114dbcba4ce66991096e51a66e61eda51256
   ReactCommon: ed4e11d27609d571e7eee8b65548efc191116eb3
-  rokt-sdk-react-native: c41c4556fc61ff0c1f292f70b27bc140a5967798
+  rokt-sdk-react-native: 3835132c0d131c11e16b9b3e46ec107f33728d1a
   Rokt-Widget: 9ae97aa12503e62d2665e29323656b3a2ddc29bb
   Yoga: 3ebccbdd559724312790e7742142d062476b698e
 
-PODFILE CHECKSUM: cf3a1419fab97338d79a3312c35eeb83df968cce
+PODFILE CHECKSUM: 6743cdf244b3cf16b358cfeec87e1c3e01df68f7
 
 COCOAPODS: 1.8.4

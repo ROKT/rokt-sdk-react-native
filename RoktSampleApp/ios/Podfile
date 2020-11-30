@@ -7,7 +7,6 @@ target 'RoktSampleApp' do
 #  use_frameworks!
 
   #Pods for RoktSampleApp
-  pod 'Rokt-Widget', '3.3.0'
   pod 'FBLazyVector', :path => "../node_modules/react-native/Libraries/FBLazyVector"
   pod 'FBReactNativeSpec', :path => "../node_modules/react-native/Libraries/FBReactNativeSpec"
   pod 'RCTRequired', :path => "../node_modules/react-native/Libraries/RCTRequired"

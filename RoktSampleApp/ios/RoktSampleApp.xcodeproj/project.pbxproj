@@ -12,7 +12,7 @@
 		13B07FBD1A68108700A75B9A /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB11A68108700A75B9A /* LaunchScreen.xib */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
-		27370100878890EC2BB8612B /* libPods-RoktSampleApp-tvOSTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 06874726551B3833D93A17B0 /* libPods-RoktSampleApp-tvOSTests.a */; };
+		1A155976CA16416263095436 /* libPods-RoktSampleApp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D8D351F4CD89E951298F412 /* libPods-RoktSampleApp.a */; };
 		2D02E4BC1E0B4A80006451C7 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.m */; };
 		2D02E4BD1E0B4A84006451C7 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		2D02E4BF1E0B4AB3006451C7 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
@@ -26,9 +26,9 @@
 		2D16E6881FA4F8E400B85C8A /* libReact.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2D16E6891FA4F8E400B85C8A /* libReact.a */; };
 		2DCD954D1E0B4F2C00145EB5 /* RoktSampleAppTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 00E356F21AD99517003FC87E /* RoktSampleAppTests.m */; };
 		2DF0FFEE2056DD460020B375 /* libReact.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DAD3EA31DF850E9000B6D8A /* libReact.a */; };
-		3037684CE2AE5D02A0C25906 /* libPods-RoktSampleApp-tvOS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3E972EC90C0FD03E0DA02E5A /* libPods-RoktSampleApp-tvOS.a */; };
-		DB93CFC42F744E520FAA0B34 /* libPods-RoktSampleApp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 615CA262C7DCD1EDE155987A /* libPods-RoktSampleApp.a */; };
-		F5A827A591763B55F4F10971 /* libPods-RoktSampleApp-RoktSampleAppTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = AE64CE7D27C4C91719411437 /* libPods-RoktSampleApp-RoktSampleAppTests.a */; };
+		8DB8A98AA61BBD157C2B9ADD /* libPods-RoktSampleApp-tvOSTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E37A181F450018533017B2A5 /* libPods-RoktSampleApp-tvOSTests.a */; };
+		A3D6A9C7C730115DCC3AC151 /* libPods-RoktSampleApp-tvOS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3C2C90604B9142197D21769C /* libPods-RoktSampleApp-tvOS.a */; };
+		B048676435D1A5875A8180A0 /* libPods-RoktSampleApp-RoktSampleAppTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 087423F76702FBAF07DADBF8 /* libPods-RoktSampleApp-RoktSampleAppTests.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -317,7 +317,9 @@
 		00E356EE1AD99517003FC87E /* RoktSampleAppTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RoktSampleAppTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		00E356F11AD99517003FC87E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		00E356F21AD99517003FC87E /* RoktSampleAppTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RoktSampleAppTests.m; sourceTree = "<group>"; };
-		06874726551B3833D93A17B0 /* libPods-RoktSampleApp-tvOSTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-RoktSampleApp-tvOSTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		066EF3A7D25726CFDE39ECF4 /* Pods-RoktSampleApp-RoktSampleAppTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RoktSampleApp-RoktSampleAppTests.release.xcconfig"; path = "Target Support Files/Pods-RoktSampleApp-RoktSampleAppTests/Pods-RoktSampleApp-RoktSampleAppTests.release.xcconfig"; sourceTree = "<group>"; };
+		087423F76702FBAF07DADBF8 /* libPods-RoktSampleApp-RoktSampleAppTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-RoktSampleApp-RoktSampleAppTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		0CEE7F71F8BFB6E28182ACEE /* Pods-RoktSampleApp-RoktSampleAppTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RoktSampleApp-RoktSampleAppTests.debug.xcconfig"; path = "Target Support Files/Pods-RoktSampleApp-RoktSampleAppTests/Pods-RoktSampleApp-RoktSampleAppTests.debug.xcconfig"; sourceTree = "<group>"; };
 		139105B61AF99BAD00B5F7CC /* RCTSettings.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTSettings.xcodeproj; path = "../node_modules/react-native/Libraries/Settings/RCTSettings.xcodeproj"; sourceTree = "<group>"; };
 		139FDEE61B06529A00C62182 /* RCTWebSocket.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTWebSocket.xcodeproj; path = "../node_modules/react-native/Libraries/WebSocket/RCTWebSocket.xcodeproj"; sourceTree = "<group>"; };
 		13B07F961A680F5B00A75B9A /* RoktSampleApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RoktSampleApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -331,21 +333,19 @@
 		2D02E47B1E0B4A5D006451C7 /* RoktSampleApp-tvOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "RoktSampleApp-tvOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		2D02E4901E0B4A5D006451C7 /* RoktSampleApp-tvOSTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "RoktSampleApp-tvOSTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		2D16E6891FA4F8E400B85C8A /* libReact.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = libReact.a; sourceTree = BUILT_PRODUCTS_DIR; };
-		348D51FD4DA517352F2E8413 /* Pods-RoktSampleApp-tvOSTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RoktSampleApp-tvOSTests.release.xcconfig"; path = "Target Support Files/Pods-RoktSampleApp-tvOSTests/Pods-RoktSampleApp-tvOSTests.release.xcconfig"; sourceTree = "<group>"; };
-		3E972EC90C0FD03E0DA02E5A /* libPods-RoktSampleApp-tvOS.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-RoktSampleApp-tvOS.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		4468D7F18D8B767147575C7E /* Pods-RoktSampleApp-tvOS.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RoktSampleApp-tvOS.release.xcconfig"; path = "Target Support Files/Pods-RoktSampleApp-tvOS/Pods-RoktSampleApp-tvOS.release.xcconfig"; sourceTree = "<group>"; };
+		3C2C90604B9142197D21769C /* libPods-RoktSampleApp-tvOS.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-RoktSampleApp-tvOS.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		4D8D351F4CD89E951298F412 /* libPods-RoktSampleApp.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-RoktSampleApp.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		5E91572D1DD0AC6500FF2AA8 /* RCTAnimation.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTAnimation.xcodeproj; path = "../node_modules/react-native/Libraries/NativeAnimation/RCTAnimation.xcodeproj"; sourceTree = "<group>"; };
-		615CA262C7DCD1EDE155987A /* libPods-RoktSampleApp.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-RoktSampleApp.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		75B05EC4036157D6A878FBB1 /* Pods-RoktSampleApp-RoktSampleAppTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RoktSampleApp-RoktSampleAppTests.release.xcconfig"; path = "Target Support Files/Pods-RoktSampleApp-RoktSampleAppTests/Pods-RoktSampleApp-RoktSampleAppTests.release.xcconfig"; sourceTree = "<group>"; };
+		6C56E6E405CB6FB26D63C602 /* Pods-RoktSampleApp-tvOS.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RoktSampleApp-tvOS.release.xcconfig"; path = "Target Support Files/Pods-RoktSampleApp-tvOS/Pods-RoktSampleApp-tvOS.release.xcconfig"; sourceTree = "<group>"; };
+		6D3E13C03FCA2578EFB1DA24 /* Pods-RoktSampleApp.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RoktSampleApp.debug.xcconfig"; path = "Target Support Files/Pods-RoktSampleApp/Pods-RoktSampleApp.debug.xcconfig"; sourceTree = "<group>"; };
 		78C398B01ACF4ADC00677621 /* RCTLinking.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTLinking.xcodeproj; path = "../node_modules/react-native/Libraries/LinkingIOS/RCTLinking.xcodeproj"; sourceTree = "<group>"; };
+		7C2AAA6622BBCB4CC7F3FAF4 /* Pods-RoktSampleApp-tvOSTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RoktSampleApp-tvOSTests.release.xcconfig"; path = "Target Support Files/Pods-RoktSampleApp-tvOSTests/Pods-RoktSampleApp-tvOSTests.release.xcconfig"; sourceTree = "<group>"; };
 		832341B01AAA6A8300B99B32 /* RCTText.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTText.xcodeproj; path = "../node_modules/react-native/Libraries/Text/RCTText.xcodeproj"; sourceTree = "<group>"; };
+		8B4AD456B4BC0A9D368636CA /* Pods-RoktSampleApp.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RoktSampleApp.release.xcconfig"; path = "Target Support Files/Pods-RoktSampleApp/Pods-RoktSampleApp.release.xcconfig"; sourceTree = "<group>"; };
+		927864C392B7CD6A25A41048 /* Pods-RoktSampleApp-tvOSTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RoktSampleApp-tvOSTests.debug.xcconfig"; path = "Target Support Files/Pods-RoktSampleApp-tvOSTests/Pods-RoktSampleApp-tvOSTests.debug.xcconfig"; sourceTree = "<group>"; };
 		ADBDB91F1DFEBF0600ED6528 /* RCTBlob.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTBlob.xcodeproj; path = "../node_modules/react-native/Libraries/Blob/RCTBlob.xcodeproj"; sourceTree = "<group>"; };
-		AE64CE7D27C4C91719411437 /* libPods-RoktSampleApp-RoktSampleAppTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-RoktSampleApp-RoktSampleAppTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		C1D3237312C55C7C4F44823F /* Pods-RoktSampleApp.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RoktSampleApp.debug.xcconfig"; path = "Target Support Files/Pods-RoktSampleApp/Pods-RoktSampleApp.debug.xcconfig"; sourceTree = "<group>"; };
-		C35C3F20E96132EADD9EC85B /* Pods-RoktSampleApp.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RoktSampleApp.release.xcconfig"; path = "Target Support Files/Pods-RoktSampleApp/Pods-RoktSampleApp.release.xcconfig"; sourceTree = "<group>"; };
-		E1D34E00BC8E9AE12AEFC051 /* Pods-RoktSampleApp-tvOSTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RoktSampleApp-tvOSTests.debug.xcconfig"; path = "Target Support Files/Pods-RoktSampleApp-tvOSTests/Pods-RoktSampleApp-tvOSTests.debug.xcconfig"; sourceTree = "<group>"; };
-		E236355C4B70AF86A63F768B /* Pods-RoktSampleApp-RoktSampleAppTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RoktSampleApp-RoktSampleAppTests.debug.xcconfig"; path = "Target Support Files/Pods-RoktSampleApp-RoktSampleAppTests/Pods-RoktSampleApp-RoktSampleAppTests.debug.xcconfig"; sourceTree = "<group>"; };
-		EAA337F82E80A066876C05D7 /* Pods-RoktSampleApp-tvOS.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RoktSampleApp-tvOS.debug.xcconfig"; path = "Target Support Files/Pods-RoktSampleApp-tvOS/Pods-RoktSampleApp-tvOS.debug.xcconfig"; sourceTree = "<group>"; };
+		CA1B22248C2494BFBA885947 /* Pods-RoktSampleApp-tvOS.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RoktSampleApp-tvOS.debug.xcconfig"; path = "Target Support Files/Pods-RoktSampleApp-tvOS/Pods-RoktSampleApp-tvOS.debug.xcconfig"; sourceTree = "<group>"; };
+		E37A181F450018533017B2A5 /* libPods-RoktSampleApp-tvOSTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-RoktSampleApp-tvOSTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -353,7 +353,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				F5A827A591763B55F4F10971 /* libPods-RoktSampleApp-RoktSampleAppTests.a in Frameworks */,
+				B048676435D1A5875A8180A0 /* libPods-RoktSampleApp-RoktSampleAppTests.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -361,7 +361,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				DB93CFC42F744E520FAA0B34 /* libPods-RoktSampleApp.a in Frameworks */,
+				1A155976CA16416263095436 /* libPods-RoktSampleApp.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -377,7 +377,7 @@
 				2D02E4C61E0B4AEC006451C7 /* libRCTSettings-tvOS.a in Frameworks */,
 				2D02E4C71E0B4AEC006451C7 /* libRCTText-tvOS.a in Frameworks */,
 				2D02E4C81E0B4AEC006451C7 /* libRCTWebSocket-tvOS.a in Frameworks */,
-				3037684CE2AE5D02A0C25906 /* libPods-RoktSampleApp-tvOS.a in Frameworks */,
+				A3D6A9C7C730115DCC3AC151 /* libPods-RoktSampleApp-tvOS.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -386,7 +386,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				2DF0FFEE2056DD460020B375 /* libReact.a in Frameworks */,
-				27370100878890EC2BB8612B /* libPods-RoktSampleApp-tvOSTests.a in Frameworks */,
+				8DB8A98AA61BBD157C2B9ADD /* libPods-RoktSampleApp-tvOSTests.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -513,10 +513,10 @@
 			isa = PBXGroup;
 			children = (
 				2D16E6891FA4F8E400B85C8A /* libReact.a */,
-				3E972EC90C0FD03E0DA02E5A /* libPods-RoktSampleApp-tvOS.a */,
-				06874726551B3833D93A17B0 /* libPods-RoktSampleApp-tvOSTests.a */,
-				615CA262C7DCD1EDE155987A /* libPods-RoktSampleApp.a */,
-				AE64CE7D27C4C91719411437 /* libPods-RoktSampleApp-RoktSampleAppTests.a */,
+				4D8D351F4CD89E951298F412 /* libPods-RoktSampleApp.a */,
+				087423F76702FBAF07DADBF8 /* libPods-RoktSampleApp-RoktSampleAppTests.a */,
+				3C2C90604B9142197D21769C /* libPods-RoktSampleApp-tvOS.a */,
+				E37A181F450018533017B2A5 /* libPods-RoktSampleApp-tvOSTests.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -524,14 +524,14 @@
 		3B5D04759E72680C735E9369 /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				C1D3237312C55C7C4F44823F /* Pods-RoktSampleApp.debug.xcconfig */,
-				C35C3F20E96132EADD9EC85B /* Pods-RoktSampleApp.release.xcconfig */,
-				E236355C4B70AF86A63F768B /* Pods-RoktSampleApp-RoktSampleAppTests.debug.xcconfig */,
-				75B05EC4036157D6A878FBB1 /* Pods-RoktSampleApp-RoktSampleAppTests.release.xcconfig */,
-				EAA337F82E80A066876C05D7 /* Pods-RoktSampleApp-tvOS.debug.xcconfig */,
-				4468D7F18D8B767147575C7E /* Pods-RoktSampleApp-tvOS.release.xcconfig */,
-				E1D34E00BC8E9AE12AEFC051 /* Pods-RoktSampleApp-tvOSTests.debug.xcconfig */,
-				348D51FD4DA517352F2E8413 /* Pods-RoktSampleApp-tvOSTests.release.xcconfig */,
+				6D3E13C03FCA2578EFB1DA24 /* Pods-RoktSampleApp.debug.xcconfig */,
+				8B4AD456B4BC0A9D368636CA /* Pods-RoktSampleApp.release.xcconfig */,
+				0CEE7F71F8BFB6E28182ACEE /* Pods-RoktSampleApp-RoktSampleAppTests.debug.xcconfig */,
+				066EF3A7D25726CFDE39ECF4 /* Pods-RoktSampleApp-RoktSampleAppTests.release.xcconfig */,
+				CA1B22248C2494BFBA885947 /* Pods-RoktSampleApp-tvOS.debug.xcconfig */,
+				6C56E6E405CB6FB26D63C602 /* Pods-RoktSampleApp-tvOS.release.xcconfig */,
+				927864C392B7CD6A25A41048 /* Pods-RoktSampleApp-tvOSTests.debug.xcconfig */,
+				7C2AAA6622BBCB4CC7F3FAF4 /* Pods-RoktSampleApp-tvOSTests.release.xcconfig */,
 			);
 			path = Pods;
 			sourceTree = "<group>";
@@ -632,12 +632,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 00E357021AD99517003FC87E /* Build configuration list for PBXNativeTarget "RoktSampleAppTests" */;
 			buildPhases = (
-				79F35FA77F37FB782636FDB0 /* [CP] Check Pods Manifest.lock */,
+				43E40CF20240FBCC8D1FE806 /* [CP] Check Pods Manifest.lock */,
 				00E356EA1AD99517003FC87E /* Sources */,
 				00E356EB1AD99517003FC87E /* Frameworks */,
 				00E356EC1AD99517003FC87E /* Resources */,
-				CCC0C87A6B6D358A00710C24 /* [CP] Embed Pods Frameworks */,
-				62A22677D35135FBE23D25D6 /* [CP] Copy Pods Resources */,
+				AD4F7F7FFD2EDA7414BCE324 /* [CP] Embed Pods Frameworks */,
+				A35FC7E0E54F27D96E0F6557 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -653,13 +653,13 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "RoktSampleApp" */;
 			buildPhases = (
-				3090952B1E024D452EA47658 /* [CP] Check Pods Manifest.lock */,
+				28049B497607454B30FEF0D0 /* [CP] Check Pods Manifest.lock */,
 				13B07F871A680F5B00A75B9A /* Sources */,
 				13B07F8C1A680F5B00A75B9A /* Frameworks */,
 				13B07F8E1A680F5B00A75B9A /* Resources */,
 				00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */,
-				1B9027FF536732A11D7A0C2B /* [CP] Embed Pods Frameworks */,
-				958C5F3C63F8D53AA7FF8276 /* [CP] Copy Pods Resources */,
+				67B7F5367A7BF21B300AB964 /* [CP] Embed Pods Frameworks */,
+				9F7EB8D1B0FB6E5F7A9D70D7 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -674,7 +674,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 2D02E4BA1E0B4A5E006451C7 /* Build configuration list for PBXNativeTarget "RoktSampleApp-tvOS" */;
 			buildPhases = (
-				5FD5E5656403DB1B4DFC5564 /* [CP] Check Pods Manifest.lock */,
+				9FCCC4399954AF69B7B3392A /* [CP] Check Pods Manifest.lock */,
 				2D02E4771E0B4A5D006451C7 /* Sources */,
 				2D02E4781E0B4A5D006451C7 /* Frameworks */,
 				2D02E4791E0B4A5D006451C7 /* Resources */,
@@ -693,7 +693,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 2D02E4BB1E0B4A5E006451C7 /* Build configuration list for PBXNativeTarget "RoktSampleApp-tvOSTests" */;
 			buildPhases = (
-				884234F8F1FBCD8E9737A6A5 /* [CP] Check Pods Manifest.lock */,
+				9038B5736E22440E1EF5B582 /* [CP] Check Pods Manifest.lock */,
 				2D02E48C1E0B4A5D006451C7 /* Sources */,
 				2D02E48D1E0B4A5D006451C7 /* Frameworks */,
 				2D02E48E1E0B4A5D006451C7 /* Resources */,
@@ -1115,39 +1115,7 @@
 			shellPath = /bin/sh;
 			shellScript = "export NODE_BINARY=node\n../node_modules/react-native/scripts/react-native-xcode.sh";
 		};
-		1B9027FF536732A11D7A0C2B /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-RoktSampleApp/Pods-RoktSampleApp-frameworks.sh",
-				"${PODS_ROOT}/Rokt-Widget/Rokt-Widget/Rokt_Widget.framework",
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputPaths = (
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Rokt_Widget.framework",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-RoktSampleApp/Pods-RoktSampleApp-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		2D02E4CB1E0B4B27006451C7 /* Bundle React Native Code And Images */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "Bundle React Native Code And Images";
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "export NODE_BINARY=node\n../node_modules/react-native/scripts/react-native-xcode.sh";
-		};
-		3090952B1E024D452EA47658 /* [CP] Check Pods Manifest.lock */ = {
+		28049B497607454B30FEF0D0 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -1169,48 +1137,21 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		5FD5E5656403DB1B4DFC5564 /* [CP] Check Pods Manifest.lock */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
-				"${PODS_ROOT}/Manifest.lock",
-			);
-			name = "[CP] Check Pods Manifest.lock";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-RoktSampleApp-tvOS-checkManifestLockResult.txt",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
-			showEnvVarsInLog = 0;
-		};
-		62A22677D35135FBE23D25D6 /* [CP] Copy Pods Resources */ = {
+		2D02E4CB1E0B4B27006451C7 /* Bundle React Native Code And Images */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-RoktSampleApp-RoktSampleAppTests/Pods-RoktSampleApp-RoktSampleAppTests-resources.sh",
-				"${PODS_ROOT}/Rokt-Widget/Rokt-Widget/Rokt_Widget.framework/Rokt-Widget.bundle",
-				"${PODS_CONFIGURATION_BUILD_DIR}/Rokt-Widget/Rokt-Widget.bundle",
 			);
-			name = "[CP] Copy Pods Resources";
+			name = "Bundle React Native Code And Images";
 			outputPaths = (
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/Rokt-Widget.bundle",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-RoktSampleApp-RoktSampleAppTests/Pods-RoktSampleApp-RoktSampleAppTests-resources.sh\"\n";
-			showEnvVarsInLog = 0;
+			shellScript = "export NODE_BINARY=node\n../node_modules/react-native/scripts/react-native-xcode.sh";
 		};
-		79F35FA77F37FB782636FDB0 /* [CP] Check Pods Manifest.lock */ = {
+		43E40CF20240FBCC8D1FE806 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -1232,7 +1173,25 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		884234F8F1FBCD8E9737A6A5 /* [CP] Check Pods Manifest.lock */ = {
+		67B7F5367A7BF21B300AB964 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-RoktSampleApp/Pods-RoktSampleApp-frameworks.sh",
+				"${PODS_ROOT}/Rokt-Widget/Rokt-Widget/Rokt_Widget.framework",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputPaths = (
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Rokt_Widget.framework",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-RoktSampleApp/Pods-RoktSampleApp-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		9038B5736E22440E1EF5B582 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -1254,7 +1213,7 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		958C5F3C63F8D53AA7FF8276 /* [CP] Copy Pods Resources */ = {
+		9F7EB8D1B0FB6E5F7A9D70D7 /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -1273,7 +1232,48 @@
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-RoktSampleApp/Pods-RoktSampleApp-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		CCC0C87A6B6D358A00710C24 /* [CP] Embed Pods Frameworks */ = {
+		9FCCC4399954AF69B7B3392A /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-RoktSampleApp-tvOS-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		A35FC7E0E54F27D96E0F6557 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-RoktSampleApp-RoktSampleAppTests/Pods-RoktSampleApp-RoktSampleAppTests-resources.sh",
+				"${PODS_ROOT}/Rokt-Widget/Rokt-Widget/Rokt_Widget.framework/Rokt-Widget.bundle",
+				"${PODS_CONFIGURATION_BUILD_DIR}/Rokt-Widget/Rokt-Widget.bundle",
+			);
+			name = "[CP] Copy Pods Resources";
+			outputPaths = (
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/Rokt-Widget.bundle",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-RoktSampleApp-RoktSampleAppTests/Pods-RoktSampleApp-RoktSampleAppTests-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		AD4F7F7FFD2EDA7414BCE324 /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -1358,7 +1358,7 @@
 /* Begin XCBuildConfiguration section */
 		00E356F61AD99517003FC87E /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = E236355C4B70AF86A63F768B /* Pods-RoktSampleApp-RoktSampleAppTests.debug.xcconfig */;
+			baseConfigurationReference = 0CEE7F71F8BFB6E28182ACEE /* Pods-RoktSampleApp-RoktSampleAppTests.debug.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -1384,7 +1384,7 @@
 		};
 		00E356F71AD99517003FC87E /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 75B05EC4036157D6A878FBB1 /* Pods-RoktSampleApp-RoktSampleAppTests.release.xcconfig */;
+			baseConfigurationReference = 066EF3A7D25726CFDE39ECF4 /* Pods-RoktSampleApp-RoktSampleAppTests.release.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				COPY_PHASE_STRIP = NO;
@@ -1407,7 +1407,7 @@
 		};
 		13B07F941A680F5B00A75B9A /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = C1D3237312C55C7C4F44823F /* Pods-RoktSampleApp.debug.xcconfig */;
+			baseConfigurationReference = 6D3E13C03FCA2578EFB1DA24 /* Pods-RoktSampleApp.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CURRENT_PROJECT_VERSION = 1;
@@ -1430,7 +1430,7 @@
 		};
 		13B07F951A680F5B00A75B9A /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = C35C3F20E96132EADD9EC85B /* Pods-RoktSampleApp.release.xcconfig */;
+			baseConfigurationReference = 8B4AD456B4BC0A9D368636CA /* Pods-RoktSampleApp.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CURRENT_PROJECT_VERSION = 1;
@@ -1452,7 +1452,7 @@
 		};
 		2D02E4971E0B4A5E006451C7 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = EAA337F82E80A066876C05D7 /* Pods-RoktSampleApp-tvOS.debug.xcconfig */;
+			baseConfigurationReference = CA1B22248C2494BFBA885947 /* Pods-RoktSampleApp-tvOS.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = "App Icon & Top Shelf Image";
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
@@ -1482,7 +1482,7 @@
 		};
 		2D02E4981E0B4A5E006451C7 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 4468D7F18D8B767147575C7E /* Pods-RoktSampleApp-tvOS.release.xcconfig */;
+			baseConfigurationReference = 6C56E6E405CB6FB26D63C602 /* Pods-RoktSampleApp-tvOS.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = "App Icon & Top Shelf Image";
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
@@ -1512,7 +1512,7 @@
 		};
 		2D02E4991E0B4A5E006451C7 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = E1D34E00BC8E9AE12AEFC051 /* Pods-RoktSampleApp-tvOSTests.debug.xcconfig */;
+			baseConfigurationReference = 927864C392B7CD6A25A41048 /* Pods-RoktSampleApp-tvOSTests.debug.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CLANG_ANALYZER_NONNULL = YES;
@@ -1541,7 +1541,7 @@
 		};
 		2D02E49A1E0B4A5E006451C7 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 348D51FD4DA517352F2E8413 /* Pods-RoktSampleApp-tvOSTests.release.xcconfig */;
+			baseConfigurationReference = 7C2AAA6622BBCB4CC7F3FAF4 /* Pods-RoktSampleApp-tvOSTests.release.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CLANG_ANALYZER_NONNULL = YES;
