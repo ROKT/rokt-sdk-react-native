@@ -241,7 +241,7 @@ PODS:
     - React-cxxreact (= 0.62.2)
     - React-jsi (= 0.62.2)
     - ReactCommon/callinvoker (= 0.62.2)
-  - rokt-sdk-react-native (1.0.7):
+  - rokt-sdk-react-native (2.0.0-alpha.2):
     - React
     - Rokt-Widget
   - Rokt-Widget (3.3.0)
@@ -364,10 +364,10 @@ SPEC CHECKSUMS:
   React-RCTText: fae545b10cfdb3d247c36c56f61a94cfd6dba41d
   React-RCTVibration: 4356114dbcba4ce66991096e51a66e61eda51256
   ReactCommon: ed4e11d27609d571e7eee8b65548efc191116eb3
-  rokt-sdk-react-native: f916d6c53b52cfba9e3f2b78913d639643e2275d
+  rokt-sdk-react-native: c41c4556fc61ff0c1f292f70b27bc140a5967798
   Rokt-Widget: 9ae97aa12503e62d2665e29323656b3a2ddc29bb
   Yoga: 3ebccbdd559724312790e7742142d062476b698e
 
 PODFILE CHECKSUM: cf3a1419fab97338d79a3312c35eeb83df968cce
 
-COCOAPODS: 1.10.0
+COCOAPODS: 1.8.4

@@ -1,6 +1,6 @@
 {
   "name": "react-native-rokt-widget",
-  "version": "1.0.7",
+  "version": "2.0.0-alpha.2",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -10,13 +10,12 @@
     "rokt widget"
   ],
   "author": "",
-  "license": "Copyright 2018 Rokt Pte Ltd",
+  "license": "Copyright 2020 Rokt Pte Ltd",
   "devDependencies": {
-    "jetifier": "^1.6.6"
-  },
-  "dependencies": {
+    "jetifier": "^1.6.6",
     "react": "16.11.0",
     "react-native": "0.62.2",
     "react-native-sentry": "^0.14.16"
-  }
+  },
+  "dependencies": {}
 }

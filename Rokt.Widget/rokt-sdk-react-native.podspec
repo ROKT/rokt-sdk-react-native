@@ -10,12 +10,12 @@ Pod::Spec.new do |s|
   s.license      = package["license"]
   s.authors      = package["author"]
   #   todo change 
-  s.homepage     = "test"
-  s.summary      = "test"
+  s.homepage     = "https://github.com/ROKT/rokt-sdk-react-native"
+  s.summary      = "Rokt Mobile SDK to integrate ROKT Api into React Native iOS application"
 
   s.platforms    = { :ios => "9.0" }
 #   todo change 
-  s.source       = { :git => "https://github.com/danial-rokt/test.git", :tag => "#{s.version}" }
+  s.source       = { :git => "https://github.com/ROKT/rokt-sdk-react-native", :tag => "#{s.version}" }
 
   
   s.source_files = "ios/**/*.*"
