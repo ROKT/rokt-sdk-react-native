@@ -28,8 +28,22 @@ allprojects {
 }
 ```
 
+#### File: MainApplication.java (Module: app)
+2. In your ReactApplication class, make sure you add the RoktWidgetViewPackage to the getPackages method:
+```
+        @Override
+        protected List<ReactPackage> getPackages() {
+          @SuppressWarnings("UnnecessaryLocalVariable")
+          List<ReactPackage> packages = new PackageList(this).getPackages();
+
+          //Add the RoktWidgetViewPackage
+          packages.add(new RoktWidgetViewPackage());
+          return packages;
+        }
+ ```
+
 #### File: .gradle (Module: app)
-2. It's likely that you will need multiDexEnabled as well, if so, you can enable it like this:
+3. It's likely that you will need multiDexEnabled as well, if so, you can enable it like this:
 ```
 android {
     ...
