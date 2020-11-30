@@ -51,7 +51,6 @@ dependencies {
     ...
      
     implementation 'com.rokt:roktsdk:1.16'
-    implementation 'com.google.android.gms:play-services-ads:X.X.X'
     ...
 }
 ```
