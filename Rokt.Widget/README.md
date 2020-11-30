@@ -16,7 +16,8 @@ run `$ npm install`
 
 ### Gradle Configurations (Added to your Project's gradle files):
 #### File: .gradle (Project: YourProjectName)
-Add Maven Repository of Rokt SDK
+
+1. Add Maven Repository of Rokt SDK
 ```
 allprojects {
     repositories {
@@ -43,13 +44,16 @@ allprojects {
  ```
 
 #### File: .gradle (Module: app)
-3. It's likely that you will need multiDexEnabled as well, if so, you can enable it like this:
+3. It's likely that you will need multiDexEnabled as well
+4. Make sure you are targeting mindSdk version 18 or higher. 
+
 ```
 android {
     ...
     defaultConfig {
         ...
-        multiDexEnabled true
+        multiDexEnabled true,
+        minSdkVersion 18
     }
 }
 ```
