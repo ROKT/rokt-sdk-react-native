@@ -59,7 +59,6 @@ android {
 ```
 
 ...
-```
 ## iOS Configuration
 
 ### Install the pods
