@@ -29,40 +29,17 @@ allprojects {
 ```
 
 #### File: .gradle (Module: app)
-1. Add DataBinding to Gradle
-2. Very likely that you will need multiDexEnabled as well
-3. In the dependencies section add RoktSdk reference and also Google Play Ads Service
-
+2. It's likely that you will need multiDexEnabled as well, if so, you can enable it like this:
 ```
 android {
-     
     ...
     defaultConfig {
         ...
         multiDexEnabled true
     }
-    ...
-    dataBinding {
-        enabled = true
-    }
-}
-...
-dependencies {
-    ...
-     
-    implementation 'com.rokt:roktsdk:1.16'
-    implementation 'com.google.android.gms:play-services-ads:X.X.X'
-    ...
 }
 ```
 
-
-#### File: gradle.properties
-1. add : android.databinding.enableV2=true
-```
-...
-android.databinding.enableV2=true
- 
 ...
 ```
 ## iOS Configuration
