@@ -1,0 +1,7 @@
+rootProject.name = 'RoktSampleApp'
+include ':react-native-rokt-widget'
+project(':react-native-rokt-widget').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-rokt-widget/android')
+include ':react-native-rokt-widget'
+project(':react-native-rokt-widget').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-rokt-widget/android')
+
+include ':app'
