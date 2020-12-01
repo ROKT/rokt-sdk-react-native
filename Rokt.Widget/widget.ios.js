@@ -1,17 +1,17 @@
-// Widget.js
+// RoktEmbeddedView.js
 import { requireNativeComponent , StyleSheet, NativeEventEmitter, NativeModules} from 'react-native';
 import React, {Component} from 'react';
 const { RoktEventManager } = NativeModules;
 
 const eventManagerEmitter = new NativeEventEmitter(RoktEventManager);
 
-class RoktWidget extends Component {
+class RoktEmbeddedView extends Component {
 
   subscription = eventManagerEmitter.addListener(
     'WidgetHeightChanges',
     (widgetChanges) => {
       console.log
-      if (widgetChanges.selectedPlacement == this.state.palcementName) {
+      if (widgetChanges.selectedPlacement == this.state.placeholderName) {
         this.state.height = parseInt(widgetChanges.height);
         this.forceUpdate();
       } 
@@ -21,7 +21,7 @@ class RoktWidget extends Component {
     constructor(props){
         super(props);
 
-         this.state = { height: 0,  palcementName: this.props.palcementName};
+         this.state = { height: 0,  placeholderName: this.props.placeholderName};
     }
 
     render() {
@@ -44,6 +44,6 @@ class RoktWidget extends Component {
         backgroundColor: 'white' },
     });
   
-  export default RoktWidget;
+  export default RoktEmbeddedView;
 
 
