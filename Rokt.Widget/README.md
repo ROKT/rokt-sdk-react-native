@@ -79,7 +79,7 @@ pod install
 
 #### Import 
 ```
-import {Rokt, RoktWidget} from 'react-native-rokt-widget';;
+import {Rokt, RoktEmbeddedView} from 'react-native-rokt-widget';;
 ```
 
 #### Initialize
@@ -91,7 +91,7 @@ Rokt.initialize( "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" , "1.0");
 
 #### Execute 
 ```
-jenny = {
+attributes = {
       "email": "j.smith@example.com",
       "firstname": "Jenny",
       "lastname": "Smith",
@@ -99,24 +99,24 @@ jenny = {
       "postcode": "90210",
       "country": "US"
 }
-Rokt.execute("RoktExperience", jenny, null,  () => console.log("Widget Loaded"));
+Rokt.execute("RoktExperience", attributes, null,  () => console.log("Placement Loaded"));
 ```
 
 
 ### To launch Embedded placement
 
-#### Create placements
+#### Create placeholder
 ```
   constructor(props){
     super(props);
-    this.widgetRef1 = React.createRef();
+    this.placeholder1 = React.createRef();
   }
 
 ```
 
 in render() 
 ```
-<RoktWidget ref={this.widgetRef1} palcementName={"RoktEmbedded1"} ></RoktWidget>
+<RoktEmbeddedView ref={this.placeholder1} placeholderName={"RoktEmbedded1"} ></RoktEmbeddedView>
 
 ```
 
@@ -124,11 +124,11 @@ in render()
 
 #### Execute
 ```
-placements = {
-      "RoktEmbedded1": findNodeHandle(this.widgetRef1.current)
+placeholders = {
+      "RoktEmbedded1": findNodeHandle(this.placeholder1.current)
 }
 
-jenny = {
+attributes = {
       "email": "j.smith@example.com",
       "firstname": "Jenny",
       "lastname": "Smith",
@@ -136,7 +136,7 @@ jenny = {
       "postcode": "90210",
       "country": "US"
 }
-Rokt.execute("RoktEmbeddedExperience", jenny, placements,  () => console.log("Widget Loaded"));
+Rokt.execute("RoktEmbeddedExperience", attributes, placeholders,  () => console.log("Widget Loaded"));
 ```
 
 
