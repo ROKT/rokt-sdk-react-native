@@ -8,7 +8,7 @@
 
 import React, {Component} from 'react';
 import {Platform, StyleSheet, Text, View,findNodeHandle, TouchableOpacity, SafeAreaView, ScrollView} from 'react-native';
-import {Rokt, RoktWidget, RoktEmbeddedView} from 'react-native-rokt-widget';
+import {Rokt, RoktEmbeddedView} from 'react-native-rokt-widget';
 
 const instructions = Platform.select({
   ios: 'Press Cmd+R to reload,\n' + 'Cmd+D or shake for dev menu',
@@ -17,8 +17,8 @@ const instructions = Platform.select({
     'Shake or press menu button for dev menu',
 });
 
-// const embeddedAndLightbox = "testiOS";
-// const embeddedAndroid = "testAndroidLboxAndE";
+const embeddedAndLightbox = "testiOS";
+const embeddedAndroid = "testAndroidLboxAndE";
 const roktViewName = "testTwoEmbedded"
 
 export default class App extends Component {
@@ -74,7 +74,7 @@ export default class App extends Component {
 			</View>
       {/* <RoktWidget ref={this.widgetRef1} palcementName={"Location1"} ></RoktWidget> */}
 			<RoktEmbeddedView ref={this.placeholder1} placeholderName={"Location1"} ></RoktEmbeddedView>
-			{/* <RoktEmbeddedView ref={this.placeholder2} placeholderName={"Location2"} ></RoktEmbeddedView> */}
+			<RoktEmbeddedView ref={this.placeholder2} placeholderName={"Location2"} ></RoktEmbeddedView>
 			<View style={styles.afterWidget}/>
 		</ScrollView>
 	</SafeAreaView>);
