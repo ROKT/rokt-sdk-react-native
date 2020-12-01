@@ -1,13 +1,13 @@
-// Widget.js
+// RoktEmbeddedView.js
 import { requireNativeComponent , StyleSheet} from 'react-native';
 import React, {Component} from 'react';
 
-class RoktWidget extends Component {
+class RoktEmbeddedView extends Component {
 
     constructor(props){
         super(props);
 
-        this.state = { height: 0,  palcementName: this.props.palcementName, marginTop: 0, marginRight: 0, marginLeft: 0, marginBottom: 0};
+        this.state = { height: 0,  placeholderName: this.props.placeholderName, marginTop: 0, marginRight: 0, marginLeft: 0, marginBottom: 0};
         this.onWidgetHeightChanged = this.onWidgetHeightChanged.bind(this);
         this.onWidgetMarginChanged = this.onWidgetMarginChanged.bind(this);
     }
@@ -42,6 +42,6 @@ class RoktWidget extends Component {
         backgroundColor: 'white' },
     });
   
-  export default RoktWidget;
+  export default RoktEmbeddedView;
 
 
