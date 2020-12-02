@@ -241,7 +241,7 @@ PODS:
     - React-cxxreact (= 0.62.2)
     - React-jsi (= 0.62.2)
     - ReactCommon/callinvoker (= 0.62.2)
-  - rokt-sdk-react-native (2.0.0-alpha.2):
+  - rokt-react-native-sdk (2.0.0-alpha.3):
     - React
     - Rokt-Widget (~> 3.3.0)
   - Rokt-Widget (3.3.0)
@@ -275,7 +275,7 @@ DEPENDENCIES:
   - React-RCTVibration (from `../node_modules/react-native/Libraries/Vibration`)
   - ReactCommon/callinvoker (from `../node_modules/react-native/ReactCommon`)
   - ReactCommon/turbomodule/core (from `../node_modules/react-native/ReactCommon`)
-  - rokt-sdk-react-native (from `../../Rokt.Widget`)
+  - rokt-react-native-sdk (from `../../Rokt.Widget`)
   - Yoga (from `../node_modules/react-native/ReactCommon/yoga`)
 
 SPEC REPOS:
@@ -332,7 +332,7 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/Libraries/Vibration"
   ReactCommon:
     :path: "../node_modules/react-native/ReactCommon"
-  rokt-sdk-react-native:
+  rokt-react-native-sdk:
     :path: "../../Rokt.Widget"
   Yoga:
     :path: "../node_modules/react-native/ReactCommon/yoga"
@@ -363,10 +363,10 @@ SPEC CHECKSUMS:
   React-RCTText: fae545b10cfdb3d247c36c56f61a94cfd6dba41d
   React-RCTVibration: 4356114dbcba4ce66991096e51a66e61eda51256
   ReactCommon: ed4e11d27609d571e7eee8b65548efc191116eb3
-  rokt-sdk-react-native: 3835132c0d131c11e16b9b3e46ec107f33728d1a
+  rokt-react-native-sdk: b82eac3e5aecd1b614ceafcb360a27a851e04fb6
   Rokt-Widget: 9ae97aa12503e62d2665e29323656b3a2ddc29bb
   Yoga: 3ebccbdd559724312790e7742142d062476b698e
 
-PODFILE CHECKSUM: 6743cdf244b3cf16b358cfeec87e1c3e01df68f7
+PODFILE CHECKSUM: 63e61960042a954dc9ba8107c10e660af63f277c
 
 COCOAPODS: 1.8.4

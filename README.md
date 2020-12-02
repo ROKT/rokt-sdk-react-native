@@ -1,5 +1,5 @@
 
-# react-native-rokt-widget
+# @rokt/react-native-sdk
 
 ## Getting started
 

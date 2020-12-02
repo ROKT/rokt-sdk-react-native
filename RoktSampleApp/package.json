@@ -14,7 +14,7 @@
   "dependencies": {
     "react": "16.11.0",
     "react-native": "^0.62.2",
-    "@rokt/react-native-sdk": "file:../Rokt.Widget/rokt-react-native-sdk-2.0.0-alpha.2.tgz",
+    "@rokt/react-native-sdk": "file:../Rokt.Widget/rokt-react-native-sdk-2.0.0-alpha.3.tgz",
     "react-native-toast-message": "^1.3.7"
   },
   "devDependencies": {

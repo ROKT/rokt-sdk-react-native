@@ -1,13 +1,13 @@
 {
   "name": "@rokt/react-native-sdk",
-  "version": "2.0.0-alpha.2",
+  "version": "2.0.0-alpha.3",
   "description": "",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
-    "rokt widget"
+    "Rokt React Native SDK"
   ],
   "author": "",
   "license": "Copyright 2020 Rokt Pte Ltd",
