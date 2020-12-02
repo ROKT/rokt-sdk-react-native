@@ -35,7 +35,7 @@ target 'RoktSampleApp' do
   pod 'DoubleConversion', :podspec => '../node_modules/react-native/third-party-podspecs/DoubleConversion.podspec'
   pod 'glog', :podspec => '../node_modules/react-native/third-party-podspecs/glog.podspec'
   pod 'Folly', :podspec => '../node_modules/react-native/third-party-podspecs/Folly.podspec'
-  pod 'rokt-sdk-react-native', :path => '../../Rokt.Widget'
+  pod 'rokt-react-native-sdk', :path => '../../Rokt.Widget'
 
   target 'RoktSampleAppTests' do
     inherit! :complete
