@@ -8,7 +8,7 @@ import com.rokt.roktsdk.Widget;
 
 import java.util.Map;
 
-public class RoktWidgetViewManager extends ViewGroupManager<Widget> {
+public class RoktEmbeddedViewManager extends ViewGroupManager<Widget> {
     @Override
     public String getName() {
         return "RoktNativeWidget";

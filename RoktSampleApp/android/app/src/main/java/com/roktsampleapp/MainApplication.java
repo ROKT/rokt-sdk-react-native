@@ -4,12 +4,11 @@ import android.app.Application;
 
 import com.facebook.react.ReactApplication;
 import com.reactlibrary.RNRoktWidgetPackage;
-import com.reactlibrary.RNRoktWidgetPackage;
 import com.facebook.react.ReactNativeHost;
 import com.facebook.react.ReactPackage;
 import com.facebook.react.shell.MainReactPackage;
 import com.facebook.soloader.SoLoader;
-import com.reactlibrary.RoktWidgetViewPackage;
+import com.reactlibrary.RoktEmbeddedViewPackage;
 
 
 import java.util.Arrays;
@@ -28,8 +27,7 @@ public class MainApplication extends Application implements ReactApplication {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
             new RNRoktWidgetPackage(),
-              new RoktWidgetViewPackage()
-      );
+              new RoktEmbeddedViewPackage());
     }
 
     @Override

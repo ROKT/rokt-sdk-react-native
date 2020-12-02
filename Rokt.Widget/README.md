@@ -3,11 +3,11 @@
 
 ## Getting started
 
-`$ npm install react-native-rokt-widget --save`
+`$ npm install @rokt/react-native-sdk --save`
 
 ### Mostly automatic installation
 
-run `$ react-native link react-native-rokt-widget`
+run `$ react-native link @rokt/react-native-sdk`
 
 run `$ npm install`
 
@@ -30,15 +30,15 @@ allprojects {
 ```
 
 #### File: MainApplication.java (Module: app)
-2. In your ReactApplication class, make sure you add the RoktWidgetViewPackage to the getPackages method:
+2. In your ReactApplication class, make sure you add the RoktEmbeddedViewPackage to the getPackages method:
 ```
         @Override
         protected List<ReactPackage> getPackages() {
           @SuppressWarnings("UnnecessaryLocalVariable")
           List<ReactPackage> packages = new PackageList(this).getPackages();
 
-          //Add the RoktWidgetViewPackage
-          packages.add(new RoktWidgetViewPackage());
+          //Add the RoktEmbeddedViewPackage
+          packages.add(new RoktEmbeddedViewPackage());
           return packages;
         }
  ```
@@ -79,7 +79,7 @@ pod install
 
 #### Import 
 ```
-import {Rokt, RoktEmbeddedView} from 'react-native-rokt-widget';;
+import { Rokt, RoktEmbeddedView } from "@rokt/react-native-sdk";
 ```
 
 #### Initialize
@@ -136,7 +136,7 @@ attributes = {
       "postcode": "90210",
       "country": "US"
 }
-Rokt.execute("RoktEmbeddedExperience", attributes, placeholders,  () => console.log("Widget Loaded"));
+Rokt.execute("RoktEmbeddedExperience", attributes, placeholders,  () => console.log("Placement Loaded"));
 ```
 
 
