@@ -8,16 +8,21 @@
     "ios": "react-native run-ios",
     "start": "react-native start",
     "test": "jest",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "haul": "haul start"
   },
   "dependencies": {
     "react": "16.11.0",
     "react-native": "^0.62.2",
-    "react-native-rokt-widget": "file:../Rokt.Widget/react-native-rokt-widget-2.0.0-alpha.2.tgz"
+    "react-native-rokt-widget": "file:../Rokt.Widget/react-native-rokt-widget-2.0.0-alpha.2.tgz",
+    "react-native-toast-message": "^1.3.7"
   },
   "devDependencies": {
     "@babel/core": "^7.6.2",
     "@babel/runtime": "^7.6.2",
+    "@haul-bundler/babel-preset-react-native": "^0.16.0",
+    "@haul-bundler/cli": "^0.22.1",
+    "@haul-bundler/preset-0.60": "^0.18.0",
     "@react-native-community/eslint-config": "^0.0.5",
     "babel-jest": "^24.9.0",
     "eslint": "^6.5.1",
