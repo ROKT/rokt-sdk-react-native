@@ -148,11 +148,10 @@ android {
 }
 
 dependencies {
-    compile project(':react-native-rokt-widget')
-    implementation project(':react-native-rokt-widget')
+    compile project(':@rokt_react-native-sdk')
+    implementation project(':@rokt_react-native-sdk')
     implementation fileTree(dir: "libs", include: ["*.jar"])
     implementation "com.facebook.react:react-native:0.62.2"  // From node_modules
-
 
     if (enableHermes) {
         def hermesPath = "../../node_modules/hermes-engine/android/";
