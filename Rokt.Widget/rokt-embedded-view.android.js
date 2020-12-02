@@ -1,4 +1,4 @@
-// RoktEmbeddedView.js
+// rokt-embedded-view.js
 import { requireNativeComponent , StyleSheet} from 'react-native';
 import React, {Component} from 'react';
 

@@ -1,6 +1,6 @@
 
 import { NativeModules } from 'react-native';
-import RoktEmbeddedView from './RoktEmbeddedView'
+import RoktEmbeddedView from './rokt-embedded-view'
 
 const { RNRoktWidget } = NativeModules;
 
