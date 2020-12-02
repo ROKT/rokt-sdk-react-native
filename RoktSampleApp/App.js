@@ -22,7 +22,7 @@ import Toast from "react-native-toast-message";
 import { isNumeric, isEmpty, isNotEmpty, isValidJson } from "./utils/text-utils";
 import { DEFAULT_ATTRIBUTES, DEFAULT_TAG_ID, DEFAULT_VIEW_NAME, DEFAULT_COUNTRY } from "./utils/rokt-constants";
 import { Colors } from "react-native/Libraries/NewAppScreen";
-import { Rokt, RoktEmbeddedView } from "react-native-rokt-widget";
+import { Rokt, RoktEmbeddedView } from "@rokt/react-native-sdk";
 
 export default class App extends Component {
   constructor(props) {
