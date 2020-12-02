@@ -148,7 +148,6 @@ android {
 }
 
 dependencies {
-    compile project(':@rokt_react-native-sdk')
     implementation project(':@rokt_react-native-sdk')
     implementation fileTree(dir: "libs", include: ["*.jar"])
     implementation "com.facebook.react:react-native:0.62.2"  // From node_modules
@@ -169,4 +168,3 @@ task copyDownloadableDepsToLibs(type: Copy) {
     into 'libs'
 }
 
-apply from: file("../../node_modules/@react-native-community/cli-platform-android/native_modules.gradle"); applyNativeModulesAppBuildGradle(project)
