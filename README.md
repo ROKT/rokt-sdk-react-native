@@ -5,10 +5,6 @@
 
 `$ npm install @rokt/react-native-sdk --save`
 
-### Mostly automatic installation
-
-run `$ react-native link @rokt/react-native-sdk`
-
 run `$ npm install`
 
 
