@@ -22,7 +22,7 @@ jobs:
           command: cd ./Rokt.Widget && echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > ./.npmrc
       - run:
           name: npm publish 
-          command: cd ./Rokt.Widget && npm publish
+          command: cd ./Rokt.Widget && npm publish --access=public
 
 workflows:
   version: 2.1
