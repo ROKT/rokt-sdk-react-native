@@ -23,7 +23,6 @@ RCT_EXPORT_MODULE(RoktNativeWidget)
 - (UIView *)view
 {
   return [[RoktEmbeddedView alloc] init];
-//    return [RoktWidget new];
 }
 
 @end

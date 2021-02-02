@@ -38,10 +38,10 @@ RCT_EXPORT_METHOD(execute:(NSString *)viewName
                   attributes:(NSDictionary *)attributes
                   placeholders:(NSDictionary *)placeholders
                   callback:(RCTResponseSenderBlock)callback
-                )
+                  )
 {
     NSMutableDictionary *nativePlaceholders = [[NSMutableDictionary alloc]initWithCapacity:10];
-
+    
     [self.bridge.uiManager addUIBlock:^(RCTUIManager *uiManager, NSDictionary<NSNumber *,UIView *> *viewRegistry) {
         for(id key in placeholders){
             RoktEmbeddedView *view = viewRegistry[[placeholders objectForKey:key]];
@@ -57,31 +57,24 @@ RCT_EXPORT_METHOD(execute:(NSString *)viewName
         }
         
         RoktEventManager *event = [RoktEventManager allocWithZone: nil];
-
         
-            [Rokt executeWithViewName:viewName attributes:attributes
-                           placements:nativePlaceholders
-                                onLoad:^{ callback(@[@"onLoad", [NSNull null]]);}
-                             onUnLoad:^{
-                                 RCTLogInfo(@"unloaded");
-                             }
-         onShouldShowLoadingIndicator:nil
-         onShouldHideLoadingIndicator:nil
-                 onEmbeddedSizeChange:^(NSString *selectedPlacement, CGFloat widgetHeight){
-                
-                [event onWidgetHeightChanges:widgetHeight placement:selectedPlacement];
-    
-            }];
+        
+        [Rokt executeWithViewName:viewName attributes:attributes
+                       placements:nativePlaceholders
+                           onLoad:^{ callback(@[@"onLoad", [NSNull null]]);}
+                         onUnLoad:^{
+            RCTLogInfo(@"unloaded");
+        }
+     onShouldShowLoadingIndicator:nil
+     onShouldHideLoadingIndicator:nil
+             onEmbeddedSizeChange:^(NSString *selectedPlacement, CGFloat widgetHeight){
+            
+            [event onWidgetHeightChanges:widgetHeight placement:selectedPlacement];
+            
+        }];
         
     }];
     
-    
-            
-    
-    
-    
-    
-
 }
 @end
   
