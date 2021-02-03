@@ -1,0 +1,39 @@
+# This file contains the fastlane.tools configuration
+# You can find the documentation at https://docs.fastlane.tools
+#
+# For a list of all available actions, check out
+#
+#     https://docs.fastlane.tools/actions
+#
+# For a list of all available plugins, check out
+#
+#     https://docs.fastlane.tools/plugins/available-plugins
+#
+
+# Uncomment the line if you want fastlane to automatically update itself
+# update_fastlane
+
+default_platform(:android)
+
+platform :android do
+     desc "Run UI tests on AWS device farm(stage) and wait for the results"
+       lane :deviceFarmUITest do
+         ENV['AWS_ACCESS_KEY_ID']     = ENV['DEVICE_FARM_STAGE_ACCESS_KEY']
+         ENV['AWS_SECRET_ACCESS_KEY'] = ENV['DEVICE_FARM_STAGE_SECRET_KEY']
+         ENV['AWS_REGION']            = "us-west-2"
+
+         # Build Debug App + Instrumentation Apk
+         gradle(task: 'assemble')
+         gradle(task: 'app:assembleAndroidTest')
+
+         # RUN tests on AWS Device Farm
+         aws_device_farm(
+           binary_path:          "app/build/outputs/apk/debug/app-debug.apk",
+           test_binary_path:     "app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk",
+           name:                 ENV['DEVICE_FARM_STAGE_PROJECT_NAME'],
+           device_pool:          ENV['DEVICE_FARM_STAGE_DEVICE_POOL'],
+           print_web_url_of_run: true,
+           filter:               "com.rokt.roktwebviewsample"
+         )
+       end
+end
