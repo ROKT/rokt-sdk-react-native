@@ -18,6 +18,7 @@ import {
   StatusBar,
   TouchableOpacity,
 } from "react-native";
+import CheckBox from '@react-native-community/checkbox';
 import Toast from "react-native-toast-message";
 import { isNumeric, isEmpty, isNotEmpty, isValidJson } from "./utils/text-utils";
 import { DEFAULT_ATTRIBUTES, DEFAULT_TAG_ID, DEFAULT_VIEW_NAME, DEFAULT_COUNTRY } from "./utils/rokt-constants";
@@ -38,12 +39,20 @@ export default class App extends Component {
       country: DEFAULT_COUNTRY,
       targetElement1: "Location1",
       targetElement2: "Location2",
-      attributes: attributes
+      attributes: attributes,
+      checked:false
     };
   }
 
   onInitHandler = () => {
     if (isNotEmpty(this.state.tagId) && isNumeric(this.state.tagId)) {
+      if (this.state.checked) {
+        console.log("Executing on Stage");
+        Rokt.setEnvironmentToStage();
+      } else {
+        console.log("Executing on Prod");
+        Rokt.setEnvironmentToProd();
+      }
       Rokt.initialize(this.state.tagId, "1.1");
       console.log("Initialize");
     } else {
@@ -109,6 +118,7 @@ export default class App extends Component {
                   Rokt Tag ID:
                 </Text>
                 <TextInput
+                  accessibilityLabel="input_tag_id"
                   style={styles.textInput}
                   value={this.state.tagId}
                   onChangeText={(tagId) => this.setState({ tagId })}
@@ -120,6 +130,7 @@ export default class App extends Component {
                       View Name:
                     </Text>
                     <TextInput
+                      accessibilityLabel="input_view_name"
                       style={styles.textInput}
                       value={this.state.viewName}
                       onChangeText={(viewName) => this.setState({ viewName })}
@@ -171,6 +182,14 @@ export default class App extends Component {
                   }}
                 />
 
+              <View style={{ flexDirection: 'row' }}>
+                <CheckBox
+                  accessibilityLabel="input_stage_env"
+                  value={this.state.checked}
+                  onValueChange={() => this.setState({ checked: !this.state.checked })}
+                />
+                <Text style={{marginTop: 5}}>Stage Environment</Text>
+              </View>
                 <View style={styles.buttonContainer}>
                   <TouchableOpacity
                     onPress={this.onInitHandler}
@@ -185,6 +204,7 @@ export default class App extends Component {
                 </View>
               </View>
             </View>
+            
 
             <RoktEmbeddedView
               ref={this.placeholder1}

@@ -86,6 +86,16 @@ public class RNRoktWidgetModule extends ReactContextBaseJavaModule {
     public String getName() {
         return "RNRoktWidget";
     }
+
+    @ReactMethod
+    public void setEnvironmentToStage() {
+        Rokt.INSTANCE.setEnvironment(Rokt.Environment.Stage.INSTANCE);
+    }
+
+    @ReactMethod
+    public void setEnvironmentToProd() {
+        Rokt.INSTANCE.setEnvironment(Rokt.Environment.Prod.INSTANCE);
+    }
 }
 
 
