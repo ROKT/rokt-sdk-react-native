@@ -1,5 +1,5 @@
 steps:
-  - name: ':hammer: Build and UI Test'
+  - name: ':hammer: Build and UI Test trigger'
     commands:
       - cd android
       - bundle install
