@@ -44,7 +44,9 @@ public class RNRoktWidgetModule extends ReactContextBaseJavaModule {
     @ReactMethod
     public void initialize(String roktTagId, String appVersion) {
         Activity currentActivity = getCurrentActivity();
-        Rokt.INSTANCE.init(roktTagId, appVersion, currentActivity);
+        if (currentActivity != null) {
+            Rokt.INSTANCE.init(roktTagId, appVersion, currentActivity);
+        }
     }
 
     @ReactMethod
