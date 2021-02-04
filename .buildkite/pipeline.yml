@@ -1,7 +1,8 @@
 steps:
   - name: ':hammer: Build and UI Test trigger'
     commands:
-      - cd android
+      - ls
+      - cd ./RoktSampleApp/android
       - bundle install
       - bundle exec fastlane deviceFarmUITest
     artifact_paths:
