@@ -65,7 +65,7 @@ public class RNRoktWidgetModule extends ReactContextBaseJavaModule {
                     if (entry.getValue() != null && entry.getValue() instanceof Double) {
                         int tag = ((Double) entry.getValue()).intValue();
                         View view = nativeViewHierarchyManager.resolveView(tag);
-                        if (view instanceof Widget) {
+                        if (view != null && view instanceof Widget) {
                             placeholderMap.put(entry.getKey(), new WeakReference(view));
                         }
                     }
