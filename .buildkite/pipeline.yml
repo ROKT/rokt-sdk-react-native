@@ -2,6 +2,8 @@ steps:
   - name: ':hammer: Build and UI Test trigger'
     commands:
       - cd ./RoktSampleApp
+      - sudo apt install nodejs
+      - sudo apt install npm
       - npm install
       - ls
       - cd ./RoktSampleApp/android
