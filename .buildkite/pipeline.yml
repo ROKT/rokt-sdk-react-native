@@ -34,5 +34,4 @@ steps:
               secret-id: 'stage-android-webviewsdk-buildkite'
               json-key: '.DEVICE_FARM_STAGE_SECRET_KEY'
     agents:
-      queue: stage-us-west-2-default
-      timeout_in_minutes: 25        
+    - "queue=stage-us-west-2-default"       
