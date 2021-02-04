@@ -33,7 +33,7 @@ platform :android do
            name:                 ENV['DEVICE_FARM_STAGE_PROJECT_NAME'],
            device_pool:          ENV['DEVICE_FARM_STAGE_DEVICE_POOL'],
            print_web_url_of_run: true,
-           filter:               "com.rokt.roktwebviewsample"
+           filter:               "com.roktsampleapp"
          )
        end
 end
