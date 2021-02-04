@@ -1,13 +1,11 @@
 steps:
   - name: ':hammer: Build and UI Test'
-    depends_on: 'key-unit-tests'
     commands:
       - cd android
       - bundle install
       - bundle exec fastlane deviceFarmUITest
     artifact_paths:
       - "app/**/*.apk"
-      - "roktsdk/**/*.aar"
     plugins:
       - docker-compose#v3.0.0:
           config: docker-compose.yml
