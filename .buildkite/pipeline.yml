@@ -8,7 +8,7 @@ steps:
       - "app/**/*.apk"
     plugins:
       - docker-compose#v3.0.0:
-          config: /docker-compose.yml
+          config: ./docker-compose.yml
           run: build_android
       - seek-oss/aws-sm#v2.0.0:
           env:
