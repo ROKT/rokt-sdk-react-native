@@ -1,6 +1,8 @@
 steps:
   - name: ':hammer: Build and UI Test trigger'
     commands:
+      - cd ./RoktSampleApp
+      - npm install
       - ls
       - cd ./RoktSampleApp/android
       - bundle install
