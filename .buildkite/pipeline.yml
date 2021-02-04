@@ -7,7 +7,7 @@ steps:
       - sudo apt-get install -y nodejs 
       - npm install
       - ls
-      - cd ./RoktSampleApp/android
+      - cd ./android
       - bundle install
       - bundle exec fastlane deviceFarmUITest
     artifact_paths:
