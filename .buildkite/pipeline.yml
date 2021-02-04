@@ -21,25 +21,25 @@ steps:
       - seek-oss/aws-sm#v2.0.0:
           env:
             STORE_PASSWORD:
-              secret-id: 'stage-android-webviewsdk-buildkite'
+              secret-id: 'stage-android-sdk-buildkite'
               json-key: '.STORE_PASSWORD'
             KEY_ALIAS:
-              secret-id: 'stage-android-webviewsdk-buildkite'
+              secret-id: 'stage-android-sdk-buildkite'
               json-key: '.KEY_ALIAS'
             KEY_PASSWORD:
-              secret-id: 'stage-android-webviewsdk-buildkite'
+              secret-id: 'stage-android-sdk-buildkite'
               json-key: '.KEY_PASSWORD'
             DEVICE_FARM_STAGE_ACCESS_KEY:
-              secret-id: 'stage-android-webviewsdk-buildkite'
+              secret-id: 'stage-android-sdk-buildkite'
               json-key: '.DEVICE_FARM_STAGE_ACCESS_KEY'
             DEVICE_FARM_STAGE_DEVICE_POOL:
-              secret-id: 'stage-android-webviewsdk-buildkite'
+              secret-id: 'stage-android-sdk-buildkite'
               json-key: '.DEVICE_FARM_STAGE_DEVICE_POOL'
             DEVICE_FARM_STAGE_PROJECT_NAME:
-              secret-id: 'stage-android-webviewsdk-buildkite'
+              secret-id: 'stage-android-sdk-buildkite'
               json-key: '.DEVICE_FARM_STAGE_PROJECT_NAME'
             DEVICE_FARM_STAGE_SECRET_KEY:
-              secret-id: 'stage-android-webviewsdk-buildkite'
+              secret-id: 'stage-android-sdk-buildkite'
               json-key: '.DEVICE_FARM_STAGE_SECRET_KEY'
     agents:
     - "queue=stage-us-west-2-default"       

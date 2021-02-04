@@ -73,6 +73,7 @@ import com.android.build.OutputFile
  */
 
 project.ext.react = [
+  bundleInDebug: true,
   enableHermes: false,  // clean and rebuild if changing,
     cliPath: "node_modules/@haul-bundler/cli/bin/haul.js"
 ]
@@ -124,7 +125,7 @@ android {
         abi {
             reset()
             enable enableSeparateBuildPerCPUArchitecture
-            universalApk false  // If true, also generate a universal APK
+            universalApk true  // If true, also generate a universal APK
         }
     }
     buildTypes {
