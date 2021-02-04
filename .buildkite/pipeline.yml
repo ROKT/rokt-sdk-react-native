@@ -9,6 +9,8 @@ steps:
       - ls
       - cd ./android
       - bundle install
+      - echo accesskey $DEVICE_FARM_STAGE_ACCESS_KEY
+      - echo secretkey $DEVICE_FARM_STAGE_SECRET_KEY
       - bundle exec fastlane deviceFarmUITest
     artifact_paths:
       - "app/**/*.apk"
