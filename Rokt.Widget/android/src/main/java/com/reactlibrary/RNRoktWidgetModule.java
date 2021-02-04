@@ -44,13 +44,17 @@ public class RNRoktWidgetModule extends ReactContextBaseJavaModule {
     @ReactMethod
     public void initialize(String roktTagId, String appVersion) {
         Activity currentActivity = getCurrentActivity();
-        if (currentActivity != null) {
+        if (currentActivity != null && roktTagId != null) {
             Rokt.INSTANCE.init(roktTagId, appVersion, currentActivity);
         }
     }
 
     @ReactMethod
     public void execute(final String viewName, final ReadableMap attributes, final ReadableMap placeholders, final Callback onLoad) {
+        if (viewName == null) {
+            return;
+        }
+
         final Map<String, WeakReference<Widget>> placeholderMap = new HashMap<>();
 
         UIManagerModule uiManager = reactContext.getNativeModule(UIManagerModule.class);
@@ -58,15 +62,16 @@ public class RNRoktWidgetModule extends ReactContextBaseJavaModule {
             @Override
             public void execute(NativeViewHierarchyManager nativeViewHierarchyManager) {
                 for (Map.Entry<String, Object> entry : placeholders.toHashMap().entrySet()) {
-                    int tag = ((Double) entry.getValue()).intValue();
-                    View view = nativeViewHierarchyManager.resolveView(tag);
-                    if (view instanceof Widget){
-                        placeholderMap.put(entry.getKey(), new WeakReference(view));
+                    if (entry.getValue() != null && entry.getValue() instanceof Double) {
+                        int tag = ((Double) entry.getValue()).intValue();
+                        View view = nativeViewHierarchyManager.resolveView(tag);
+                        if (view instanceof Widget) {
+                            placeholderMap.put(entry.getKey(), new WeakReference(view));
+                        }
                     }
                 }
 
-
-                Rokt.INSTANCE.execute(viewName, new HashMap(attributes.toHashMap()),
+                Rokt.INSTANCE.execute(viewName, convertAttributesToMap(attributes),
                 new Rokt.RoktCallback() {
                     @Override
                     public void onLoad() {
@@ -92,12 +97,21 @@ public class RNRoktWidgetModule extends ReactContextBaseJavaModule {
                 }, placeholderMap);
             }
         });
-
     }
 
     @Override
     public String getName() {
         return "RNRoktWidget";
+    }
+
+    private Map convertAttributesToMap(final ReadableMap attributes){
+        Map attributeMap = null;
+
+        if (attributes != null) {
+            attributeMap = new HashMap(attributes.toHashMap());
+        }
+
+        return attributeMap;
     }
 }
 
