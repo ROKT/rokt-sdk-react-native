@@ -52,7 +52,6 @@ public class RNRoktWidgetModule extends ReactContextBaseJavaModule {
                     }
                 }
 
-
                 Rokt.INSTANCE.execute(viewName, new HashMap(attributes.toHashMap()),
                 new Rokt.RoktCallback() {
                     @Override
@@ -79,7 +78,6 @@ public class RNRoktWidgetModule extends ReactContextBaseJavaModule {
                 }, placeholderMap);
             }
         });
-
     }
 
     @Override
