@@ -43,3 +43,17 @@ steps:
               json-key: '.DEVICE_FARM_STAGE_SECRET_KEY'
     agents:
     - "queue=stage-us-west-2-default"       
+  
+  - name: ':rocket: Publish'
+    commands:
+      - cd ./Rokt.Widget && echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > ./.npmrc
+      - cd npm publish --access=public
+    plugins:
+      - seek-oss/aws-sm#v2.0.0:
+          env:
+            STORE_PASSWORD:
+              secret-id: 'stage-android-sdk-buildkite'
+              json-key: '.NPM_TOKEN'    
+        agents:
+    queue: "eng-default"
+   
