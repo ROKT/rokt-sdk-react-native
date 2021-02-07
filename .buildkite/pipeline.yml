@@ -54,6 +54,6 @@ steps:
             STORE_PASSWORD:
               secret-id: 'stage-android-sdk-buildkite'
               json-key: '.NPM_TOKEN'    
-        agents:
-    queue: "eng-default"
+    agents:
+    - "queue=stage-us-west-2-default"  
    
