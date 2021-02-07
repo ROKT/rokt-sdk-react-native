@@ -47,7 +47,7 @@ steps:
   - name: ':rocket: Publish'
     commands:
       - cd ./Rokt.Widget && echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > ./.npmrc
-      - cd npm publish --access=public
+      - npm publish --access=public
     plugins:
       - seek-oss/aws-sm#v2.0.0:
           env:
