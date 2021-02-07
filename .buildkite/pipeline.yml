@@ -16,7 +16,7 @@ steps:
       - "app/**/*.apk"
     plugins:
       - docker-compose#v3.0.0:
-          config: ./docker-compose.yml
+          config: ./docker/docker-compose.yml
           run: build_android
       - seek-oss/aws-sm#v2.0.0:
           env:
@@ -45,6 +45,10 @@ steps:
     - "queue=stage-us-west-2-default"       
   
   - name: ':rocket: Publish'
+    plugins:
+      - docker-compose#v3.0.0:
+          config: ./docker/docker-compose-node.yml
+          run: build_android 
     commands:
       - cd ./Rokt.Widget && echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > ./.npmrc
       - npm publish --access=public
