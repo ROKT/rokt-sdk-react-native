@@ -26,8 +26,6 @@ RCT_EXPORT_MODULE();
     return sharedInstance;
 }
 
-
-
 // Will be called when this module's first listener is added.
 -(void)startObserving {
     hasListeners = YES;

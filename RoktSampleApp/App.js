@@ -78,6 +78,10 @@ export default class App extends Component {
 
      attributes["country"] = this.state.country
 
+     // invalid attributes should be ignored by SDK
+     attributes["testNullValue"] = null
+     attributes["testNotStringValue"] = 13
+
     var placeholders = {};
     placeholders[this.state.targetElement1] = findNodeHandle(
       this.placeholder1.current
