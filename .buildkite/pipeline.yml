@@ -1,9 +1,10 @@
 steps:
-   - block: ":whale: Run UI tests"
-     prompt: "Confirm running UI tests on device farm?"
+   - input: ':whale: Run UI tests'
+     prompt: 'Run UI tests on Device Farm??'
+     key: 'release-block-ui-test'
 
-   - wait
    - name: ':hammer: Build and UI Test trigger'
+     depends_on: 'release-block-ui-test'
      commands:
       - ls
       - cd ./RoktSampleApp
@@ -49,11 +50,12 @@ steps:
      agents:
      - "queue=stage-us-west-2-default"       
   
-     - block: ":whale: Publish"
-       prompt: "Confirm publish Widget to npm?"
+   - input: ':whale: Publish'
+     prompt: 'Publish to npm?'
+     key: 'release-block-publish'
 
-   - wait
    - name: ':rocket: Publish'
+     depends_on: 'release-block-publish'
      commands:
       - cd ./Rokt.Widget && echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > ./.npmrc
       - npm publish --access=public
