@@ -32,6 +32,10 @@
 RCT_EXPORT_MODULE()
 RCT_EXPORT_METHOD(initialize:(NSString *)roktTagId appVersion: (NSString * _Nullable)fakeApp)
 {
+    if (roktTagId == nil) {
+        RCTLog(@"roktTagId cannot be null");
+        return;
+    }
     [Rokt initWithRoktTagId:roktTagId];
 }
 RCT_EXPORT_METHOD(execute:(NSString *)viewName
@@ -40,6 +44,12 @@ RCT_EXPORT_METHOD(execute:(NSString *)viewName
                   callback:(RCTResponseSenderBlock)callback
                   )
 {
+    if (viewName == nil) {
+        RCTLog(@"Execute failed. ViewName cannot be null");
+        return;
+    }
+    NSMutableDictionary *finalAttributes = [self convertAttributesToDictionary:attributes];
+    
     NSMutableDictionary *nativePlaceholders = [[NSMutableDictionary alloc]initWithCapacity:10];
     
     [self.bridge.uiManager addUIBlock:^(RCTUIManager *uiManager, NSDictionary<NSNumber *,UIView *> *viewRegistry) {
@@ -48,18 +58,15 @@ RCT_EXPORT_METHOD(execute:(NSString *)viewName
             if (!view || ![view isKindOfClass:[RoktEmbeddedView class]]) {
                 RCTLogError(@"Cannot find RoktEmbeddedView with tag #%@", key);
                 return;
-            } else {
-                RCTLog(@"yes #%@", key);
             }
             
             nativePlaceholders[key] = view;
-            
         }
         
         RoktEventManager *event = [RoktEventManager allocWithZone: nil];
         
         
-        [Rokt executeWithViewName:viewName attributes:attributes
+        [Rokt executeWithViewName:viewName attributes:finalAttributes
                        placements:nativePlaceholders
                            onLoad:^{ callback(@[@"onLoad", [NSNull null]]);}
                          onUnLoad:^{
@@ -75,6 +82,20 @@ RCT_EXPORT_METHOD(execute:(NSString *)viewName
         
     }];
     
+}
+
+- (NSMutableDictionary*)convertAttributesToDictionary:(NSDictionary*)attributes
+{
+    NSMutableDictionary *finalAttributes = [attributes mutableCopy];
+    NSArray *keysForNullValues = [finalAttributes allKeysForObject:[NSNull null]];
+    [finalAttributes removeObjectsForKeys:keysForNullValues];
+    
+    NSSet *keys = [finalAttributes keysOfEntriesPassingTest:^BOOL(id key, id obj, BOOL *stop) {
+        return ![obj isKindOfClass:[NSString class]];
+    }];
+
+    [finalAttributes removeObjectsForKeys:[keys allObjects]];
+    return finalAttributes;
 }
 @end
   
