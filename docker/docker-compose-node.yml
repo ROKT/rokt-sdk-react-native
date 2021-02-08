@@ -1,14 +1,19 @@
 version: '3.7'
 services:
   build_android:
-    context: ./
-    image: circleci/node:9.11.2-jessie
-    user: root
-    volumes:
-      - ./:/source
+    build:
+       context: ./
+       image: circleci/node:9.11.2-jessie
+       user: root
+       volumes:
+           - ./:/source
     working_dir: /source
     environment:
       - NPM_TOKEN=${NPM_TOKEN}
       - BUILDKITE_BUILD_NUMBER=${BUILDKITE_BUILD_NUMBER}
       - BUILDKITE_BRANCH=${BUILDKITE_BRANCH}
       - BUILDKITE_MESSAGE=${BUILDKITE_MESSAGE}
+      - UPLOAD_AWS_ACCESS_KEY_ID=${UPLOAD_AWS_ACCESS_KEY_ID}
+      - UPLOAD_AWS_SECRET_ACCESS_KEY=${UPLOAD_AWS_SECRET_ACCESS_KEY}
+      - KEY_ALIAS=${KEY_ALIAS}
+      - KEY_PASSWORD=${KEY_PASSWORD}

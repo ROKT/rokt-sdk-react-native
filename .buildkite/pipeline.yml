@@ -69,7 +69,16 @@ steps:
           env:
             NPM_TOKEN:
               secret-id: 'stage-android-sdk-buildkite'
-              json-key: '.NPM_TOKEN'    
+              json-key: '.NPM_TOKEN'
+            STORE_PASSWORD:
+              secret-id: 'stage-android-sdk-buildkite'
+              json-key: '.STORE_PASSWORD'
+            KEY_ALIAS:
+              secret-id: 'stage-android-sdk-buildkite'
+              json-key: '.KEY_ALIAS'
+            KEY_PASSWORD:
+              secret-id: 'stage-android-sdk-buildkite'
+              json-key: '.KEY_PASSWORD'      
      agents:
      - "queue=eng-default"  
    
