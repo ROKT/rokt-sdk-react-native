@@ -1,6 +1,7 @@
 version: '3.7'
 services:
   build_android:
+    context: ./
     image: circleci/node:9.11.2-jessie
     user: root
     volumes:

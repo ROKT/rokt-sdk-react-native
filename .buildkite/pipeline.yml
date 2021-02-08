@@ -2,7 +2,7 @@ steps:
   - name: ':hammer: Build and UI Test trigger'
     commands:
       - ls
-      - cd ./../RoktSampleApp
+      - cd ./RoktSampleApp
       - sudo apt install curl
       - curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash -
       - sudo apt-get install -y nodejs 
@@ -51,7 +51,7 @@ steps:
           config: ./docker/docker-compose-node.yml
           run: build_android 
     commands:
-      - cd ./../Rokt.Widget && echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > ./.npmrc
+      - cd ./Rokt.Widget && echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > ./.npmrc
       - npm publish --access=public
     plugins:
       - seek-oss/aws-sm#v2.0.0:
