@@ -67,7 +67,7 @@ steps:
 
       - seek-oss/aws-sm#v2.0.0:
           env:
-            STORE_PASSWORD:
+            NPM_TOKEN:
               secret-id: 'stage-android-sdk-buildkite'
               json-key: '.NPM_TOKEN'    
      agents:
