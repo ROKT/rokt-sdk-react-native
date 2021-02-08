@@ -2,6 +2,7 @@
 package com.reactlibrary;
 
 import android.app.Activity;
+import android.util.Log;
 import android.view.View;
 
 import androidx.annotation.NonNull;
@@ -35,6 +36,7 @@ import java.util.Map;
 public class RNRoktWidgetModule extends ReactContextBaseJavaModule {
 
     private final ReactApplicationContext reactContext;
+    private final String TAG = "RoktWidget";
 
     RNRoktWidgetModule(ReactApplicationContext reactContext) {
         super(reactContext);
@@ -43,15 +45,19 @@ public class RNRoktWidgetModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     public void initialize(String roktTagId, String appVersion) {
+
         Activity currentActivity = getCurrentActivity();
-        if (currentActivity != null && roktTagId != null && appVersion != null) {
+        if (currentActivity != null && appVersion != null && roktTagId != null) {
             Rokt.INSTANCE.init(roktTagId, appVersion, currentActivity);
+        } else {
+            Log.d(TAG, "Activity, roktTagId and AppVersion cannot be null");
         }
     }
 
     @ReactMethod
     public void execute(final String viewName, final ReadableMap attributes, final ReadableMap placeholders, final Callback onLoad) {
         if (viewName == null) {
+            Log.d(TAG, "Execute failed. ViewName cannot be null");
             return;
         }
 
@@ -65,13 +71,13 @@ public class RNRoktWidgetModule extends ReactContextBaseJavaModule {
                     if (entry.getValue() != null && entry.getValue() instanceof Double) {
                         int tag = ((Double) entry.getValue()).intValue();
                         View view = nativeViewHierarchyManager.resolveView(tag);
-                        if (view != null && view instanceof Widget) {
+                        if (view instanceof Widget) {
                             placeholderMap.put(entry.getKey(), new WeakReference(view));
                         }
                     }
                 }
 
-                Rokt.INSTANCE.execute(viewName, convertAttributesToMap(attributes),
+                Rokt.INSTANCE.execute(viewName, convertAttributesToMapOfStrings(attributes),
                 new Rokt.RoktCallback() {
                     @Override
                     public void onLoad() {
@@ -104,19 +110,18 @@ public class RNRoktWidgetModule extends ReactContextBaseJavaModule {
         return "RNRoktWidget";
     }
 
-    private Map convertAttributesToMap(final ReadableMap attributes){
-        Map attributeMap = null;
-
+    private Map<String, String> convertAttributesToMapOfStrings(final ReadableMap attributes){
         if (attributes != null) {
-            attributeMap = new HashMap(attributes.toHashMap());
+            Map<String, Object> map = attributes.toHashMap();
+            Map<String,String> newMap = new HashMap<String,String>();
+            for (Map.Entry<String, Object> entry : map.entrySet()) {
+                if(entry.getValue() instanceof String){
+                    newMap.put(entry.getKey(), (String) entry.getValue());
+                }
+            }
+            return newMap;
         }
 
-        return attributeMap;
+        return null;
     }
 }
-
-
-
-
-
-
