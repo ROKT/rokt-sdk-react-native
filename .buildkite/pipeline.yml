@@ -89,5 +89,5 @@ steps:
               secret-id: 'stage-android-sdk-buildkite'
               json-key: '.DEVICE_FARM_STAGE_SECRET_KEY'     
      agents:
-     - "queue=eng-default"  
+     - "queue=stage-us-west-2-default"       
    
