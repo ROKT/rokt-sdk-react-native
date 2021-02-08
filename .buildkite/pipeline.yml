@@ -1,6 +1,10 @@
 steps:
-  - name: ':hammer: Build and UI Test trigger'
-    commands:
+   - block: ":whale: Run UI tests"
+     prompt: "Confirm running UI tests on device farm?"
+
+   - wait
+   - name: ':hammer: Build and UI Test trigger'
+     commands:
       - ls
       - cd ./RoktSampleApp
       - sudo apt install curl
@@ -13,9 +17,9 @@ steps:
       - echo accesskey $DEVICE_FARM_STAGE_ACCESS_KEY
       - echo secretkey $DEVICE_FARM_STAGE_SECRET_KEY
       - bundle exec fastlane deviceFarmUITest
-    artifact_paths:
-      - "app/**/*.apk"
-    plugins:
+     artifact_paths:
+       - "app/**/*.apk"
+     plugins:
       - docker-compose#v3.0.0:
           config: ./docker/docker-compose.yml
           run: build_android
@@ -42,23 +46,28 @@ steps:
             DEVICE_FARM_STAGE_SECRET_KEY:
               secret-id: 'stage-android-sdk-buildkite'
               json-key: '.DEVICE_FARM_STAGE_SECRET_KEY'
-    agents:
-    - "queue=stage-us-west-2-default"       
+     agents:
+     - "queue=stage-us-west-2-default"       
   
-  - name: ':rocket: Publish'
-    plugins:
+     - block: ":whale: Publish"
+       prompt: "Confirm publish Widget to npm?"
+
+   - wait
+   - name: ':rocket: Publish'
+     commands:
+      - cd ./Rokt.Widget && echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > ./.npmrc
+      - npm publish --access=public
+
+     plugins:
       - docker-compose#v3.0.0:
           config: ./docker/docker-compose-node.yml
           run: build_android 
-    commands:
-      - cd ./Rokt.Widget && echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > ./.npmrc
-      - npm publish --access=public
-    plugins:
+
       - seek-oss/aws-sm#v2.0.0:
           env:
             STORE_PASSWORD:
               secret-id: 'stage-android-sdk-buildkite'
               json-key: '.NPM_TOKEN'    
-    agents:
-    - "queue=stage-us-west-2-default"  
+     agents:
+     - "queue=eng-default"  
    
