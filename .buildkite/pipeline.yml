@@ -1,6 +1,7 @@
 steps:
   - name: ':hammer: Build and UI Test trigger'
     commands:
+      - ls
       - cd ./../RoktSampleApp
       - sudo apt install curl
       - curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash -
