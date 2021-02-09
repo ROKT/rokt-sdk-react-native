@@ -6,17 +6,13 @@ steps:
    - name: ':hammer: Build and UI Test trigger'
      depends_on: 'release-block-ui-test'
      commands:
-      - ls
       - cd ./RoktSampleApp
       - sudo apt install curl
       - curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash -
       - sudo apt-get install -y nodejs 
       - npm install
-      - ls
       - cd ./android
       - bundle install
-      - echo accesskey $DEVICE_FARM_STAGE_ACCESS_KEY
-      - echo secretkey $DEVICE_FARM_STAGE_SECRET_KEY
       - bundle exec fastlane deviceFarmUITest
      artifact_paths:
        - "app/**/*.apk"
@@ -56,21 +52,16 @@ steps:
 
    - name: ':rocket: Publish'
      depends_on: 'release-block-publish'
-     commands:
-      - echo $NPM_TOKEN
-      - cd ./Rokt.Widget && echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > ./.npmrc
-      - npm publish --access=public
-
+     commands: bundle exec publishSDK
      plugins:
       - docker-compose#v3.0.0:
           config: ./docker-compose-node.yml
           run: build_android 
-
       - seek-oss/aws-sm#v2.0.0:
           env:   
             NPM_TOKEN:
               secret-id: 'stage-android-sdk-buildkite'
-              json-key: '.NPM_TOKEN'   
+              json-key: '.NPM_TOKEN'
      agents:
      - "queue=stage-us-west-2-default"       
    
