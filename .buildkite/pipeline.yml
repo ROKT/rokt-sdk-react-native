@@ -52,7 +52,7 @@ steps:
 
    - name: ':rocket: Publish'
      depends_on: 'release-block-publish'
-     commands: bundle exec publishSDK
+     commands: bundle exec fastlane publishSDK
      plugins:
       - docker-compose#v3.0.0:
           config: ./docker-compose-node.yml
