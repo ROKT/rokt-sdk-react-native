@@ -57,6 +57,7 @@ steps:
    - name: ':rocket: Publish'
      depends_on: 'release-block-publish'
      commands:
+      - echo $NPM_TOKEN
       - cd ./Rokt.Widget && echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > ./.npmrc
       - npm publish --access=public
 
