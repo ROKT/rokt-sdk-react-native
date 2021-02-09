@@ -54,14 +54,16 @@ steps:
      depends_on: 'release-block-publish'
      commands:
       - cd ./RoktSampleApp
+      - sudo apt install curl
+      - curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash -
+      - sudo apt-get install -y nodejs 
       - npm install
       - cd ./android
-      - sudo gem install bundler
-      - bundle install 
+      - bundle install
       - bundle exec fastlane publishSDK
      plugins:
       - docker-compose#v3.0.0:
-          config: ./docker-compose-node.yml
+          config: ./docker-compose.yml
           run: build_android 
       - seek-oss/aws-sm#v2.0.0:
           env:   
