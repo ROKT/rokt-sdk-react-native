@@ -38,7 +38,7 @@ platform :android do
        end
 
 
-    desc "Run UI tests on AWS device farm(stage) and wait for the results"
+    desc "Publish version to npm"
        lane :publishSDK do
           Dir.chdir("../../../Rokt.Widget") do
              ENV['NPM_TOKEN'] = ENV['NPM_TOKEN']
