@@ -74,14 +74,11 @@ RCT_EXPORT_METHOD(execute:(NSString *)viewName
             }];
         
     }];
-    
-    
-            
-    
-    
-    
-    
-
 }
+
+
+RCT_EXPORT_METHOD(setEnvironmentToStage)
+RCT_EXPORT_METHOD(setEnvironmentToProd) 
+
 @end
   
