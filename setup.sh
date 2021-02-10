@@ -7,3 +7,5 @@ sudo apt-get install -y nodejs
 npm install
 cd ./android
 bundle install
+exit 0
+
