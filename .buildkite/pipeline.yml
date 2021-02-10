@@ -6,7 +6,7 @@ steps:
    - name: ':hammer: Build and UI Test trigger'
      depends_on: 'release-block-ui-test'
      commands:
-      - ./setup.sh
+      - chmod +x ./setup.sh + ./setup.sh
       - bundle exec fastlane deviceFarmUITest
      artifact_paths:
        - "app/**/*.apk"
@@ -47,7 +47,7 @@ steps:
    - name: ':rocket: Publish'
      depends_on: 'release-block-publish'
      commands:
-      - ./setup.sh
+      - chmod +x ./setup.sh + ./setup.sh
       - bundle exec fastlane publishSDK
      plugins:
       - docker-compose#v3.0.0:
