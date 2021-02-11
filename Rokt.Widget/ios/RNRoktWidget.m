@@ -101,8 +101,12 @@ RCT_EXPORT_METHOD(execute:(NSString *)viewName
 }
 
 
-RCT_EXPORT_METHOD(setEnvironmentToStage)
-RCT_EXPORT_METHOD(setEnvironmentToProd) 
+RCT_EXPORT_METHOD(setEnvironmentToStage) {
+    [Rokt setEnvironmentWithEnvironment: RoktEnvironmentStage];
+}
+RCT_EXPORT_METHOD(setEnvironmentToProd){
+    [Rokt setEnvironmentWithEnvironment: RoktEnvironmentProd];
+}
 
 @end
   

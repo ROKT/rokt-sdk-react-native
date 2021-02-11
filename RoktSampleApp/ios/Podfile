@@ -37,6 +37,8 @@ target 'RoktSampleApp' do
   pod 'Folly', :podspec => '../node_modules/react-native/third-party-podspecs/Folly.podspec'
   pod 'rokt-react-native-sdk', :path => '../../Rokt.Widget'
 
+  pod 'RNCCheckbox', :path => '../node_modules/@react-native-community/checkbox'
+
   target 'RoktSampleAppTests' do
     inherit! :complete
     # Pods for testing
