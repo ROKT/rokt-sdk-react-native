@@ -77,7 +77,9 @@ public class RNRoktWidgetModule extends ReactContextBaseJavaModule {
                     }
                 }
 
+
                 Rokt.INSTANCE.execute(viewName, convertAttributesToMapOfStrings(attributes),
+
                 new Rokt.RoktCallback() {
                     @Override
                     public void onLoad() {
@@ -109,6 +111,17 @@ public class RNRoktWidgetModule extends ReactContextBaseJavaModule {
     public String getName() {
         return "RNRoktWidget";
     }
+
+    @ReactMethod
+    public void setEnvironmentToStage() {
+        Rokt.INSTANCE.setEnvironment(Rokt.Environment.Stage.INSTANCE);
+    }
+
+    @ReactMethod
+    public void setEnvironmentToProd() {
+        Rokt.INSTANCE.setEnvironment(Rokt.Environment.Prod.INSTANCE);
+    }
+
 
     private Map<String, String> convertAttributesToMapOfStrings(final ReadableMap attributes){
         if (attributes != null) {

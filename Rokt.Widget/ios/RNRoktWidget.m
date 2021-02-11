@@ -66,6 +66,7 @@ RCT_EXPORT_METHOD(execute:(NSString *)viewName
         RoktEventManager *event = [RoktEventManager allocWithZone: nil];
         
         
+
         [Rokt executeWithViewName:viewName attributes:finalAttributes
                        placements:nativePlaceholders
                            onLoad:^{ callback(@[@"onLoad", [NSNull null]]);}
@@ -96,6 +97,16 @@ RCT_EXPORT_METHOD(execute:(NSString *)viewName
 
     [finalAttributes removeObjectsForKeys:[keys allObjects]];
     return finalAttributes;
+
 }
+
+
+RCT_EXPORT_METHOD(setEnvironmentToStage) {
+    [Rokt setEnvironmentWithEnvironment: RoktEnvironmentStage];
+}
+RCT_EXPORT_METHOD(setEnvironmentToProd){
+    [Rokt setEnvironmentWithEnvironment: RoktEnvironmentProd];
+}
+
 @end
   
