@@ -54,7 +54,7 @@ repositories {
 
 dependencies {
     implementation "org.webkit:android-jsc:+"
-    implementation 'com.facebook.react:react-native:0.62.2'
+    implementation "com.facebook.react:react-native:+"  // From node_modules    
     implementation ('com.rokt:roktsdk:3.4.1'){
         exclude group: 'com.walmartlabs.ern'
     }
