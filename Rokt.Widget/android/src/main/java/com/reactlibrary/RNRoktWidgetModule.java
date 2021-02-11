@@ -2,6 +2,7 @@
 package com.reactlibrary;
 
 import android.app.Activity;
+import android.util.Log;
 import android.view.View;
 
 import androidx.annotation.NonNull;
@@ -21,9 +22,21 @@ import java.lang.ref.WeakReference;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Copyright 2020 Rokt Pte Ltd
+ *
+ * Licensed under the Rokt Software Development Kit (SDK) Terms of Use
+ * Version 2.0 (the "License");
+ *
+ * You may not use this file except in compliance with the License.
+ *
+ * You may obtain a copy of the License at https://rokt.com/sdk-license-2-0/
+*/
+
 public class RNRoktWidgetModule extends ReactContextBaseJavaModule {
 
     private final ReactApplicationContext reactContext;
+    private final String TAG = "RoktWidget";
 
     RNRoktWidgetModule(ReactApplicationContext reactContext) {
         super(reactContext);
@@ -32,12 +45,22 @@ public class RNRoktWidgetModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     public void initialize(String roktTagId, String appVersion) {
+
         Activity currentActivity = getCurrentActivity();
-        Rokt.INSTANCE.init(roktTagId, appVersion, currentActivity);
+        if (currentActivity != null && appVersion != null && roktTagId != null) {
+            Rokt.INSTANCE.init(roktTagId, appVersion, currentActivity);
+        } else {
+            Log.d(TAG, "Activity, roktTagId and AppVersion cannot be null");
+        }
     }
 
     @ReactMethod
     public void execute(final String viewName, final ReadableMap attributes, final ReadableMap placeholders, final Callback onLoad) {
+        if (viewName == null) {
+            Log.d(TAG, "Execute failed. ViewName cannot be null");
+            return;
+        }
+
         final Map<String, WeakReference<Widget>> placeholderMap = new HashMap<>();
 
         UIManagerModule uiManager = reactContext.getNativeModule(UIManagerModule.class);
@@ -45,14 +68,18 @@ public class RNRoktWidgetModule extends ReactContextBaseJavaModule {
             @Override
             public void execute(NativeViewHierarchyManager nativeViewHierarchyManager) {
                 for (Map.Entry<String, Object> entry : placeholders.toHashMap().entrySet()) {
-                    int tag = ((Double) entry.getValue()).intValue();
-                    View view = nativeViewHierarchyManager.resolveView(tag);
-                    if (view instanceof Widget){
-                        placeholderMap.put(entry.getKey(), new WeakReference(view));
+                    if (entry.getValue() != null && entry.getValue() instanceof Double) {
+                        int tag = ((Double) entry.getValue()).intValue();
+                        View view = nativeViewHierarchyManager.resolveView(tag);
+                        if (view instanceof Widget) {
+                            placeholderMap.put(entry.getKey(), new WeakReference(view));
+                        }
                     }
                 }
 
-                Rokt.INSTANCE.execute(viewName, new HashMap(attributes.toHashMap()),
+
+                Rokt.INSTANCE.execute(viewName, convertAttributesToMapOfStrings(attributes),
+
                 new Rokt.RoktCallback() {
                     @Override
                     public void onLoad() {
@@ -94,10 +121,20 @@ public class RNRoktWidgetModule extends ReactContextBaseJavaModule {
     public void setEnvironmentToProd() {
         Rokt.INSTANCE.setEnvironment(Rokt.Environment.Prod.INSTANCE);
     }
+
+
+    private Map<String, String> convertAttributesToMapOfStrings(final ReadableMap attributes){
+        if (attributes != null) {
+            Map<String, Object> map = attributes.toHashMap();
+            Map<String,String> newMap = new HashMap<String,String>();
+            for (Map.Entry<String, Object> entry : map.entrySet()) {
+                if(entry.getValue() instanceof String){
+                    newMap.put(entry.getKey(), (String) entry.getValue());
+                }
+            }
+            return newMap;
+        }
+
+        return null;
+    }
 }
-
-
-
-
-
-
