@@ -16,6 +16,7 @@ import com.facebook.react.uimanager.NativeViewHierarchyManager;
 import com.facebook.react.uimanager.UIBlock;
 import com.facebook.react.uimanager.UIManagerModule;
 import com.rokt.roktsdk.Rokt;
+import com.rokt.roktsdk.Rokt.RoktEventHandler;
 import com.rokt.roktsdk.Widget;
 
 import java.lang.ref.WeakReference;
@@ -36,7 +37,8 @@ import java.util.Map;
 public class RNRoktWidgetModule extends ReactContextBaseJavaModule {
 
     private final ReactApplicationContext reactContext;
-    private final String TAG = "RoktWidget";
+    private RoktEventHandler roktEventHandler;
+    private Boolean debug = false;
 
     RNRoktWidgetModule(ReactApplicationContext reactContext) {
         super(reactContext);
@@ -45,66 +47,67 @@ public class RNRoktWidgetModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     public void initialize(String roktTagId, String appVersion) {
-
         Activity currentActivity = getCurrentActivity();
         if (currentActivity != null && appVersion != null && roktTagId != null) {
             Rokt.INSTANCE.init(roktTagId, appVersion, currentActivity);
         } else {
-            Log.d(TAG, "Activity, roktTagId and AppVersion cannot be null");
+            logDebug("Activity, roktTagId and AppVersion cannot be null");
         }
     }
 
     @ReactMethod
     public void execute(final String viewName, final ReadableMap attributes, final ReadableMap placeholders, final Callback onLoad) {
         if (viewName == null) {
-            Log.d(TAG, "Execute failed. ViewName cannot be null");
+            logDebug("Execute failed. ViewName cannot be null");
             return;
         }
-
-        final Map<String, WeakReference<Widget>> placeholderMap = new HashMap<>();
 
         UIManagerModule uiManager = reactContext.getNativeModule(UIManagerModule.class);
         uiManager.addUIBlock(new UIBlock() {
             @Override
             public void execute(NativeViewHierarchyManager nativeViewHierarchyManager) {
-                for (Map.Entry<String, Object> entry : placeholders.toHashMap().entrySet()) {
-                    if (entry.getValue() != null && entry.getValue() instanceof Double) {
-                        int tag = ((Double) entry.getValue()).intValue();
-                        View view = nativeViewHierarchyManager.resolveView(tag);
-                        if (view instanceof Widget) {
-                            placeholderMap.put(entry.getKey(), new WeakReference(view));
-                        }
-                    }
-                }
-
-
-                Rokt.INSTANCE.execute(viewName, convertAttributesToMapOfStrings(attributes),
-
-                new Rokt.RoktCallback() {
-                    @Override
-                    public void onLoad() {
-                        if (onLoad != null) {
-                            onLoad.invoke();
-                        }
-                    }
-
-                    @Override
-                    public void onUnload(@NonNull Rokt.UnloadReasons unloadReasons) {
-                        if (unloadReasons != null) {
-
-                        }
-                    }
-
-                    @Override
-                    public void onShouldShowLoadingIndicator() {
-                    }
-
-                    @Override
-                    public void onShouldHideLoadingIndicator() {
-                    }
-                }, placeholderMap);
+                Rokt.INSTANCE.execute(viewName, readableMapToMapOfStrings(attributes), createRoktCallback(onLoad), safeUnwrapPlaceholders(placeholders, nativeViewHierarchyManager));
             }
         });
+    }
+
+    @ReactMethod
+    public void execute2Step(final String viewName, final ReadableMap attributes, final ReadableMap placeholders, final Callback onLoad, final Callback roktEventCallback) {
+        UIManagerModule uiManager = reactContext.getNativeModule(UIManagerModule.class);
+        uiManager.addUIBlock(new UIBlock() {
+            @Override
+            public void execute(NativeViewHierarchyManager nativeViewHierarchyManager) {
+                Rokt.INSTANCE.execute2Step(viewName, readableMapToMapOfStrings(attributes), createRoktCallback(onLoad), safeUnwrapPlaceholders(placeholders, nativeViewHierarchyManager), new Rokt.RoktEventCallback() {
+                    @Override
+                    public void onEvent(Rokt.RoktEventType roktEventType, final Rokt.RoktEventHandler roktEventHandler) {
+                        setRoktEventHandler(roktEventHandler);
+                        if (roktEventType == Rokt.RoktEventType.FirstPositiveEngagement) {
+                            logDebug("onFirstPositiveEvent was fired");
+                            roktEventCallback.invoke();
+                        }
+                    }
+                });
+            }
+        });
+    }
+
+    @ReactMethod
+    public void setFulfillmentAttributes(final ReadableMap attributes) {
+        if (this.roktEventHandler != null) {
+            Map<String, String> fulfillmentAttributes = readableMapToMapOfStrings(attributes);
+            if (fulfillmentAttributes != null) {
+                roktEventHandler.setFulfillmentAttributes(fulfillmentAttributes);
+                logDebug("Calling setFulfillmentAttributes");
+            } else {
+                logDebug("Fulfillment attributes must be a map of Strings");
+            }
+        } else {
+            logDebug("RoktEventHandler is null, make sure you run execute2Step before calling setFulfillmentAttributes");
+        }
+    }
+
+    private void setRoktEventHandler(RoktEventHandler roktEventHandler) {
+        this.roktEventHandler = roktEventHandler;
     }
 
     @Override
@@ -122,13 +125,23 @@ public class RNRoktWidgetModule extends ReactContextBaseJavaModule {
         Rokt.INSTANCE.setEnvironment(Rokt.Environment.Prod.INSTANCE);
     }
 
+    @ReactMethod
+    public void toggleDebug(Boolean enabled) {
+        this.debug = enabled;
+    }
 
-    private Map<String, String> convertAttributesToMapOfStrings(final ReadableMap attributes){
+    private void logDebug(String message) {
+        if (debug) {
+            Log.d("Rokt", message);
+        }
+    }
+
+    private Map<String, String> readableMapToMapOfStrings(final ReadableMap attributes) {
         if (attributes != null) {
             Map<String, Object> map = attributes.toHashMap();
-            Map<String,String> newMap = new HashMap<String,String>();
+            Map<String, String> newMap = new HashMap<String, String>();
             for (Map.Entry<String, Object> entry : map.entrySet()) {
-                if(entry.getValue() instanceof String){
+                if (entry.getValue() instanceof String) {
                     newMap.put(entry.getKey(), (String) entry.getValue());
                 }
             }
@@ -137,4 +150,45 @@ public class RNRoktWidgetModule extends ReactContextBaseJavaModule {
 
         return null;
     }
+
+    private Rokt.RoktCallback createRoktCallback(final Callback onLoad) {
+        return new Rokt.RoktCallback() {
+            @Override
+            public void onLoad() {
+                if (onLoad != null) {
+                    onLoad.invoke();
+                }
+            }
+
+            @Override
+            public void onUnload(@NonNull Rokt.UnloadReasons unloadReasons) {
+                if (unloadReasons != null) {
+
+                }
+            }
+
+            @Override
+            public void onShouldShowLoadingIndicator() {
+            }
+
+            @Override
+            public void onShouldHideLoadingIndicator() {
+            }
+        };
+    }
+
+    private Map<String, WeakReference<Widget>> safeUnwrapPlaceholders(final ReadableMap placeholders, final NativeViewHierarchyManager nativeViewHierarchyManager) {
+        final Map<String, WeakReference<Widget>> placeholderMap = new HashMap<>();
+
+        for (Map.Entry<String, Object> entry : placeholders.toHashMap().entrySet()) {
+            int tag = ((Double) entry.getValue()).intValue();
+            View view = nativeViewHierarchyManager.resolveView(tag);
+            if (view instanceof Widget) {
+                placeholderMap.put(entry.getKey(), new WeakReference(view));
+            }
+        }
+
+        return placeholderMap;
+    }
 }
+

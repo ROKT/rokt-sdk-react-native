@@ -26,10 +26,10 @@ import {
 import CheckBox from '@react-native-community/checkbox';
 import Toast from "react-native-toast-message";
 import { isNumeric, isEmpty, isNotEmpty, isValidJson } from "./utils/text-utils";
-import { DEFAULT_ATTRIBUTES, DEFAULT_TAG_ID, DEFAULT_VIEW_NAME, DEFAULT_COUNTRY } from "./utils/rokt-constants";
+import { DEFAULT_ATTRIBUTES, DEFAULT_TAG_ID, DEFAULT_VIEW_NAME, DEFAULT_COUNTRY, FULLFILLMENT_ATTRIBUTES } from "./utils/rokt-constants";
 import { Colors } from "react-native/Libraries/NewAppScreen";
 import { Rokt, RoktEmbeddedView } from "@rokt/react-native-sdk";
-
+import sha256 from 'crypto-js/sha256';
 export default class App extends Component {
   constructor(props) {
     super(props);
@@ -45,13 +45,14 @@ export default class App extends Component {
       targetElement1: "Location1",
       targetElement2: "Location2",
       attributes: attributes,
-      checked:false
+      stageEnabled:false,
+      twoStepEnabled: false
     };
   }
 
   onInitHandler = () => {
     if (isNotEmpty(this.state.tagId) && isNumeric(this.state.tagId)) {
-      if (this.state.checked) {
+      if (this.state.stageEnabled) {
         console.log("Executing on Stage");
         Rokt.setEnvironmentToStage();
       } else {
@@ -73,6 +74,28 @@ export default class App extends Component {
       position: "bottom",
       autoHide: true,
     });
+  };
+
+  execute2Step = async(attributes, placeholders) => {
+    try {
+      // first we send hashed email
+      attributes["emailsha256"] = sha256(attributes["email"]).toString();
+      attributes["email"] = null;
+      console.log(attributes);
+
+      Rokt.execute2Step(this.state.viewName, attributes, placeholders, (x) => {
+        console.log("Widget OnLoad Callback");
+      },
+      (x) => {
+        console.log("Widget OnFirstPositiveEvent Callback");
+         // Send unhashed email on first positive response
+        Rokt.setFulfillmentAttributes(FULLFILLMENT_ATTRIBUTES);
+      });
+
+      console.log("Execute 2 Step");
+    } catch (e) {
+      console.error(e);
+    }
   };
 
   onExecuteHandler = () => {
@@ -103,12 +126,16 @@ export default class App extends Component {
       this.showToast("View Name cannot be empty");
     }
 
-    Rokt.execute(this.state.viewName, attributes, placeholders, (x) => {
-      console.log("Widget OnLoad Callback");
-    });
-    console.log("Execute");
+    if (this.state.twoStepEnabled) {
+      this.execute2Step(attributes, placeholders);
+    } else {
+      Rokt.execute(this.state.viewName, attributes, placeholders, (x) => {
+        console.log("Widget OnLoad Callback");
+      });
+      console.log("Execute");
+    }
   };
-
+  
   render() {
     return (
       <>
@@ -194,11 +221,20 @@ export default class App extends Component {
               <View style={{ flexDirection: 'row' }}>
                 <CheckBox
                   accessibilityLabel="input_stage_env"
-                  value={this.state.checked}
-                  onValueChange={() => this.setState({ checked: !this.state.checked })}
+                  value={this.state.stageEnabled}
+                  onValueChange={() => this.setState({ stageEnabled: !this.state.stageEnabled })}
                 />
                 <Text style={{marginTop: 5}}>Stage Environment</Text>
-              </View>
+                </View>
+                <View style={{ flexDirection: 'row' }}>
+                <CheckBox
+                  accessibilityLabel="input_2step"
+                  value={this.state.twoStepEnabled}
+                  onValueChange={() => this.setState({ twoStepEnabled: !this.state.twoStepEnabled })}
+                />
+
+                <Text style={{marginTop: 5}}>2Step Data Pass</Text>
+                </View>
                 <View style={styles.buttonContainer}>
                   <TouchableOpacity
                     onPress={this.onInitHandler}
@@ -213,7 +249,6 @@ export default class App extends Component {
                 </View>
               </View>
             </View>
-            
 
             <RoktEmbeddedView
               ref={this.placeholder1}
