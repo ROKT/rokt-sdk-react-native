@@ -73,6 +73,11 @@ public class RNRoktWidgetModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     public void execute2Step(final String viewName, final ReadableMap attributes, final ReadableMap placeholders, final Callback onLoad, final Callback roktEventCallback) {
+        if (viewName == null) {
+            logDebug("Execute failed. ViewName cannot be null");
+            return;
+        }
+        
         UIManagerModule uiManager = reactContext.getNativeModule(UIManagerModule.class);
         uiManager.addUIBlock(new UIBlock() {
             @Override
