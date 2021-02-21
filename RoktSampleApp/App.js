@@ -22,14 +22,18 @@ import {
   findNodeHandle,
   StatusBar,
   TouchableOpacity,
+  NativeEventEmitter
 } from "react-native";
 import CheckBox from '@react-native-community/checkbox';
 import Toast from "react-native-toast-message";
 import { isNumeric, isEmpty, isNotEmpty, isValidJson } from "./utils/text-utils";
 import { DEFAULT_ATTRIBUTES, DEFAULT_TAG_ID, DEFAULT_VIEW_NAME, DEFAULT_COUNTRY, FULLFILLMENT_ATTRIBUTES } from "./utils/rokt-constants";
 import { Colors } from "react-native/Libraries/NewAppScreen";
-import { Rokt, RoktEmbeddedView } from "@rokt/react-native-sdk";
+import { Rokt, RoktEmbeddedView, RoktEventManager } from "@rokt/react-native-sdk";
 import sha256 from 'crypto-js/sha256';
+
+const eventManagerEmitter = new NativeEventEmitter(RoktEventManager);
+
 export default class App extends Component {
   constructor(props) {
     super(props);
@@ -46,8 +50,21 @@ export default class App extends Component {
       targetElement2: "Location2",
       attributes: attributes,
       stageEnabled:false,
-      twoStepEnabled: false
+      twoStepEnabled: true
     };
+  }
+
+  subscription = eventManagerEmitter.addListener(
+    'FirstPositiveResponse',
+    (x) => {
+      console.log("Widget OnFirstPositiveEvent Callback");
+      // Send unhashed email on first positive response
+     Rokt.setFulfillmentAttributes(FULLFILLMENT_ATTRIBUTES);
+    }
+  );
+
+  componentWillUnmount(){
+    this.subscription.remove();
   }
 
   onInitHandler = () => {
@@ -83,13 +100,8 @@ export default class App extends Component {
       attributes["email"] = null;
       console.log(attributes);
 
-      Rokt.execute2Step(this.state.viewName, attributes, placeholders, (x) => {
+      Rokt.execute2Step(this.state.viewName, attributes, placeholders, (onLoad) => {
         console.log("Widget OnLoad Callback");
-      },
-      (x) => {
-        console.log("Widget OnFirstPositiveEvent Callback");
-         // Send unhashed email on first positive response
-        Rokt.setFulfillmentAttributes(FULLFILLMENT_ATTRIBUTES);
       });
 
       console.log("Execute 2 Step");
@@ -224,7 +236,7 @@ export default class App extends Component {
                   value={this.state.stageEnabled}
                   onValueChange={() => this.setState({ stageEnabled: !this.state.stageEnabled })}
                 />
-                <Text style={{marginTop: 5}}>Stage Environment</Text>
+                <Text style={{marginTop: 5, marginLeft: 5}}>Stage Environment</Text>
                 </View>
                 <View style={{ flexDirection: 'row' }}>
                 <CheckBox
@@ -233,7 +245,7 @@ export default class App extends Component {
                   onValueChange={() => this.setState({ twoStepEnabled: !this.state.twoStepEnabled })}
                 />
 
-                <Text style={{marginTop: 5}}>2Step Data Pass</Text>
+                <Text style={{marginTop: 5, marginLeft: 5}}>2Step Data Pass</Text>
                 </View>
                 <View style={styles.buttonContainer}>
                   <TouchableOpacity
