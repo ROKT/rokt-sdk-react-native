@@ -34,6 +34,7 @@ import sha256 from 'crypto-js/sha256';
 
 const eventManagerEmitter = new NativeEventEmitter(RoktEventManager);
 
+
 export default class App extends Component {
   constructor(props) {
     super(props);
@@ -50,7 +51,7 @@ export default class App extends Component {
       targetElement2: "Location2",
       attributes: attributes,
       stageEnabled:false,
-      twoStepEnabled: true
+      twoStepEnabled: false
     };
   }
 
@@ -99,7 +100,6 @@ export default class App extends Component {
       attributes["emailsha256"] = sha256(attributes["email"]).toString();
       attributes["email"] = null;
       console.log(attributes);
-
       Rokt.execute2Step(this.state.viewName, attributes, placeholders, (onLoad) => {
         console.log("Widget OnLoad Callback");
       });
@@ -244,7 +244,6 @@ export default class App extends Component {
                   value={this.state.twoStepEnabled}
                   onValueChange={() => this.setState({ twoStepEnabled: !this.state.twoStepEnabled })}
                 />
-
                 <Text style={{marginTop: 5, marginLeft: 5}}>2Step Data Pass</Text>
                 </View>
                 <View style={styles.buttonContainer}>
