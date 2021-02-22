@@ -201,10 +201,12 @@ public class RNRoktWidgetModule extends ReactContextBaseJavaModule {
         final Map<String, WeakReference<Widget>> placeholderMap = new HashMap<>();
 
         for (Map.Entry<String, Object> entry : placeholders.toHashMap().entrySet()) {
-            int tag = ((Double) entry.getValue()).intValue();
-            View view = nativeViewHierarchyManager.resolveView(tag);
-            if (view instanceof Widget) {
-                placeholderMap.put(entry.getKey(), new WeakReference(view));
+            if (entry.getValue() instanceof Double) {
+                int tag = ((Double) entry.getValue()).intValue();
+                View view = nativeViewHierarchyManager.resolveView(tag);
+                if (view instanceof Widget) {
+                    placeholderMap.put(entry.getKey(), new WeakReference(view));
+                }
             }
         }
 
