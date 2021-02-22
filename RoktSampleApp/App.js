@@ -69,7 +69,7 @@ export default class App extends Component {
   }
 
   onInitHandler = () => {
-    if (isNotEmpty(this.state.tagId) && isNumeric(this.state.tagId)) {
+    if (isNotEmpty(this.state.tagId)) {
       if (this.state.stageEnabled) {
         console.log("Executing on Stage");
         Rokt.setEnvironmentToStage();
@@ -80,7 +80,7 @@ export default class App extends Component {
       Rokt.initialize(this.state.tagId, "1.1");
       console.log("Initialize");
     } else {
-      this.showToast("Tag ID must be a valid number");
+      this.showToast("Tag ID must be a valid string");
     }
   };
 
