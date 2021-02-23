@@ -51,7 +51,7 @@ RCT_EXPORT_METHOD(execute:(NSString *)viewName
     NSMutableDictionary *finalAttributes = [self convertAttributesToDictionary:attributes];
     
     NSMutableDictionary *nativePlaceholders = [[NSMutableDictionary alloc]initWithCapacity:placeholders.count];
-
+    
     [self.bridge.uiManager addUIBlock:^(RCTUIManager *uiManager, NSDictionary<NSNumber *,UIView *> *viewRegistry) {
         for(id key in placeholders){
             RoktEmbeddedView *view = viewRegistry[[placeholders objectForKey:key]];
@@ -65,8 +65,6 @@ RCT_EXPORT_METHOD(execute:(NSString *)viewName
         
         RoktEventManager *event = [RoktEventManager allocWithZone: nil];
         
-        
-
         [Rokt executeWithViewName:viewName attributes:finalAttributes
                        placements:nativePlaceholders
                            onLoad:^{ callback(@[@"onLoad", [NSNull null]]);}
@@ -110,22 +108,20 @@ RCT_EXPORT_METHOD(execute2Step:(NSString *)viewName
         
         RoktEventManager *event = [RoktEventManager allocWithZone: nil];
         
-        
-
         [Rokt execute2stepWithViewName:viewName attributes:finalAttributes
-                       placements:nativePlaceholders
-                           onLoad:^{ callback(@[@"onLoad", [NSNull null]]);}
-                         onUnLoad:^{
+                            placements:nativePlaceholders
+                                onLoad:^{ callback(@[@"onLoad", [NSNull null]]);}
+                              onUnLoad:^{
             RCTLogInfo(@"unloaded");
         }
-     onShouldShowLoadingIndicator:nil
-     onShouldHideLoadingIndicator:nil
-             onEmbeddedSizeChange:^(NSString *selectedPlacement, CGFloat widgetHeight){
+          onShouldShowLoadingIndicator:nil
+          onShouldHideLoadingIndicator:nil
+                  onEmbeddedSizeChange:^(NSString *selectedPlacement, CGFloat widgetHeight){
             
             [event onWidgetHeightChanges:widgetHeight placement:selectedPlacement];
             
         }
-         onEvent:^(RoktEventType roktEventType, RoktEventHandler* roktEventHandler){
+                               onEvent:^(RoktEventType roktEventType, RoktEventHandler* roktEventHandler){
             self.roktEventHandler = roktEventHandler;
             if (roktEventType == RoktEventTypeFirstPositiveEngagement) {
                 RCTLogInfo(@"firstPositiveEvent was fired");
@@ -153,10 +149,10 @@ RCT_EXPORT_METHOD(setFulfillmentAttributes:(NSDictionary *)attributes) {
     NSSet *keys = [finalAttributes keysOfEntriesPassingTest:^BOOL(id key, id obj, BOOL *stop) {
         return ![obj isKindOfClass:[NSString class]];
     }];
-
+    
     [finalAttributes removeObjectsForKeys:[keys allObjects]];
     return finalAttributes;
-
+    
 }
 
 
@@ -168,4 +164,4 @@ RCT_EXPORT_METHOD(setEnvironmentToProd){
 }
 
 @end
-  
+
