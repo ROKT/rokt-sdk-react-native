@@ -243,7 +243,7 @@ PODS:
     - ReactCommon/callinvoker (= 0.62.2)
   - RNCCheckbox (0.5.7):
     - React-Core
-  - rokt-react-native-sdk (3.4.1-alpha.04):
+  - rokt-react-native-sdk (3.4.1):
     - React
     - Rokt-Widget (~> 3.4.1)
   - Rokt-Widget (3.4.1)
@@ -369,10 +369,10 @@ SPEC CHECKSUMS:
   React-RCTVibration: 4356114dbcba4ce66991096e51a66e61eda51256
   ReactCommon: ed4e11d27609d571e7eee8b65548efc191116eb3
   RNCCheckbox: 500919ac122273ea8eef93dae01431091968c14a
-  rokt-react-native-sdk: 422a799234b554231060fd40e11e76a5971a3dd8
+  rokt-react-native-sdk: b04f5560b4f9adddf3876ac4abc1754dc1938d03
   Rokt-Widget: 699506330293dbe8858f799e689849b10eed57d4
   Yoga: 3ebccbdd559724312790e7742142d062476b698e
 
 PODFILE CHECKSUM: d1fd179c448e1c0e84813fc71b0fa0f955e535b4
 
-COCOAPODS: 1.8.4
+COCOAPODS: 1.10.0

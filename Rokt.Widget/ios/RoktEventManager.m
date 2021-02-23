@@ -15,7 +15,7 @@
   bool hasListeners;
 }
 
-RCT_EXPORT_MODULE();
+RCT_EXPORT_MODULE(RoktEventManager);
 
 + (id)allocWithZone:(NSZone *)zone {
     static RoktEventManager *sharedInstance = nil;
@@ -39,7 +39,7 @@ RCT_EXPORT_MODULE();
 
 - (NSArray<NSString *> *)supportedEvents
 {
-  return @[@"WidgetHeightChanges"];
+  return @[@"WidgetHeightChanges", @"FirstPositiveResponse"];
 }
 
 - (void)onWidgetHeightChanges:(CGFloat)widgetHeight placement:(NSString*) selectedPlacement
@@ -48,6 +48,13 @@ RCT_EXPORT_MODULE();
         [self sendEventWithName:@"WidgetHeightChanges" body:@{@"height": [NSNumber numberWithDouble: widgetHeight],
                                                               @"selectedPlacement": selectedPlacement
         }];
+    }
+}
+
+- (void)onFirstPositiveResponse
+{
+    if (hasListeners) {
+        [self sendEventWithName:@"FirstPositiveResponse" body:@{@"":@""}];
     }
 }
 

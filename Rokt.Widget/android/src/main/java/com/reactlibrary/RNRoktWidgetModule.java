@@ -6,12 +6,16 @@ import android.util.Log;
 import android.view.View;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.facebook.react.bridge.Callback;
 import com.facebook.react.bridge.ReactApplicationContext;
+import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.ReadableMap;
+import com.facebook.react.bridge.WritableMap;
+import com.facebook.react.modules.core.DeviceEventManagerModule;
 import com.facebook.react.uimanager.NativeViewHierarchyManager;
 import com.facebook.react.uimanager.UIBlock;
 import com.facebook.react.uimanager.UIManagerModule;
@@ -72,12 +76,12 @@ public class RNRoktWidgetModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void execute2Step(final String viewName, final ReadableMap attributes, final ReadableMap placeholders, final Callback onLoad, final Callback roktEventCallback) {
+    public void execute2Step(final String viewName, final ReadableMap attributes, final ReadableMap placeholders, final Callback onLoad) {
         if (viewName == null) {
             logDebug("Execute failed. ViewName cannot be null");
             return;
         }
-        
+
         UIManagerModule uiManager = reactContext.getNativeModule(UIManagerModule.class);
         uiManager.addUIBlock(new UIBlock() {
             @Override
@@ -88,12 +92,23 @@ public class RNRoktWidgetModule extends ReactContextBaseJavaModule {
                         setRoktEventHandler(roktEventHandler);
                         if (roktEventType == Rokt.RoktEventType.FirstPositiveEngagement) {
                             logDebug("onFirstPositiveEvent was fired");
-                            roktEventCallback.invoke();
+                            sendEvent(reactContext, "FirstPositiveResponse", null);
                         }
                     }
                 });
             }
         });
+    }
+
+
+    private void sendEvent(ReactContext reactContext,
+                           String eventName,
+                           @Nullable WritableMap params) {
+        if (reactContext != null) {
+            reactContext
+                    .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
+                    .emit(eventName, params);
+        }
     }
 
     @ReactMethod
@@ -186,10 +201,12 @@ public class RNRoktWidgetModule extends ReactContextBaseJavaModule {
         final Map<String, WeakReference<Widget>> placeholderMap = new HashMap<>();
 
         for (Map.Entry<String, Object> entry : placeholders.toHashMap().entrySet()) {
-            int tag = ((Double) entry.getValue()).intValue();
-            View view = nativeViewHierarchyManager.resolveView(tag);
-            if (view instanceof Widget) {
-                placeholderMap.put(entry.getKey(), new WeakReference(view));
+            if (entry.getValue() instanceof Double) {
+                int tag = ((Double) entry.getValue()).intValue();
+                View view = nativeViewHierarchyManager.resolveView(tag);
+                if (view instanceof Widget) {
+                    placeholderMap.put(entry.getKey(), new WeakReference(view));
+                }
             }
         }
 
