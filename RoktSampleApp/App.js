@@ -123,12 +123,12 @@ export default class App extends Component {
     try {
       let publicKey;
 
-      if (attributes.stageEnabled) {
+      if (this.state.stageEnabled) {
         publicKey = PUBLIC_KEY_STAGE;
-        attributes["piiencryptionkeyid"] = this.ENCRYPTION_KEY_ID_STAGE;
+        attributes["piiencryptionkeyid"] = ENCRYPTION_KEY_ID_STAGE;
       } else {
         publicKey = PUBLIC_KEY_PROD;
-        attributes["piiencryptionkeyid"] = this.ENCRYPTION_KEY_ID_PROD;
+        attributes["piiencryptionkeyid"] = ENCRYPTION_KEY_ID_PROD;
       }
        
       // first we send hashed email
