@@ -27,13 +27,13 @@ import {
 import CheckBox from '@react-native-community/checkbox';
 import Toast from "react-native-toast-message";
 import { isNumeric, isEmpty, isNotEmpty, isValidJson } from "./utils/text-utils";
-import { DEFAULT_ATTRIBUTES, DEFAULT_TAG_ID, DEFAULT_VIEW_NAME, DEFAULT_COUNTRY, FULLFILLMENT_ATTRIBUTES } from "./utils/rokt-constants";
+import { DEFAULT_ATTRIBUTES, DEFAULT_TAG_ID, DEFAULT_VIEW_NAME, DEFAULT_COUNTRY, FULLFILLMENT_ATTRIBUTES, PUBLIC_KEY_PROD, ENCRYPTION_KEY_ID_PROD, PUBLIC_KEY_STAGE, ENCRYPTION_KEY_ID_STAGE } from "./utils/rokt-constants";
 import { Colors } from "react-native/Libraries/NewAppScreen";
 import { Rokt, RoktEmbeddedView, RoktEventManager } from "@rokt/react-native-sdk";
 import sha256 from 'crypto-js/sha256';
+var forge = require('node-forge');
 
 const eventManagerEmitter = new NativeEventEmitter(RoktEventManager);
-
 
 export default class App extends Component {
   constructor(props) {
@@ -51,7 +51,8 @@ export default class App extends Component {
       targetElement2: "Location2",
       attributes: attributes,
       stageEnabled:false,
-      twoStepEnabled: false
+      twoStepEnabled: false,
+      encryptEnabled:false
     };
   }
 
@@ -63,6 +64,15 @@ export default class App extends Component {
      Rokt.setFulfillmentAttributes(FULLFILLMENT_ATTRIBUTES);
     }
   );
+
+  encrypt(text, publicKey) {
+    var publicBytes = forge.util.decode64(publicKey);
+    var pkeyAsn1 = forge.asn1.fromDer(publicBytes);
+    var publicKey = forge.pki.publicKeyFromAsn1(pkeyAsn1);
+    let toEncrypt = Buffer.from(text);
+    let encrypted = publicKey.encrypt(toEncrypt, 'RSA-OAEP', {md: forge.md.sha256.create()});
+    return forge.util.encode64(encrypted);
+  }
 
   componentWillUnmount(){
     this.subscription.remove();
@@ -99,7 +109,6 @@ export default class App extends Component {
       // first we send hashed email
       attributes["emailsha256"] = sha256(attributes["email"]).toString();
       attributes["email"] = null;
-      console.log(attributes);
       Rokt.execute2Step(this.state.viewName, attributes, placeholders, (onLoad) => {
         console.log("Widget OnLoad Callback");
       });
@@ -109,6 +118,35 @@ export default class App extends Component {
       console.error(e);
     }
   };
+
+  executeEncrypted = async(attributes, placeholders) => {
+    try {
+      let publicKey;
+
+      if (attributes.stageEnabled) {
+        publicKey = PUBLIC_KEY_STAGE;
+        attributes["piiencryptionkeyid"] = this.ENCRYPTION_KEY_ID_STAGE;
+      } else {
+        publicKey = PUBLIC_KEY_PROD;
+        attributes["piiencryptionkeyid"] = this.ENCRYPTION_KEY_ID_PROD;
+      }
+       
+      // first we send hashed email
+      attributes["emailEnc"] = this.encrypt(attributes["email"], publicKey).toString();
+      attributes["firstnameEnc"] = this.encrypt(attributes["firstname"], publicKey).toString();
+      attributes["email"] = null;
+      attributes["firstname"] = null;
+
+      Rokt.execute(this.state.viewName, attributes, placeholders, (onLoad) => {
+        console.log("Widget OnLoad Callback");
+      });
+
+      console.log("Execute Encrypted");
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
 
   onExecuteHandler = () => {
     var stateCopy = JSON.parse(JSON.stringify(this.state));
@@ -140,7 +178,9 @@ export default class App extends Component {
 
     if (this.state.twoStepEnabled) {
       this.execute2Step(attributes, placeholders);
-    } else {
+    } else if (this.state.encryptEnabled){
+      this.executeEncrypted(attributes, placeholders);
+    }else {
       Rokt.execute(this.state.viewName, attributes, placeholders, (x) => {
         console.log("Widget OnLoad Callback");
       });
@@ -245,6 +285,15 @@ export default class App extends Component {
                   onValueChange={() => this.setState({ twoStepEnabled: !this.state.twoStepEnabled })}
                 />
                 <Text style={{marginTop: 5, marginLeft: 5}}>2Step Data Pass</Text>
+                </View>
+
+                <View style={{ flexDirection: 'row' }}>
+                <CheckBox
+                  accessibilityLabel="input_encrypt"
+                  value={this.state.encryptEnabled}
+                  onValueChange={() => this.setState({ encryptEnabled: !this.state.encryptEnabled })}
+                />
+                <Text style={{marginTop: 5, marginLeft: 5}}>Encrypt RSA</Text>
                 </View>
                 <View style={styles.buttonContainer}>
                   <TouchableOpacity
