@@ -1,7 +1,7 @@
 {
   "name": "@rokt/react-native-sdk",
-  "version": "3.5.0",
-  "description": "",
+  "version": "3.5.1",
+  "description": "Rokt Mobile SDK to integrate ROKT Api into ReactNative application",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
