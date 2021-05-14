@@ -7,7 +7,7 @@ steps:
      commands:
       - cd ./RoktSampleApp
       - sudo apt clean
-      - docker system prune --force
+      - sudo docker system prune --force
       - sudo apt install curl
       - sudo curl -sL https://deb.nodesource.com/setup_12.x | sudo -E bash -
       - sudo apt-get install -y nodejs 
