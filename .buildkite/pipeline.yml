@@ -4,12 +4,10 @@ steps:
      key: 'release-block-ui-test'
 
    - name: ':hammer: Build and UI Test trigger'
-     depends_on: 'release-block-ui-test'
      commands:
       - cd ./RoktSampleApp
-      - printf "deb http://archive.debian.org/debian/ jessie main\ndeb-src http://archive.debian.org/debian/ jessie main\ndeb http://security.debian.org jessie/updates main\ndeb-src http://security.debian.org jessie/updates main" > /etc/apt/sources.list
       - sudo apt install curl
-      - curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash -
+      - curl -sL https://deb.nodesource.com/setup_12.x | sudo -E bash -
       - sudo apt-get install -y nodejs 
       - npm install
       - cd ./android
