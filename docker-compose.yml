@@ -1,7 +1,7 @@
 version: '3.7'
 services:
   build_android:
-    image: nedarm/docker-java-node
+    image: nedarm/docker-java-node:latest
     user: root
     volumes:
       - ./:/source
