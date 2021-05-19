@@ -4,6 +4,7 @@ steps:
      key: 'release-block-ui-test'
 
    - name: ':hammer: Build and UI Test trigger'
+     depends_on: 'release-block-ui-test'
      commands:
       - cd ./RoktSampleApp
       - npm install
@@ -50,9 +51,6 @@ steps:
      depends_on: 'release-block-publish'
      commands:
       - cd ./RoktSampleApp
-      - sudo apt install curl
-      - curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash -
-      - sudo apt-get install -y nodejs 
       - npm install
       - cd ./android
       - bundle install
