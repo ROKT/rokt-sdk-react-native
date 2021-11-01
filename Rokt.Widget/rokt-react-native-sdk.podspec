@@ -13,7 +13,7 @@ Pod::Spec.new do |s|
   s.homepage     = "https://github.com/ROKT/rokt-sdk-react-native"
   s.summary      = "Rokt Mobile SDK to integrate ROKT Api into React Native iOS application"
 
-  s.platforms    = { :ios => "9.0" }
+  s.platforms    = { :ios => "10.0" }
 #   todo change 
   s.source       = { :git => "https://github.com/ROKT/rokt-sdk-react-native", :tag => "#{s.version}" }
 
@@ -22,5 +22,5 @@ Pod::Spec.new do |s|
   
 
   s.dependency "React"
-  s.dependency "Rokt-Widget", "~> 3.5.1"
+  s.dependency "Rokt-Widget", "~> 3.6.0"
 end
