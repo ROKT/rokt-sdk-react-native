@@ -40,6 +40,9 @@ steps:
             DEVICE_FARM_STAGE_SECRET_KEY:
               secret-id: 'stage-android-sdk-buildkite'
               json-key: '.DEVICE_FARM_STAGE_SECRET_KEY'
+            NPM_TOKEN:
+              secret-id: 'stage-android-sdk-buildkite'
+              json-key: '.NPM_TOKEN'
      agents:
      - "queue=stage-us-west-2-default"       
   
