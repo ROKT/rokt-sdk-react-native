@@ -13,7 +13,7 @@
   },
   "dependencies": {
     "@react-native-community/checkbox": "^0.5.7",
-    "@rokt/react-native-sdk": "file:../Rokt.Widget/rokt-react-native-sdk-3.6.1.tgz",
+    "@rokt/react-native-sdk": "file:../Rokt.Widget/rokt-react-native-sdk-3.6.2.tgz",
     "crypto-js": "^4.0.0",
     "node-forge": "^0.10.0",
     "react": "16.11.0",
