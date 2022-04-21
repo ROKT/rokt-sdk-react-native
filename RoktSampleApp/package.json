@@ -15,7 +15,7 @@
     "@react-native-community/checkbox": "^0.5.7",
     "@rokt/react-native-sdk": "file:../Rokt.Widget/rokt-react-native-sdk-3.6.4.tgz",
     "crypto-js": "^4.0.0",
-    "node-forge": "^0.10.0",
+    "node-forge": "^1.3.0",
     "react": "16.11.0",
     "react-native": "^0.62.2",
     "react-native-toast-message": "^1.4.9"
