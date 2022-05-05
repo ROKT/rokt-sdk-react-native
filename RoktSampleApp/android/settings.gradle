@@ -2,5 +2,7 @@ rootProject.name = 'RoktSampleApp'
 include ':@rokt_react-native-sdk'
 project(':@rokt_react-native-sdk').projectDir = new File(rootProject.projectDir, '../node_modules/@rokt/react-native-sdk/android')
 
+include ':react-native-community-checkbox'
+project(':react-native-community-checkbox').projectDir = new File(rootProject.projectDir, '../node_modules/@react-native-community/checkbox/android')
 
 include ':app'
