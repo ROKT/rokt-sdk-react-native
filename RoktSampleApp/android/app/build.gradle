@@ -75,7 +75,6 @@ import com.android.build.OutputFile
 project.ext.react = [
   bundleInDebug: true,
   enableHermes: false,  // clean and rebuild if changing,
-    cliPath: "node_modules/@haul-bundler/cli/bin/haul.js"
 ]
 
 apply from: "../../node_modules/react-native/react.gradle"
@@ -169,6 +168,7 @@ dependencies {
 
     implementation fileTree(dir: "libs", include: ["*.jar"])
     implementation "com.facebook.react:react-native:0.62.2"  // From node_modules
+    implementation project(':react-native-community-checkbox')
 
     if (enableHermes) {
         def hermesPath = "../../node_modules/hermes-engine/android/";
