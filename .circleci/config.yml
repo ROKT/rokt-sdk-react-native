@@ -45,16 +45,6 @@ jobs:
           root: ~/rokt-sdk-react-native/RoktSampleApp
           paths:
             - node_modules
-
-  fastlane_release:
-    executor: rn/linux_js
-    working_directory: ~/rokt-sdk-react-native/RoktSampleApp/android
-    steps:
-      - attach_workspace:
-          at: .
-      - run:
-          command: bundle exec fastlane android release
-          name: Run Fastlane
             
   android-build-and-test:
     working_directory: ~/rokt-sdk-react-native/RoktSampleApp/android
@@ -107,8 +97,11 @@ jobs:
           key: bundle-v1-{{ checksum "Gemfile.lock" }}-{{ arch }}
           paths:
             - vendor/bundle
-      - run: cd ../../Rokt.Widget && npm install
-      - run: cd ~/rokt-sdk-react-native/RoktSampleApp/android
+      - run:
+          name: Package the rokt sdk
+          command: npm install
+          working_directory: ~/rokt-sdk-react-native/Rokt.Widget
+
       - android_build:
           assemble_android_test: <<parameters.assemble_android_test>>
           build_type: <<parameters.build_type>>
@@ -230,25 +223,3 @@ commands:
                         paths:
                             - ~/gradle-build-caches
                         when: always
-
-executors:
-    linux_android:
-        docker:
-            - image: reactnativecommunity/react-native-android
-        environment:
-            - _JAVA_OPTIONS: <<parameters.java_options>>
-            - GRADLE_OPTS: <<parameters.gradle_options>>
-        parameters:
-            gradle_options:
-                default: -Xmx2014m -Dorg.gradle.daemon=false -Dorg.gradle.jvmargs="-XX:+UnlockExperimentalVMOptions -XX:+HeapDumpOnOutOfMemoryError"
-                description: Gradle command options. Note that setting this will override the default options so you might need to supply those as well.
-                type: string
-            java_options:
-                default: -Xmx1024m -XX:+UnlockExperimentalVMOptions -XX:+UseContainerSupport
-                description: Java command options. Note that setting this will override the default options so you might need to supply those as well.
-                type: string
-            resource_class:
-                default: large
-                description: Changes the resource class of the executor. Requires a support request to enable the resource_class parameter. See https://circleci.com/docs/2.0/configuration-reference/#resource_class
-                type: string
-        resource_class: <<parameters.resource_class>>
