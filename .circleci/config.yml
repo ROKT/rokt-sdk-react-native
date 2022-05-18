@@ -32,6 +32,7 @@ jobs:
 
       - restore_cache:
           key: node-v1-{{ checksum "package.json" }}-{{ arch }}
+    
 
       - run: npm install
 
@@ -106,6 +107,8 @@ jobs:
           key: bundle-v1-{{ checksum "Gemfile.lock" }}-{{ arch }}
           paths:
             - vendor/bundle
+      - run: cd ../../Rokt.Widget && npm install
+      - run: cd ~/rokt-sdk-react-native/RoktSampleApp/android
       - android_build:
           assemble_android_test: <<parameters.assemble_android_test>>
           build_type: <<parameters.build_type>>
