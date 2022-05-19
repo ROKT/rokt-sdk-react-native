@@ -58,6 +58,17 @@ jobs:
           paths:
                 - .
           root: ~/rokt-sdk-react-native
+
+  deploy:
+    working_directory: ~/rokt-sdk-react-native/RoktSampleApp
+    docker:
+      - image: cimg/node:12.16
+    steps:
+      - attach_workspace:
+          at: ~/rokt-sdk-react-native
+      - run: 
+          name: attach auth token with registry into the project
+          command: cd ../Rokt.Widget && echo "$NPM_TOKEN"
             
   android-build-and-test:
     working_directory: ~/rokt-sdk-react-native/RoktSampleApp/android
@@ -135,7 +146,7 @@ jobs:
       - store_artifacts:
           path: test-results
 workflows:
-  test_deploy-RN:
+  build_test_deploy-RN:
     jobs:
       - checkout_code
       - node_sdk:
@@ -154,6 +165,9 @@ workflows:
           filters:
             branches:
               only: circleci-project-setup
+      - deploy:
+          requires:
+            - hold
 commands:
     android_build:
         description: Builds the Android app at the given path with the given build types. This should be run only after installing dependencies.
