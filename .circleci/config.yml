@@ -9,7 +9,6 @@ jobs:
           paths:
                 - .
           root: .
-
   node_sdk:
     working_directory: ~/rokt-sdk-react-native/Rokt.Widget
     docker:
@@ -60,15 +59,32 @@ jobs:
           root: ~/rokt-sdk-react-native
 
   deploy:
-    working_directory: ~/rokt-sdk-react-native/RoktSampleApp
+    working_directory: ~/rokt-sdk-react-native/RoktSampleApp/android
     docker:
-      - image: cimg/node:12.16
+      - image: reactnativecommunity/react-native-android
     steps:
       - attach_workspace:
           at: ~/rokt-sdk-react-native
-      - run: 
-          name: attach auth token with registry into the project
-          command: cd ../Rokt.Widget && echo "$NPM_TOKEN"
+      - run: gem install fastlane
+      - run: bundle install
+      - run:
+          name: fastlane tests
+          command: |
+            bundle exec fastlane publishSDK
+
+  deployAlpha:
+    working_directory: ~/rokt-sdk-react-native/RoktSampleApp/android
+    docker:
+      - image: reactnativecommunity/react-native-android
+    steps:
+      - attach_workspace:
+          at: ~/rokt-sdk-react-native
+      - run: gem install fastlane
+      - run: bundle install
+      - run:
+          name: fastlane tests
+          command: |
+            bundle exec fastlane publishAlphaSDK
             
   android-build-and-test:
     working_directory: ~/rokt-sdk-react-native/RoktSampleApp/android
@@ -162,12 +178,18 @@ workflows:
           type: approval # <<< This key-value pair will set your workflow to a status of "On Hold"
           requires: # We only run the "hold" job when android-build-and-test has succeeded
             - android-build-and-test
+      - deployAlpha:
+          requires:
+            - hold
           filters:
             branches:
-              only: circleci-project-setup
+              ignore: /release-(.*)/
       - deploy:
           requires:
             - hold
+          filters:
+            branches:
+              only: /release-(.*)/
 commands:
     android_build:
         description: Builds the Android app at the given path with the given build types. This should be run only after installing dependencies.

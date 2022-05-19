@@ -1,6 +1,6 @@
 {
   "name": "@rokt/react-native-sdk",
-  "version": "3.6.5",
+  "version": "3.6.6-alpha2",
   "description": "Rokt Mobile SDK to integrate ROKT Api into ReactNative application",
   "main": "index.js",
   "scripts": {
@@ -11,7 +11,7 @@
   ],
   "author": "",
   "license": "Copyright 2020 Rokt Pte Ltd",
-   "peerDependencies": {
+  "peerDependencies": {
     "react-native": ">= 0.55.4"
   },
   "devDependencies": {
