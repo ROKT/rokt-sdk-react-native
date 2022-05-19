@@ -1,13 +1,23 @@
 version: 2.1
 jobs:
+  checkout_code:
+    docker:
+      - image: cimg/node:12.16
+    steps:
+      - checkout
+      - persist_to_workspace:
+          paths:
+                - .
+          root: .
+
   node_sdk:
     working_directory: ~/rokt-sdk-react-native/Rokt.Widget
     docker:
       - image: cimg/node:12.16
 
     steps:
-      - checkout:
-          path: ~/rokt-sdk-react-native
+      - attach_workspace:
+          at: ~/rokt-sdk-react-native
 
       - restore_cache:
           key: node-v1-{{ checksum "package.json" }}-{{ arch }}
@@ -20,6 +30,10 @@ jobs:
           key: node-v1-{{ checksum "package.json" }}-{{ arch }}
           paths:
             - node_modules
+      - persist_to_workspace:
+          paths:
+                - .
+          root: ~/rokt-sdk-react-native
 
   node:
     working_directory: ~/rokt-sdk-react-native/RoktSampleApp
@@ -27,8 +41,8 @@ jobs:
       - image: cimg/node:12.16
 
     steps:
-      - checkout:
-          path: ~/rokt-sdk-react-native
+      - attach_workspace:
+          at: ~/rokt-sdk-react-native
 
       - restore_cache:
           key: node-v1-{{ checksum "package.json" }}-{{ arch }}
@@ -40,11 +54,10 @@ jobs:
           key: node-v1-{{ checksum "package.json" }}-{{ arch }}
           paths:
             - node_modules
-
       - persist_to_workspace:
-          root: ~/rokt-sdk-react-native/RoktSampleApp
           paths:
-            - node_modules
+                - .
+          root: ~/rokt-sdk-react-native
             
   android-build-and-test:
     working_directory: ~/rokt-sdk-react-native/RoktSampleApp/android
@@ -80,11 +93,8 @@ jobs:
             type: boolean
 
     steps:
-      - checkout:
-          path: ~/rokt-sdk-react-native
-
       - attach_workspace:
-          at: ~/rokt-sdk-react-native/RoktSampleApp
+          at: ~/rokt-sdk-react-native
 
       - restore_cache:
           key: bundle-v1-{{ checksum "Gemfile.lock" }}-{{ arch }}
@@ -97,10 +107,6 @@ jobs:
           key: bundle-v1-{{ checksum "Gemfile.lock" }}-{{ arch }}
           paths:
             - vendor/bundle
-      - run:
-          name: Package the rokt sdk
-          command: npm install
-          working_directory: ~/rokt-sdk-react-native/Rokt.Widget
 
       - android_build:
           assemble_android_test: <<parameters.assemble_android_test>>
@@ -131,7 +137,10 @@ jobs:
 workflows:
   node-android:
     jobs:
-      - node_sdk
+      - checkout_code
+      - node_sdk:
+          requires:
+            - checkout_code
       - node:
           requires:
             - node_sdk
