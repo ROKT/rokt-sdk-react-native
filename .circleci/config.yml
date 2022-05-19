@@ -135,7 +135,7 @@ jobs:
       - store_artifacts:
           path: test-results
 workflows:
-  node-android:
+  test_deploy-RN:
     jobs:
       - checkout_code
       - node_sdk:
@@ -147,6 +147,13 @@ workflows:
       - android-build-and-test:
           requires:
             - node
+      - hold: # <<< A job that will require manual approval in the CircleCI web application.
+          type: approval # <<< This key-value pair will set your workflow to a status of "On Hold"
+          requires: # We only run the "hold" job when android-build-and-test has succeeded
+            - android-build-and-test
+          filters:
+            branches:
+              only: circleci-project-setup
 commands:
     android_build:
         description: Builds the Android app at the given path with the given build types. This should be run only after installing dependencies.
