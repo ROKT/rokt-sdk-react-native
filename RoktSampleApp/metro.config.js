@@ -5,9 +5,6 @@
  * @format
  */
 
-const packagePath =
-    '../Rokt.Widget';
-
 module.exports = {
   transformer: {
     getTransformOptions: async () => ({
@@ -17,9 +14,4 @@ module.exports = {
       },
     }),
   },
-resolver: {
-        nodeModulesPaths: [packagePath],
-        // rest of metro resolver options...
-    },
-watchFolders: [packagePath],
 };
