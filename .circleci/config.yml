@@ -181,15 +181,15 @@ jobs:
             description: The path to the directory to place the derived data, relative to the root of the repository.
             type: string
         device:
-            default: iPhone 11
+            default: iPhone 13
             description: The type of device you want to build for.
             type: string
         project_path:
             description: The path to the Xcode project (*.xcodeproj) or the Xcode workspace (*.xcworkspace) that you want to build, relative to the root of the repository.
             type: string
-            default: ios
+            default: ios/RoktSampleApp.xcworkspace
         project_type:
-            default: project
+            default: workspace
             description: If the iOS app is built using a project file (*.xcodeproj) or a workspace.
             enum:
                 - project
@@ -200,7 +200,7 @@ jobs:
             description: The location of the "ios" directory
             type: string
         scheme:
-            default: Example
+            default: RoktSampleApp
             description: The scheme to use.
             type: string
     steps:
