@@ -229,7 +229,11 @@ jobs:
       - run:
           name: Build iOS App
           command: export RCT_NO_LAUNCH_PACKAGER=true && xcodebuild -<<parameters.project_type>> <<parameters.project_path>> -destination 'platform=iOS Simulator,name=<<parameters.device>>' -scheme <<parameters.scheme>> -parallelizeTargets -configuration <<parameters.build_configuration>> -derivedDataPath <<parameters.derived_data_path>>  -UseModernBuildSystem=YES | xcpretty -k
-          
+      - save_cache:
+          key: ios-build-cache-{{ arch }}-{{ checksum "~/.tmp/checksumfiles/package.json" }}-{{ .Environment.CACHE_VERSION }}
+          name: Saving iOS Build Cache
+          paths:
+              - <<parameters.derived_data_path>>/Build
 workflows:
   build_test_deploy-RN:
     jobs:
