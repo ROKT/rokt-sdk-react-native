@@ -203,10 +203,38 @@ jobs:
             default: RoktSampleApp
             description: The scheme to use.
             type: string
+        yarn_cache_folder:
+            default: /tmp/yarn
+            description: The path to the yarn cache folder.  Defaults to /tmp/yarn
+            type: string
     steps:
       - attach_workspace:
           at: ~/rokt-sdk-react-native
+      # run simulator on background
+      - run:
+          background: true
+          command: xcrun simctl boot "<<parameters.device>>" || true
+          name: Start iOS simulator (background)
 
+      # install yarn
+      - run:
+          command: |
+              mkdir -p ~/.tmp/checksumfiles
+              find . -type f -name 'package.json' -not -path "*node_modules*" -exec cat {} + >> ~/.tmp/checksumfiles/package.json
+              find . -type f -name 'yarn.lock' -not -path "*node_modules*" -exec cat {} + >> ~/.tmp/checksumfiles/yarn.lock
+          name: Create cache checksum file
+      - restore_cache:
+          keys:
+              - yarn-cache-{{ arch }}-{{ checksum "~/.tmp/checksumfiles/package.json" }}-{{ checksum "~/.tmp/checksumfiles/yarn.lock" }}-{{ .Environment.CACHE_VERSION }}
+      - run:
+          command: yarn install --frozen-lockfile --non-interactive --cache-folder <<parameters.yarn_cache_folder>>
+          name: Yarn Install
+      - save_cache:
+          key: |
+              yarn-cache-{{ arch }}-{{ checksum "~/.tmp/checksumfiles/package.json" }}-{{ checksum "~/.tmp/checksumfiles/yarn.lock" }}-{{ .Environment.CACHE_VERSION }}
+          paths:
+              - <<parameters.yarn_cache_folder>>
+      # pod cache and install
       - restore_cache:
           keys:
             - '{{ .Environment.CACHE_VERSION }}-cache-pods-{{ checksum "<<parameters.pod_install_directory>>/Podfile.lock" }}'
