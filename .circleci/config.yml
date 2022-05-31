@@ -203,10 +203,6 @@ jobs:
             default: RoktSampleApp
             description: The scheme to use.
             type: string
-        yarn_cache_folder:
-            default: /tmp/checksumfiles
-            description: The path to the yarn cache folder.  Defaults to /tmp/yarn
-            type: string
     steps:
       - attach_workspace:
           at: ~/rokt-sdk-react-native
@@ -215,25 +211,6 @@ jobs:
           background: true
           command: xcrun simctl boot "<<parameters.device>>" || true
           name: Start iOS simulator (background)
-
-      # install yarn
-      - run:
-          command: |
-              mkdir -p ~/.tmp/checksumfiles
-              find . -type f -name 'package.json' -not -path "*node_modules*" -exec cat {} + >> ~/.tmp/checksumfiles/package.json
-              find . -type f -name 'yarn.lock' -not -path "*node_modules*" -exec cat {} + >> ~/.tmp/checksumfiles/yarn.lock
-          name: Create cache checksum file
-      - restore_cache:
-          keys:
-              - yarn-cache-{{ arch }}-{{ checksum "~/.tmp/checksumfiles/package.json" }}-{{ checksum "~/.tmp/checksumfiles/yarn.lock" }}-{{ .Environment.CACHE_VERSION }}
-      - run:
-          command: yarn install --frozen-lockfile --non-interactive --cache-folder <<parameters.yarn_cache_folder>>
-          name: Yarn Install
-      - save_cache:
-          key: |
-              yarn-cache-{{ arch }}-{{ checksum "~/.tmp/checksumfiles/package.json" }}-{{ checksum "~/.tmp/checksumfiles/yarn.lock" }}-{{ .Environment.CACHE_VERSION }}
-          paths:
-              - <<parameters.yarn_cache_folder>>
       # pod cache and install
       - restore_cache:
           keys:
@@ -275,25 +252,26 @@ workflows:
       - iOS_build_and_test:
           requires:
             - node
-      # - android-build-and-test:
-      #     requires:
-      #       - node
-      # - hold: # <<< A job that will require manual approval in the CircleCI web application.
-      #     type: approval # <<< This key-value pair will set your workflow to a status of "On Hold"
-      #     requires: # We only run the "hold" job when android-build-and-test has succeeded
-      #       - android-build-and-test
-      # - deployAlpha:
-      #     requires:
-      #       - hold
-      #     filters:
-      #       branches:
-      #         ignore: /release-(.*)/
-      # - deploy:
-      #     requires:
-      #       - hold
-      #     filters:
-      #       branches:
-      #         only: /release-(.*)/
+      - android-build-and-test:
+          requires:
+            - node
+      - hold: # <<< A job that will require manual approval in the CircleCI web application.
+          type: approval # <<< This key-value pair will set your workflow to a status of "On Hold"
+          requires: # We only run the "hold" job when android-build-and-test and iOS_build_and_test has succeeded
+            - android-build-and-test
+            - iOS_build_and_test
+      - deployAlpha:
+          requires:
+            - hold
+          filters:
+            branches:
+              ignore: /release-(.*)/
+      - deploy:
+          requires:
+            - hold
+          filters:
+            branches:
+              only: /release-(.*)/
 commands:
     android_build:
         description: Builds the Android app at the given path with the given build types. This should be run only after installing dependencies.
