@@ -204,7 +204,7 @@ jobs:
             description: The scheme to use.
             type: string
         yarn_cache_folder:
-            default: /tmp/yarn
+            default: /tmp/checksumfiles
             description: The path to the yarn cache folder.  Defaults to /tmp/yarn
             type: string
     steps:
