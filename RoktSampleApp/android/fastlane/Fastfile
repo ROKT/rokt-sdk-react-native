@@ -16,6 +16,17 @@
 default_platform(:android)
 
 platform :android do
+     desc "Runs all the tests"
+     lane :test do
+    	gradle(task: "assembleRelease")
+     end
+
+  desc 'Build the Android application.'
+  lane :build do
+   gradle(task: '--stop')
+    gradle(task: 'assemble', build_type: 'release')
+  end
+
      desc "Run UI tests on AWS device farm(stage) and wait for the results"
        lane :deviceFarmUITest do
          ENV['AWS_ACCESS_KEY_ID']     = ENV['DEVICE_FARM_STAGE_ACCESS_KEY']
@@ -47,4 +58,13 @@ platform :android do
              sh("npm publish --access=public")
         end  
        end
+   desc "Publish alpha version to npm"
+       lane :publishAlphaSDK do
+          Dir.chdir("../../../Rokt.Widget") do
+             ENV['NPM_TOKEN'] = ENV['NPM_TOKEN']
+
+             sh("echo \"//registry.npmjs.org/:_authToken=$NPM_TOKEN\" > ./.npmrc")
+	     sh("npm publish --tag alpha")
+        end  
+   end
 end

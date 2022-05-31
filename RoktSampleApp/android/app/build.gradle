@@ -115,7 +115,7 @@ android {
     defaultConfig {
         multiDexEnabled true
         applicationId "com.roktsampleapp"
-        minSdkVersion rootProject.ext.minSdkVersion
+        minSdkVersion 21
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
         versionName "1.0"
@@ -184,5 +184,18 @@ dependencies {
 task copyDownloadableDepsToLibs(type: Copy) {
     from configurations.compile
     into 'libs'
+}
+
+task downloadDependencies() {
+  description 'Download all dependencies to the Gradle cache'
+  doLast {
+    configurations.findAll().each { config ->
+      if (config.name.contains("minReactNative") && config.canBeResolved) {
+        print config.name
+        print '\n'
+        config.files
+      }
+    }
+  }
 }
 
