@@ -161,6 +161,89 @@ jobs:
 
       - store_artifacts:
           path: test-results
+  
+  iOS_build_and_test:
+    macos:
+      xcode: 13.3.1  
+    working_directory: ~/rokt-sdk-react-native/RoktSampleApp/
+    description: Builds the iOS app at the given path with the given build scheme and configuration. This should be run only after installing NPM dependencies.
+    parameters:
+        build_configuration:
+            default: Debug
+            description: The build configuration to use. This is normally either "Debug" or "Release" but you may have custom build configuration configured for your app.
+            type: string
+        cache:
+            default: true
+            description: Save and restore the build cache? Defaults to true
+            type: boolean
+        derived_data_path:
+            default: ios/build
+            description: The path to the directory to place the derived data, relative to the root of the repository.
+            type: string
+        device:
+            default: iPhone 13
+            description: The type of device you want to build for.
+            type: string
+        project_path:
+            description: The path to the Xcode project (*.xcodeproj) or the Xcode workspace (*.xcworkspace) that you want to build, relative to the root of the repository.
+            type: string
+            default: ios/RoktSampleApp.xcworkspace
+        project_type:
+            default: workspace
+            description: If the iOS app is built using a project file (*.xcodeproj) or a workspace.
+            enum:
+                - project
+                - workspace
+            type: enum
+        pod_install_directory:
+            default: ios
+            description: The location of the "ios" directory
+            type: string
+        scheme:
+            default: RoktSampleApp
+            description: The scheme to use.
+            type: string
+    steps:
+      - attach_workspace:
+          at: ~/rokt-sdk-react-native
+      - run:
+          command: |
+              mkdir -p ~/.tmp/checksumfiles
+              find . -type f -name 'package.json' -not -path "*node_modules*" -exec cat {} + >> ~/.tmp/checksumfiles/package.json
+          name: Create cache checksum file
+      # run simulator on background
+      - run:
+          background: true
+          command: xcrun simctl boot "<<parameters.device>>" || true
+          name: Start iOS simulator (background)
+      # pod cache and install
+      - restore_cache:
+          keys:
+            - '{{ .Environment.CACHE_VERSION }}-cache-pods-{{ checksum "<<parameters.pod_install_directory>>/Podfile.lock" }}'
+            - '{{ .Environment.CACHE_VERSION }}-cache-pods'
+
+      - run:
+          name: Install CocoaPods
+          command: |
+            cd <<parameters.pod_install_directory>> && pod install && cd -
+
+      - save_cache:
+          key: '{{ .Environment.CACHE_VERSION }}-cache-pods-{{ checksum "<<parameters.pod_install_directory>>/Podfile.lock" }}'
+          paths:
+            - <<parameters.pod_install_directory>>/Pods
+
+      - restore_cache:
+          keys:
+            - ios-build-cache-{{ arch }}-{{ checksum "~/.tmp/checksumfiles/package.json" }}-{{ .Environment.CACHE_VERSION }}
+          name: Restoring iOS Build caches
+      - run:
+          name: Build iOS App
+          command: export RCT_NO_LAUNCH_PACKAGER=true && xcodebuild -<<parameters.project_type>> <<parameters.project_path>> -destination 'platform=iOS Simulator,name=<<parameters.device>>' -scheme <<parameters.scheme>> -parallelizeTargets -configuration <<parameters.build_configuration>> -derivedDataPath <<parameters.derived_data_path>>  -UseModernBuildSystem=YES | xcpretty -k
+      - save_cache:
+          key: ios-build-cache-{{ arch }}-{{ checksum "~/.tmp/checksumfiles/package.json" }}-{{ .Environment.CACHE_VERSION }}
+          name: Saving iOS Build Cache
+          paths:
+              - <<parameters.derived_data_path>>/Build
 workflows:
   build_test_deploy-RN:
     jobs:
@@ -171,13 +254,17 @@ workflows:
       - node:
           requires:
             - node_sdk
+      - iOS_build_and_test:
+          requires:
+            - node
       - android-build-and-test:
           requires:
             - node
       - hold: # <<< A job that will require manual approval in the CircleCI web application.
           type: approval # <<< This key-value pair will set your workflow to a status of "On Hold"
-          requires: # We only run the "hold" job when android-build-and-test has succeeded
+          requires: # We only run the "hold" job when android-build-and-test and iOS_build_and_test has succeeded
             - android-build-and-test
+            - iOS_build_and_test
       - deployAlpha:
           requires:
             - hold
