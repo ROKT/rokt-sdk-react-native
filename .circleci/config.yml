@@ -206,6 +206,11 @@ jobs:
     steps:
       - attach_workspace:
           at: ~/rokt-sdk-react-native
+      - run:
+          command: |
+              mkdir -p ~/.tmp/checksumfiles
+              find . -type f -name 'package.json' -not -path "*node_modules*" -exec cat {} + >> ~/.tmp/checksumfiles/package.json
+          name: Create cache checksum file
       # run simulator on background
       - run:
           background: true
