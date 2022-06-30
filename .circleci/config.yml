@@ -85,82 +85,23 @@ jobs:
           name: fastlane tests
           command: |
             bundle exec fastlane publishAlphaSDK
-            
-  android-build-and-test:
+  
+  android-build-run-ui-test:
     working_directory: ~/rokt-sdk-react-native/RoktSampleApp/android
     docker:
       - image: reactnativecommunity/react-native-android
     resource_class: large
-    parameters:
-        assemble_android_test:
-            default: assembleAndroidTest
-            description: Configure the android tests to run. Defaults to assembleAndroidTest
-            type: string
-        gradle_options:
-            default: -Xmx2014m -Dorg.gradle.daemon=false -Dorg.gradle.jvmargs="-XX:+UnlockExperimentalVMOptions -XX:+HeapDumpOnOutOfMemoryError"
-            description: Gradle command options. Note that setting this will override the default options so you might need to supply those as well.
-            type: string
-        java_options:
-            default: -Xmx1024m -XX:+UnlockExperimentalVMOptions -XX:+UseContainerSupport
-            description: Java command options. Note that setting this will override the default options so you might need to supply those as well.
-            type: string
-        resource_class:
-            default: xlarge
-            description: Changes the resource class of the executor. Requires a support request to enable the resource_class parameter. See https://circleci.com/docs/2.0/configuration-reference/#resource_class
-            type: string
-        build_type:
-            default: debug
-            description: >-
-              The build type to build. This is normally either "debug" or "release" but
-              you may have custom build types configured for your app.
-            type: string
-        build_cache:
-            default: true
-            description: Should we cache after Gradle build? Defaults to true
-            type: boolean
-
     steps:
       - attach_workspace:
           at: ~/rokt-sdk-react-native
-
-      - restore_cache:
-          key: bundle-v1-{{ checksum "Gemfile.lock" }}-{{ arch }}
-      
       - run: gem install fastlane
-
       - run: bundle install
-
-      - save_cache:
-          key: bundle-v1-{{ checksum "Gemfile.lock" }}-{{ arch }}
-          paths:
-            - vendor/bundle
-
-      - android_build:
-          assemble_android_test: <<parameters.assemble_android_test>>
-          build_type: <<parameters.build_type>>
-          cache: <<parameters.build_cache>>
-      - run: ./gradlew  assembleRelease
       - run:
-          name: fastlane tests
+          name: fastlane UI tests
           command: |
-            mkdir -p test-results/fastlane
-            bundle exec fastlane build
-            mv fastlane/report.xml test-results/fastlane
-      - run:
-          name: Build Android JS Bundle
-          command: |
-            ./gradlew --stop
-            ./gradlew bundleReleaseJsAndAssets
-      - run:
-          name: Build Android APK
-          command: |
-            ./gradlew --stop
-            ./gradlew assembleRelease -x bundleReleaseJsAndAssets 
-      - store_test_results:
-          path: test-results
-
+            bundle exec fastlane deviceFarmUITest
       - store_artifacts:
-          path: test-results
+          path: app/build/outputs/apk/debug
   
   iOS_build_and_test:
     macos:
@@ -254,16 +195,16 @@ workflows:
       - node:
           requires:
             - node_sdk
-      - iOS_build_and_test:
+      - android-build-run-ui-test:
           requires:
             - node
-      - android-build-and-test:
+      - iOS_build_and_test:
           requires:
             - node
       - hold: # <<< A job that will require manual approval in the CircleCI web application.
           type: approval # <<< This key-value pair will set your workflow to a status of "On Hold"
-          requires: # We only run the "hold" job when android-build-and-test and iOS_build_and_test has succeeded
-            - android-build-and-test
+          requires: # We only run the "hold" job when android-build-run-ui-test and iOS_build_and_test has succeeded
+            - android-build-run-ui-test
             - iOS_build_and_test
       - deployAlpha:
           requires:
@@ -277,88 +218,3 @@ workflows:
           filters:
             branches:
               only: /release-(.*)/
-commands:
-    android_build:
-        description: Builds the Android app at the given path with the given build types. This should be run only after installing dependencies.
-        parameters:
-            assemble_android_test:
-                default: assembleAndroidTest
-                description: Configure the android tests to run. Defaults to assembleAndroidTest but you might want to set to app:assembleAndroidTest if that works for your project
-                type: string
-            build_type:
-                default: debug
-                description: The build type to build. This is normally either "debug" or "release" but you may have custom build types configured for your app.
-                type: string
-            cache:
-                default: true
-                description: Save and restore the caches? Defaults to true
-                type: boolean
-            project_path:
-                default: .
-                description: The path to the root of the Android project you want to build, relative to the root of the repository.
-                type: string
-        steps:
-            - when:
-                condition: <<parameters.cache>>
-                steps:
-                    - run:
-                        command: |
-                            mkdir -p ~/.tmp/checksumfiles
-                            find . -type f -name 'build.gradle' -not -path "*node_modules*" -exec cat {} + >> ~/.tmp/checksumfiles/build.gradle
-                            find . -type f -name 'settings.gradle' -not -path "*node_modules*" -exec cat {} + >> ~/.tmp/checksumfiles/settings.gradle
-                        name: Create cache checksum files
-                    - restore_cache:
-                        keys:
-                            - gradle-wrapper-{{ arch }}-{{ checksum "<<parameters.project_path>>/gradle/wrapper/gradle-wrapper.properties" }}-{{ .Environment.CACHE_VERSION }}
-                    - restore_cache:
-                        keys:
-                            - gradle-home-cache-{{ arch }}-{{ checksum "~/.tmp/checksumfiles/build.gradle" }}-{{ checksum "~/.tmp/checksumfiles/settings.gradle" }}-{{ .Environment.CACHE_VERSION }}
-                    - restore_cache:
-                        keys:
-                            - gradle-build-cache-{{ .Revision }}
-                        name: Restoring Gradle Build caches
-            - run:
-                command: |
-                    [ -d ~/gradle-build-caches ] &&
-                      [ -n "$(ls -A ~/gradle-build-caches)" ] &&
-                      rm -rf ~/.gradle/caches/build-cache-* &&
-                      mkdir -p ~/.gradle/caches/ &&
-                      mv ~/gradle-build-caches/* ~/.gradle/caches/ || true
-                name: Dispersing Gradle Build caches for restoring
-            - run:
-                command: cd <<parameters.project_path>> && chmod +x gradlew && ./gradlew --max-workers 2 downloadDependencies
-                name: Downloading Gradle Dependencies
-            - when:
-                condition: <<parameters.cache>>
-                steps:
-                    - save_cache:
-                        key: gradle-wrapper-{{ arch }}-{{ checksum "<<parameters.project_path>>/gradle/wrapper/gradle-wrapper.properties" }}-{{ .Environment.CACHE_VERSION }}
-                        name: Saving Gradle wrapper cache
-                        paths:
-                            - ~/.gradle/wrapper/
-                    - save_cache:
-                        key: gradle-home-cache-{{ arch }}-{{ checksum "~/.tmp/checksumfiles/build.gradle" }}-{{ checksum "~/.tmp/checksumfiles/settings.gradle" }}-{{ .Environment.CACHE_VERSION }}
-                        name: Saving Gradle home cache
-                        paths:
-                            - ~/.gradle/caches/
-            - run:
-                command: cd <<parameters.project_path>> && chmod +x gradlew && ./gradlew --build-cache --max-workers 2 --continue --no-daemon assemble<<parameters.build_type>> <<parameters.assemble_android_test>> -DtestBuildType=<<parameters.build_type>> --stacktrace
-                name: Build Android APK
-            - when:
-                condition: <<parameters.cache>>
-                steps:
-                    - run:
-                        command: |
-                            mkdir -p ~/gradle-build-caches
-                            [ -d ~/.gradle/caches ] &&
-                              [ -n "$(ls -Ad ~/.gradle/caches/build-cache-* 2>/dev/null)" ] &&
-                              rm -rf ~/gradle-build-caches/* &&
-                              mv ~/.gradle/caches/build-cache-* ~/gradle-build-caches || true
-                        name: Collecting Gradle Build caches for saving
-                        when: always
-                    - save_cache:
-                        key: gradle-build-cache-{{ .Revision }}
-                        name: Saving Gradle Build caches
-                        paths:
-                            - ~/gradle-build-caches
-                        when: always

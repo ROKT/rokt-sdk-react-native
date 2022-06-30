@@ -75,6 +75,7 @@ import com.android.build.OutputFile
 project.ext.react = [
   bundleInDebug: true,
   enableHermes: false,  // clean and rebuild if changing,
+  //nodeExecutableAndArgs : ["/usr/local/bin/node"]
 ]
 
 apply from: "../../node_modules/react-native/react.gradle"
@@ -111,6 +112,7 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+    ndkVersion '21.4.7075529'
 
     defaultConfig {
         multiDexEnabled true
