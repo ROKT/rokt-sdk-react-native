@@ -240,6 +240,7 @@ export default class App extends Component {
                   Target Element
                 </Text>
                 <TextInput
+		  accessibilityLabel="input_target_element"
                   style={styles.textInput}
                   value={this.state.targetElement1}
                   onChangeText={(targetElement1) =>
@@ -260,6 +261,7 @@ export default class App extends Component {
                   Attributes
                 </Text>
                 <TextInput
+		  accessibilityLabel="input_attributes"
                   multiline
                   numberOfLines={4}
                   style={styles.multiLineText}
