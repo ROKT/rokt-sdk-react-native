@@ -25,14 +25,17 @@ class RoktSampleAppUITests: XCTestCase {
         // Put teardown code here. This method is called after the invocation of each test method in the class.
     }
   
-  func testExample() throws {
+  func testEmbedded() throws {
     // UI tests must launch the application that they test.
     let app = XCUIApplication()
     app.launch()
-    waiting(2.0)
+    
+    XCTAssertTrue(app.otherElements["Initialize"].waitForExistence(timeout: 10))
     app.otherElements["Initialize"].tap()
+    
     waiting(5.0)
     app.otherElements["Execute"].tap()
+    
     waiting(5.0)
     XCTAssert(app.buttons["Rokt Privacy Policy"].exists, "Rokt Privacy Policy exists" )
   }
@@ -41,8 +44,10 @@ class RoktSampleAppUITests: XCTestCase {
     // UI tests must launch the application that they test.
     let app = XCUIApplication()
     app.launch()
-    waiting(2.0)
+
+    XCTAssertTrue(app.otherElements["Initialize"].waitForExistence(timeout: 10))
     app.otherElements["Initialize"].tap()
+    
     waiting(5.0)
     app.textFields["input_view_name"].doubleTap()
 
