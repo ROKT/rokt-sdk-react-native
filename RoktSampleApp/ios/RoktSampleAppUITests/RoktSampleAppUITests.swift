@@ -30,7 +30,7 @@ class RoktSampleAppUITests: XCTestCase {
     let app = XCUIApplication()
     app.launch()
     
-    XCTAssertTrue(app.otherElements["Initialize"].waitForExistence(timeout: 10))
+    XCTAssertTrue(app.otherElements["Initialize"].waitForExistence(timeout: 60))
     app.otherElements["Initialize"].tap()
     
     waiting(5.0)
@@ -45,7 +45,7 @@ class RoktSampleAppUITests: XCTestCase {
     let app = XCUIApplication()
     app.launch()
 
-    XCTAssertTrue(app.otherElements["Initialize"].waitForExistence(timeout: 10))
+    XCTAssertTrue(app.otherElements["Initialize"].waitForExistence(timeout: 60))
     app.otherElements["Initialize"].tap()
     
     waiting(5.0)
