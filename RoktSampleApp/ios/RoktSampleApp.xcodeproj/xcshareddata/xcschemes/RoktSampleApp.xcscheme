@@ -75,6 +75,16 @@
                ReferencedContainer = "container:RoktSampleApp.xcodeproj">
             </BuildableReference>
          </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "250ED064287FABC100FD50F6"
+               BuildableName = "RoktSampleAppUITests.xctest"
+               BlueprintName = "RoktSampleAppUITests"
+               ReferencedContainer = "container:RoktSampleApp.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
       </Testables>
    </TestAction>
    <LaunchAction
