@@ -1,9 +1,11 @@
+
 # React Native 
 Install ReactNative by running `npm install -g expo-cli`. The full description could be find here https://reactnative.dev/docs/environment-setup
 
-## Install the Rokt widget
-go to *../Rokt.Widget* directory and run `npm install`
-if there is any changes, run `npm pack`
+
+| Environment | Build |
+| ----------- | :----- |
+| release |  [![CircleCI](https://circleci.com/bb/ROKT/rokt-sdk-ios/tree/master.svg?style=svg&circle-token=519d542734b554bf3484517306ccecddd243e78c)]
 
 ## NPM install on Sample app
 go to *RoktSampleApp* directory and run `npm install`
@@ -24,6 +26,10 @@ go to *RoktSampleApp* directory and run `npx react-native run-ios`
 
 ## run Android
 go to *RoktSampleApp* directory and run `npx react-native run-android` 
+
+## CI/CD System
+
+The CI system used is  **CircleCi**  [https://app.circleci.com/pipelines/github/ROKT/rokt-sdk-react-native](https://app.circleci.com/pipelines/github/ROKT/rokt-sdk-react-native)  CircleCi workflows are defined in the  `.circleci`  directory. The iOS step build the app and run the UI test in the CircleCi environment whereas Android step builds the apk in the circleCi environment whereas the UI test is executed in device farm using the fastlane lane ```deviceFarmUITest``` defined in the directory ```RoktSampleApp/android```
 
 
 # Copyright

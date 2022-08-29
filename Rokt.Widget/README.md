@@ -1,143 +1,24 @@
-
 # @rokt/react-native-sdk
 
-## Getting started
-
-`$ npm install @rokt/react-native-sdk --save`
-
-### Mostly automatic installation
-
-run `$ react-native link @rokt/react-native-sdk`
-
-run `$ npm install`
+| Environment | Build |
+| ----------- | :----- |
+| release |  [![CircleCI](https://circleci.com/bb/ROKT/rokt-sdk-ios/tree/master.svg?style=svg&circle-token=519d542734b554bf3484517306ccecddd243e78c)]
 
 
-## Android Configuration
+## CI/CD System
 
-### Gradle Configurations (Added to your Project's gradle files):
-#### File: .gradle (Project: YourProjectName)
+The CI system used is **CircleCi**  https://app.circleci.com/pipelines/github/ROKT/rokt-sdk-react-native
+CircleCi workflows are defined in the `.circleci` directory. There are two seperate workflows that are executed based on branch names. 
+Branches with **release-** prefix are considered production branches, the publish step will release to the production maven respository.
+All other branches are considered alpha branches, so it will publish to maven with with **-alpha** postfix. 
 
-1. Add Maven Repository of Rokt SDK
-```
-allprojects {
-    repositories {
-        ...
-        maven {
-            url  "https://rokt-eng-us-west-2-mobile-sdk-artefacts.s3.amazonaws.com"
-        }
-    }
-}
-```
+## Publishing
+This SDK is published to a NPM package repository. The publishing step uses the fastlane lanes publishAlphaSDK or publishSDK for publishing the alpha or production version to NPM. The fastlane file is located inside ```RoktSampleApp/android```
+The steps are configured in `publish.gradle`.
+Publishing  Alpha and prod are possible through CircleCi based on the Git branch names as explained in above step.
 
-#### File: MainApplication.java (Module: app)
-2. In your ReactApplication class, make sure you add the RoktEmbeddedViewPackage to the getPackages method:
-```
-        @Override
-        protected List<ReactPackage> getPackages() {
-          @SuppressWarnings("UnnecessaryLocalVariable")
-          List<ReactPackage> packages = new PackageList(this).getPackages();
-
-          //Add the RoktEmbeddedViewPackage
-          packages.add(new RoktEmbeddedViewPackage());
-          return packages;
-        }
- ```
-
-#### File: .gradle (Module: app)
-3. It's likely that you will need multiDexEnabled as well
-4. Make sure you are targeting mindSdk version 18 or higher. 
-
-```
-android {
-    ...
-    defaultConfig {
-        ...
-        multiDexEnabled true,
-        minSdkVersion 18
-    }
-}
-```
-
-...
-## iOS Configuration
-
-### Install the pods
-go to ios folder and run command below to install the pod
-```
-pod install
-```
-
-
-## Usage
-
-### Initialising the SDK
-
-- Rokt Module provides two methods:
-1. initialize(string ROKT_TAG_ID, string AppVersion)
-2. execute(string TemplateVersion, object UserAttributes, object placements, function onLoad)
-- The Initialize Method will fetch API results that Execute Method would need. so best not to put both calls next to each other.
-
-#### Import 
-```
-import { Rokt, RoktEmbeddedView } from "@rokt/react-native-sdk";
-```
-
-#### Initialize
-```
-Rokt.initialize( "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" , "1.0");
-```
-
-### To launch Overlay placement
-
-#### Execute 
-```
-attributes = {
-      "email": "j.smith@example.com",
-      "firstname": "Jenny",
-      "lastname": "Smith",
-      "mobile": "(323) 867-5309",
-      "postcode": "90210",
-      "country": "US"
-}
-Rokt.execute("RoktExperience", attributes, null,  () => console.log("Placement Loaded"));
-```
-
-
-### To launch Embedded placement
-
-#### Create placeholder
-```
-  constructor(props){
-    super(props);
-    this.placeholder1 = React.createRef();
-  }
-
-```
-
-in render() 
-```
-<RoktEmbeddedView ref={this.placeholder1} placeholderName={"RoktEmbedded1"} ></RoktEmbeddedView>
-
-```
-
-
-
-#### Execute
-```
-placeholders = {
-      "RoktEmbedded1": findNodeHandle(this.placeholder1.current)
-}
-
-attributes = {
-      "email": "j.smith@example.com",
-      "firstname": "Jenny",
-      "lastname": "Smith",
-      "mobile": "(323) 867-5309",
-      "postcode": "90210",
-      "country": "US"
-}
-Rokt.execute("RoktEmbeddedExperience", attributes, placeholders,  () => console.log("Placement Loaded"));
-```
+## Local Changes
+To Test the local changes, execute the ```$ npm pack ``` to create the SDK package. To change the version of the package, go to the ```package.json``` and modify the version field to new version.
 
 
 ## License 
