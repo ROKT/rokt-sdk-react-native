@@ -1,8 +1,3 @@
-
-
-
-
-
 # @rokt/react-native-sdk
 
 ## Resident Experts
