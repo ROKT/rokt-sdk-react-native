@@ -199,7 +199,8 @@ export default class App extends Component {
             <View style={styles.body}>
 
               <View style={styles.sectionContainer}>
-                <Text style={[styles.sectionTitle, { marginBottom: 20 }]}>
+                <Text style={[styles.sectionTitle, { marginBottom: 20 }]}
+                  testID="Welcome">
                   Welcome to Rokt Demo{" "}
                 </Text>
                 <Text style={[styles.label, { color: Colors.black }]}>
@@ -207,6 +208,7 @@ export default class App extends Component {
                 </Text>
                 <TextInput
                   accessibilityLabel="input_tag_id"
+                  testID="input_tag_id"
                   style={styles.textInput}
                   value={this.state.tagId}
                   onChangeText={(tagId) => this.setState({ tagId })}
@@ -219,6 +221,7 @@ export default class App extends Component {
                     </Text>
                     <TextInput
                       accessibilityLabel="input_view_name"
+                      testID="input_view_name"
                       style={styles.textInput}
                       value={this.state.viewName}
                       onChangeText={(viewName) => this.setState({ viewName })}
@@ -240,6 +243,8 @@ export default class App extends Component {
                   Target Element
                 </Text>
                 <TextInput
+		              accessibilityLabel="input_target_element"
+                  testID="input_target_element"
                   style={styles.textInput}
                   value={this.state.targetElement1}
                   onChangeText={(targetElement1) =>
@@ -260,6 +265,8 @@ export default class App extends Component {
                   Attributes
                 </Text>
                 <TextInput
+                  accessibilityLabel="input_attributes"
+                  testID="input_attributes"
                   multiline
                   numberOfLines={4}
                   style={styles.multiLineText}

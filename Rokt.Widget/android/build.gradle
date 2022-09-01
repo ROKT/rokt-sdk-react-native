@@ -20,7 +20,7 @@ android {
     buildToolsVersion '28.0.3'
 
     defaultConfig {
-        minSdkVersion 18
+        minSdkVersion 21
         targetSdkVersion 28
         versionCode 2
         versionName "2.0"
@@ -53,10 +53,7 @@ repositories {
 }
 
 dependencies {
-    implementation "org.webkit:android-jsc:+"
     implementation "com.facebook.react:react-native:+"  // From node_modules    
-    implementation ('com.rokt:roktsdk:3.6.2'){
-        exclude group: 'com.walmartlabs.ern'
-    }
+    implementation ('com.rokt:roktsdk:3.8.0')
 }
   

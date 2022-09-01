@@ -8,8 +8,8 @@ if there is any changes, run `npm pack`
 ## NPM install on Sample app
 go to *RoktSampleApp* directory and run `npm install`
 
-## Start with Haul
-go to *RoktSampleApp* directory and run `npx haul start`
+## Start with npx
+go to *RoktSampleApp* directory and run `npx react-native start --reset-cache`
 
 
 # iOS

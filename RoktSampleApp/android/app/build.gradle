@@ -75,7 +75,7 @@ import com.android.build.OutputFile
 project.ext.react = [
   bundleInDebug: true,
   enableHermes: false,  // clean and rebuild if changing,
-    cliPath: "node_modules/@haul-bundler/cli/bin/haul.js"
+  //nodeExecutableAndArgs : ["/usr/local/bin/node"]
 ]
 
 apply from: "../../node_modules/react-native/react.gradle"
@@ -112,11 +112,12 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+    ndkVersion '21.4.7075529'
 
     defaultConfig {
         multiDexEnabled true
         applicationId "com.roktsampleapp"
-        minSdkVersion rootProject.ext.minSdkVersion
+        minSdkVersion 21
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
         versionName "1.0"
@@ -169,6 +170,7 @@ dependencies {
 
     implementation fileTree(dir: "libs", include: ["*.jar"])
     implementation "com.facebook.react:react-native:0.62.2"  // From node_modules
+    implementation project(':react-native-community-checkbox')
 
     if (enableHermes) {
         def hermesPath = "../../node_modules/hermes-engine/android/";
@@ -184,5 +186,18 @@ dependencies {
 task copyDownloadableDepsToLibs(type: Copy) {
     from configurations.compile
     into 'libs'
+}
+
+task downloadDependencies() {
+  description 'Download all dependencies to the Gradle cache'
+  doLast {
+    configurations.findAll().each { config ->
+      if (config.name.contains("minReactNative") && config.canBeResolved) {
+        print config.name
+        print '\n'
+        config.files
+      }
+    }
+  }
 }
 

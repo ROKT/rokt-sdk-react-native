@@ -2,7 +2,6 @@ package com.roktsampleapp;
 
 import androidx.test.espresso.ViewAssertion;
 import androidx.test.espresso.ViewInteraction;
-
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.matcher.ViewMatchers.isCompletelyDisplayed;
