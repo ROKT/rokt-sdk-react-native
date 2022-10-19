@@ -7,7 +7,7 @@
 
 ## Overview
 
-This repository contains React Native SDK [Rokt.Widget](Rokt.Widget) as well as the Sample Application [RoktSampleApp](RoktSample) .
+This repository contains React Native SDK [Rokt.Widget](Rokt.Widget) as well as the Sample Application [RoktSampleApp](RoktSampleApp) .
 
 The React Native SDK enables you to integrate Rokt into your React Native mobile apps to drive more value from—and for—your customers. The SDK is built to be lightweight, secure, and simple to integrate and maintain, resulting in minimal lift for your engineering team. The RoktSampleApp includes bare-minimum UI to demonstrate the usage of React Native SDK for our partners using the [Integration guide](##-integration-guide-for-demo-apps)
 
