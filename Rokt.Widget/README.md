@@ -33,7 +33,7 @@ Go to the root of the project **Rokt.Widget** " and run ```npm install```.
 This will install all required packages for the project.
 
 To test the local changes, execute the ```$ npm pack ``` to create the SDK package name as ```rokt-react-native-sdk-X.X.X.tgz```. To change the version ```X.X.X``` , go to the ```package.json``` and modify the version field to new version. 
-Then we need to go RoktSampleApp project ```package.json``` to point to ``rokt-react-native-sdk-X.X.X.tgz``` file.
+Then we need to go RoktSampleApp project ```package.json``` to point to ```rokt-react-native-sdk-X.X.X.tgz``` file.
 
 
 ## License 

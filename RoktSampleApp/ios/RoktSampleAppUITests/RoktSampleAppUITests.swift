@@ -40,7 +40,7 @@ class RoktSampleAppUITests: XCTestCase {
     XCTAssert(app.buttons["Rokt Privacy Policy"].exists, "Rokt Privacy Policy exists" )
   }
 
-/*
+
   func testOverlay() throws {
     // UI tests must launch the application that they test.
     let app = XCUIApplication()
@@ -52,7 +52,6 @@ class RoktSampleAppUITests: XCTestCase {
     waiting(5.0)
     app.textFields["input_view_name"].doubleTap()
 
-    app.textFields["input_view_name"].typeText(String(repeating: XCUIKeyboardKey.delete.rawValue, count: 1))
     app.textFields["input_view_name"].typeText("iOSOverlay")
     app.staticTexts["Welcome"].tap()
 
@@ -61,7 +60,7 @@ class RoktSampleAppUITests: XCTestCase {
     XCTAssert(app.staticTexts["Test Title"].exists, "test title exist" )
     XCTAssert(app.buttons["Example Privacy Policy"].exists, "Example Privacy Policy exists" )
   }
-*/
+
 
   func waiting(_ secounds: TimeInterval) {
     _ = XCTWaiter.wait(for: [expectation(description: "Wait for n seconds")], timeout: secounds)
