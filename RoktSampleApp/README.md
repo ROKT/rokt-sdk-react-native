@@ -16,7 +16,7 @@ We use ```npm``` package manager to manage the dependencies for the project.
 
 | Environment | Build |
 | ----------- | :----- |
-| release |  [![CircleCI](https://dl.circleci.com/status-badge/img/gh/ROKT/rokt-sdk-react-native/tree/release-3.8.x.svg?style=svg)](https://dl.circleci.com/status-badge/redirect/gh/ROKT/rokt-sdk-react-native/tree/release-3.8.x)
+| release |  [![CircleCI](https://dl.circleci.com/status-badge/img/gh/ROKT/rokt-sdk-react-native/tree/release-3.9.x.svg?style=svg)](https://dl.circleci.com/status-badge/redirect/gh/ROKT/rokt-sdk-react-native/tree/release-3.9.x)
 ### Note
 Modify the Circleci url whenever default branch is changed.
 

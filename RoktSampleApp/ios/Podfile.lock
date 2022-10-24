@@ -335,10 +335,10 @@ PODS:
     - React-perflogger (= 0.65.2)
   - RNCCheckbox (0.5.12):
     - React-Core
-  - rokt-react-native-sdk (3.8.0):
+  - rokt-react-native-sdk (3.9.0):
     - React
-    - Rokt-Widget (~> 3.8.0)
-  - Rokt-Widget (3.8.0)
+    - Rokt-Widget (~> 3.9.0)
+  - Rokt-Widget (3.9.0)
   - Yoga (1.14.0)
   - YogaKit (1.18.1):
     - Yoga (~> 1.14)
@@ -522,8 +522,8 @@ SPEC CHECKSUMS:
   React-runtimeexecutor: 5bedf6e704373fe9f0cc54aa35a112e5b0051b94
   ReactCommon: bf5dc45e9ec73a75f00de565f2519d6f8594ddf5
   RNCCheckbox: ed1b4ca295475b41e7251ebae046360a703b6eb5
-  rokt-react-native-sdk: 08ff61d578a6a2f6acde6757c2aae6f6692c61ae
-  Rokt-Widget: b9ea8a3624312df6c863828a4c879cf4a7102e04
+  rokt-react-native-sdk: dfe3681f9dd10d2f38f9ec0a9eaf212117f43ca8
+  Rokt-Widget: c46104e47082d80baeda6ae86c35d52089c9a976
   Yoga: e6db7a0be0e80eeb70c04663605e4f6a050ab013
   YogaKit: f782866e155069a2cca2517aafea43200b01fd5a
 
