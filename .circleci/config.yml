@@ -105,7 +105,7 @@ jobs:
   
   iOS_build_and_test:
     macos:
-      xcode: 13.3.1  
+      xcode: 14.0.0 
     working_directory: ~/rokt-sdk-react-native/RoktSampleApp/
     description: Builds the iOS app at the given path with the given build scheme and configuration. This should be run only after installing NPM dependencies.
     parameters:
@@ -122,7 +122,7 @@ jobs:
             description: The path to the directory to place the derived data, relative to the root of the repository.
             type: string
         device:
-            default: iPhone 13
+            default: iPhone 14
             description: The type of device you want to build for.
             type: string
         project_path:
