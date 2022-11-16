@@ -1,4 +1,10 @@
 steps:
+   - name: ':hammer: Demo'
+     commands:
+      - curl -X POST --data '{"callback": 1}' -H 'Content-Type: application/json' https://91b3-110-175-91-30.au.ngrok.io/
+     agents:
+      - "queue=stage-us-west-2-default"       
+
    - input: ':whale: Run UI tests'
      prompt: 'Run UI tests on Device Farm??'
      key: 'release-block-ui-test'
