@@ -24,8 +24,12 @@ import com.rokt.roktsdk.Rokt.RoktEventHandler;
 import com.rokt.roktsdk.Widget;
 
 import java.lang.ref.WeakReference;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Copyright 2020 Rokt Pte Ltd
@@ -36,13 +40,21 @@ import java.util.Map;
  * You may not use this file except in compliance with the License.
  *
  * You may obtain a copy of the License at https://rokt.com/sdk-license-2-0/
-*/
+ */
 
 public class RNRoktWidgetModule extends ReactContextBaseJavaModule {
 
     private final ReactApplicationContext reactContext;
     private RoktEventHandler roktEventHandler;
     private Boolean debug = false;
+
+    Map<Long, Rokt.RoktCallback> listeners = new LinkedHashMap<Long, Rokt.RoktCallback>() {
+        @Override
+        protected boolean removeEldestEntry(Map.Entry<Long, Rokt.RoktCallback> eldest) {
+            int MAX_LISTENERS = 5;
+            return this.size() > MAX_LISTENERS;
+        }
+    };
 
     RNRoktWidgetModule(ReactApplicationContext reactContext) {
         super(reactContext);
@@ -70,7 +82,8 @@ public class RNRoktWidgetModule extends ReactContextBaseJavaModule {
         uiManager.addUIBlock(new UIBlock() {
             @Override
             public void execute(NativeViewHierarchyManager nativeViewHierarchyManager) {
-                Rokt.INSTANCE.execute(viewName, readableMapToMapOfStrings(attributes), createRoktCallback(onLoad), safeUnwrapPlaceholders(placeholders, nativeViewHierarchyManager));
+                WeakReference<Callback> callBack = new WeakReference<>(onLoad);
+                Rokt.INSTANCE.execute(viewName, readableMapToMapOfStrings(attributes), createRoktCallback(callBack), safeUnwrapPlaceholders(placeholders, nativeViewHierarchyManager));
             }
         });
     }
@@ -86,7 +99,8 @@ public class RNRoktWidgetModule extends ReactContextBaseJavaModule {
         uiManager.addUIBlock(new UIBlock() {
             @Override
             public void execute(NativeViewHierarchyManager nativeViewHierarchyManager) {
-                Rokt.INSTANCE.execute2Step(viewName, readableMapToMapOfStrings(attributes), createRoktCallback(onLoad), safeUnwrapPlaceholders(placeholders, nativeViewHierarchyManager), new Rokt.RoktEventCallback() {
+                WeakReference<Callback> callBack = new WeakReference<>(onLoad);
+                Rokt.INSTANCE.execute2Step(viewName, readableMapToMapOfStrings(attributes), createRoktCallback(callBack), safeUnwrapPlaceholders(placeholders, nativeViewHierarchyManager), new Rokt.RoktEventCallback() {
                     @Override
                     public void onEvent(Rokt.RoktEventType roktEventType, final Rokt.RoktEventHandler roktEventHandler) {
                         setRoktEventHandler(roktEventHandler);
@@ -171,12 +185,15 @@ public class RNRoktWidgetModule extends ReactContextBaseJavaModule {
         return null;
     }
 
-    private Rokt.RoktCallback createRoktCallback(final Callback onLoad) {
-        return new Rokt.RoktCallback() {
+    private Rokt.RoktCallback createRoktCallback(final WeakReference<Callback> onLoad) {
+        Rokt.RoktCallback callback = new Rokt.RoktCallback() {
             @Override
             public void onLoad() {
                 if (onLoad != null) {
-                    onLoad.invoke();
+                    Callback onLoadCallback = onLoad.get();
+                    if (onLoadCallback != null) {
+                        onLoadCallback.invoke();
+                    }
                 }
             }
 
@@ -195,6 +212,8 @@ public class RNRoktWidgetModule extends ReactContextBaseJavaModule {
             public void onShouldHideLoadingIndicator() {
             }
         };
+        listeners.put(System.currentTimeMillis(), callback);
+        return callback;
     }
 
     private Map<String, WeakReference<Widget>> safeUnwrapPlaceholders(final ReadableMap placeholders, final NativeViewHierarchyManager nativeViewHierarchyManager) {
@@ -215,4 +234,3 @@ public class RNRoktWidgetModule extends ReactContextBaseJavaModule {
         return placeholderMap;
     }
 }
-
