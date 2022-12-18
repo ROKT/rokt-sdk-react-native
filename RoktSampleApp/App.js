@@ -232,7 +232,9 @@ export default class App extends Component {
                       Country
                     </Text>
                     <TextInput
+                      accessibilityLabel="input_view_country"
                       style={styles.textInput}
+                      testID="input_view_country"
                       value={this.state.country}
                       onChangeText={(country) => this.setState({ country })}
                     />
