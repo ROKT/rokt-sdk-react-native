@@ -54,6 +54,6 @@ repositories {
 
 dependencies {
     implementation "com.facebook.react:react-native:+"  // From node_modules    
-    implementation ('com.rokt:roktsdk:3.9.1')
+    implementation ('com.rokt:roktsdk:3.10.0')
 }
   
