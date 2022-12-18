@@ -44,7 +44,6 @@ dependencyResolutionManagement {
 	repositories {  
 		google()  
 		mavenCentral()  
-		jcenter()  // Warning: this repository is going to shut down soon  
 		// Rokt SDK artifacts  
 		maven {  
 			url "https://rokt-eng-us-west-2-mobile-sdk-artefacts.s3.amazonaws.com"  

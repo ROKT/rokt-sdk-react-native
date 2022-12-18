@@ -2,8 +2,8 @@ buildscript {
     ext.kotlin_version = '1.3.71'
 
     repositories {
-        jcenter()
          google()
+         mavenCentral()
     }
 
     dependencies {
@@ -49,11 +49,11 @@ repositories {
         }
 
         google()
-        jcenter()
+        mavenCentral()
 }
 
 dependencies {
     implementation "com.facebook.react:react-native:+"  // From node_modules    
-    implementation ('com.rokt:roktsdk:3.9.1')
+    implementation ('com.rokt:roktsdk:3.10.0')
 }
   

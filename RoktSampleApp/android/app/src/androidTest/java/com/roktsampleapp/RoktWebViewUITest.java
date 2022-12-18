@@ -42,6 +42,7 @@ public class RoktWebViewUITest {
         // Setup
         onView(allOf(withContentDescription("input_tag_id"), isDisplayed())).perform(replaceText("2754655826098840951"));
         onView(allOf(withContentDescription("input_view_name"), isDisplayed())).perform(replaceText("crossPlatformEmbedded"));
+        onView(allOf(withContentDescription("input_view_country"), isDisplayed())).perform(replaceText("AU"));
         onView(allOf(withContentDescription("input_target_element"), isDisplayed())).perform(replaceText("RoktEmbedded1"));
         onView(allOf(withContentDescription("input_attributes"), isDisplayed())).perform(replaceText(RAW_ATTRIBUTES));
 
@@ -67,6 +68,7 @@ public class RoktWebViewUITest {
         // Setup
         onView(allOf(withContentDescription("input_tag_id"), isDisplayed())).perform(replaceText("2754655826098840951"));
         onView(allOf(withContentDescription("input_view_name"), isDisplayed())).perform(replaceText("crossPlatformOverlay"));
+        onView(allOf(withContentDescription("input_view_country"), isDisplayed())).perform(replaceText("AU"));
         onView(allOf(withContentDescription("input_attributes"), isDisplayed())).perform(replaceText(RAW_ATTRIBUTES));
 
         onView(withText("Initialize")).perform(scrollTo(), click());
