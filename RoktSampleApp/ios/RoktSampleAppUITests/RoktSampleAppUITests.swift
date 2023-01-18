@@ -57,8 +57,8 @@ class RoktSampleAppUITests: XCTestCase {
 
     app.otherElements["Execute"].tap()
     waiting(5.0)
-    XCTAssert(app.staticTexts["Test Title"].exists, "test title exist" )
     XCTAssert(app.buttons["Example Privacy Policy"].exists, "Example Privacy Policy exists" )
+    XCTAssert(app.staticTexts["Test Title"].exists, "test title exist" )
   }
 
 
