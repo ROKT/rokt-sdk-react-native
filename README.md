@@ -14,6 +14,8 @@ The React Native SDK enables you to integrate Rokt into your React Native mobile
 ## Development Environment
 Install ReactNative development environment by following the description [here](https://reactnative.dev/docs/environment-setup).
 
+For this project, a mininum `Ruby` version `2.7.6` is required. Check by running `ruby -v` on your terminal.
+
 ## Integration Guide for Demo Apps
 
 To add this SDK in your Application, Go to the root of your project in your terminal and add run the below commands:
