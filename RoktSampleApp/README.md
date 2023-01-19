@@ -39,9 +39,12 @@ go to *RoktSampleApp* directory and run `npx react-native start --reset-cache`
 ### Install the pod
 go to *RoktSampleApp/iOS* directory and run `pod install` (if pod install failed, rund `pod update` to get the latest libraries)
 
-## run iOS
+## Run iOS
 Make sure you have your iOS device or Simulator turned on.
-go to *RoktSampleApp* directory and run `npx react-native run-ios` 
+
+1. go to *RoktSampleApp* directory 
+2. if you are on an M1 Mac, run `npx react-native start`
+3. run `npx react-native run-ios` 
 
 ## Android
 
