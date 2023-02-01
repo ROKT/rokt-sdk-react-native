@@ -29,7 +29,7 @@ The CI system used is  **CircleCi**  [https://app.circleci.com/pipelines/github/
 ### NPM install on Sample app
 1. Go to *RoktSampleApp* directory
 2. `npm install`
-3. If installation errors on `Rokt.Widget/rokt-react-native-sdk-3.10.1.tgz` not found, go back to Rokt.Widget directory and run `npm pack`
+3. If installation errors on Rokt.Widget/rokt-react-native-sdk-3.10.1.tgz not found, go back to Rokt.Widget directory and run `npm pack`
 
 ### Start with npx
 Make sure you have your Android device or Emulator turned on.
@@ -46,7 +46,7 @@ Make sure you have your iOS device or Simulator turned on.
 
 1. go to *RoktSampleApp* directory 
 2. if you are on an M1 Mac, run `npx react-native start`
-3. run `npx react-native run-ios --simulator="[simulator/device name]"` e.g. `npx react-native run-ios --simulator=“[iPhone 14]”`
+3. run `npx react-native run-ios --simulator="[simulator/device name]"` e.g. `npx react-native run-ios --simulator=“iPhone 14”`
 
 ## Android
 
