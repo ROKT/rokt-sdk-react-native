@@ -29,7 +29,7 @@ The CI system used is  **CircleCi**  [https://app.circleci.com/pipelines/github/
 ### NPM install on Sample app
 1. Go to *RoktSampleApp* directory
 2. `npm install`
-3. If installation errors on Rokt.Widget/rokt-react-native-sdk-3.10.1.tgz not found, follow [README on *Rokt.Widget* directory](https://github.com/ROKT/rokt-sdk-react-native/tree/release-3.10.x/Rokt.Widget#readme) first
+3. If installation errors on Rokt.Widget/rokt-react-native-sdk-X.X.X.tgz not found (where X.X.X is the Rokt SDK version), follow [README on *Rokt.Widget* directory](https://github.com/ROKT/rokt-sdk-react-native/tree/release-3.10.x/Rokt.Widget#readme) first
 
 ### Start with npx
 Make sure you have your Android device or Emulator turned on.
