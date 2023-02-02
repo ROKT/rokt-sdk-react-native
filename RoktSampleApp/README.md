@@ -27,7 +27,9 @@ The CI system used is  **CircleCi**  [https://app.circleci.com/pipelines/github/
 ## Local Setup
 
 ### NPM install on Sample app
-go to *RoktSampleApp* directory and run `npm install`
+1. Go to *RoktSampleApp* directory
+2. `npm install`
+3. If installation errors on Rokt.Widget/rokt-react-native-sdk-X.X.X.tgz not found (where X.X.X is the Rokt SDK version), follow [README on *Rokt.Widget* directory](https://github.com/ROKT/rokt-sdk-react-native/tree/release-3.10.x/Rokt.Widget#readme) first
 
 ### Start with npx
 Make sure you have your Android device or Emulator turned on.
@@ -37,14 +39,14 @@ go to *RoktSampleApp* directory and run `npx react-native start --reset-cache`
 ## iOS
 
 ### Install the pod
-go to *RoktSampleApp/iOS* directory and run `pod install` (if pod install failed, rund `pod update` to get the latest libraries)
+go to *RoktSampleApp/ios* directory and run `pod install` (if pod install failed, run `pod update` to get the latest libraries)
 
 ## Run iOS
 Make sure you have your iOS device or Simulator turned on.
 
 1. go to *RoktSampleApp* directory 
 2. if you are on an M1 Mac, run `npx react-native start`
-3. run `npx react-native run-ios` 
+3. run `npx react-native run-ios --simulator="[simulator/device name]"` e.g. `npx react-native run-ios --simulator=“iPhone 14”`
 
 ## Android
 
