@@ -52,7 +52,7 @@ class RoktSampleAppUITests: XCTestCase {
     waiting(5.0)
     app.textFields["input_view_name"].doubleTap()
 
-    app.textFields["input_view_name"].typeText("iOSOverlay")
+    for c in "iOSOverlay" {app.textFields["input_view_name"].typeText(String(c))}
     app.staticTexts["Welcome"].tap()
 
     app.otherElements["Execute"].tap()
