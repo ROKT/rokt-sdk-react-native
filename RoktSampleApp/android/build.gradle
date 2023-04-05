@@ -2,6 +2,7 @@
 
 buildscript {
     ext {
+        RNNKotlinVersion = "1.4.31"
         buildToolsVersion = "30.0.3"
         minSdkVersion = 21
         compileSdkVersion = 32
@@ -12,6 +13,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.4.31"
         classpath 'com.android.tools.build:gradle:4.2.1'
 
         // NOTE: Do not place your application dependencies here; they belong

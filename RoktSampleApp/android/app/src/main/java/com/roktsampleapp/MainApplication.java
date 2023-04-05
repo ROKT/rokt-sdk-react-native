@@ -2,9 +2,10 @@ package com.roktsampleapp;
 
 import android.app.Application;
 
-import com.facebook.react.ReactApplication;
+import com.reactnativenavigation.NavigationApplication;
 import com.reactlibrary.RNRoktWidgetPackage;
 import com.facebook.react.ReactNativeHost;
+import com.reactnativenavigation.react.NavigationReactNativeHost;
 import com.facebook.react.ReactPackage;
 import com.facebook.react.shell.MainReactPackage;
 import com.facebook.soloader.SoLoader;
@@ -15,9 +16,9 @@ import com.reactnativecommunity.checkbox.ReactCheckBoxPackage;
 import java.util.Arrays;
 import java.util.List;
 
-public class MainApplication extends Application implements ReactApplication {
+public class MainApplication extends NavigationApplication {
 
-  private final ReactNativeHost mReactNativeHost = new ReactNativeHost(this) {
+  private final ReactNativeHost mReactNativeHost = new NavigationReactNativeHost(this) {
     @Override
     public boolean getUseDeveloperSupport() {
       return true;
@@ -46,6 +47,6 @@ public class MainApplication extends Application implements ReactApplication {
   @Override
   public void onCreate() {
     super.onCreate();
-    SoLoader.init(this, /* native exopackage */ false);
+    
   }
 }
