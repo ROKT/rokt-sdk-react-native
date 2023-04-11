@@ -17,3 +17,44 @@ steps:
     agents:
       queue: ${ENG_BK_AGENT}
     timeout_in_minutes: 15
+  
+  - label: ":android: Android Build and Test"
+    key: "android-test"
+    depends_on: "pack"
+    commands:
+      - cd RoktSampleApp
+      - npm install
+      - cd android
+      - gem install fastlane
+      - bundle install
+      - bundle exec fastlane deviceFarmUITest
+    plugins:
+      - seek-oss/aws-sm#v2.3.1:
+          env:
+            DEVICE_FARM_STAGE_ACCESS_KEY:
+              secret-id: "stage-react-native-buildkite"
+              json-key: ".DEVICE_FARM_STAGE_ACCESS_KEY"
+            DEVICE_FARM_STAGE_SECRET_KEY:
+              secret-id: "stage-react-native-buildkite"
+              json-key: ".DEVICE_FARM_STAGE_SECRET_KEY"
+            DEVICE_FARM_STAGE_DEVICE_POOL:
+              secret-id: "stage-react-native-buildkite"
+              json-key: ".DEVICE_FARM_STAGE_DEVICE_POOL"
+            DEVICE_FARM_STAGE_PROJECT_NAME:
+              secret-id: "stage-react-native-buildkite"
+              json-key: ".DEVICE_FARM_STAGE_PROJECT_NAME"
+      - artifacts#v1.9.0:
+          download: "Rokt.Widget/*.tgz"
+          upload: "RoktSampleApp/android/app/build/outputs/apk/debug"
+      - docker#v5.6.0:
+          image: reactnativecommunity/react-native-android
+          user: "root"
+          mount-buildkite-agent: true
+          environment:
+            - DEVICE_FARM_STAGE_ACCESS_KEY
+            - DEVICE_FARM_STAGE_SECRET_KEY
+            - DEVICE_FARM_STAGE_DEVICE_POOL
+            - DEVICE_FARM_STAGE_PROJECT_NAME
+    agents:
+      queue: ${ENG_BK_AGENT}
+    timeout_in_minutes: 45
