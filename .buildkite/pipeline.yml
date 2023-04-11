@@ -72,7 +72,7 @@ steps:
       - npm install
       - pm2 start --name reactnative npm -- start
       - cd ios && pod install --verbose --repo-update && cd -
-      - export RCT_NO_LAUNCH_PACKAGER=true && xcodebuild -workspace ios/RoktSampleApp.xcworkspace -destination 'platform=iOS Simulator,name=iPhone 14' -scheme RoktSampleApp -parallelizeTargets -configuration Debug -derivedDataPath ios/build -UseModernBuildSystem=YES test | xcpretty -k
+      - export RCT_NO_LAUNCH_PACKAGER=true && xcodebuild -workspace ios/RoktSampleApp.xcworkspace -destination 'platform=iOS Simulator,name=iPhone 14' -scheme RoktSampleApp -parallelizeTargets -configuration Debug -derivedDataPath ios/build -UseModernBuildSystem=YES test
       - pm2 stop reactnative && pm2 delete reactnative
     plugins:
       - artifacts#v1.9.0:
