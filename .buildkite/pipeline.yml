@@ -1,0 +1,19 @@
+env:
+  MAC_BK_AGENT: eng-prod-us-west-2-mac-arm-macos-build-medium
+  ENG_BK_AGENT: eng-default
+
+steps:
+  - label: ":package: Create Tarball"
+    key: "pack"
+    commands:
+      - cd Rokt.Widget
+      - npm install && npm pack
+    plugins:
+      - docker#v5.6.0:
+          image: "cimg/node:12.16"
+          user: "root"
+      - artifacts#v1.9.0:
+          upload: "Rokt.Widget/*.tgz"
+    agents:
+      queue: ${ENG_BK_AGENT}
+    timeout_in_minutes: 15
