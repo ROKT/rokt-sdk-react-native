@@ -58,3 +58,25 @@ steps:
     agents:
       queue: ${ENG_BK_AGENT}
     timeout_in_minutes: 45
+
+  - label: ":ios: iOS Build and Test"
+    key: "ios-test"
+    depends_on: "pack"
+    commands:
+      - . ~/.zshrc
+      - rbenv local 2.7.6
+      - cd RoktSampleApp
+      - xcrun simctl boot "iPhone 14" || true
+      - nvm use 12
+      - npm install pm2 -g
+      - npm install
+      - pm2 start --name reactnative npm -- start
+      - cd ios && pod install --verbose --repo-update && cd -
+      - export RCT_NO_LAUNCH_PACKAGER=true && xcodebuild -workspace ios/RoktSampleApp.xcworkspace -destination 'platform=iOS Simulator,name=iPhone 14' -scheme RoktSampleApp -parallelizeTargets -configuration Debug -derivedDataPath ios/build -UseModernBuildSystem=YES test | xcpretty -k
+      - pm2 stop reactnative && pm2 delete reactnative
+    plugins:
+      - artifacts#v1.9.0:
+          download: "Rokt.Widget/*.tgz"
+    agents:
+      queue: ${MAC_BK_AGENT}
+    timeout_in_minutes: 45
