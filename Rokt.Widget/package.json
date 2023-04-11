@@ -9,6 +9,17 @@
   "keywords": [
     "Rokt React Native SDK"
   ],
+  "files": [
+    "android",
+    "ios",
+    "index.js",
+    "rokt-embedded-view.android.js",
+    "rokt-embedded-view.ios.js",
+    "LICENSE",
+    "README.md",
+    "rokt-react-native-sdk.podspec",
+    "package.json"
+  ],
   "author": "",
   "license": "Copyright 2020 Rokt Pte Ltd",
   "peerDependencies": {
