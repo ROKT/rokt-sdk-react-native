@@ -106,7 +106,7 @@ steps:
               json-key: ".NPM_TOKEN"
       - artifacts#v1.9.0:
           download: "Rokt.Widget/*.tgz"
-      - docker#v5.6.0:
+      - docker#v5.6.0: # TODO: Improve this image and add to ecr
           image: reactnativecommunity/react-native-android
           user: "root"
           mount-buildkite-agent: true
