@@ -4,6 +4,7 @@
 
 - Danial Motahari - danial.motahari@rokt.com
 - Sahil Suri - sahil.suri@rokt.com
+- Thomson Thomas - thomson.thomas@rokt.com
 
 ## Overview
 
@@ -14,7 +15,7 @@ The React Native SDK enables you to integrate Rokt into your React Native mobile
 ## Development Environment
 Install ReactNative development environment by following the description [here](https://reactnative.dev/docs/environment-setup).
 
-For this project, a mininum `Ruby` version `2.7.6` is required. Check by running `ruby -v` on your terminal.
+For this project, a minimum `Ruby` version `2.7.6` is required. Check by running `ruby -v` on your terminal.
 
 ## Integration Guide for Demo Apps
 

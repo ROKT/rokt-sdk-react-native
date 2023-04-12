@@ -46,7 +46,7 @@ Make sure you have your iOS device or Simulator turned on.
 
 1. go to *RoktSampleApp* directory 
 2. if you are on an M1 Mac, run `npx react-native start`
-3. run `npx react-native run-ios --simulator="[simulator/device name]"` e.g. `npx react-native run-ios --simulator=“iPhone 14”`
+3. run `npx react-native run-ios --simulator="[simulator/device name]"` e.g. `npx react-native run-ios --simulator="iPhone 14"`
 
 ## Android
 
