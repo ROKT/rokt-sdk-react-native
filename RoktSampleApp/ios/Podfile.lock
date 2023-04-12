@@ -354,7 +354,7 @@ PODS:
   - RNCCheckbox (0.5.14):
     - BEMCheckBox (~> 1.4)
     - React-Core
-  - rokt-react-native-sdk (3.12.0):
+  - rokt-react-native-sdk (3.12.0-alpha.0):
     - React
     - Rokt-Widget (~> 3.12.0)
   - Rokt-Widget (3.12.0)
