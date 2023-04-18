@@ -49,7 +49,7 @@ steps:
           download: "Rokt.Widget/*.tgz"
           upload: "RoktSampleApp/android/app/build/outputs/apk/debug"
       - docker#v5.6.0:
-          image: "${ECR_HOST}/cached/reactnativecommunity/react-native-android"
+          image: "${ECR_HOST}/cached/reactnativecommunity/react-native-android:7.0"
           user: "root"
           mount-buildkite-agent: true
           environment:
@@ -75,7 +75,7 @@ steps:
       - pm2 start --name reactnative npm -- start
       - cd ios && pod install --verbose --repo-update && cd -
       - gem install xcpretty -v 0.3.0
-      - export RCT_NO_LAUNCH_PACKAGER=true && xcodebuild -workspace ios/RoktSampleApp.xcworkspace -destination 'platform=iOS Simulator,name=iPhone 14' -scheme RoktSampleApp -parallelizeTargets -configuration Debug -derivedDataPath ios/build -UseModernBuildSystem=YES test | xcpretty -k
+      - export RCT_NO_LAUNCH_PACKAGER=true && xcodebuild -workspace ios/RoktSampleApp.xcworkspace -destination 'platform=iOS Simulator,name=iPhone 14' -scheme RoktSampleApp -parallelizeTargets -configuration Debug -derivedDataPath ios/build -UseModernBuildSystem=YES clean test | xcpretty -k
       - pm2 stop reactnative && pm2 delete reactnative
     plugins:
       - artifacts#v1.9.0:
@@ -109,7 +109,7 @@ steps:
       - artifacts#v1.9.0:
           download: "Rokt.Widget/*.tgz"
       - docker#v5.6.0:
-          image: "${ECR_HOST}/cached/reactnativecommunity/react-native-android"
+          image: "${ECR_HOST}/cached/reactnativecommunity/react-native-android:7.0"
           user: "root"
           mount-buildkite-agent: true
           environment:
@@ -145,7 +145,7 @@ steps:
       - artifacts#v1.9.0:
           download: "Rokt.Widget/*.tgz"
       - docker#v5.6.0:
-          image: "${ECR_HOST}/cached/reactnativecommunity/react-native-android"
+          image: "${ECR_HOST}/cached/reactnativecommunity/react-native-android:7.0"
           user: "root"
           mount-buildkite-agent: true
           environment:
