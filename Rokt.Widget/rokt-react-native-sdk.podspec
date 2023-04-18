@@ -18,7 +18,7 @@ Pod::Spec.new do |s|
   s.source       = { :git => "https://github.com/ROKT/rokt-sdk-react-native", :tag => "#{s.version}" }
 
   
-  s.source_files = "ios/**/*.*"
+  s.source_files = "ios/**/*.{h,m}"
   
 
   s.dependency "React"
