@@ -10,7 +10,7 @@ steps:
       - npm install && npm pack
     plugins:
       - docker#v5.6.0:
-          image: "cimg/node:12.16"
+          image: "035088524874.dkr.ecr.us-west-2.amazonaws.com/cached/node:16.13.1-bullseye"
           user: "root"
       - artifacts#v1.9.0:
           upload: "Rokt.Widget/*.tgz"
