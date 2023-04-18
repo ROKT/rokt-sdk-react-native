@@ -1,0 +1,155 @@
+env:
+  ENG_ACCOUNT: "035088524874"
+  ECR_HOST: ${ENG_ACCOUNT}.dkr.ecr.us-west-2.amazonaws.com
+  MAC_BK_AGENT: eng-prod-us-west-2-mac-arm-macos-build-medium
+  ENG_BK_AGENT: eng-default
+
+steps:
+  - label: ":package: Create Tarball"
+    key: "pack"
+    commands:
+      - cd Rokt.Widget
+      - npm install && npm pack
+    plugins:
+      - docker#v5.6.0:
+          image: "${ECR_HOST}/cached/node:17.2.0-alpine"
+          user: "root"
+      - artifacts#v1.9.0:
+          upload: "Rokt.Widget/*.tgz"
+    agents:
+      queue: ${ENG_BK_AGENT}
+    timeout_in_minutes: 15
+  
+  - label: ":android: Android Build and Test"
+    key: "android-test"
+    depends_on: "pack"
+    commands:
+      - cd RoktSampleApp
+      - npm install
+      - cd android
+      - gem install fastlane
+      - bundle install
+      - bundle exec fastlane deviceFarmUITest
+    plugins:
+      - seek-oss/aws-sm#v2.3.1:
+          env:
+            DEVICE_FARM_STAGE_ACCESS_KEY:
+              secret-id: "stage-react-native-buildkite"
+              json-key: ".DEVICE_FARM_STAGE_ACCESS_KEY"
+            DEVICE_FARM_STAGE_SECRET_KEY:
+              secret-id: "stage-react-native-buildkite"
+              json-key: ".DEVICE_FARM_STAGE_SECRET_KEY"
+            DEVICE_FARM_STAGE_DEVICE_POOL:
+              secret-id: "stage-react-native-buildkite"
+              json-key: ".DEVICE_FARM_STAGE_DEVICE_POOL"
+            DEVICE_FARM_STAGE_PROJECT_NAME:
+              secret-id: "stage-react-native-buildkite"
+              json-key: ".DEVICE_FARM_STAGE_PROJECT_NAME"
+      - artifacts#v1.9.0:
+          download: "Rokt.Widget/*.tgz"
+          upload: "RoktSampleApp/android/app/build/outputs/apk/debug"
+      - docker#v5.6.0:
+          image: "${ECR_HOST}/cached/reactnativecommunity/react-native-android:7.0"
+          user: "root"
+          mount-buildkite-agent: true
+          environment:
+            - DEVICE_FARM_STAGE_ACCESS_KEY
+            - DEVICE_FARM_STAGE_SECRET_KEY
+            - DEVICE_FARM_STAGE_DEVICE_POOL
+            - DEVICE_FARM_STAGE_PROJECT_NAME
+    agents:
+      queue: ${ENG_BK_AGENT}
+    timeout_in_minutes: 45
+
+  - label: ":ios: iOS Build and Test"
+    key: "ios-test"
+    depends_on: "pack"
+    commands:
+      - . ~/.zshrc
+      - rbenv local 2.7.6
+      - cd RoktSampleApp
+      - xcrun simctl boot "iPhone 14" || true
+      - nvm use 12
+      - npm install pm2 -g
+      - npm install
+      - pm2 start --name reactnative npm -- start
+      - cd ios && pod install --verbose --repo-update && cd -
+      - gem install xcpretty -v 0.3.0
+      - export RCT_NO_LAUNCH_PACKAGER=true && xcodebuild -workspace ios/RoktSampleApp.xcworkspace -destination 'platform=iOS Simulator,name=iPhone 14' -scheme RoktSampleApp -parallelizeTargets -configuration Debug -derivedDataPath ios/build -UseModernBuildSystem=YES clean test | xcpretty -k
+      - pm2 stop reactnative && pm2 delete reactnative
+    plugins:
+      - artifacts#v1.9.0:
+          download: "Rokt.Widget/*.tgz"
+    agents:
+      queue: ${MAC_BK_AGENT}
+    timeout_in_minutes: 45
+
+  - block: ":whale: Publish Alpha Version to npm"
+    key: "alpha-block"
+    prompt: "Confirm publishing alpha version to npm?"
+    depends_on:
+      - "android-test"
+      - "ios-test"
+  
+  - label: ":npm: Publish Alpha Version to npm"
+    depends_on: "alpha-block"
+    commands:
+      - cd RoktSampleApp
+      - npm install
+      - cd android
+      - gem install fastlane
+      - bundle install
+      - bundle exec fastlane publishAlphaSDK
+    plugins:
+      - seek-oss/aws-sm#v2.3.1:
+          env:
+            NPM_TOKEN:
+              secret-id: "stage-react-native-buildkite"
+              json-key: ".NPM_TOKEN"
+      - artifacts#v1.9.0:
+          download: "Rokt.Widget/*.tgz"
+      - docker#v5.6.0:
+          image: "${ECR_HOST}/cached/reactnativecommunity/react-native-android:7.0"
+          user: "root"
+          mount-buildkite-agent: true
+          environment:
+            - NPM_TOKEN
+    agents:
+      queue: ${ENG_BK_AGENT}
+    timeout_in_minutes: 45
+  
+  - block: ":whale: Publish to npm"
+    key: "publish-block"
+    prompt: "Confirm publishing to npm?"
+    depends_on:
+      - "android-test"
+      - "ios-test"
+    if: build.message =~ /hotfix/i || build.branch =~ /^release/i
+  
+  - label: ":npm: Publish to npm"
+    depends_on: "publish-block"
+    if: build.message =~ /hotfix/i || build.branch =~ /^release/i
+    commands:
+      - cd RoktSampleApp
+      - npm install
+      - cd android
+      - gem install fastlane
+      - bundle install
+      - bundle exec fastlane publishSDK
+    plugins:
+      - seek-oss/aws-sm#v2.3.1:
+          env:
+            NPM_TOKEN:
+              secret-id: "stage-react-native-buildkite"
+              json-key: ".NPM_TOKEN"
+      - artifacts#v1.9.0:
+          download: "Rokt.Widget/*.tgz"
+      - docker#v5.6.0:
+          image: "${ECR_HOST}/cached/reactnativecommunity/react-native-android:7.0"
+          user: "root"
+          mount-buildkite-agent: true
+          environment:
+            - NPM_TOKEN
+    agents:
+      queue: ${ENG_BK_AGENT}
+    timeout_in_minutes: 45
