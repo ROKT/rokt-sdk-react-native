@@ -1,4 +1,6 @@
 env:
+  ENG_ACCOUNT: "035088524874"
+  ECR_HOST: ${ENG_ACCOUNT}.dkr.ecr.us-west-2.amazonaws.com
   MAC_BK_AGENT: eng-prod-us-west-2-mac-arm-macos-build-medium
   ENG_BK_AGENT: eng-default
 
@@ -10,7 +12,7 @@ steps:
       - npm install && npm pack
     plugins:
       - docker#v5.6.0:
-          image: "035088524874.dkr.ecr.us-west-2.amazonaws.com/cached/node:16.13.1-bullseye"
+          image: "${ECR_HOST}/cached/node:17.2.0-alpine"
           user: "root"
       - artifacts#v1.9.0:
           upload: "Rokt.Widget/*.tgz"
@@ -47,7 +49,7 @@ steps:
           download: "Rokt.Widget/*.tgz"
           upload: "RoktSampleApp/android/app/build/outputs/apk/debug"
       - docker#v5.6.0:
-          image: reactnativecommunity/react-native-android
+          image: "${ECR_HOST}/cached/reactnativecommunity/react-native-android"
           user: "root"
           mount-buildkite-agent: true
           environment:
@@ -106,8 +108,8 @@ steps:
               json-key: ".NPM_TOKEN"
       - artifacts#v1.9.0:
           download: "Rokt.Widget/*.tgz"
-      - docker#v5.6.0: # TODO: Improve this image and add to ecr
-          image: reactnativecommunity/react-native-android
+      - docker#v5.6.0:
+          image: "${ECR_HOST}/cached/reactnativecommunity/react-native-android"
           user: "root"
           mount-buildkite-agent: true
           environment:
@@ -143,7 +145,7 @@ steps:
       - artifacts#v1.9.0:
           download: "Rokt.Widget/*.tgz"
       - docker#v5.6.0:
-          image: reactnativecommunity/react-native-android
+          image: "${ECR_HOST}/cached/reactnativecommunity/react-native-android"
           user: "root"
           mount-buildkite-agent: true
           environment:
