@@ -61,7 +61,7 @@ jobs:
   deploy:
     working_directory: ~/rokt-sdk-react-native/RoktSampleApp/android
     docker:
-      - image: reactnativecommunity/react-native-android
+      - image: reactnativecommunity/react-native-android:7.0
     steps:
       - attach_workspace:
           at: ~/rokt-sdk-react-native
@@ -75,7 +75,7 @@ jobs:
   deployAlpha:
     working_directory: ~/rokt-sdk-react-native/RoktSampleApp/android
     docker:
-      - image: reactnativecommunity/react-native-android
+      - image: reactnativecommunity/react-native-android:7.0
     steps:
       - attach_workspace:
           at: ~/rokt-sdk-react-native
@@ -89,7 +89,7 @@ jobs:
   android-build-run-ui-test:
     working_directory: ~/rokt-sdk-react-native/RoktSampleApp/android
     docker:
-      - image: reactnativecommunity/react-native-android
+      - image: reactnativecommunity/react-native-android:7.0
     resource_class: large
     steps:
       - attach_workspace:
