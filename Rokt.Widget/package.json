@@ -13,7 +13,7 @@
     "android",
     "ios",
     "index.js",
-    "rokt-embedded-view.android.js",
+    "rokt-embedded-view.android.tsx",
     "rokt-embedded-view.ios.js",
     "LICENSE",
     "README.md",
