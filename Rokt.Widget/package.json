@@ -13,7 +13,7 @@
     "android",
     "ios",
     "index.js",
-    "rokt-embedded-view.android.js",
+    "rokt-embedded-view.android.tsx",
     "rokt-embedded-view.ios.js",
     "LICENSE",
     "README.md",
@@ -26,7 +26,11 @@
     "react-native": ">= 0.55.4"
   },
   "devDependencies": {
+    "@types/jest": "^27.5.1",
+    "@types/react": "^17.0.2",
+    "@types/react-native": "^0.68.0",
     "react": "17.0.2",
-    "react-native": "0.68.0"
+    "react-native": "0.68.0",
+    "typescript": "^5.0.4"
   }
 }

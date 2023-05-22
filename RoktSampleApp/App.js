@@ -328,7 +328,7 @@ export default class App extends Component {
               placeholderName={this.state.targetElement2}
             ></RoktEmbeddedView>
           </ScrollView>
-          <Toast ref={(ref) => Toast.setRef(ref)} />
+          <Toast/>
         </SafeAreaView>
       </>
     );
