@@ -9,7 +9,7 @@ steps:
     key: "pack"
     commands:
       - cd Rokt.Widget
-      - npm install && npm pack
+      - npm install && npm run build && npm pack
     plugins:
       - docker#v5.6.0:
           image: "${ECR_HOST}/cached/node:17.2.0-alpine"
