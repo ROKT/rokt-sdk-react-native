@@ -4,6 +4,7 @@
   "description": "Rokt Mobile SDK to integrate ROKT Api into ReactNative application",
   "main": "index.js",
   "scripts": {
+    "build": "tsc",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
@@ -13,8 +14,8 @@
     "android",
     "ios",
     "index.js",
-    "rokt-embedded-view.android.tsx",
-    "rokt-embedded-view.ios.js",
+    "build/rokt-embedded-view.android.js",
+    "build/rokt-embedded-view.ios.js",
     "LICENSE",
     "README.md",
     "rokt-react-native-sdk.podspec",

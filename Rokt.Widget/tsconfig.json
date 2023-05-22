@@ -1,16 +1,16 @@
 {
     "compilerOptions": {
       "allowJs": true,
+      "outDir": "build",
       "allowSyntheticDefaultImports": true,
       "esModuleInterop": true,
       "isolatedModules": true,
       "jsx": "react-native",
-      "lib": ["esnext"],
+      "lib": ["es6"],
       "types": ["react-native"],
       "moduleResolution": "node",
-      "noEmit": true,
       "strict": true,
-      "target": "esnext",
+      "target": "es6",
       "noImplicitReturns": true,
       "resolveJsonModule": true,
       "skipLibCheck": true,
@@ -20,14 +20,12 @@
       "noImplicitOverride": true,
       "allowUnreachableCode": false
     },
-    "include": [
-      "*",
-      "**/*"
-    ],
+    "include": ["rokt-embedded-view.android.tsx", "rokt-embedded-view.ios.js"],
     "exclude": [
       "node_modules",
       "babel.config.js",
       "metro.config.js",
-      "jest.config.js"
+      "jest.config.js",
+      "build"
     ]
   }
