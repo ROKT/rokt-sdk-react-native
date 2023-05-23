@@ -9,44 +9,58 @@
  * You may obtain a copy of the License at https://rokt.com/sdk-license-2-0/
  */
 
-import { requireNativeComponent , StyleSheet, NativeEventEmitter, NativeModules} from 'react-native';
+import { requireNativeComponent , StyleSheet, NativeEventEmitter, NativeModules, HostComponent, ViewProps, NativeModule} from 'react-native';
 import React, {Component} from 'react';
-const { RoktEventManager } = NativeModules;
+
+const RoktEventManager = NativeModules.RoktEventManager as NativeModule
+
+export interface RoktEmbeddedViewProps {
+  placeholderName: string
+}
+
+export interface RoktEmbeddedViewState {
+  height: number,
+  placeholderName: string
+}
+
+export interface WidgetChangeEvent {
+  selectedPlacement: string,
+  height: string
+}
 
 const eventManagerEmitter = new NativeEventEmitter(RoktEventManager);
 
-class RoktEmbeddedView extends Component {
+class RoktEmbeddedView extends Component<RoktEmbeddedViewProps, RoktEmbeddedViewState> {
 
   subscription = eventManagerEmitter.addListener(
     'WidgetHeightChanges',
-    (widgetChanges) => {
+    (widgetChanges: WidgetChangeEvent) => {
       console.log
       if (widgetChanges.selectedPlacement == this.state.placeholderName) {
-        this.state.height = parseInt(widgetChanges.height);
-        this.forceUpdate();
+        this.setState({height: parseInt(widgetChanges.height)})
       } 
     }
   );
 
-    constructor(props){
+    constructor(props: RoktEmbeddedViewProps){
         super(props);
 
          this.state = { height: 0,  placeholderName: this.props.placeholderName};
     }
 
-    render() {
+    override render() {
       return (
           <WidgetNativeComponent style={[styles.widget, {height: this.state.height}]}/>
       );
     }
 
-    componentWillUnmount(){
+    override componentWillUnmount(){
       this.subscription.remove();
     }
 
   }
 
-  const WidgetNativeComponent = requireNativeComponent('RoktNativeWidget')
+  const WidgetNativeComponent: HostComponent<ViewProps> = requireNativeComponent('RoktNativeWidget')
 
   const styles = StyleSheet.create({
     widget: {
@@ -55,5 +69,3 @@ class RoktEmbeddedView extends Component {
     });
   
   export default RoktEmbeddedView;
-
-

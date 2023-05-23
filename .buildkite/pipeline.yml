@@ -5,8 +5,22 @@ env:
   ENG_BK_AGENT: eng-default
 
 steps:
+  - label: ":tslint: Lint"
+    key: "lint"
+    commands:
+      - cd Rokt.Widget
+      - npm install && npm run lint
+    plugins:
+      - docker#v5.6.0:
+          image: "${ECR_HOST}/cached/node:17.2.0-alpine"
+          user: "root"
+    agents:
+      queue: ${ENG_BK_AGENT}
+    timeout_in_minutes: 15
+    
   - label: ":package: Create Tarball"
     key: "pack"
+    depends_on: "lint"
     commands:
       - cd Rokt.Widget
       - npm install && npm run build && npm pack

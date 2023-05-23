@@ -1,7 +1,7 @@
 {
     "compilerOptions": {
       "allowJs": true,
-      "outDir": "build",
+      "outDir": "dist",
       "allowSyntheticDefaultImports": true,
       "esModuleInterop": true,
       "isolatedModules": true,
@@ -20,12 +20,12 @@
       "noImplicitOverride": true,
       "allowUnreachableCode": false
     },
-    "include": ["rokt-embedded-view.android.tsx", "rokt-embedded-view.ios.js"],
+    "include": ["src"],
     "exclude": [
       "node_modules",
       "babel.config.js",
       "metro.config.js",
       "jest.config.js",
-      "build"
+      "dist"
     ]
   }
