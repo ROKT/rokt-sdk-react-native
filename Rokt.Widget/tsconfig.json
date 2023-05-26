@@ -18,7 +18,8 @@
       "forceConsistentCasingInFileNames": true,
       "noFallthroughCasesInSwitch": true,
       "noImplicitOverride": true,
-      "allowUnreachableCode": false
+      "allowUnreachableCode": false,
+      "declaration": true
     },
     "include": ["src"],
     "exclude": [

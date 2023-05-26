@@ -5,7 +5,7 @@
   "main": "dist/index.js",
   "scripts": {
     "lint": "eslint .",
-    "build": "tsc",
+    "build": "rm -rf ./dist && tsc && cp ./src/rokt-embedded-view.d.ts ./dist/",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
@@ -15,8 +15,7 @@
     "android",
     "ios",
     "index.js",
-    "dist/rokt-embedded-view.android.js",
-    "dist/rokt-embedded-view.ios.js",
+    "dist",
     "LICENSE",
     "README.md",
     "rokt-react-native-sdk.podspec",

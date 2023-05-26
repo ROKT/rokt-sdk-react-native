@@ -25,6 +25,11 @@ export interface MarginChangedEvent extends Event {
   marginBottom: string
 }
 
+export interface WidgetChangeEvent {
+  selectedPlacement: string,
+  height: string
+}
+
 export interface RoktEmbeddedViewProps {
   placeholderName: string
 }
@@ -43,7 +48,7 @@ export interface WidgetNativeComponentProps extends ViewProps {
   onWidgetMarginChanged: (event: React.SyntheticEvent) => void
 }
 
-class RoktEmbeddedView extends Component<RoktEmbeddedViewProps, RoktEmbeddedViewState> {
+export class RoktEmbeddedView extends Component<RoktEmbeddedViewProps, RoktEmbeddedViewState> {
 
   constructor(props: RoktEmbeddedViewProps) {
     super(props);

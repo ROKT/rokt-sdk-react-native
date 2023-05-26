@@ -14,13 +14,15 @@ import React, {Component} from 'react';
 
 const RoktEventManager = NativeModules.RoktEventManager as NativeModule
 
-export interface RoktEmbeddedViewProps {
-  placeholderName: string
+export interface HeightChangedEvent extends Event {
+  height: string,
 }
 
-export interface RoktEmbeddedViewState {
-  height: number,
-  placeholderName: string
+export interface MarginChangedEvent extends Event {
+  marginTop: string,
+  marginRight: string,
+  marginLeft: string,
+  marginBottom: string
 }
 
 export interface WidgetChangeEvent {
@@ -28,9 +30,22 @@ export interface WidgetChangeEvent {
   height: string
 }
 
+export interface RoktEmbeddedViewProps {
+  placeholderName: string
+}
+
+export interface RoktEmbeddedViewState {
+  height: number,
+  placeholderName: string,
+  marginTop: number,
+  marginRight: number,
+  marginLeft: number,
+  marginBottom: number
+}
+
 const eventManagerEmitter = new NativeEventEmitter(RoktEventManager);
 
-class RoktEmbeddedView extends Component<RoktEmbeddedViewProps, RoktEmbeddedViewState> {
+export class RoktEmbeddedView extends Component<RoktEmbeddedViewProps, RoktEmbeddedViewState> {
 
   subscription = eventManagerEmitter.addListener(
     'WidgetHeightChanges',
@@ -45,7 +60,7 @@ class RoktEmbeddedView extends Component<RoktEmbeddedViewProps, RoktEmbeddedView
     constructor(props: RoktEmbeddedViewProps){
         super(props);
 
-         this.state = { height: 0,  placeholderName: this.props.placeholderName};
+        this.state = { height: 0, placeholderName: this.props.placeholderName, marginTop: 0, marginRight: 0, marginLeft: 0, marginBottom: 0 };
     }
 
     override render() {
