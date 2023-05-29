@@ -5,11 +5,25 @@ env:
   ENG_BK_AGENT: eng-default
 
 steps:
-  - label: ":package: Create Tarball"
-    key: "pack"
+  - label: ":tslint: Lint"
+    key: "lint"
     commands:
       - cd Rokt.Widget
-      - npm install && npm pack
+      - npm install && npm run lint
+    plugins:
+      - docker#v5.6.0:
+          image: "${ECR_HOST}/cached/node:17.2.0-alpine"
+          user: "root"
+    agents:
+      queue: ${ENG_BK_AGENT}
+    timeout_in_minutes: 15
+    
+  - label: ":package: Create Tarball"
+    key: "pack"
+    depends_on: "lint"
+    commands:
+      - cd Rokt.Widget
+      - npm install && npm run build && npm pack
     plugins:
       - docker#v5.6.0:
           image: "${ECR_HOST}/cached/node:17.2.0-alpine"
@@ -105,7 +119,7 @@ steps:
           env:
             NPM_TOKEN:
               secret-id: "stage-react-native-buildkite"
-              json-key: ".NPM_TOKEN"
+              json-key: ".NPM_TOKEN_NEW"
       - artifacts#v1.9.0:
           download: "Rokt.Widget/*.tgz"
       - docker#v5.6.0:
@@ -141,7 +155,7 @@ steps:
           env:
             NPM_TOKEN:
               secret-id: "stage-react-native-buildkite"
-              json-key: ".NPM_TOKEN"
+              json-key: ".NPM_TOKEN_NEW"
       - artifacts#v1.9.0:
           download: "Rokt.Widget/*.tgz"
       - docker#v5.6.0:

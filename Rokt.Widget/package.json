@@ -1,9 +1,12 @@
 {
   "name": "@rokt/react-native-sdk",
-  "version": "3.13.0",
+  "version": "3.14.0-alpha.0",
   "description": "Rokt Mobile SDK to integrate ROKT Api into ReactNative application",
-  "main": "index.js",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
+    "lint": "eslint .",
+    "build": "rm -rf ./dist && tsc && cp ./src/rokt-embedded-view.d.ts ./dist/",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
@@ -13,8 +16,7 @@
     "android",
     "ios",
     "index.js",
-    "rokt-embedded-view.android.js",
-    "rokt-embedded-view.ios.js",
+    "dist",
     "LICENSE",
     "README.md",
     "rokt-react-native-sdk.podspec",
@@ -26,7 +28,14 @@
     "react-native": ">= 0.55.4"
   },
   "devDependencies": {
+    "@types/jest": "^27.5.1",
+    "@types/react": "^17.0.2",
+    "@types/react-native": "^0.68.0",
+    "@typescript-eslint/eslint-plugin": "^5.59.7",
+    "@typescript-eslint/parser": "^5.59.7",
+    "eslint": "^8.41.0",
     "react": "17.0.2",
-    "react-native": "0.68.0"
+    "react-native": "0.68.0",
+    "typescript": "^5.0.4"
   }
 }
