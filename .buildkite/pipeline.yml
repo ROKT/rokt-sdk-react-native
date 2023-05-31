@@ -101,8 +101,7 @@ steps:
   - block: ":whale: Publish Alpha Version to npm"
     key: "alpha-block"
     prompt: "Confirm publishing alpha version to npm?"
-    depends_on:
-      - ~
+    depends_on: ~
   
   - label: ":npm: Publish Alpha Version to npm"
     depends_on: "alpha-block"
