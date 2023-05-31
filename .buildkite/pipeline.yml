@@ -119,8 +119,6 @@ steps:
             NPM_TOKEN:
               secret-id: "stage-react-native-buildkite"
               json-key: ".NPM_TOKEN"
-      - artifacts#v1.9.0:
-          download: "Rokt.Widget/*.tgz"
       - docker#v5.6.0:
           image: "${ECR_HOST}/cached/reactnativecommunity/react-native-android:7.0"
           user: "root"
