@@ -108,7 +108,9 @@ steps:
   - label: ":npm: Publish Alpha Version to npm"
     depends_on: "alpha-block"
     commands:
-      - cd RoktSampleApp
+      - cd Rokt.Widget
+      - npm install && npm run build && npm pack
+      - cd - && cd RoktSampleApp
       - npm install
       - cd android
       - gem install fastlane
@@ -120,8 +122,6 @@ steps:
             NPM_TOKEN:
               secret-id: "stage-react-native-buildkite"
               json-key: ".NPM_TOKEN"
-      - artifacts#v1.9.0:
-          download: "Rokt.Widget/*.tgz"
       - docker#v5.6.0:
           image: "${ECR_HOST}/cached/reactnativecommunity/react-native-android:7.0"
           user: "root"
@@ -144,7 +144,9 @@ steps:
     depends_on: "publish-block"
     if: build.message =~ /hotfix/i || build.branch =~ /^release/i
     commands:
-      - cd RoktSampleApp
+      - cd Rokt.Widget
+      - npm install && npm run build && npm pack
+      - cd - && cd RoktSampleApp
       - npm install
       - cd android
       - gem install fastlane
@@ -156,8 +158,6 @@ steps:
             NPM_TOKEN:
               secret-id: "stage-react-native-buildkite"
               json-key: ".NPM_TOKEN"
-      - artifacts#v1.9.0:
-          download: "Rokt.Widget/*.tgz"
       - docker#v5.6.0:
           image: "${ECR_HOST}/cached/reactnativecommunity/react-native-android:7.0"
           user: "root"
