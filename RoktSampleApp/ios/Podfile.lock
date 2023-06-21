@@ -354,10 +354,10 @@ PODS:
   - RNCCheckbox (0.5.15):
     - BEMCheckBox (~> 1.4)
     - React-Core
-  - rokt-react-native-sdk (3.14.2):
+  - rokt-react-native-sdk (3.15.0):
     - React
-    - Rokt-Widget (~> 3.14.2)
-  - Rokt-Widget (3.14.2)
+    - Rokt-Widget (~> 3.15.0)
+  - Rokt-Widget (3.15.0)
   - SocketRocket (0.6.0)
   - Yoga (1.14.0)
   - YogaKit (1.18.1):
@@ -516,7 +516,7 @@ SPEC CHECKSUMS:
   BEMCheckBox: 5ba6e37ade3d3657b36caecc35c8b75c6c2b1a4e
   boost: a7c83b31436843459a1961bfd74b96033dc77234
   CocoaAsyncSocket: 065fd1e645c7abab64f7a6a2007a48038fdc6a99
-  DoubleConversion: 831926d9b8bf8166fd87886c4abab286c2422662
+  DoubleConversion: 5189b271737e1565bdce30deb4a08d647e3f5f54
   FBLazyVector: a8af91c2b5a0029d12ff6b32e428863d63c48991
   FBReactNativeSpec: ec5e878f6452a3de5430e0b2324a4d4ae6ac63f6
   Flipper: 26fc4b7382499f1281eb8cb921e5c3ad6de91fe0
@@ -529,7 +529,7 @@ SPEC CHECKSUMS:
   Flipper-RSocket: d9d9ade67cbecf6ac10730304bf5607266dd2541
   FlipperKit: cbdee19bdd4e7f05472a66ce290f1b729ba3cb86
   fmt: ff9d55029c625d3757ed641535fd4a75fedc7ce9
-  glog: 5337263514dd6f09803962437687240c5dc39aa4
+  glog: 3d02b25ca00c2d456734d0bcff864cbc62f6ae1a
   libevent: 4049cae6c81cdb3654a443be001fb9bdceff7913
   OpenSSL-Universal: ebc357f1e6bc71fa463ccb2fe676756aff50e88c
   RCT-Folly: b9d9fe1fc70114b751c076104e52f3b1b5e5a95a
@@ -559,8 +559,8 @@ SPEC CHECKSUMS:
   React-runtimeexecutor: 5ebf1ddaa706bf2986123f22d2cad905443c2c5f
   ReactCommon: 65754b8932ea80272714988268bbfb9f303264a5
   RNCCheckbox: 43bcc6493611468af0e19f19f029dab3da8561c4
-  rokt-react-native-sdk: 1a356adb1b3ab130b4b816eea086e10b4aa26897
-  Rokt-Widget: 26a2ef588ecf0268f13ad33f92b0e965d61b8e76
+  rokt-react-native-sdk: bf254ef3d96d11b17ff46a984da0697a1d80f13e
+  Rokt-Widget: 9ae4cc7b799e7ca263780444909434ad275873af
   SocketRocket: fccef3f9c5cedea1353a9ef6ada904fde10d6608
   Yoga: d24d6184b6b85f742536bd93bd07d69d7b9bb4c1
   YogaKit: f782866e155069a2cca2517aafea43200b01fd5a
