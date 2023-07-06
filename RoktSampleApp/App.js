@@ -65,6 +65,7 @@ export default class App extends Component {
       stageEnabled: false,
       twoStepEnabled: false,
       encryptEnabled: false,
+      withUrlListener: false,
     };
   }
 
@@ -198,6 +199,15 @@ export default class App extends Component {
 
     if (isEmpty(this.state.viewName)) {
       this.showToast('View Name cannot be empty');
+    }
+
+    if (this.state.withUrlListener) {
+      urlListenerSubscription = eventManagerEmitter.addListener(
+        'OpenURL',
+        (data) => {
+          console.log('OpenURL ID: ' + data['urlId'] + ' URL: ' + data['urlString']);
+        },
+      )
     }
 
     if (this.state.twoStepEnabled) {
@@ -341,6 +351,18 @@ export default class App extends Component {
                     }
                   />
                   <Text style={{marginTop: 5, marginLeft: 5}}>Encrypt RSA</Text>
+                </View>
+                <View style={{flexDirection: 'row'}}>
+                  <CheckBox
+                    accessibilityLabel="input_url_listener"
+                    value={this.state.withUrlListener}
+                    onValueChange={() =>
+                      this.setState({
+                        withUrlListener: !this.state.withUrlListener,
+                      })
+                    }
+                  />
+                  <Text style={{marginTop: 5, marginLeft: 5}}>Add URL listener</Text>
                 </View>
                 <View style={styles.buttonContainer}>
                   <TouchableOpacity

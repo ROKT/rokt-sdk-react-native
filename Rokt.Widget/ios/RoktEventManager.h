@@ -15,5 +15,6 @@
 + (id)allocWithZone:(NSZone *)zone;
 - (void)onWidgetHeightChanges:(CGFloat)widgetHeight placement:(NSString*) selectedPlacement;
 - (void)onFirstPositiveResponse;
+- (void)onOpenUrl:(NSString*)urlId url:(NSString*)urlString;
 
 @end
