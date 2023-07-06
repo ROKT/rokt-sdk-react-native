@@ -78,6 +78,10 @@ RCT_EXPORT_METHOD(execute:(NSString *)viewName
             [event onWidgetHeightChanges:widgetHeight placement:selectedPlacement];
             
         }];
+
+        [Rokt urlListenerOnOpenUrl:^(NSString *urlId, NSString *urlString){  
+            [event onOpenUrl:urlId url:urlString];
+        }];
         
     }];
 }
@@ -107,7 +111,7 @@ RCT_EXPORT_METHOD(execute2Step:(NSString *)viewName
         }
         
         RoktEventManager *event = [RoktEventManager allocWithZone: nil];
-        
+
         [Rokt execute2stepWithViewName:viewName attributes:finalAttributes
                             placements:nativePlaceholders
                                 onLoad:^{ callback(@[@"onLoad", [NSNull null]]);}
@@ -128,7 +132,11 @@ RCT_EXPORT_METHOD(execute2Step:(NSString *)viewName
                 [event onFirstPositiveResponse];
             }
         }];
-        
+
+        [Rokt urlListenerOnOpenUrl:^(NSString *urlId, NSString *urlString){  
+            [event onOpenUrl:urlId url:urlString];
+        }];
+
     }];
     
 }
