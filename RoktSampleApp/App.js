@@ -72,6 +72,7 @@ export default class App extends Component {
       encryptEnabled: false,
       showWebView: false,
       webViewUrl: 'https://example.com',
+      webViewId: -1,
       withUrlListener: false,
     };
   }
@@ -213,7 +214,7 @@ export default class App extends Component {
         'OpenURL',
         (data) => {
           console.log('OpenURL ID: ' + data['urlId'] + ' URL: ' + data['urlString']);
-          this.setState({webViewUrl: data['urlString']})
+          this.setState({webViewUrl: data['urlString'], webViewId: data['urlId']})
         },
       )
     }
@@ -402,6 +403,9 @@ export default class App extends Component {
                   source={{ uri: this.state.webViewUrl }}
                   mediaPlaybackRequiresUserAction={true}
                   style={styles.webview}
+                  // This deals with more than just url errors but its good enough for testing
+                  // TODO: call sendUrlFailure method 
+                  renderError={() => console.log(`Error with ${this.state.webViewUrl}, ${this.state.webViewId}`)}
                 />
               }
 
