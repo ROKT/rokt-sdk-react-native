@@ -39,7 +39,7 @@ RCT_EXPORT_MODULE(RoktEventManager);
 
 - (NSArray<NSString *> *)supportedEvents
 {
-  return @[@"WidgetHeightChanges", @"FirstPositiveResponse"];
+  return @[@"WidgetHeightChanges", @"FirstPositiveResponse", @"OpenURL"];
 }
 
 - (void)onWidgetHeightChanges:(CGFloat)widgetHeight placement:(NSString*) selectedPlacement
@@ -55,6 +55,13 @@ RCT_EXPORT_MODULE(RoktEventManager);
 {
     if (hasListeners) {
         [self sendEventWithName:@"FirstPositiveResponse" body:@{@"":@""}];
+    }
+}
+
+- (void)onOpenUrl:(NSString*)urlId url:(NSString*)urlString
+{
+    if (hasListeners) {
+        [self sendEventWithName:@"OpenURL" body:@{@"urlId": urlId, @"urlString": urlString}];
     }
 }
 
