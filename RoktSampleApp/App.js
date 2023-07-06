@@ -24,6 +24,7 @@ import {
   StatusBar,
   TouchableOpacity,
   NativeEventEmitter,
+  Dimensions,
 } from 'react-native';
 import CheckBox from '@react-native-community/checkbox';
 import Toast from 'react-native-toast-message';
@@ -43,9 +44,13 @@ import {Colors} from 'react-native/Libraries/NewAppScreen';
 import {Rokt, RoktEmbeddedView, RoktEventManager} from '@rokt/react-native-sdk';
 import sha256 from 'crypto-js/sha256';
 import {Buffer} from 'buffer';
+import { WebView } from 'react-native-webview';
 var forge = require('node-forge');
 
 const eventManagerEmitter = new NativeEventEmitter(RoktEventManager);
+
+const deviceHeight = Dimensions.get('window').height;
+const deviceWidth = Dimensions.get('window').width;
 
 export default class App extends Component {
   constructor(props) {
@@ -65,6 +70,8 @@ export default class App extends Component {
       stageEnabled: false,
       twoStepEnabled: false,
       encryptEnabled: false,
+      showWebView: false,
+      webViewUrl: 'https://example.com',
       withUrlListener: false,
     };
   }
@@ -206,6 +213,7 @@ export default class App extends Component {
         'OpenURL',
         (data) => {
           console.log('OpenURL ID: ' + data['urlId'] + ' URL: ' + data['urlString']);
+          this.setState({webViewUrl: data['urlString']})
         },
       )
     }
@@ -354,6 +362,16 @@ export default class App extends Component {
                 </View>
                 <View style={{flexDirection: 'row'}}>
                   <CheckBox
+                    accessibilityLabel="show_webview"
+                    value={this.state.showWebView}
+                    onValueChange={() =>
+                      this.setState({ showWebView: !this.state.showWebView })
+                    }
+                  />
+                  <Text style={{marginTop: 5, marginLeft: 5}}>Toggle Webview Visibility</Text>
+                </View>
+                <View style={{flexDirection: 'row'}}>
+                  <CheckBox
                     accessibilityLabel="input_url_listener"
                     value={this.state.withUrlListener}
                     onValueChange={() =>
@@ -378,6 +396,14 @@ export default class App extends Component {
                 </View>
               </View>
             </View>
+
+            {this.state.showWebView &&
+              <WebView
+                  source={{ uri: this.state.webViewUrl }}
+                  mediaPlaybackRequiresUserAction={true}
+                  style={styles.webview}
+                />
+              }
 
             <RoktEmbeddedView
               ref={this.placeholder1}
@@ -461,4 +487,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'stretch',
   },
+  webview: {
+    marginTop: 20,
+    height: deviceHeight / 4,
+    width: deviceWidth,
+    flex: 1,
+    borderWidth: 2,
+  }
 });
