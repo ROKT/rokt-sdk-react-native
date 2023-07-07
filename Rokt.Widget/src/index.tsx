@@ -10,6 +10,7 @@ export interface RNRoktWidget {
     setEnvironmentToStage(): void;
     setEnvironmentToProd(): void;
     toggleDebug(enabled: boolean): void;
+    sendUrlFailure(urlId: string, brokenUrl: string, description: string): void;
 }
 
 declare module 'react-native' {
