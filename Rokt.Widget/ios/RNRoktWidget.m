@@ -147,8 +147,11 @@ RCT_EXPORT_METHOD(setFulfillmentAttributes:(NSDictionary *)attributes) {
         [self.roktEventHandler setFulfillmentAttributesWithAttributes:attributes];
     }
 }
-RCT_EXPORT_METHOD(sendUrlFailure:(NSString *)urlId brokenUrl:(NSString *)brokenUrl description:(NSString *)description)
+RCT_EXPORT_METHOD(sendUrlFailure:(NSString *)urlId brokenUrl:(NSString *)brokenUrl description:(NSString * _Nullable)description)
 {
+    if (description == nil) {
+        NSString *description = @"";
+    }
     [Rokt sendUrlFailureWithUrlId:urlId brokenUrl:brokenUrl description:description];
 }
 
