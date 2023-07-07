@@ -285,6 +285,8 @@ PODS:
   - React-jsinspector (0.69.12)
   - React-logger (0.69.12):
     - glog
+  - react-native-webview (13.2.2):
+    - React-Core
   - React-perflogger (0.69.12)
   - React-RCTActionSheet (0.69.12):
     - React-Core/RCTActionSheetHeaders (= 0.69.12)
@@ -358,7 +360,7 @@ PODS:
     - React
     - Rokt-Widget (~> 3.16.0-alpha.1146)
   - Rokt-Widget (3.16.0-alpha.1146)
-  - SocketRocket (0.6.0)
+  - SocketRocket (0.6.1)
   - Yoga (1.14.0)
   - YogaKit (1.18.1):
     - Yoga (~> 1.14)
@@ -406,6 +408,7 @@ DEPENDENCIES:
   - React-jsiexecutor (from `../node_modules/react-native/ReactCommon/jsiexecutor`)
   - React-jsinspector (from `../node_modules/react-native/ReactCommon/jsinspector`)
   - React-logger (from `../node_modules/react-native/ReactCommon/logger`)
+  - react-native-webview (from `../node_modules/react-native-webview`)
   - React-perflogger (from `../node_modules/react-native/ReactCommon/reactperflogger`)
   - React-RCTActionSheet (from `../node_modules/react-native/Libraries/ActionSheetIOS`)
   - React-RCTAnimation (from `../node_modules/react-native/Libraries/NativeAnimation`)
@@ -481,6 +484,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon/jsinspector"
   React-logger:
     :path: "../node_modules/react-native/ReactCommon/logger"
+  react-native-webview:
+    :path: "../node_modules/react-native-webview"
   React-perflogger:
     :path: "../node_modules/react-native/ReactCommon/reactperflogger"
   React-RCTActionSheet:
@@ -546,6 +551,7 @@ SPEC CHECKSUMS:
   React-jsiexecutor: ce0b9aa647bdf94126eb2ee1f235d329eb8c0aec
   React-jsinspector: f275698149311abc8c32ebb97797d6b97c44adde
   React-logger: da69d7f1c9501c78cd60776d52a60d7fa5e4d9c2
+  react-native-webview: b8ec89966713985111a14d6e4bf98d8b54bced0d
   React-perflogger: 5ade0a1627352f1647d283e78331819bb46cceae
   React-RCTActionSheet: 8e94f1e46e09c7035b81fe56c0ed8d78f3ccd340
   React-RCTAnimation: bf2af72f03cf16528db9a830be69fa04b341a1b7
@@ -561,7 +567,7 @@ SPEC CHECKSUMS:
   RNCCheckbox: 75255b03e604bbcc26411eb31c4cbe3e3865f538
   rokt-react-native-sdk: d94b82b719743e7dfb64dcfe78e9eaa29330490c
   Rokt-Widget: b1cc0ac094f0c0b7236bdd8420ae7d57da3d1967
-  SocketRocket: fccef3f9c5cedea1353a9ef6ada904fde10d6608
+  SocketRocket: f32cd54efbe0f095c4d7594881e52619cfe80b17
   Yoga: 8a90b50af67eaa9fe94fd03e550bfeab06096873
   YogaKit: f782866e155069a2cca2517aafea43200b01fd5a
 
