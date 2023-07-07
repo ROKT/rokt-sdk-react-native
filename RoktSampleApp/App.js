@@ -404,8 +404,12 @@ export default class App extends Component {
                   mediaPlaybackRequiresUserAction={true}
                   style={styles.webview}
                   // This deals with more than just url errors but its good enough for testing
-                  // TODO: call sendUrlFailure method 
-                  renderError={() => console.log(`Error with ${this.state.webViewUrl}, ${this.state.webViewId}`)}
+                  renderError={() => 
+                    {
+                      console.log(`Error with ${this.state.webViewUrl}, ${this.state.webViewId}`);
+                      Rokt.sendUrlFailure(this.state.webViewId, this.state.webViewUrl, "This is a test")
+                    }
+                  }
                 />
               }
 
