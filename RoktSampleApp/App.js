@@ -44,7 +44,7 @@ import {Colors} from 'react-native/Libraries/NewAppScreen';
 import {Rokt, RoktEmbeddedView, RoktEventManager} from '@rokt/react-native-sdk';
 import sha256 from 'crypto-js/sha256';
 import {Buffer} from 'buffer';
-import { WebView } from 'react-native-webview';
+import {WebView} from 'react-native-webview';
 var forge = require('node-forge');
 
 const eventManagerEmitter = new NativeEventEmitter(RoktEventManager);
@@ -210,13 +210,13 @@ export default class App extends Component {
     }
 
     if (this.state.withUrlListener) {
-      urlListenerSubscription = eventManagerEmitter.addListener(
-        'OpenURL',
-        (data) => {
-          console.log('OpenURL ID: ' + data['urlId'] + ' URL: ' + data['urlString']);
-          this.setState({webViewUrl: data['urlString'], webViewId: data['urlId']})
-        },
-      )
+      eventManagerEmitter.addListener('OpenURL', (data) => {
+        console.log('OpenURL ID: ' + data.urlId + ' URL: ' + data.urlString);
+        this.setState({
+          webViewUrl: data.urlString,
+          webViewId: data.urlId,
+        });
+      });
     }
 
     if (this.state.twoStepEnabled) {
@@ -366,10 +366,12 @@ export default class App extends Component {
                     accessibilityLabel="show_webview"
                     value={this.state.showWebView}
                     onValueChange={() =>
-                      this.setState({ showWebView: !this.state.showWebView })
+                      this.setState({showWebView: !this.state.showWebView})
                     }
                   />
-                  <Text style={{marginTop: 5, marginLeft: 5}}>Toggle Webview Visibility</Text>
+                  <Text style={{marginTop: 5, marginLeft: 5}}>
+                    Toggle Webview Visibility
+                  </Text>
                 </View>
                 <View style={{flexDirection: 'row'}}>
                   <CheckBox
@@ -381,7 +383,9 @@ export default class App extends Component {
                       })
                     }
                   />
-                  <Text style={{marginTop: 5, marginLeft: 5}}>Add URL listener</Text>
+                  <Text style={{marginTop: 5, marginLeft: 5}}>
+                    Add URL listener
+                  </Text>
                 </View>
                 <View style={styles.buttonContainer}>
                   <TouchableOpacity
@@ -398,20 +402,24 @@ export default class App extends Component {
               </View>
             </View>
 
-            {this.state.showWebView &&
+            {this.state.showWebView && (
               <WebView
-                  source={{ uri: this.state.webViewUrl }}
-                  mediaPlaybackRequiresUserAction={true}
-                  style={styles.webview}
-                  // This deals with more than just url errors but its good enough for testing
-                  renderError={() => 
-                    {
-                      console.log(`Error with ${this.state.webViewUrl}, ${this.state.webViewId}`);
-                      Rokt.sendUrlFailure(this.state.webViewId, this.state.webViewUrl, "This is a test")
-                    }
-                  }
-                />
-              }
+                source={{uri: this.state.webViewUrl}}
+                mediaPlaybackRequiresUserAction={true}
+                style={styles.webview}
+                // This deals with more than just url errors but its good enough for testing
+                renderError={() => {
+                  console.log(
+                    `Error with ${this.state.webViewUrl}, ${this.state.webViewId}`,
+                  );
+                  Rokt.sendUrlFailure(
+                    this.state.webViewId,
+                    this.state.webViewUrl,
+                    'This is a test',
+                  );
+                }}
+              />
+            )}
 
             <RoktEmbeddedView
               ref={this.placeholder1}
@@ -501,5 +509,5 @@ const styles = StyleSheet.create({
     width: deviceWidth,
     flex: 1,
     borderWidth: 2,
-  }
+  },
 });
