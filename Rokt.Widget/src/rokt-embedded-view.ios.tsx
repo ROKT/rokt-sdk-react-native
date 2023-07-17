@@ -80,7 +80,8 @@ export class RoktEmbeddedView extends Component<RoktEmbeddedViewProps, RoktEmbed
   const styles = StyleSheet.create({
     widget: {
         flex: 1,
-        backgroundColor: 'white' },
+        backgroundColor: 'transparent',
+        overflow: `hidden` },
     });
   
   export default RoktEmbeddedView;
