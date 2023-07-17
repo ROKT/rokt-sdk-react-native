@@ -9,8 +9,8 @@
  * You may obtain a copy of the License at https://rokt.com/sdk-license-2-0/
  */
 
-import { requireNativeComponent , StyleSheet, NativeEventEmitter, NativeModules, HostComponent, ViewProps, NativeModule} from 'react-native';
-import React, {Component} from 'react';
+import { requireNativeComponent, StyleSheet, NativeEventEmitter, NativeModules, HostComponent, ViewProps, NativeModule } from 'react-native';
+import React, { Component } from 'react';
 
 const RoktEventManager = NativeModules.RoktEventManager as NativeModule
 
@@ -52,36 +52,37 @@ export class RoktEmbeddedView extends Component<RoktEmbeddedViewProps, RoktEmbed
     (widgetChanges: WidgetChangeEvent) => {
       console.log
       if (widgetChanges.selectedPlacement == this.state.placeholderName) {
-        this.setState({height: parseInt(widgetChanges.height)})
-      } 
+        this.setState({ height: parseInt(widgetChanges.height) })
+      }
     }
   );
 
-    constructor(props: RoktEmbeddedViewProps){
-        super(props);
+  constructor(props: RoktEmbeddedViewProps) {
+    super(props);
 
-        this.state = { height: 0, placeholderName: this.props.placeholderName, marginTop: 0, marginRight: 0, marginLeft: 0, marginBottom: 0 };
-    }
-
-    override render() {
-      return (
-          <WidgetNativeComponent style={[styles.widget, {height: this.state.height}]}/>
-      );
-    }
-
-    override componentWillUnmount(){
-      this.subscription.remove();
-    }
-
+    this.state = { height: 0, placeholderName: this.props.placeholderName, marginTop: 0, marginRight: 0, marginLeft: 0, marginBottom: 0 };
   }
 
-  const WidgetNativeComponent: HostComponent<ViewProps> = requireNativeComponent('RoktNativeWidget')
+  override render() {
+    return (
+      <WidgetNativeComponent style={[styles.widget, { height: this.state.height }]} />
+    );
+  }
 
-  const styles = StyleSheet.create({
-    widget: {
-        flex: 1,
-        backgroundColor: 'transparent',
-        overflow: `hidden` },
-    });
-  
-  export default RoktEmbeddedView;
+  override componentWillUnmount() {
+    this.subscription.remove();
+  }
+
+}
+
+const WidgetNativeComponent: HostComponent<ViewProps> = requireNativeComponent('RoktNativeWidget')
+
+const styles = StyleSheet.create({
+  widget: {
+    flex: 1,
+    backgroundColor: 'transparent',
+    overflow: 'hidden'
+  },
+});
+
+export default RoktEmbeddedView;
