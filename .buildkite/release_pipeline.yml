@@ -7,6 +7,6 @@ env:
 steps:
   - label: "TEST"
     commands:
-      - echo $BUILDKITE_TRIGGERED_FROM_BUILD_PIPELINE_SLUG
+      - echo $(buildkite-agent meta-data get "VERSION")
     agents:
       queue: ${ENG_BK_AGENT}
