@@ -7,6 +7,6 @@ env:
 steps:
   - label: "TEST"
     commands:
-      - echo "HELLO"
+      - echo $BUILDKITE_TRIGGERED_FROM_BUILD_PIPELINE_SLUG
     agents:
       queue: ${ENG_BK_AGENT}
