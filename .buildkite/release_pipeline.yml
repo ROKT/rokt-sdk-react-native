@@ -1,0 +1,12 @@
+env:
+  ENG_ACCOUNT: "035088524874"
+  ECR_HOST: ${ENG_ACCOUNT}.dkr.ecr.us-west-2.amazonaws.com
+  MAC_BK_AGENT: eng-prod-us-west-2-mac-arm-macos-build-medium
+  ENG_BK_AGENT: eng-default
+
+steps:
+  - label: "TEST"
+    commands:
+      - echo "HELLO"
+    agents:
+      queue: ${ENG_BK_AGENT}
