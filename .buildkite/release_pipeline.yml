@@ -10,7 +10,15 @@ steps:
       - cd infra
       - ./modify_native_ios_version.sh $(buildkite-agent meta-data get "IOS_NATIVE_VERSION") ../Rokt.Widget/rokt-react-native-sdk.podspec
       - ./modify_native_android_version.sh $(buildkite-agent meta-data get "ANDROID_NATIVE_VERSION") ../Rokt.Widget/android/build.gradle
-      - cat ../Rokt.Widget/rokt-react-native-sdk.podspec
-      - cat ../Rokt.Widget/android/build.gradle
+      - cd ../Rokt.Widget
+      - npm version $(buildkite-agent meta-data get "VERSION")
+      - npm install && npm run build && npm run pack
+    plugins:
+      - docker#v5.6.0:
+          image: "${ECR_HOST}/cached/node:17.2.0-alpine"
+          user: "root"
+      - artifacts#v1.9.0:
+          upload: "Rokt.Widget/*.tgz"
     agents:
       queue: ${ENG_BK_AGENT}
+    timeout_in_minutes: 15
