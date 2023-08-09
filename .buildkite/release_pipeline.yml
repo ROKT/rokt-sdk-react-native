@@ -17,6 +17,7 @@ steps:
       - docker#v5.6.0:
           image: "${ECR_HOST}/cached/node:17.2.0-alpine"
           user: "root"
+          mount-buildkite-agent: true
       - artifacts#v1.9.0:
           upload: "Rokt.Widget/*.tgz"
     agents:
