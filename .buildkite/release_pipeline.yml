@@ -8,9 +8,8 @@ steps:
   - label: "TEST"
     commands:
       - cd infra
-      - ls -la
-      - ./modify_native_ios_version.sh $(buildkite-agent meta-data get "IOS_NATIVE_VERSION") ../Rokt.Widget/rokt-react-native-sdk.podspec
-      - ./modify_native_android_version.sh $(buildkite-agent meta-data get "ANDROID_NATIVE_VERSION") ../Rokt.Widget/android/build.gradle
+      - sh modify_native_ios_version.sh $(buildkite-agent meta-data get "IOS_NATIVE_VERSION") ../Rokt.Widget/rokt-react-native-sdk.podspec
+      - sh modify_native_android_version.sh $(buildkite-agent meta-data get "ANDROID_NATIVE_VERSION") ../Rokt.Widget/android/build.gradle
       - cd ../Rokt.Widget
       - npm version $(buildkite-agent meta-data get "VERSION")
       - npm install && npm run build && npm run pack
