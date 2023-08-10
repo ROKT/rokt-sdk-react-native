@@ -19,6 +19,7 @@ steps:
           image: "${ECR_HOST}/cached/node:17.2.0-bullseye"
           user: "root"
           mount-buildkite-agent: true
+          mount-ssh-agent: true
       - artifacts#v1.9.0:
           upload: "Rokt.Widget/*.tgz"
     agents:
