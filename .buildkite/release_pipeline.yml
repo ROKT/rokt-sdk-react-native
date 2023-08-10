@@ -13,6 +13,7 @@ steps:
       - cd ../Rokt.Widget
       - npm version $(buildkite-agent meta-data get "VERSION")
       - npm install && npm run build && npm pack
+      - cd ../infra && ./create_tag.sh
     plugins:
       - docker#v5.6.0:
           image: "${ECR_HOST}/cached/node:17.2.0-bullseye"
