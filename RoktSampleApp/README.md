@@ -16,13 +16,11 @@ We use ```npm``` package manager to manage the dependencies for the project.
 
 | Environment | Build |
 | ----------- | :----- |
-| release |  [![CircleCI](https://dl.circleci.com/status-badge/img/gh/ROKT/rokt-sdk-react-native/tree/release-3.10.x.svg?style=svg)](https://dl.circleci.com/status-badge/redirect/gh/ROKT/rokt-sdk-react-native/tree/release-3.10.x)
-### Note
-Modify the Circleci url whenever default branch is changed.
+| release |  [![Build status](https://badge.buildkite.com/e75677bd3c8e83f1da750aa9124df1f418f211c9c630765ffd.svg)](https://buildkite.com/rokt/react-native-sdk)
 
 ## CI/CD System
 
-The CI system used is  **CircleCi**  [https://app.circleci.com/pipelines/github/ROKT/rokt-sdk-react-native](https://app.circleci.com/pipelines/github/ROKT/rokt-sdk-react-native)  CircleCi workflows are defined in the  `.circleci`  directory. The iOS step build the app and run the UI test in the CircleCi environment whereas Android step builds the apk in the circleCi environment whereas the UI test is executed in device farm using the fastlane lane ```deviceFarmUITest``` defined in the directory ```RoktSampleApp/android```
+The CI system used is  **Buildkite**  [https://buildkite.com/rokt/react-native-sdk/](https://buildkite.com/rokt/react-native-sdk/) Buildkite workflows are defined in the  `.buildkite`  directory. In the iOS step, we build the app and run UI tests in the Buildkite environment. For Android, we create the APK within Buildkite, and then perform UI tests on a device farm.   This is done by using the deviceFarmUITest Fastlane lane located in the directory `RoktSampleApp/android`.
 
 ## Local Setup
 
