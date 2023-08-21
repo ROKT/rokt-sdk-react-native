@@ -12,21 +12,18 @@ We use ```npm``` package manager to manage the dependencies for the project.
 
 | Environment | Build |
 | ----------- | :----- |
-| release |  [![CircleCI](https://dl.circleci.com/status-badge/img/gh/ROKT/rokt-sdk-react-native/tree/release-3.12.x.svg?style=svg)](https://dl.circleci.com/status-badge/redirect/gh/ROKT/rokt-sdk-react-native/tree/release-3.10.x)
-### Note
-Modify the Circleci url whenever default branch is changed.
-
+| release |  [![Build status](https://badge.buildkite.com/e75677bd3c8e83f1da750aa9124df1f418f211c9c630765ffd.svg)](https://buildkite.com/rokt/react-native-sdk)
 
 ## CI/CD System
 
-The CI system used is [**CircleCi**](https://app.circleci.com/pipelines/github/ROKT/rokt-sdk-react-native). CircleCi workflows are defined in the `.circleci` directory. There are two seperate workflows that are executed based on branch names. 
+The CI system used is [**Buildkite**](https://buildkite.com/rokt/react-native-sdk). Buildkite workflows are defined in the `.buildkite` directory. There are two seperate workflows that are executed based on branch names. 
 Branches with **release-** prefix are considered production branches, the publish step will release to the production [**NPM Respository**](https://www.npmjs.com/package/@rokt/react-native-sdk)
 All other branches are considered alpha branches, so it will publish to maven with with **-alpha** postfix. 
 
 ## Publishing
 This SDK is published to a NPM package repository. The publishing step uses the fastlane lanes ```publishAlphaSDK``` or ```publishSDK``` for publishing the alpha or production version respectively to NPM. The fastlane file is located inside ```RoktSampleApp/android```
 The steps are configured in `publish.gradle`.
-Publishing  Alpha and prod are possible through CircleCi based on the Git branch names as explained in above step.
+Publishing  Alpha and prod are possible through Buildkite based on the Git branch names as explained in above step.
 
 ## Local Setup
 Go to the root of the project **Rokt.Widget** " and run ```npm install```.
