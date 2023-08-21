@@ -20,7 +20,7 @@ We use ```npm``` package manager to manage the dependencies for the project.
 
 ## CI/CD System
 
-The CI system used is  **Buildkite**  [https://buildkite.com/rokt/react-native-sdk/](https://buildkite.com/rokt/react-native-sdk/) Buildkite workflows are defined in the  `.buildkite`  directory. The iOS step build the app and run the UI test in the Buildkite environment whereas Android step builds the apk in the Buildkite environment whereas the UI test is executed in device farm using the fastlane lane ```deviceFarmUITest``` defined in the directory ```RoktSampleApp/android```
+The CI system used is  **Buildkite**  [https://buildkite.com/rokt/react-native-sdk/](https://buildkite.com/rokt/react-native-sdk/) Buildkite workflows are defined in the  `.buildkite`  directory. In the iOS step, we build the app and run UI tests in the Buildkite environment. For Android, we create the APK within Buildkite, and then perform UI tests on a device farm.   This is done by using the deviceFarmUITest Fastlane lane located in the directory `RoktSampleApp/android`.
 
 ## Local Setup
 
