@@ -76,6 +76,13 @@ export default class App extends Component {
       Rokt.setFulfillmentAttributes(FULLFILLMENT_ATTRIBUTES);
     },
   );
+   
+  callBackSubscription = eventManagerEmitter.addListener(
+    'RoktCallback',
+    (data) => {
+      console.log('roktCallback received: ' + data.callbackValue);
+    },
+  );
 
   encrypt(text, publicKey) {
     var publicBytes = forge.util.decode64(publicKey);
@@ -123,14 +130,7 @@ export default class App extends Component {
       // first we send hashed email
       attributes.emailsha256 = sha256(attributes.email).toString();
       attributes.email = null;
-      Rokt.execute2Step(
-        this.state.viewName,
-        attributes,
-        placeholders,
-        (onLoad) => {
-          console.log('Widget OnLoad Callback');
-        },
-      );
+      Rokt.execute2Step(this.state.viewName, attributes, placeholders);
 
       console.log('Execute 2 Step');
     } catch (e) {
@@ -162,9 +162,7 @@ export default class App extends Component {
       attributes.email = null;
       attributes.firstname = null;
 
-      Rokt.execute(this.state.viewName, attributes, placeholders, (onLoad) => {
-        console.log('Widget OnLoad Callback');
-      });
+      Rokt.execute(this.state.viewName, attributes, placeholders);
 
       console.log('Execute Encrypted');
     } catch (e) {
@@ -205,9 +203,7 @@ export default class App extends Component {
     } else if (this.state.encryptEnabled) {
       this.executeEncrypted(attributes, placeholders);
     } else {
-      Rokt.execute(this.state.viewName, attributes, placeholders, (x) => {
-        console.log('Widget OnLoad Callback');
-      });
+      Rokt.execute(this.state.viewName, attributes, placeholders);
       console.log('Execute');
     }
   };
