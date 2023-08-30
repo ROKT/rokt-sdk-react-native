@@ -16,5 +16,6 @@
 - (void)onWidgetHeightChanges:(CGFloat)widgetHeight placement:(NSString*) selectedPlacement;
 - (void)onFirstPositiveResponse;
 - (void)onOpenUrl:(NSString*)urlId url:(NSString*)urlString;
+- (void)onRoktCallbackReceived:(NSString*)eventValue;
 
 @end

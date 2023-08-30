@@ -40,7 +40,7 @@ steps:
     commands:
       - cd RoktSampleApp
       - npm install
-      - cd android
+      - npx react-native start --reset-cache && cd android
       - gem install fastlane
       - bundle install
       - bundle exec fastlane deviceFarmUITest
@@ -61,7 +61,9 @@ steps:
               json-key: ".DEVICE_FARM_STAGE_PROJECT_NAME"
       - artifacts#v1.9.0:
           download: "Rokt.Widget/*.tgz"
-          upload: "RoktSampleApp/android/app/build/outputs/apk/debug"
+          upload: 
+            - "RoktSampleApp/android/app/build/outputs/apk/debug/*.apk"
+            - "RoktSampleApp/android/app/build/outputs/apk/androidTest/debug/*.apk"
       - docker#v5.6.0:
           image: "${ECR_HOST}/cached/reactnativecommunity/react-native-android:7.0"
           user: "root"

@@ -40,9 +40,7 @@ RCT_EXPORT_METHOD(initialize:(NSString *)roktTagId appVersion: (NSString * _Null
 }
 RCT_EXPORT_METHOD(execute:(NSString *)viewName
                   attributes:(NSDictionary *)attributes
-                  placeholders:(NSDictionary *)placeholders
-                  callback:(RCTResponseSenderBlock)callback
-                  )
+                  placeholders:(NSDictionary *)placeholders)
 {
     if (viewName == nil) {
         RCTLog(@"Execute failed. ViewName cannot be null");
@@ -67,12 +65,13 @@ RCT_EXPORT_METHOD(execute:(NSString *)viewName
         
         [Rokt executeWithViewName:viewName attributes:finalAttributes
                        placements:nativePlaceholders
-                           onLoad:^{ callback(@[@"onLoad", [NSNull null]]);}
+                           onLoad:^{ [event onRoktCallbackReceived:@"onLoad"];}
                          onUnLoad:^{
+                            [event onRoktCallbackReceived:@"onUnLoad"];
             RCTLogInfo(@"unloaded");
         }
-     onShouldShowLoadingIndicator:nil
-     onShouldHideLoadingIndicator:nil
+     onShouldShowLoadingIndicator:^{ [event onRoktCallbackReceived:@"onShouldShowLoadingIndicator"];}
+     onShouldHideLoadingIndicator:^{ [event onRoktCallbackReceived:@"onShouldHideLoadingIndicator"];}
              onEmbeddedSizeChange:^(NSString *selectedPlacement, CGFloat widgetHeight){
             
             [event onWidgetHeightChanges:widgetHeight placement:selectedPlacement];
@@ -88,8 +87,7 @@ RCT_EXPORT_METHOD(execute:(NSString *)viewName
 
 RCT_EXPORT_METHOD(execute2Step:(NSString *)viewName
                   attributes:(NSDictionary *)attributes
-                  placeholders:(NSDictionary *)placeholders
-                  callback:(RCTResponseSenderBlock)callback)
+                  placeholders:(NSDictionary *)placeholders)
 {
     if (viewName == nil) {
         RCTLog(@"Execute failed. ViewName cannot be null");
@@ -114,12 +112,13 @@ RCT_EXPORT_METHOD(execute2Step:(NSString *)viewName
 
         [Rokt execute2stepWithViewName:viewName attributes:finalAttributes
                             placements:nativePlaceholders
-                                onLoad:^{ callback(@[@"onLoad", [NSNull null]]);}
+                                onLoad:^{ [event onRoktCallbackReceived:@"onLoad"];}
                               onUnLoad:^{
+                                [event onRoktCallbackReceived:@"onUnLoad"];
             RCTLogInfo(@"unloaded");
         }
-          onShouldShowLoadingIndicator:nil
-          onShouldHideLoadingIndicator:nil
+          onShouldShowLoadingIndicator:^{ [event onRoktCallbackReceived:@"onShouldShowLoadingIndicator"];}
+          onShouldHideLoadingIndicator:^{ [event onRoktCallbackReceived:@"onShouldHideLoadingIndicator"];}
                   onEmbeddedSizeChange:^(NSString *selectedPlacement, CGFloat widgetHeight){
             
             [event onWidgetHeightChanges:widgetHeight placement:selectedPlacement];

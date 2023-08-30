@@ -39,7 +39,7 @@ RCT_EXPORT_MODULE(RoktEventManager);
 
 - (NSArray<NSString *> *)supportedEvents
 {
-  return @[@"WidgetHeightChanges", @"FirstPositiveResponse", @"OpenURL"];
+  return @[@"WidgetHeightChanges", @"FirstPositiveResponse", @"OpenURL", @"RoktCallback"];
 }
 
 - (void)onWidgetHeightChanges:(CGFloat)widgetHeight placement:(NSString*) selectedPlacement
@@ -62,6 +62,13 @@ RCT_EXPORT_MODULE(RoktEventManager);
 {
     if (hasListeners) {
         [self sendEventWithName:@"OpenURL" body:@{@"urlId": urlId, @"urlString": urlString}];
+    }
+}
+
+- (void)onRoktCallbackReceived:(NSString*)eventValue
+{
+    if (hasListeners) {
+        [self sendEventWithName:@"RoktCallback" body:@{@"callbackValue": eventValue}];
     }
 }
 
