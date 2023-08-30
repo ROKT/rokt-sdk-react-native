@@ -266,7 +266,7 @@ export default class App extends Component {
                 </View>
 
                 <Text style={[styles.label, {color: Colors.black}]}>
-                  Target Element
+                  Target Element 1
                 </Text>
                 <TextInput
                   accessibilityLabel="input_target_element"
@@ -278,7 +278,7 @@ export default class App extends Component {
                   }
                 />
                 <Text style={[styles.label, {color: Colors.black}]}>
-                  Target Element
+                  Target Element 2
                 </Text>
                 <TextInput
                   style={styles.textInput}
