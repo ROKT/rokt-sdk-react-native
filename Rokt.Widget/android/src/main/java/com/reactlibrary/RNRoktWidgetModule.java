@@ -8,6 +8,7 @@ import android.view.View;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.Callback;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContext;
@@ -72,7 +73,7 @@ public class RNRoktWidgetModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void execute(final String viewName, final ReadableMap attributes, final ReadableMap placeholders, final Callback onLoad) {
+    public void execute(final String viewName, final ReadableMap attributes, final ReadableMap placeholders) {
         if (viewName == null) {
             logDebug("Execute failed. ViewName cannot be null");
             return;
@@ -82,14 +83,13 @@ public class RNRoktWidgetModule extends ReactContextBaseJavaModule {
         uiManager.addUIBlock(new UIBlock() {
             @Override
             public void execute(NativeViewHierarchyManager nativeViewHierarchyManager) {
-                WeakReference<Callback> callBack = new WeakReference<>(onLoad);
-                Rokt.INSTANCE.execute(viewName, readableMapToMapOfStrings(attributes), createRoktCallback(callBack), safeUnwrapPlaceholders(placeholders, nativeViewHierarchyManager));
+                Rokt.INSTANCE.execute(viewName, readableMapToMapOfStrings(attributes), createRoktCallback(), safeUnwrapPlaceholders(placeholders, nativeViewHierarchyManager));
             }
         });
     }
 
     @ReactMethod
-    public void execute2Step(final String viewName, final ReadableMap attributes, final ReadableMap placeholders, final Callback onLoad) {
+    public void execute2Step(final String viewName, final ReadableMap attributes, final ReadableMap placeholders) {
         if (viewName == null) {
             logDebug("Execute failed. ViewName cannot be null");
             return;
@@ -99,8 +99,7 @@ public class RNRoktWidgetModule extends ReactContextBaseJavaModule {
         uiManager.addUIBlock(new UIBlock() {
             @Override
             public void execute(NativeViewHierarchyManager nativeViewHierarchyManager) {
-                WeakReference<Callback> callBack = new WeakReference<>(onLoad);
-                Rokt.INSTANCE.execute2Step(viewName, readableMapToMapOfStrings(attributes), createRoktCallback(callBack), safeUnwrapPlaceholders(placeholders, nativeViewHierarchyManager), new Rokt.RoktEventCallback() {
+                Rokt.INSTANCE.execute2Step(viewName, readableMapToMapOfStrings(attributes), createRoktCallback(), safeUnwrapPlaceholders(placeholders, nativeViewHierarchyManager), new Rokt.RoktEventCallback() {
                     @Override
                     public void onEvent(Rokt.RoktEventType roktEventType, final Rokt.RoktEventHandler roktEventHandler) {
                         setRoktEventHandler(roktEventHandler);
@@ -185,35 +184,36 @@ public class RNRoktWidgetModule extends ReactContextBaseJavaModule {
         return null;
     }
 
-    private Rokt.RoktCallback createRoktCallback(final WeakReference<Callback> onLoad) {
+    private Rokt.RoktCallback createRoktCallback() {
         Rokt.RoktCallback callback = new Rokt.RoktCallback() {
             @Override
             public void onLoad() {
-                if (onLoad != null) {
-                    Callback onLoadCallback = onLoad.get();
-                    if (onLoadCallback != null) {
-                        onLoadCallback.invoke();
-                    }
-                }
+                sendCallback("onLoad");
             }
 
             @Override
             public void onUnload(@NonNull Rokt.UnloadReasons unloadReasons) {
-                if (unloadReasons != null) {
-
-                }
+                sendCallback("onUnLoad");
             }
 
             @Override
             public void onShouldShowLoadingIndicator() {
+                sendCallback("onShouldShowLoadingIndicator");
             }
 
             @Override
             public void onShouldHideLoadingIndicator() {
+                sendCallback("onShouldHideLoadingIndicator");
             }
         };
         listeners.put(System.currentTimeMillis(), callback);
         return callback;
+    }
+
+    private void sendCallback(final String eventValue) {
+        WritableMap params = Arguments.createMap();
+        params.putString("callbackValue", eventValue);
+        sendEvent(reactContext, "RoktCallback", params);
     }
 
     private Map<String, WeakReference<Widget>> safeUnwrapPlaceholders(final ReadableMap placeholders, final NativeViewHierarchyManager nativeViewHierarchyManager) {
