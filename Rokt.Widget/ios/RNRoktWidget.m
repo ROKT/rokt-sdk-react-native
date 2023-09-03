@@ -85,6 +85,7 @@ RCT_EXPORT_METHOD(execute:(NSString *)viewName
 RCT_EXPORT_METHOD(execute2Step:(NSString *)viewName
                   attributes:(NSDictionary *)attributes
                   placeholders:(NSDictionary *)placeholders
+                  )
 {
     if (viewName == nil) {
         RCTLog(@"Execute failed. ViewName cannot be null");
