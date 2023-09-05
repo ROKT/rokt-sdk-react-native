@@ -13,6 +13,7 @@
  */
 
 import React, {Component} from 'react';
+import { Dimensions } from "react-native";
 import {
   SafeAreaView,
   StyleSheet,
@@ -47,6 +48,9 @@ var forge = require('node-forge');
 
 const eventManagerEmitter = new NativeEventEmitter(RoktEventManager);
 
+var width = Dimensions.get('window').width; //full width
+var height = Dimensions.get('window').height; //full height
+
 export default class App extends Component {
   constructor(props) {
     super(props);
@@ -65,6 +69,7 @@ export default class App extends Component {
       stageEnabled: false,
       twoStepEnabled: false,
       encryptEnabled: false,
+      showBottomSheet: false,
     };
   }
 
@@ -81,6 +86,9 @@ export default class App extends Component {
     'RoktCallback',
     (data) => {
       console.log('roktCallback received: ' + data.callbackValue);
+      if (data.callbackValue === "onUnLoad") {
+        this.setState({ showBottomSheet: false});
+      }
     },
   );
 
@@ -203,7 +211,7 @@ export default class App extends Component {
     } else if (this.state.encryptEnabled) {
       this.executeEncrypted(attributes, placeholders);
     } else {
-      Rokt.execute(this.state.viewName, attributes, placeholders);
+      this.setState({ showBottomSheet: true}, Rokt.execute(this.state.viewName, attributes, placeholders));
       console.log('Execute');
     }
   };
@@ -212,7 +220,7 @@ export default class App extends Component {
     return (
       <>
         <StatusBar barStyle="dark-content" />
-        <SafeAreaView>
+        <SafeAreaView style={{flex: 1}}>
           <ScrollView
             contentInsetAdjustmentBehavior="automatic"
             style={styles.scrollView}>
@@ -352,17 +360,17 @@ export default class App extends Component {
                 </View>
               </View>
             </View>
-
-            <RoktEmbeddedView
-              ref={this.placeholder1}
-              placeholderName={this.state.targetElement1}
-            />
             <RoktEmbeddedView
               ref={this.placeholder2}
               placeholderName={this.state.targetElement2}
             />
           </ScrollView>
-          <Toast />
+        <View style={{backgroundColor: Colors.black, position: 'absolute', height: this.state.showBottomSheet ? '40%' : '0%', bottom: 30, width: '100%', padding: 10}}>
+          <RoktEmbeddedView
+                ref={this.placeholder1}
+                placeholderName={this.state.targetElement1}
+              />
+          </View>
         </SafeAreaView>
       </>
     );
@@ -372,6 +380,7 @@ export default class App extends Component {
 const styles = StyleSheet.create({
   scrollView: {
     backgroundColor: Colors.lighter,
+    flex: 1
   },
   engine: {
     position: 'absolute',
