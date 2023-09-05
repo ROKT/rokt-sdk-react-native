@@ -85,7 +85,7 @@ const WidgetNativeComponent: HostComponent<WidgetNativeComponentProps> = require
 const styles = StyleSheet.create({
   widget: {
     flex: 1,
-    backgroundColor: 'white'
+    backgroundColor: 'transparent'
   },
 });
 
