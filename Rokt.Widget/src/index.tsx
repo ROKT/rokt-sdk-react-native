@@ -4,8 +4,8 @@ import 'react-native'
 
 export interface RNRoktWidget {
     initialize(roktTagId: string, appVersion: string): void;
-    execute(viewName: string, attributes: Map<string, string>, placeholders: Map<string, number>, callback: () => void): void;
-    execute2Step(viewName: string, attributes: Map<string, string>, placeholders: Map<string, number>, callback: () => void): void;
+    execute(viewName: string, attributes: Map<string, string> | Record<string, string>, placeholders: Map<string, number> | Record<string, number>, callback: () => void): void;
+    execute2Step(viewName: string, attributes: Map<string, string> | Record<string, string>, placeholders: Map<string, number> | Record<string, number>, callback: () => void): void;
     setFulfillmentAttributes(attributes: Map<string, string>): void;
     setEnvironmentToStage(): void;
     setEnvironmentToProd(): void;
