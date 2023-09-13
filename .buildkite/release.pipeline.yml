@@ -69,6 +69,7 @@ steps:
           image: "${ECR_HOST}/cached/reactnativecommunity/react-native-android:7.0"
           user: "root"
           mount-buildkite-agent: true
+          mount-ssh-agent: true
           environment:
             - DEVICE_FARM_STAGE_ACCESS_KEY
             - DEVICE_FARM_STAGE_SECRET_KEY
