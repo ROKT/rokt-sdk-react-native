@@ -25,7 +25,7 @@ steps:
       - rbenv local 2.7.6
       - nvm use 16
       - ./.buildkite/bin/update_versions.sh $(buildkite-agent meta-data get ANDROID_VERSION) Rokt.Widget/android/build.gradle $(buildkite-agent meta-data get IOS_VERSION) Rokt.Widget/rokt-react-native-sdk.podspec $(buildkite-agent meta-data get VERSION)
-      -  cd Rokt.Widget && npm install && npm run build && npm pack && cd -
+      - cd Rokt.Widget && npm install && npm run build && npm pack && cd -
       - ./.buildkite/bin/update_sample_app.sh $(buildkite-agent meta-data get VERSION)
       - ./.buildkite/bin/create_tag.sh $(buildkite-agent meta-data get VERSION)
     depends_on: 'lint'
@@ -35,69 +35,73 @@ steps:
     agents:
       queue: ${MAC_BK_AGENT}
   
-  # - label: ":android: Android Build and Test"
-  #   key: "android-test"
-  #   depends_on: "pack"
-  #   commands:
-  #     - cd RoktSampleApp
-  #     - npm install
-  #     - cd android
-  #     - gem install fastlane
-  #     - bundle install
-  #     - bundle exec fastlane deviceFarmUITest
-  #   plugins:
-  #     - seek-oss/aws-sm#v2.3.1:
-  #         env:
-  #           DEVICE_FARM_STAGE_ACCESS_KEY:
-  #             secret-id: "stage-react-native-buildkite"
-  #             json-key: ".DEVICE_FARM_STAGE_ACCESS_KEY"
-  #           DEVICE_FARM_STAGE_SECRET_KEY:
-  #             secret-id: "stage-react-native-buildkite"
-  #             json-key: ".DEVICE_FARM_STAGE_SECRET_KEY"
-  #           DEVICE_FARM_STAGE_DEVICE_POOL:
-  #             secret-id: "stage-react-native-buildkite"
-  #             json-key: ".DEVICE_FARM_STAGE_DEVICE_POOL"
-  #           DEVICE_FARM_STAGE_PROJECT_NAME:
-  #             secret-id: "stage-react-native-buildkite"
-  #             json-key: ".DEVICE_FARM_STAGE_PROJECT_NAME"
-  #     - artifacts#v1.9.0:
-  #         download: "Rokt.Widget/*.tgz"
-  #         upload: "RoktSampleApp/android/app/build/outputs/apk/debug"
-  #     - docker#v5.6.0:
-  #         image: "${ECR_HOST}/cached/reactnativecommunity/react-native-android:7.0"
-  #         user: "root"
-  #         mount-buildkite-agent: true
-  #         environment:
-  #           - DEVICE_FARM_STAGE_ACCESS_KEY
-  #           - DEVICE_FARM_STAGE_SECRET_KEY
-  #           - DEVICE_FARM_STAGE_DEVICE_POOL
-  #           - DEVICE_FARM_STAGE_PROJECT_NAME
-  #   agents:
-  #     queue: ${ENG_BK_AGENT}
-  #   timeout_in_minutes: 45
+  - label: ":android: Android Build and Test"
+    key: "android-test"
+    depends_on: "tag"
+    commands:
+      - git fetch --all --tags --force
+      - git checkout "v$(buildkite-agent meta-data get VERSION)"
+      - cd RoktSampleApp
+      - npm install
+      - cd android
+      - gem install fastlane
+      - bundle install
+      - bundle exec fastlane deviceFarmUITest
+    plugins:
+      - seek-oss/aws-sm#v2.3.1:
+          env:
+            DEVICE_FARM_STAGE_ACCESS_KEY:
+              secret-id: "stage-react-native-buildkite"
+              json-key: ".DEVICE_FARM_STAGE_ACCESS_KEY"
+            DEVICE_FARM_STAGE_SECRET_KEY:
+              secret-id: "stage-react-native-buildkite"
+              json-key: ".DEVICE_FARM_STAGE_SECRET_KEY"
+            DEVICE_FARM_STAGE_DEVICE_POOL:
+              secret-id: "stage-react-native-buildkite"
+              json-key: ".DEVICE_FARM_STAGE_DEVICE_POOL"
+            DEVICE_FARM_STAGE_PROJECT_NAME:
+              secret-id: "stage-react-native-buildkite"
+              json-key: ".DEVICE_FARM_STAGE_PROJECT_NAME"
+      - artifacts#v1.9.0:
+          download: "Rokt.Widget/*.tgz"
+          upload: "RoktSampleApp/android/app/build/outputs/apk/debug"
+      - docker#v5.6.0:
+          image: "${ECR_HOST}/cached/reactnativecommunity/react-native-android:7.0"
+          user: "root"
+          mount-buildkite-agent: true
+          environment:
+            - DEVICE_FARM_STAGE_ACCESS_KEY
+            - DEVICE_FARM_STAGE_SECRET_KEY
+            - DEVICE_FARM_STAGE_DEVICE_POOL
+            - DEVICE_FARM_STAGE_PROJECT_NAME
+    agents:
+      queue: ${ENG_BK_AGENT}
+    timeout_in_minutes: 45
 
-  # - label: ":ios: iOS Build and Test"
-  #   key: "ios-test"
-  #   depends_on: "pack"
-  #   commands:
-  #     - . ~/.zshrc
-  #     - rbenv local 2.7.6
-  #     - cd RoktSampleApp
-  #     - xcrun simctl boot "iPhone 14" || true
-  #     - nvm use 12
-  #     - npm install pm2 -g
-  #     - npm install
-  #     - pm2 start --name reactnative npm -- start
-  #     - cd ios && pod install --verbose --repo-update && cd -
-  #     - gem install xcpretty -v 0.3.0
-  #     - export RCT_NO_LAUNCH_PACKAGER=true && xcodebuild -workspace ios/RoktSampleApp.xcworkspace -destination 'platform=iOS Simulator,name=iPhone 14' -scheme RoktSampleApp -parallelizeTargets -configuration Debug -derivedDataPath ios/build -UseModernBuildSystem=YES clean test | xcpretty -k
-  #     - pm2 stop reactnative && pm2 delete reactnative
-  #   plugins:
-  #     - artifacts#v1.9.0:
-  #         download: "Rokt.Widget/*.tgz"
-  #   agents:
-  #     queue: ${MAC_BK_AGENT}
-  #   timeout_in_minutes: 45
+  - label: ":ios: iOS Build and Test"
+    key: "ios-test"
+    depends_on: "tag"
+    commands:
+      - . ~/.zshrc
+      - rbenv local 2.7.6
+      - git fetch --all --tags --force
+      - git checkout "v$(buildkite-agent meta-data get VERSION)"
+      - cd RoktSampleApp
+      - xcrun simctl boot "iPhone 14" || true
+      - nvm use 12
+      - npm install pm2 -g
+      - npm install
+      - pm2 start --name reactnative npm -- start
+      - cd ios && pod install --verbose --repo-update && cd -
+      - gem install xcpretty -v 0.3.0
+      - export RCT_NO_LAUNCH_PACKAGER=true && xcodebuild -workspace ios/RoktSampleApp.xcworkspace -destination 'platform=iOS Simulator,name=iPhone 14' -scheme RoktSampleApp -parallelizeTargets -configuration Debug -derivedDataPath ios/build -UseModernBuildSystem=YES clean test | xcpretty -k
+      - pm2 stop reactnative && pm2 delete reactnative
+    plugins:
+      - artifacts#v1.9.0:
+          download: "Rokt.Widget/*.tgz"
+    agents:
+      queue: ${MAC_BK_AGENT}
+    timeout_in_minutes: 45
 
   # - block: ":whale: Publish Alpha Version to npm"
   #   key: "alpha-block"
