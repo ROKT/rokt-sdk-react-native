@@ -23,33 +23,17 @@ steps:
     commands:
       - . ~/.zshrc
       - rbenv local 2.7.6
-      - nvm use 12
+      - nvm use 16
       - ./.buildkite/bin/update_versions.sh $(buildkite-agent meta-data get ANDROID_VERSION) Rokt.Widget/android/build.gradle $(buildkite-agent meta-data get IOS_VERSION) Rokt.Widget/rokt-react-native-sdk.podspec $(buildkite-agent meta-data get VERSION)
+      - npm install && npm run build && npm pack
       - ./.buildkite/bin/update_sample_app.sh $(buildkite-agent meta-data get VERSION)
       - ./.buildkite/bin/create_tag.sh $(buildkite-agent meta-data get VERSION)
     depends_on: 'lint'
-    agents:
-      queue: ${MAC_BK_AGENT}
-    
-  - label: ":package: Create Tarball"
-    key: "pack"
-    depends_on: "lint"
-    commands:
-      - git fetch --all --tags --force
-      - git checkout "v$(buildkite-agent meta-data get VERSION)"
-      - cd Rokt.Widget
-      - npm install && npm run build && npm pack
     plugins:
-      - docker#v5.6.0:
-          image: "${ECR_HOST}/cached/node:17.2.0-bullseye"
-          user: "root"
-          mount-buildkite-agent: true
-          mount-ssh-agent: true
       - artifacts#v1.9.0:
           upload: "Rokt.Widget/*.tgz"
     agents:
-      queue: ${ENG_BK_AGENT}
-    timeout_in_minutes: 15
+      queue: ${MAC_BK_AGENT}
   
   # - label: ":android: Android Build and Test"
   #   key: "android-test"
