@@ -18,14 +18,14 @@ steps:
       queue: ${ENG_BK_AGENT}
     timeout_in_minutes: 15
 
-  - name: ':git: Create git tag'
-  key: 'tag'
-  commands:
-    - ./.buildkite/bin/update_versions.sh $(buildkite-agent meta-data get ANDROID_VERSION) Rokt.Widget/android/build.gradle $(buildkite-agent meta-data get IOS_VERSION) Rokt.Widget/rokt-react-native-sdk.podspec $(buildkite-agent meta-data get VERSION)
-    - ./.buildkite/bin/create_tag.sh $(buildkite-agent meta-data get VERSION)
-  depends_on: 'lint'
-  agents:
-    queue: ${MAC_BK_AGENT}
+  - label: ':git: Create git tag'
+    key: 'tag'
+    commands:
+      - ./.buildkite/bin/update_versions.sh $(buildkite-agent meta-data get ANDROID_VERSION) Rokt.Widget/android/build.gradle $(buildkite-agent meta-data get IOS_VERSION) Rokt.Widget/rokt-react-native-sdk.podspec $(buildkite-agent meta-data get VERSION)
+      - ./.buildkite/bin/create_tag.sh $(buildkite-agent meta-data get VERSION)
+    depends_on: 'lint'
+    agents:
+      queue: ${MAC_BK_AGENT}
     
   - label: ":package: Create Tarball"
     key: "pack"
