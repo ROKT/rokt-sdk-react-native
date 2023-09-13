@@ -4,7 +4,7 @@ set -eu
 
 # $1 version
 
-WIDGET_DIR="$(dirname $0)/../Rokt.Widget"
+WIDGET_DIR="$(dirname $0)/../../Rokt.Widget"
 
 cd $WIDGET_DIR
 
