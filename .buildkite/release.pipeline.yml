@@ -21,6 +21,8 @@ steps:
   - label: ':git: Create git tag'
     key: 'tag'
     commands:
+      - . ~/.zshrc
+      - rbenv local 2.7.6
       - ./.buildkite/bin/update_versions.sh $(buildkite-agent meta-data get ANDROID_VERSION) Rokt.Widget/android/build.gradle $(buildkite-agent meta-data get IOS_VERSION) Rokt.Widget/rokt-react-native-sdk.podspec $(buildkite-agent meta-data get VERSION)
       - ./.buildkite/bin/create_tag.sh $(buildkite-agent meta-data get VERSION)
     depends_on: 'lint'
