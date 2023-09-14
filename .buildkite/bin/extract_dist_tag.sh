@@ -3,7 +3,7 @@
 set -eu
 
 # Gets the semver label e.g. "1.2.3-alpha.4" gets "alpha"
-# If there is not label, print npm default of "latest"
+# If there is no label, print npm default of "latest"
 
 # $1 New React Native SDK version
 
