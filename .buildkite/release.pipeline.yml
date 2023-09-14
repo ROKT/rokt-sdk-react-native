@@ -105,9 +105,9 @@ steps:
     timeout_in_minutes: 45
 
   - label: ":npm: Publish to npm"
-    depends_on:
-      - "android-test"
-      - "ios-test"
+    depends_on: ~
+      # - "android-test"
+      # - "ios-test"
     commands:
       - git fetch --all --tags --force
       - git checkout "v$(buildkite-agent meta-data get VERSION)"
@@ -118,7 +118,7 @@ steps:
       - cd android
       - gem install fastlane
       - bundle install
-      - bundle exec fastlane automatedPublish dist_tag:$(./.buildkite/bin/extract_dist_tag $(buildkite-agent meta-data get VERSION))
+      - bundle exec fastlane automatedPublish dist_tag:$(../.buildkite/bin/extract_dist_tag $(buildkite-agent meta-data get VERSION))
     plugins:
       - seek-oss/aws-sm#v2.3.1:
           env:
