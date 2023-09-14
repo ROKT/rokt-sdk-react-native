@@ -105,9 +105,9 @@ steps:
     timeout_in_minutes: 45
 
   - label: ":npm: Publish to npm"
-    depends_on: "tag"
-      # - "android-test"
-      # - "ios-test"
+    depends_on:
+      - "android-test"
+      - "ios-test"
     commands:
       - git fetch --all --tags --force
       - git checkout "v$(buildkite-agent meta-data get VERSION)"
@@ -135,73 +135,3 @@ steps:
     agents:
       queue: ${ENG_BK_AGENT}
     timeout_in_minutes: 45
-
-  # - block: ":whale: Publish Alpha Version to npm"
-  #   key: "alpha-block"
-  #   prompt: "Confirm publishing alpha version to npm?"
-  #   depends_on:
-  #     - "android-test"
-  #     - "ios-test"
-  
-  # - label: ":npm: Publish Alpha Version to npm"
-  #   depends_on: "alpha-block"
-  #   commands:
-  #     - cd Rokt.Widget
-  #     - npm install && npm run build && npm pack
-  #     - cd - && cd RoktSampleApp
-  #     - npm install
-  #     - cd android
-  #     - gem install fastlane
-  #     - bundle install
-  #     - bundle exec fastlane publishAlphaSDK
-  #   plugins:
-  #     - seek-oss/aws-sm#v2.3.1:
-  #         env:
-  #           NPM_TOKEN:
-  #             secret-id: "stage-react-native-buildkite"
-  #             json-key: ".NPM_TOKEN"
-  #     - docker#v5.6.0:
-  #         image: "${ECR_HOST}/cached/reactnativecommunity/react-native-android:7.0"
-  #         user: "root"
-  #         mount-buildkite-agent: true
-  #         environment:
-  #           - NPM_TOKEN
-  #   agents:
-  #     queue: ${ENG_BK_AGENT}
-  #   timeout_in_minutes: 45
-  
-  # - block: ":whale: Publish to npm"
-  #   key: "publish-block"
-  #   prompt: "Confirm publishing to npm?"
-  #   depends_on:
-  #     - "android-test"
-  #     - "ios-test"
-  #   if: build.message =~ /hotfix/i || build.branch =~ /^release/i
-  
-  # - label: ":npm: Publish to npm"
-  #   depends_on: "publish-block"
-  #   if: build.message =~ /hotfix/i || build.branch =~ /^release/i
-  #   commands:
-  #     - cd Rokt.Widget
-  #     - npm install && npm run build && npm pack
-  #     - cd - && cd RoktSampleApp
-  #     - npm install
-  #     - cd android
-  #     - gem install fastlane
-  #     - bundle install
-  #     - bundle exec fastlane publishSDK
-  #   plugins:
-  #     - seek-oss/aws-sm#v2.3.1:
-  #         env:
-  #           NPM_TOKEN:
-  #             secret-id: "stage-react-native-buildkite"
-  #             json-key: ".NPM_TOKEN"
-  #     - docker#v5.6.0:
-  #         image: "${ECR_HOST}/cached/reactnativecommunity/react-native-android:7.0"
-  #         user: "root"
-  #         mount-buildkite-agent: true
-  #         environment:
-  #           - NPM_TOKEN
-  #   agents:
-  #     queue: ${ENG_BK_AGENT}
-  #   timeout_in_minutes: 45
