@@ -104,6 +104,38 @@ steps:
       queue: ${MAC_BK_AGENT}
     timeout_in_minutes: 45
 
+  - label: ":npm: Publish to npm"
+    depends_on:
+      - "android-test"
+      - "ios-test"
+    commands:
+      - git fetch --all --tags --force
+      - git checkout "v$(buildkite-agent meta-data get VERSION)"
+      - cd Rokt.Widget
+      - npm install && npm run build && npm pack
+      - cd - && cd RoktSampleApp
+      - npm install
+      - cd android
+      - gem install fastlane
+      - bundle install
+      - bundle exec fastlane automatedPublish dist_tag:$(./.buildkite/bin/extract_dist_tag $(buildkite-agent meta-data get VERSION))
+    plugins:
+      - seek-oss/aws-sm#v2.3.1:
+          env:
+            NPM_TOKEN:
+              secret-id: "stage-react-native-buildkite"
+              json-key: ".NPM_TOKEN"
+      - docker#v5.6.0:
+          image: "${ECR_HOST}/cached/reactnativecommunity/react-native-android:7.0"
+          user: "root"
+          mount-buildkite-agent: true
+          mount-ssh-agent: true
+          environment:
+            - NPM_TOKEN
+    agents:
+      queue: ${ENG_BK_AGENT}
+    timeout_in_minutes: 45
+
   # - block: ":whale: Publish Alpha Version to npm"
   #   key: "alpha-block"
   #   prompt: "Confirm publishing alpha version to npm?"
