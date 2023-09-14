@@ -118,7 +118,7 @@ steps:
       - cd android
       - gem install fastlane
       - bundle install
-      - bundle exec fastlane automatedPublish dist_tag:$(../../.buildkite/bin/extract_dist_tag $(buildkite-agent meta-data get VERSION))
+      - bundle exec fastlane automatedPublish dist_tag:$(../../.buildkite/bin/extract_dist_tag.sh $(buildkite-agent meta-data get VERSION))
     plugins:
       - seek-oss/aws-sm#v2.3.1:
           env:
