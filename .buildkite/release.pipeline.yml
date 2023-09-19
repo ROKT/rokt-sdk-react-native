@@ -18,8 +18,8 @@ steps:
       queue: ${ENG_BK_AGENT}
     timeout_in_minutes: 15
 
-  - label: ':git: Create git tag'
-    key: 'tag'
+  - label: ":git: Create git tag"
+    key: "tag"
     commands:
       - . ~/.zshrc
       - rbenv local 2.7.6
@@ -28,13 +28,13 @@ steps:
       - cd Rokt.Widget && npm install && npm run build && npm pack && cd -
       - ./.buildkite/bin/update_sample_app.sh $(buildkite-agent meta-data get VERSION)
       - ./.buildkite/bin/create_tag.sh $(buildkite-agent meta-data get VERSION)
-    depends_on: 'lint'
+    depends_on: "lint"
     plugins:
       - artifacts#v1.9.0:
           upload: "Rokt.Widget/*.tgz"
     agents:
       queue: ${MAC_BK_AGENT}
-  
+
   - label: ":android: Android Build and Test"
     key: "android-test"
     depends_on: "tag"
