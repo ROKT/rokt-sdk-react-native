@@ -17,27 +17,30 @@ steps:
     agents:
       queue: ${ENG_BK_AGENT}
     timeout_in_minutes: 15
-    
-  - label: ":package: Create Tarball"
-    key: "pack"
-    depends_on: "lint"
+
+  - label: ":git: Create git tag"
+    key: "tag"
     commands:
-      - cd Rokt.Widget
-      - npm install && npm run build && npm pack
+      - . ~/.zshrc
+      - rbenv local 2.7.6
+      - nvm use 16
+      - ./.buildkite/bin/update_versions.sh $(buildkite-agent meta-data get ANDROID_VERSION) Rokt.Widget/android/build.gradle $(buildkite-agent meta-data get IOS_VERSION) Rokt.Widget/rokt-react-native-sdk.podspec $(buildkite-agent meta-data get VERSION)
+      - cd Rokt.Widget && npm install && npm run build && npm pack && cd -
+      - ./.buildkite/bin/update_sample_app.sh $(buildkite-agent meta-data get VERSION)
+      - ./.buildkite/bin/create_tag.sh $(buildkite-agent meta-data get VERSION)
+    depends_on: "lint"
     plugins:
-      - docker#v5.6.0:
-          image: "${ECR_HOST}/cached/node:17.2.0-alpine"
-          user: "root"
       - artifacts#v1.9.0:
           upload: "Rokt.Widget/*.tgz"
     agents:
-      queue: ${ENG_BK_AGENT}
-    timeout_in_minutes: 15
-  
+      queue: ${MAC_BK_AGENT}
+
   - label: ":android: Android Build and Test"
     key: "android-test"
-    depends_on: "pack"
+    depends_on: "tag"
     commands:
+      - git fetch --all --tags --force
+      - git checkout "v$(buildkite-agent meta-data get VERSION)"
       - cd RoktSampleApp
       - npm install
       - cd android
@@ -66,6 +69,7 @@ steps:
           image: "${ECR_HOST}/cached/reactnativecommunity/react-native-android:7.0"
           user: "root"
           mount-buildkite-agent: true
+          mount-ssh-agent: true
           environment:
             - DEVICE_FARM_STAGE_ACCESS_KEY
             - DEVICE_FARM_STAGE_SECRET_KEY
@@ -77,10 +81,12 @@ steps:
 
   - label: ":ios: iOS Build and Test"
     key: "ios-test"
-    depends_on: "pack"
+    depends_on: "tag"
     commands:
       - . ~/.zshrc
       - rbenv local 2.7.6
+      - git fetch --all --tags --force
+      - git checkout "v$(buildkite-agent meta-data get VERSION)"
       - cd RoktSampleApp
       - xcrun simctl boot "iPhone 14" || true
       - nvm use 12
@@ -98,52 +104,13 @@ steps:
       queue: ${MAC_BK_AGENT}
     timeout_in_minutes: 45
 
-  - block: ":whale: Publish Alpha Version to npm"
-    key: "alpha-block"
-    prompt: "Confirm publishing alpha version to npm?"
-    depends_on:
-      - "android-test"
-      - "ios-test"
-  
-  - label: ":npm: Publish Alpha Version to npm"
-    depends_on: "alpha-block"
-    commands:
-      - cd Rokt.Widget
-      - npm install && npm run build && npm pack
-      - cd - && cd RoktSampleApp
-      - npm install
-      - cd android
-      - gem install fastlane
-      - bundle install
-      - bundle exec fastlane publishAlphaSDK
-    plugins:
-      - seek-oss/aws-sm#v2.3.1:
-          env:
-            NPM_TOKEN:
-              secret-id: "stage-react-native-buildkite"
-              json-key: ".NPM_TOKEN"
-      - docker#v5.6.0:
-          image: "${ECR_HOST}/cached/reactnativecommunity/react-native-android:7.0"
-          user: "root"
-          mount-buildkite-agent: true
-          environment:
-            - NPM_TOKEN
-    agents:
-      queue: ${ENG_BK_AGENT}
-    timeout_in_minutes: 45
-  
-  - block: ":whale: Publish to npm"
-    key: "publish-block"
-    prompt: "Confirm publishing to npm?"
-    depends_on:
-      - "android-test"
-      - "ios-test"
-    if: build.message =~ /hotfix/i || build.branch =~ /^release/i
-  
   - label: ":npm: Publish to npm"
-    depends_on: "publish-block"
-    if: build.message =~ /hotfix/i || build.branch =~ /^release/i
+    depends_on:
+      - "android-test"
+      - "ios-test"
     commands:
+      - git fetch --all --tags --force
+      - git checkout "v$(buildkite-agent meta-data get VERSION)"
       - cd Rokt.Widget
       - npm install && npm run build && npm pack
       - cd - && cd RoktSampleApp
@@ -151,7 +118,7 @@ steps:
       - cd android
       - gem install fastlane
       - bundle install
-      - bundle exec fastlane publishSDK
+      - bundle exec fastlane automatedPublish dist_tag:$(../../.buildkite/bin/extract_dist_tag.sh $(buildkite-agent meta-data get VERSION))
     plugins:
       - seek-oss/aws-sm#v2.3.1:
           env:
@@ -162,6 +129,7 @@ steps:
           image: "${ECR_HOST}/cached/reactnativecommunity/react-native-android:7.0"
           user: "root"
           mount-buildkite-agent: true
+          mount-ssh-agent: true
           environment:
             - NPM_TOKEN
     agents:
