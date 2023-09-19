@@ -25,6 +25,10 @@ This SDK is published to a NPM package repository. The publishing step uses the 
 The steps are configured in `publish.gradle`.
 Publishing  Alpha and prod are possible through Buildkite based on the Git branch names as explained in above step.
 
+## Automated Publishing
+The SDK can be released via the [Mobile Release Pipeline](https://github.com/ROKT/mobile-release-pipeline). Follow the instructions in the Mobile Release Pipeline repo to release. You can still release the SDK manually by following the steps in the previous section.  
+The appropriate dist tag will be applied automatically when publishing if one is set (e.g. `1.2.3-alpha.1` will set the dist tag as `alpha`). If not, the default `latest` tag will be used.
+
 ## Local Setup
 Go to the root of the project **Rokt.Widget** " and run ```npm install```.
 This will install all required packages for the project.  
