@@ -43,6 +43,7 @@ steps:
       - git checkout "v$(buildkite-agent meta-data get VERSION)"
       - cd RoktSampleApp
       - npm install
+      - mkdir android/app/src/main/assets/ && npx react-native bundle --platform android --dev false --entry-file index.js --bundle-output android/app/src/main/assets/index.android.bundle
       - cd android
       - gem install fastlane
       - bundle install
