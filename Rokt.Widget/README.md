@@ -51,6 +51,10 @@ dependencyResolutionManagement {
 ##### File: MainApplication.java (Module: app)
 2. In your ReactApplication class, make sure you add the RoktEmbeddedViewPackage to the getPackages method:
 ```
+
+// import the class
+import com.rokt.reactnativesdk.RoktEmbeddedViewPackage;
+
 @Override
 protected List<ReactPackage> getPackages() {
 	@SuppressWarnings("UnnecessaryLocalVariable")

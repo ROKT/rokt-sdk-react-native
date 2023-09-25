@@ -3,13 +3,13 @@ package com.roktsampleapp;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
-import com.reactlibrary.RNRoktWidgetPackage;
 import com.facebook.react.ReactNativeHost;
 import com.facebook.react.ReactPackage;
 import com.facebook.react.shell.MainReactPackage;
 import com.facebook.soloader.SoLoader;
-import com.reactlibrary.RoktEmbeddedViewPackage;
 import com.reactnativecommunity.checkbox.ReactCheckBoxPackage;
+import com.rokt.reactnativesdk.RNRoktWidgetPackage;
+import com.rokt.reactnativesdk.RoktEmbeddedViewPackage;
 
 
 import java.util.Arrays;
