@@ -1,5 +1,5 @@
 
-package com.reactlibrary;
+package com.rokt.reactnativesdk;
 
 import java.util.Arrays;
 import java.util.Collections;

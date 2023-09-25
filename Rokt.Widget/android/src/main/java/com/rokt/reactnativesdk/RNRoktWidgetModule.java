@@ -1,5 +1,5 @@
 
-package com.reactlibrary;
+package com.rokt.reactnativesdk;
 
 import android.app.Activity;
 import android.util.Log;
