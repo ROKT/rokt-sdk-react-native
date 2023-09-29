@@ -25,7 +25,7 @@ steps:
       - rbenv local 2.7.6
       - nvm use 16
       - ./.buildkite/bin/update_versions.sh $(buildkite-agent meta-data get ANDROID_VERSION) Rokt.Widget/android/build.gradle $(buildkite-agent meta-data get IOS_VERSION) Rokt.Widget/rokt-react-native-sdk.podspec $(buildkite-agent meta-data get VERSION)
-      - cd Rokt.Widget && npm install && npm run build && npm pack && cd -
+      - cd Rokt.Widget && npm install && npm run build && npm run build:plugin && npm pack && cd -
       - ./.buildkite/bin/update_sample_app.sh $(buildkite-agent meta-data get VERSION)
       - ./.buildkite/bin/create_tag.sh $(buildkite-agent meta-data get VERSION)
     depends_on: "lint"
@@ -113,7 +113,7 @@ steps:
       - git fetch --all --tags --force
       - git checkout "v$(buildkite-agent meta-data get VERSION)"
       - cd Rokt.Widget
-      - npm install && npm run build && npm pack
+      - npm install && npm run build && npm run build:plugin && npm pack
       - cd - && cd RoktSampleApp
       - npm install
       - cd android
