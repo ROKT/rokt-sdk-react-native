@@ -23,7 +23,7 @@ steps:
     depends_on: "lint"
     commands:
       - cd Rokt.Widget
-      - npm install && npm run build && npm pack
+      - npm install && npm run build && npm run build:plugin && npm pack
     plugins:
       - docker#v5.6.0:
           image: "${ECR_HOST}/cached/node:17.2.0-alpine"
@@ -112,7 +112,7 @@ steps:
     depends_on: "alpha-block"
     commands:
       - cd Rokt.Widget
-      - npm install && npm run build && npm pack
+      - npm install && npm run build && npm run build:plugin && npm pack
       - cd - && cd RoktSampleApp
       - npm install
       - cd android
@@ -148,7 +148,7 @@ steps:
     if: build.message =~ /hotfix/i || build.branch =~ /^release/i
     commands:
       - cd Rokt.Widget
-      - npm install && npm run build && npm pack
+      - npm install && npm run build && npm run build:plugin && npm pack
       - cd - && cd RoktSampleApp
       - npm install
       - cd android
