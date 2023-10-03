@@ -1,0 +1,4 @@
+node_modules/
+dist/
+app.plugin.js
+plugin/build

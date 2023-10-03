@@ -1,13 +1,15 @@
 {
   "name": "@rokt/react-native-sdk",
-  "version": "3.15.6",
+  "version": "3.15.7-alpha.1",
   "description": "Rokt Mobile SDK to integrate ROKT Api into ReactNative application",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
     "lint": "eslint .",
     "build": "rm -rf ./dist && tsc && cp ./src/rokt-embedded-view.d.ts ./dist/",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build:plugin": "tsc --build plugin",
+    "clean:plugin": "expo-module clean plugin"
   },
   "keywords": [
     "Rokt React Native SDK"
@@ -20,7 +22,9 @@
     "LICENSE",
     "README.md",
     "rokt-react-native-sdk.podspec",
-    "package.json"
+    "package.json",
+    "app.plugin.js",
+    "plugin"
   ],
   "author": "",
   "license": "Copyright 2020 Rokt Pte Ltd",
@@ -36,6 +40,10 @@
     "eslint": "^8.41.0",
     "react": "17.0.2",
     "react-native": "0.68.0",
-    "typescript": "^5.0.4"
+    "typescript": "^5.0.4",
+    "expo-module-scripts": "^2.0.0"
+  },
+  "dependencies": {
+    "@expo/config-plugins": "^7.2.5"
   }
 }
