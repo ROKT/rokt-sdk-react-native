@@ -164,4 +164,3 @@ RCT_EXPORT_METHOD(setEnvironmentToProd){
 }
 
 @end
-

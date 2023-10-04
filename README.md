@@ -127,6 +127,25 @@ sudo arch -x86_64 gem install ffi
 arch -x86_64 pod install
 ```
 
+### Expo
+This package cannot be used with "Expo Go" app, because it requires custom native code.
+Integration with Expo is possible in both bare workflow and custom managed workflow via config plugis.
+
+### Bare Workflow
+If using Bare Workflow, follow the above Android and iOS setup steps.
+
+### Managed Workflow
+Since Expo Go will not work with react-native-sdk, the suggested workflow is to use a custom development client. If starting a new app, you can run `npx create-react-native-app -t with-dev-client` to have this set up automatically. It will also allow you to use the Expo Application Service (EAS Build) do the Android and iOS builds.
+After installing the @rokt/react-native-sdk NPM package, add the config plugin to the plugins array of your app.json or app.config.js.
+
+```
+{
+  "expo": {
+    "plugins": ["@rokt/react-native-sdk"]
+  }
+}
+```
+If you are not using EAS Build then you must use the `expo prebuild --clean` command as described in the [Adding custom native code](https://docs.expo.dev/workflow/customizing/) guide to rebuild your app with the plugin changes.
 
 ### Usage
 
