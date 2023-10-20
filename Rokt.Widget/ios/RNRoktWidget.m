@@ -36,6 +36,7 @@ RCT_EXPORT_METHOD(initialize:(NSString *)roktTagId appVersion: (NSString * _Null
         RCTLog(@"roktTagId cannot be null");
         return;
     }
+    [Rokt setFrameworkTypeWithFrameworkType: RoktFrameworkTypeReactNative];
     [Rokt initWithRoktTagId:roktTagId];
 }
 RCT_EXPORT_METHOD(execute:(NSString *)viewName
