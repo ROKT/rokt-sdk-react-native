@@ -24,12 +24,9 @@ import com.rokt.roktsdk.Rokt.RoktEventHandler;
 import com.rokt.roktsdk.Widget;
 
 import java.lang.ref.WeakReference;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Copyright 2020 Rokt Pte Ltd
@@ -65,6 +62,7 @@ public class RNRoktWidgetModule extends ReactContextBaseJavaModule {
     public void initialize(String roktTagId, String appVersion) {
         Activity currentActivity = getCurrentActivity();
         if (currentActivity != null && appVersion != null && roktTagId != null) {
+            Rokt.INSTANCE.setFrameworkType(Rokt.SdkFrameworkType.ReactNative.INSTANCE);
             Rokt.INSTANCE.init(roktTagId, appVersion, currentActivity);
         } else {
             logDebug("Activity, roktTagId and AppVersion cannot be null");
