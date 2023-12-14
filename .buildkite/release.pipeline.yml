@@ -50,6 +50,7 @@ steps:
       - bundle exec fastlane deviceFarmUITest
     plugins:
       - seek-oss/aws-sm#v2.3.1:
+          region: us-west-2
           env:
             DEVICE_FARM_STAGE_ACCESS_KEY:
               secret-id: "stage-react-native-buildkite"
@@ -122,6 +123,7 @@ steps:
       - bundle exec fastlane automatedPublish dist_tag:$(../../.buildkite/bin/extract_dist_tag.sh $(buildkite-agent meta-data get VERSION))
     plugins:
       - seek-oss/aws-sm#v2.3.1:
+          region: us-west-2
           env:
             NPM_TOKEN:
               secret-id: "stage-react-native-buildkite"
