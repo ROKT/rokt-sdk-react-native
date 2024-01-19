@@ -22,5 +22,5 @@ Pod::Spec.new do |s|
   
 
   s.dependency "React"
-  s.dependency "Rokt-Widget", "~> 4.0.0-alpha.4"
+  s.dependency "Rokt-Widget", "~> 4.1.0-beta.5"
 end
