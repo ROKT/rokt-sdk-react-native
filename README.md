@@ -35,7 +35,7 @@ allprojects {
     repositories {
         ...
         maven {
-            url  "https://rokt-eng-us-west-2-mobile-sdk-artefacts.s3.amazonaws.com"
+            url  "https://apps.rokt.com/msdk"
         }
     }
 }
@@ -49,7 +49,7 @@ dependencyResolutionManagement {
 		mavenCentral()  
 		// Rokt SDK artifacts  
 		maven {  
-			url "https://rokt-eng-us-west-2-mobile-sdk-artefacts.s3.amazonaws.com"  
+			url "https://apps.rokt.com/msdk"  
 		}  
 	}  
 }
