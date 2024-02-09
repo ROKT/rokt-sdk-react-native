@@ -3,7 +3,7 @@ import { ConfigPlugin, withProjectBuildGradle, withMainApplication } from '@expo
 const IMPORT_STATEMENT = 'com.rokt.reactnativesdk.RoktEmbeddedViewPackage';
 const ADD_PACKAGE = 'packages.add(new RoktEmbeddedViewPackage());'
 const GRADLE_MAVEN =
-  'allprojects { repositories { maven { url "https://rokt-eng-us-west-2-mobile-sdk-artefacts.s3.amazonaws.com" } } }';
+  'allprojects { repositories { maven { url "https://apps.rokt.com/msdk" } } }';
 
 
 function addJavaImports(javaSource: string, javaImports: string[]): string {
