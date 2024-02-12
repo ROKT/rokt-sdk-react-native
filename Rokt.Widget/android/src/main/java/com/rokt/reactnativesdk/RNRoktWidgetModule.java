@@ -188,31 +188,34 @@ public class RNRoktWidgetModule extends ReactContextBaseJavaModule {
         Rokt.RoktCallback callback = new Rokt.RoktCallback() {
             @Override
             public void onLoad() {
-                sendCallback("onLoad");
+                sendCallback("onLoad", null);
             }
 
             @Override
             public void onUnload(@NonNull Rokt.UnloadReasons unloadReasons) {
-                sendCallback("onUnLoad");
+                sendCallback("onUnLoad", unloadReasons.toString());
             }
 
             @Override
             public void onShouldShowLoadingIndicator() {
-                sendCallback("onShouldShowLoadingIndicator");
+                sendCallback("onShouldShowLoadingIndicator", null);
             }
 
             @Override
             public void onShouldHideLoadingIndicator() {
-                sendCallback("onShouldHideLoadingIndicator");
+                sendCallback("onShouldHideLoadingIndicator", null);
             }
         };
         listeners.put(System.currentTimeMillis(), callback);
         return callback;
     }
 
-    private void sendCallback(final String eventValue) {
+    private void sendCallback(final String eventValue, @Nullable final String reason) {
         WritableMap params = Arguments.createMap();
         params.putString("callbackValue", eventValue);
+        if (reason != null) {
+            params.putString("reason", reason);
+        }
         sendEvent(reactContext, "RoktCallback", params);
     }
 
