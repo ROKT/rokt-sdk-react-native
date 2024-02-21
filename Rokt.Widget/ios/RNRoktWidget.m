@@ -30,7 +30,7 @@
 
 
 RCT_EXPORT_MODULE()
-RCT_EXPORT_METHOD(initialize:(NSString *)roktTagId appVersion: (NSString * _Nullable)fakeApp)
+RCT_EXPORT_METHOD(initialize:(NSString *)roktTagId appVersion: (NSString * _Nullable)fakeApp fontPostScriptNames: (NSArray))
 {
     if (roktTagId == nil) {
         RCTLog(@"roktTagId cannot be null");
@@ -41,6 +41,7 @@ RCT_EXPORT_METHOD(initialize:(NSString *)roktTagId appVersion: (NSString * _Null
 RCT_EXPORT_METHOD(execute:(NSString *)viewName
                   attributes:(NSDictionary *)attributes
                   placeholders:(NSDictionary *)placeholders
+                  fontNames:(NSDictionary *)fontNames
                   )
 {
     if (viewName == nil) {
@@ -85,6 +86,7 @@ RCT_EXPORT_METHOD(execute:(NSString *)viewName
 RCT_EXPORT_METHOD(execute2Step:(NSString *)viewName
                   attributes:(NSDictionary *)attributes
                   placeholders:(NSDictionary *)placeholders
+                  fontNames:(NSDictionary *)fontNames
                   )
 {
     if (viewName == nil) {
