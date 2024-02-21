@@ -14,8 +14,10 @@ import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
+import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableMap;
+import com.facebook.react.bridge.ReadableType;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
 import com.facebook.react.uimanager.NativeViewHierarchyManager;
 import com.facebook.react.uimanager.UIBlock;
@@ -29,8 +31,15 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.List;
 import java.util.Set;
+import java.util.HashSet;
 import java.util.concurrent.ConcurrentHashMap;
+
+import android.content.Context;
+import android.graphics.Typeface;
+import android.content.res.AssetManager;
+import java.lang.ref.WeakReference;
 
 /**
  * Copyright 2020 Rokt Pte Ltd
@@ -48,6 +57,7 @@ public class RNRoktWidgetModule extends ReactContextBaseJavaModule {
     private final ReactApplicationContext reactContext;
     private RoktEventHandler roktEventHandler;
     private Boolean debug = false;
+    private static Set<Typeface> staticTypefacesSet = new HashSet<Typeface>();
 
     Map<Long, Rokt.RoktCallback> listeners = new LinkedHashMap<Long, Rokt.RoktCallback>() {
         @Override
@@ -63,36 +73,47 @@ public class RNRoktWidgetModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void initialize(String roktTagId, String appVersion) {
+    public void initialize(String roktTagId, String appVersion, final ReadableArray fontPostScriptNames) {
         Activity currentActivity = getCurrentActivity();
         if (currentActivity != null && appVersion != null && roktTagId != null) {
-            Rokt.INSTANCE.init(roktTagId, appVersion, currentActivity);
+            Rokt.INSTANCE.setFrameworkType(Rokt.SdkFrameworkType.ReactNative.INSTANCE);
+            Rokt.INSTANCE.init(roktTagId, appVersion, currentActivity, true, readableArrayToSetOfStrings(fontPostScriptNames));
         } else {
             logDebug("Activity, roktTagId and AppVersion cannot be null");
         }
     }
 
     @ReactMethod
-    public void execute(final String viewName, final ReadableMap attributes, final ReadableMap placeholders) {
+    public void execute(final String viewName, final ReadableMap attributes, final ReadableMap placeholders, final ReadableMap fontsMap) {
         if (viewName == null) {
             logDebug("Execute failed. ViewName cannot be null");
             return;
+        }
+        Activity currentActivity = getCurrentActivity();
+        final Map<String, WeakReference<Typeface>> typefaceMap = new HashMap<>();
+        if (currentActivity != null) {
+            typefaceMap.putAll(retrieveFonts(readableMapToMapOfStrings(fontsMap), currentActivity));
         }
 
         UIManagerModule uiManager = reactContext.getNativeModule(UIManagerModule.class);
         uiManager.addUIBlock(new UIBlock() {
             @Override
             public void execute(NativeViewHierarchyManager nativeViewHierarchyManager) {
-                Rokt.INSTANCE.execute(viewName, readableMapToMapOfStrings(attributes), createRoktCallback(), safeUnwrapPlaceholders(placeholders, nativeViewHierarchyManager));
+                Rokt.INSTANCE.execute(viewName, readableMapToMapOfStrings(attributes), createRoktCallback(), safeUnwrapPlaceholders(placeholders, nativeViewHierarchyManager), typefaceMap);
             }
         });
     }
 
     @ReactMethod
-    public void execute2Step(final String viewName, final ReadableMap attributes, final ReadableMap placeholders) {
+    public void execute2Step(final String viewName, final ReadableMap attributes, final ReadableMap placeholders, final ReadableMap fontsMap) {
         if (viewName == null) {
             logDebug("Execute failed. ViewName cannot be null");
             return;
+        }
+        Activity currentActivity = getCurrentActivity();
+        final Map<String, WeakReference<Typeface>> typefaceMap = new HashMap<>();
+        if (currentActivity != null) {
+            typefaceMap.putAll(retrieveFonts(readableMapToMapOfStrings(fontsMap), currentActivity));
         }
 
         UIManagerModule uiManager = reactContext.getNativeModule(UIManagerModule.class);
@@ -108,7 +129,7 @@ public class RNRoktWidgetModule extends ReactContextBaseJavaModule {
                             sendEvent(reactContext, "FirstPositiveResponse", null);
                         }
                     }
-                });
+                }, typefaceMap);
             }
         });
     }
@@ -184,6 +205,20 @@ public class RNRoktWidgetModule extends ReactContextBaseJavaModule {
         return null;
     }
 
+    private Set<String> readableArrayToSetOfStrings(final ReadableArray array) {
+        if (array != null) {
+            Set<String> set = new HashSet<String>();
+            for (int i = 0; i < array.size(); i++) {
+                if (array.getType(i).equals(ReadableType.String)) {
+                    set.add(array.getString(i));
+                }
+            }
+            return set;
+        }
+
+        return null;
+    }
+
     private Rokt.RoktCallback createRoktCallback() {
         Rokt.RoktCallback callback = new Rokt.RoktCallback() {
             @Override
@@ -235,5 +270,21 @@ public class RNRoktWidgetModule extends ReactContextBaseJavaModule {
         }
 
         return placeholderMap;
+    }
+
+    private Map<String, WeakReference<Typeface>> retrieveFonts(final Map<String, String> fontNameMap, final Context context) {
+        final String FONTS_ASSET_PATH = "fonts/";
+        try {
+            AssetManager am = context.getAssets();
+            Map<String, WeakReference<Typeface>> typefaceMap = new HashMap<>();
+            fontNameMap.forEach((k, v) -> {
+                Typeface tf = Typeface.createFromAsset(am, FONTS_ASSET_PATH + v);
+                staticTypefacesSet.add(tf);
+                typefaceMap.put(k, new WeakReference<Typeface>(tf));
+            });
+            return typefaceMap;
+        } catch (RuntimeException e) {
+            return new HashMap<String, WeakReference<Typeface>>();
+        }
     }
 }

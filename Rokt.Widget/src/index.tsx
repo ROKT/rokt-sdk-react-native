@@ -3,9 +3,9 @@ import {RoktEmbeddedView} from './rokt-embedded-view'
 import 'react-native'
 
 export interface RNRoktWidget {
-    initialize(roktTagId: string, appVersion: string): void;
-    execute(viewName: string, attributes: Record<string, string>, placeholders: Record<string, number | null>): void;
-    execute2Step(viewName: string, attributes: Record<string, string>, placeholders: Record<string, number | null>): void;
+    initialize(roktTagId: string, appVersion: string, fontPostScriptNames: string[]): void;
+    execute(viewName: string, attributes: Record<string, string>, placeholders: Record<string, number | null>, fontNames: Record<string, string>): void;
+    execute2Step(viewName: string, attributes: Record<string, string>, placeholders: Record<string, number | null>, fontNames: Record<string, string>): void;
     setFulfillmentAttributes(attributes: Record<string, string>): void;
     setEnvironmentToStage(): void;
     setEnvironmentToProd(): void;
