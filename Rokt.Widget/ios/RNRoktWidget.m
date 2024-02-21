@@ -30,7 +30,7 @@
 
 
 RCT_EXPORT_MODULE()
-RCT_EXPORT_METHOD(initialize:(NSString *)roktTagId appVersion: (NSString * _Nullable)fakeApp fontPostScriptNames: (NSArray))
+RCT_EXPORT_METHOD(initialize:(NSString *)roktTagId appVersion: (NSString * _Nullable)fakeApp fontPostScriptNames: (NSArray *)fontPostScriptNames)
 {
     if (roktTagId == nil) {
         RCTLog(@"roktTagId cannot be null");
