@@ -35,6 +35,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.HashSet;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 import android.content.Context;
 import android.graphics.Typeface;
@@ -207,17 +208,13 @@ public class RNRoktWidgetModule extends ReactContextBaseJavaModule {
     }
 
     private Set<String> readableArrayToSetOfStrings(final ReadableArray array) {
-        if (array != null) {
-            Set<String> set = new HashSet<String>();
-            for (int i = 0; i < array.size(); i++) {
-                if (array.getType(i).equals(ReadableType.String)) {
-                    set.add(array.getString(i));
-                }
-            }
-            return set;
-        }
-
-        return null;
+        if (array == null) return null;
+        return array
+                .toArrayList()
+                .stream()
+                .filter(s -> s instanceof String)
+                .map(s -> (String) s)
+                .collect(Collectors.toSet());
     }
 
     private Rokt.RoktCallback createRoktCallback() {
