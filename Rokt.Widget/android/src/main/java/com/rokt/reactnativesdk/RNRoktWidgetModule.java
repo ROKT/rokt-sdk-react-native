@@ -57,7 +57,7 @@ public class RNRoktWidgetModule extends ReactContextBaseJavaModule {
     private final ReactApplicationContext reactContext;
     private RoktEventHandler roktEventHandler;
     private Boolean debug = false;
-    private static Set<Typeface> staticTypefacesSet = new HashSet<Typeface>();
+    private final Set<Typeface> typefacesSet;
 
     Map<Long, Rokt.RoktCallback> listeners = new LinkedHashMap<Long, Rokt.RoktCallback>() {
         @Override
@@ -70,6 +70,7 @@ public class RNRoktWidgetModule extends ReactContextBaseJavaModule {
     RNRoktWidgetModule(ReactApplicationContext reactContext) {
         super(reactContext);
         this.reactContext = reactContext;
+        this.typefacesSet = new HashSet<Typeface>();
     }
 
     @ReactMethod
@@ -279,7 +280,7 @@ public class RNRoktWidgetModule extends ReactContextBaseJavaModule {
             Map<String, WeakReference<Typeface>> typefaceMap = new HashMap<>();
             fontNameMap.forEach((k, v) -> {
                 Typeface tf = Typeface.createFromAsset(am, FONTS_ASSET_PATH + v);
-                staticTypefacesSet.add(tf);
+                typefacesSet.add(tf);
                 typefaceMap.put(k, new WeakReference<Typeface>(tf));
             });
             return typefaceMap;
