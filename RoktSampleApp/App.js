@@ -108,7 +108,7 @@ export default class App extends Component {
         console.log('Executing on Prod');
         Rokt.setEnvironmentToProd();
       }
-      Rokt.initialize(this.state.tagId, '1.1', ['somefontpostscriptname']);
+      Rokt.initialize(this.state.tagId, '1.1');
       console.log('Initialize');
     } else {
       this.showToast('Tag ID must be a valid string');
@@ -125,12 +125,12 @@ export default class App extends Component {
     });
   };
 
-  execute2Step = async (attributes, placeholders, fontsMap) => {
+  execute2Step = async (attributes, placeholders) => {
     try {
       // first we send hashed email
       attributes.emailsha256 = sha256(attributes.email).toString();
       attributes.email = null;
-      Rokt.execute2Step(this.state.viewName, attributes, placeholders, fontsMap);
+      Rokt.execute2Step(this.state.viewName, attributes, placeholders);
 
       console.log('Execute 2 Step');
     } catch (e) {
@@ -138,7 +138,7 @@ export default class App extends Component {
     }
   };
 
-  executeEncrypted = async (attributes, placeholders, fontsMap) => {
+  executeEncrypted = async (attributes, placeholders) => {
     try {
       let publicKey;
 
@@ -162,7 +162,7 @@ export default class App extends Component {
       attributes.email = null;
       attributes.firstname = null;
 
-      Rokt.execute(this.state.viewName, attributes, placeholders, fontsMap);
+      Rokt.execute(this.state.viewName, attributes, placeholders);
 
       console.log('Execute Encrypted');
     } catch (e) {
@@ -194,18 +194,16 @@ export default class App extends Component {
       this.placeholder2.current,
     );
 
-    var fontsMap = {"somefontpostscriptname": "somefontfilename"};
-
     if (isEmpty(this.state.viewName)) {
       this.showToast('View Name cannot be empty');
     }
 
     if (this.state.twoStepEnabled) {
-      this.execute2Step(attributes, placeholders, fontsMap);
+      this.execute2Step(attributes, placeholders);
     } else if (this.state.encryptEnabled) {
-      this.executeEncrypted(attributes, placeholders, fontsMap);
+      this.executeEncrypted(attributes, placeholders);
     } else {
-      Rokt.execute(this.state.viewName, attributes, placeholders, fontsMap);
+      Rokt.execute(this.state.viewName, attributes, placeholders);
       console.log('Execute');
     }
   };
