@@ -58,7 +58,6 @@ public class RNRoktWidgetModule extends ReactContextBaseJavaModule {
     private final ReactApplicationContext reactContext;
     private RoktEventHandler roktEventHandler;
     private Boolean debug = false;
-    private final Set<Typeface> typefacesSet;
 
     Map<Long, Rokt.RoktCallback> listeners = new LinkedHashMap<Long, Rokt.RoktCallback>() {
         @Override
@@ -71,11 +70,21 @@ public class RNRoktWidgetModule extends ReactContextBaseJavaModule {
     RNRoktWidgetModule(ReactApplicationContext reactContext) {
         super(reactContext);
         this.reactContext = reactContext;
-        this.typefacesSet = new HashSet<Typeface>();
     }
 
     @ReactMethod
-    public void initialize(String roktTagId, String appVersion, final ReadableArray fontPostScriptNames) {
+    public void initialize(String roktTagId, String appVersion) {
+        Activity currentActivity = getCurrentActivity();
+        if (currentActivity != null && appVersion != null && roktTagId != null) {
+            Rokt.INSTANCE.setFrameworkType(Rokt.SdkFrameworkType.ReactNative.INSTANCE);
+            Rokt.INSTANCE.init(roktTagId, appVersion, currentActivity);
+        } else {
+            logDebug("Activity, roktTagId and AppVersion cannot be null");
+        }
+    }
+
+    @ReactMethod
+    public void initializeWithFonts(String roktTagId, String appVersion, final ReadableArray fontPostScriptNames) {
         Activity currentActivity = getCurrentActivity();
         if (currentActivity != null && appVersion != null && roktTagId != null) {
             Rokt.INSTANCE.setFrameworkType(Rokt.SdkFrameworkType.ReactNative.INSTANCE);
@@ -86,7 +95,23 @@ public class RNRoktWidgetModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void execute(final String viewName, final ReadableMap attributes, final ReadableMap placeholders, final ReadableMap fontsMap) {
+    public void execute(final String viewName, final ReadableMap attributes, final ReadableMap placeholders) {
+        if (viewName == null) {
+            logDebug("Execute failed. ViewName cannot be null");
+            return;
+        }
+
+        UIManagerModule uiManager = reactContext.getNativeModule(UIManagerModule.class);
+        uiManager.addUIBlock(new UIBlock() {
+            @Override
+            public void execute(NativeViewHierarchyManager nativeViewHierarchyManager) {
+                Rokt.INSTANCE.execute(viewName, readableMapToMapOfStrings(attributes), createRoktCallback(), safeUnwrapPlaceholders(placeholders, nativeViewHierarchyManager));
+            }
+        });
+    }
+
+    @ReactMethod
+    public void executeWithFonts(final String viewName, final ReadableMap attributes, final ReadableMap placeholders, final ReadableMap fontsMap) {
         if (viewName == null) {
             logDebug("Execute failed. ViewName cannot be null");
             return;
@@ -107,7 +132,32 @@ public class RNRoktWidgetModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void execute2Step(final String viewName, final ReadableMap attributes, final ReadableMap placeholders, final ReadableMap fontsMap) {
+    public void execute2Step(final String viewName, final ReadableMap attributes, final ReadableMap placeholders) {
+        if (viewName == null) {
+            logDebug("Execute failed. ViewName cannot be null");
+            return;
+        }
+
+        UIManagerModule uiManager = reactContext.getNativeModule(UIManagerModule.class);
+        uiManager.addUIBlock(new UIBlock() {
+            @Override
+            public void execute(NativeViewHierarchyManager nativeViewHierarchyManager) {
+                Rokt.INSTANCE.execute2Step(viewName, readableMapToMapOfStrings(attributes), createRoktCallback(), safeUnwrapPlaceholders(placeholders, nativeViewHierarchyManager), new Rokt.RoktEventCallback() {
+                    @Override
+                    public void onEvent(Rokt.RoktEventType roktEventType, final Rokt.RoktEventHandler roktEventHandler) {
+                        setRoktEventHandler(roktEventHandler);
+                        if (roktEventType == Rokt.RoktEventType.FirstPositiveEngagement) {
+                            logDebug("onFirstPositiveEvent was fired");
+                            sendEvent(reactContext, "FirstPositiveResponse", null);
+                        }
+                    }
+                });
+            }
+        });
+    }
+
+    @ReactMethod
+    public void execute2StepWithFonts(final String viewName, final ReadableMap attributes, final ReadableMap placeholders, final ReadableMap fontsMap) {
         if (viewName == null) {
             logDebug("Execute failed. ViewName cannot be null");
             return;
@@ -277,7 +327,6 @@ public class RNRoktWidgetModule extends ReactContextBaseJavaModule {
             Map<String, WeakReference<Typeface>> typefaceMap = new HashMap<>();
             fontNameMap.forEach((k, v) -> {
                 Typeface tf = Typeface.createFromAsset(am, FONTS_ASSET_PATH + v);
-                typefacesSet.add(tf);
                 typefaceMap.put(k, new WeakReference<Typeface>(tf));
             });
             return typefaceMap;
