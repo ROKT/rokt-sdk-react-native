@@ -84,11 +84,11 @@ public class RNRoktWidgetModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void initializeWithFonts(String roktTagId, String appVersion, final ReadableArray fontPostScriptNames) {
+    public void initializeWithFontFiles(String roktTagId, String appVersion, final ReadableMap fontsMap) {
         Activity currentActivity = getCurrentActivity();
         if (currentActivity != null && appVersion != null && roktTagId != null) {
             Rokt.INSTANCE.setFrameworkType(Rokt.SdkFrameworkType.ReactNative.INSTANCE);
-            Rokt.INSTANCE.init(roktTagId, appVersion, currentActivity, true, readableArrayToSetOfStrings(fontPostScriptNames));
+            Rokt.INSTANCE.init(roktTagId, appVersion, currentActivity, true, new HashSet<>(), readableMapToMapOfStrings(fontsMap));
         } else {
             logDebug("Activity, roktTagId and AppVersion cannot be null");
         }
@@ -106,27 +106,6 @@ public class RNRoktWidgetModule extends ReactContextBaseJavaModule {
             @Override
             public void execute(NativeViewHierarchyManager nativeViewHierarchyManager) {
                 Rokt.INSTANCE.execute(viewName, readableMapToMapOfStrings(attributes), createRoktCallback(), safeUnwrapPlaceholders(placeholders, nativeViewHierarchyManager));
-            }
-        });
-    }
-
-    @ReactMethod
-    public void executeWithFonts(final String viewName, final ReadableMap attributes, final ReadableMap placeholders, final ReadableMap fontsMap) {
-        if (viewName == null) {
-            logDebug("Execute failed. ViewName cannot be null");
-            return;
-        }
-        Activity currentActivity = getCurrentActivity();
-        final Map<String, WeakReference<Typeface>> typefaceMap = new HashMap<>();
-        if (currentActivity != null) {
-            typefaceMap.putAll(retrieveFonts(readableMapToMapOfStrings(fontsMap), currentActivity));
-        }
-
-        UIManagerModule uiManager = reactContext.getNativeModule(UIManagerModule.class);
-        uiManager.addUIBlock(new UIBlock() {
-            @Override
-            public void execute(NativeViewHierarchyManager nativeViewHierarchyManager) {
-                Rokt.INSTANCE.execute(viewName, readableMapToMapOfStrings(attributes), createRoktCallback(), safeUnwrapPlaceholders(placeholders, nativeViewHierarchyManager), typefaceMap);
             }
         });
     }
@@ -152,36 +131,6 @@ public class RNRoktWidgetModule extends ReactContextBaseJavaModule {
                         }
                     }
                 });
-            }
-        });
-    }
-
-    @ReactMethod
-    public void execute2StepWithFonts(final String viewName, final ReadableMap attributes, final ReadableMap placeholders, final ReadableMap fontsMap) {
-        if (viewName == null) {
-            logDebug("Execute failed. ViewName cannot be null");
-            return;
-        }
-        Activity currentActivity = getCurrentActivity();
-        final Map<String, WeakReference<Typeface>> typefaceMap = new HashMap<>();
-        if (currentActivity != null) {
-            typefaceMap.putAll(retrieveFonts(readableMapToMapOfStrings(fontsMap), currentActivity));
-        }
-
-        UIManagerModule uiManager = reactContext.getNativeModule(UIManagerModule.class);
-        uiManager.addUIBlock(new UIBlock() {
-            @Override
-            public void execute(NativeViewHierarchyManager nativeViewHierarchyManager) {
-                Rokt.INSTANCE.execute2Step(viewName, readableMapToMapOfStrings(attributes), createRoktCallback(), safeUnwrapPlaceholders(placeholders, nativeViewHierarchyManager), new Rokt.RoktEventCallback() {
-                    @Override
-                    public void onEvent(Rokt.RoktEventType roktEventType, final Rokt.RoktEventHandler roktEventHandler) {
-                        setRoktEventHandler(roktEventHandler);
-                        if (roktEventType == Rokt.RoktEventType.FirstPositiveEngagement) {
-                            logDebug("onFirstPositiveEvent was fired");
-                            sendEvent(reactContext, "FirstPositiveResponse", null);
-                        }
-                    }
-                }, typefaceMap);
             }
         });
     }
@@ -257,15 +206,6 @@ public class RNRoktWidgetModule extends ReactContextBaseJavaModule {
         return null;
     }
 
-    private Set<String> readableArrayToSetOfStrings(final ReadableArray array) {
-        if (array == null) return null;
-        return array
-                .toArrayList()
-                .stream()
-                .filter(s -> s instanceof String)
-                .map(s -> (String) s)
-                .collect(Collectors.toSet());
-    }
 
     private Rokt.RoktCallback createRoktCallback() {
         Rokt.RoktCallback callback = new Rokt.RoktCallback() {
@@ -318,20 +258,5 @@ public class RNRoktWidgetModule extends ReactContextBaseJavaModule {
         }
 
         return placeholderMap;
-    }
-
-    private Map<String, WeakReference<Typeface>> retrieveFonts(final Map<String, String> fontNameMap, final Context context) {
-        final String FONTS_ASSET_PATH = "fonts/";
-        try {
-            AssetManager am = context.getAssets();
-            Map<String, WeakReference<Typeface>> typefaceMap = new HashMap<>();
-            fontNameMap.forEach((k, v) -> {
-                Typeface tf = Typeface.createFromAsset(am, FONTS_ASSET_PATH + v);
-                typefaceMap.put(k, new WeakReference<Typeface>(tf));
-            });
-            return typefaceMap;
-        } catch (RuntimeException e) {
-            return new HashMap<String, WeakReference<Typeface>>();
-        }
     }
 }
