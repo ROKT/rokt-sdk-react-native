@@ -92,107 +92,9 @@ RCT_EXPORT_METHOD(execute:(NSString *)viewName
     }];
 }
 
-RCT_EXPORT_METHOD(executeWithFonts:(NSString *)viewName
-                  attributes:(NSDictionary *)attributes
-                  placeholders:(NSDictionary *)placeholders
-                  fontNames:(NSDictionary *)fontNames
-                  )
-{
-    if (viewName == nil) {
-        RCTLog(@"Execute failed. ViewName cannot be null");
-        return;
-    }
-    NSMutableDictionary *finalAttributes = [self convertAttributesToDictionary:attributes];
-    
-    NSMutableDictionary *nativePlaceholders = [[NSMutableDictionary alloc]initWithCapacity:placeholders.count];
-    
-    [self.bridge.uiManager addUIBlock:^(RCTUIManager *uiManager, NSDictionary<NSNumber *,UIView *> *viewRegistry) {
-        for(id key in placeholders){
-            RoktEmbeddedView *view = viewRegistry[[placeholders objectForKey:key]];
-            if (!view || ![view isKindOfClass:[RoktEmbeddedView class]]) {
-                RCTLogError(@"Cannot find RoktEmbeddedView with tag #%@", key);
-                return;
-            }
-            
-            nativePlaceholders[key] = view;
-        }
-        
-        RoktEventManager *event = [RoktEventManager allocWithZone: nil];
-        
-        [Rokt executeWithViewName:viewName attributes:finalAttributes
-                       placements:nativePlaceholders
-                           onLoad:^{ [event onRoktCallbackReceived:@"onLoad"];}
-                         onUnLoad:^{
-	    [event onRoktCallbackReceived:@"onUnLoad"];
-            RCTLogInfo(@"unloaded");
-        }
-     onShouldShowLoadingIndicator:^{ [event onRoktCallbackReceived:@"onShouldShowLoadingIndicator"];}
-     onShouldHideLoadingIndicator:^{ [event onRoktCallbackReceived:@"onShouldHideLoadingIndicator"];}
-             onEmbeddedSizeChange:^(NSString *selectedPlacement, CGFloat widgetHeight){
-            
-            [event onWidgetHeightChanges:widgetHeight placement:selectedPlacement];
-            
-        }];
-        
-    }];
-}
-
 RCT_EXPORT_METHOD(execute2Step:(NSString *)viewName
                   attributes:(NSDictionary *)attributes
                   placeholders:(NSDictionary *)placeholders
-                  )
-{
-    if (viewName == nil) {
-        RCTLog(@"Execute failed. ViewName cannot be null");
-        return;
-    }
-    NSMutableDictionary *finalAttributes = [self convertAttributesToDictionary:attributes];
-    
-    NSMutableDictionary *nativePlaceholders = [[NSMutableDictionary alloc]initWithCapacity:placeholders.count];
-    
-    [self.bridge.uiManager addUIBlock:^(RCTUIManager *uiManager, NSDictionary<NSNumber *,UIView *> *viewRegistry) {
-        for(id key in placeholders){
-            RoktEmbeddedView *view = viewRegistry[[placeholders objectForKey:key]];
-            if (!view || ![view isKindOfClass:[RoktEmbeddedView class]]) {
-                RCTLogError(@"Cannot find RoktEmbeddedView with tag #%@", key);
-                return;
-            }
-            
-            nativePlaceholders[key] = view;
-        }
-        
-        RoktEventManager *event = [RoktEventManager allocWithZone: nil];
-        
-        [Rokt execute2stepWithViewName:viewName attributes:finalAttributes
-                            placements:nativePlaceholders
-                                onLoad:^{ [event onRoktCallbackReceived:@"onLoad"];}
-                              onUnLoad:^{
-	    [event onRoktCallbackReceived:@"onUnLoad"];
-            RCTLogInfo(@"unloaded");
-        }
-          onShouldShowLoadingIndicator:^{ [event onRoktCallbackReceived:@"onShouldShowLoadingIndicator"];}
-     onShouldHideLoadingIndicator:^{ [event onRoktCallbackReceived:@"onShouldHideLoadingIndicator"];}
-                  onEmbeddedSizeChange:^(NSString *selectedPlacement, CGFloat widgetHeight){
-            
-            [event onWidgetHeightChanges:widgetHeight placement:selectedPlacement];
-            
-        }
-                               onEvent:^(RoktEventType roktEventType, RoktEventHandler* roktEventHandler){
-            self.roktEventHandler = roktEventHandler;
-            if (roktEventType == RoktEventTypeFirstPositiveEngagement) {
-                RCTLogInfo(@"firstPositiveEvent was fired");
-                [event onFirstPositiveResponse];
-            }
-        }];
-        
-    }];
-    
-}
-
-RCT_EXPORT_METHOD(execute2StepWithFonts:(NSString *)viewName
-                  attributes:(NSDictionary *)attributes
-                  placeholders:(NSDictionary *)placeholders
-                  fontNames:(NSDictionary *)fontNames
                   )
 {
     if (viewName == nil) {
@@ -263,7 +165,6 @@ RCT_EXPORT_METHOD(setFulfillmentAttributes:(NSDictionary *)attributes) {
     return finalAttributes;
     
 }
-
 
 RCT_EXPORT_METHOD(setEnvironmentToStage) {
     [Rokt setEnvironmentWithEnvironment: RoktEnvironmentStage];
