@@ -38,6 +38,16 @@ RCT_EXPORT_METHOD(initialize:(NSString *)roktTagId appVersion: (NSString * _Null
     }
     [Rokt initWithRoktTagId:roktTagId];
 }
+
+RCT_EXPORT_METHOD(initializeWithFonts:(NSString *)roktTagId appVersion: (NSString * _Nullable)fakeApp fontPostScriptNames: (NSArray *)fontPostScriptNames)
+{
+    if (roktTagId == nil) {
+        RCTLog(@"roktTagId cannot be null");
+        return;
+    }
+    [Rokt initWithRoktTagId:roktTagId];
+}
+
 RCT_EXPORT_METHOD(execute:(NSString *)viewName
                   attributes:(NSDictionary *)attributes
                   placeholders:(NSDictionary *)placeholders
@@ -155,7 +165,6 @@ RCT_EXPORT_METHOD(setFulfillmentAttributes:(NSDictionary *)attributes) {
     return finalAttributes;
     
 }
-
 
 RCT_EXPORT_METHOD(setEnvironmentToStage) {
     [Rokt setEnvironmentWithEnvironment: RoktEnvironmentStage];

@@ -14,8 +14,10 @@ import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
+import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableMap;
+import com.facebook.react.bridge.ReadableType;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
 import com.facebook.react.uimanager.NativeViewHierarchyManager;
 import com.facebook.react.uimanager.UIBlock;
@@ -29,8 +31,16 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.List;
 import java.util.Set;
+import java.util.HashSet;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
+
+import android.content.Context;
+import android.graphics.Typeface;
+import android.content.res.AssetManager;
+import java.lang.ref.WeakReference;
 
 /**
  * Copyright 2020 Rokt Pte Ltd
@@ -66,7 +76,19 @@ public class RNRoktWidgetModule extends ReactContextBaseJavaModule {
     public void initialize(String roktTagId, String appVersion) {
         Activity currentActivity = getCurrentActivity();
         if (currentActivity != null && appVersion != null && roktTagId != null) {
+            Rokt.INSTANCE.setFrameworkType(Rokt.SdkFrameworkType.ReactNative.INSTANCE);
             Rokt.INSTANCE.init(roktTagId, appVersion, currentActivity);
+        } else {
+            logDebug("Activity, roktTagId and AppVersion cannot be null");
+        }
+    }
+
+    @ReactMethod
+    public void initializeWithFontFiles(String roktTagId, String appVersion, final ReadableMap fontsMap) {
+        Activity currentActivity = getCurrentActivity();
+        if (currentActivity != null && appVersion != null && roktTagId != null) {
+            Rokt.INSTANCE.setFrameworkType(Rokt.SdkFrameworkType.ReactNative.INSTANCE);
+            Rokt.INSTANCE.init(roktTagId, appVersion, currentActivity, true, new HashSet<>(), readableMapToMapOfStrings(fontsMap));
         } else {
             logDebug("Activity, roktTagId and AppVersion cannot be null");
         }
@@ -183,6 +205,7 @@ public class RNRoktWidgetModule extends ReactContextBaseJavaModule {
 
         return null;
     }
+
 
     private Rokt.RoktCallback createRoktCallback() {
         Rokt.RoktCallback callback = new Rokt.RoktCallback() {
