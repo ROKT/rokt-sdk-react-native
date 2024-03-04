@@ -22,7 +22,7 @@ steps:
     key: "tag"
     commands:
       - . ~/.zshrc
-      - rbenv local 2.7.6
+      - rbenv local 3.2.2
       - nvm use 16
       - ./.buildkite/bin/update_versions.sh $(buildkite-agent meta-data get ANDROID_VERSION) Rokt.Widget/android/build.gradle $(buildkite-agent meta-data get IOS_VERSION) Rokt.Widget/rokt-react-native-sdk.podspec $(buildkite-agent meta-data get VERSION)
       - cd Rokt.Widget && npm install && npm run build && npm run build:plugin && npm pack && cd -
@@ -85,11 +85,11 @@ steps:
     depends_on: "tag"
     commands:
       - . ~/.zshrc
-      - rbenv local 2.7.6
+      - rbenv local 3.2.2
       - git fetch --all --tags --force
       - git checkout "v$(buildkite-agent meta-data get VERSION)"
       - cd RoktSampleApp
-      - xcrun simctl boot "iPhone 14" || true
+      - xcrun simctl boot "iPhone 15" || true
       - nvm use 12
       - npm install pm2 -g
       - npm install

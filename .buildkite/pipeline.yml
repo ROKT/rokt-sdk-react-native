@@ -1,7 +1,7 @@
 env:
   ENG_ACCOUNT: "035088524874"
   ECR_HOST: ${ENG_ACCOUNT}.dkr.ecr.us-west-2.amazonaws.com
-  MAC_BK_AGENT: eng-prod-us-west-2-mac-arm-macos-build-medium
+  MAC_BK_AGENT: eng-stage-us-west-2-mac-arm-macos-build-medium
   ENG_BK_AGENT: eng-default
 
 steps:
@@ -83,9 +83,9 @@ steps:
     depends_on: "pack"
     commands:
       - . ~/.zshrc
-      - rbenv local 2.7.6
+      - rbenv local 3.2.2
       - cd RoktSampleApp
-      - xcrun simctl boot "iPhone 14" || true
+      - xcrun simctl boot "iPhone 15" || true
       - nvm use 12
       - npm install pm2 -g
       - npm install
