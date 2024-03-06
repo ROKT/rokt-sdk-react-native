@@ -83,16 +83,19 @@ steps:
     depends_on: "pack"
     commands:
       - . ~/.zshrc
-      - rbenv local 2.7.6
+      - rbenv local 3.2.2
       - cd RoktSampleApp
-      - xcrun simctl boot "iPhone 14" || true
+      - xcrun simctl boot "iPhone 15" || true
       - nvm use 12
       - npm install pm2 -g
       - npm install
       - pm2 start --name reactnative npm -- start
-      - cd ios && pod install --verbose --repo-update && cd -
+      - cd ios
+      - bundle check || bundle install --path vendor/bundle 
+      - bundle exec pod install --verbose --repo-update 
+      - cd -
       - gem install xcpretty -v 0.3.0
-      - export RCT_NO_LAUNCH_PACKAGER=true && set -o pipefail && xcodebuild -workspace ios/RoktSampleApp.xcworkspace -destination 'platform=iOS Simulator,name=iPhone 14' -scheme RoktSampleApp -parallelizeTargets -configuration Debug -derivedDataPath ios/build -UseModernBuildSystem=YES clean test | xcpretty -k
+      - export RCT_NO_LAUNCH_PACKAGER=true && set -o pipefail && xcodebuild -workspace ios/RoktSampleApp.xcworkspace -destination 'platform=iOS Simulator,name=iPhone 15' -scheme RoktSampleApp -parallelizeTargets -configuration Debug -derivedDataPath ios/build -UseModernBuildSystem=YES clean test | xcpretty -k
       - pm2 stop reactnative && pm2 delete reactnative
     plugins:
       - artifacts#v1.9.0:
