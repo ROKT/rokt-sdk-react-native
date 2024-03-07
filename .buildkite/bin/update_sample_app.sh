@@ -8,4 +8,5 @@ cd RoktSampleApp
 perl -pi -e "s/(?<=rokt-react-native-sdk-)(.*)(?=\.tgz)/$1/g" package.json
 npm i
 cd ios
-pod update rokt-react-native-sdk
+bundle check || bundle install --path vendor/bundle 
+bundle exec pod update rokt-react-native-sdk
