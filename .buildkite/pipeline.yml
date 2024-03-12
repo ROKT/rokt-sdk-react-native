@@ -89,6 +89,8 @@ steps:
       - nvm use 12
       - npm install pm2 -g
       - npm install
+      - pm2 stop all || true
+      - pm2 delete all || true
       - pm2 start --name reactnative npm -- start
       - cd ios
       - bundle check || bundle install --path vendor/bundle 
