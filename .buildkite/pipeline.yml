@@ -5,6 +5,16 @@ env:
   ENG_BK_AGENT: eng-default
 
 steps:
+  - label: ":broom: Code Quality scan with trunk"
+    key: "trunk"
+    agents:
+      queue: ${ENG_BK_AGENT}
+    plugins:
+      - ssh://git@github.com/ROKT/trunk-buildkite-plugin.git#stable:
+          team: Mobile-Integrations
+          check_args: --ci --all
+    soft_fail: true
+
   - label: ":tslint: Lint"
     key: "lint"
     commands:
@@ -17,7 +27,7 @@ steps:
     agents:
       queue: ${ENG_BK_AGENT}
     timeout_in_minutes: 15
-    
+
   - label: ":package: Create Tarball"
     key: "pack"
     depends_on: "lint"
@@ -33,7 +43,7 @@ steps:
     agents:
       queue: ${ENG_BK_AGENT}
     timeout_in_minutes: 15
-  
+
   - label: ":android: Android Build and Test"
     key: "android-test"
     depends_on: "pack"
@@ -107,7 +117,7 @@ steps:
     depends_on:
       - "android-test"
       - "ios-test"
-  
+
   - label: ":npm: Publish Alpha Version to npm"
     depends_on: "alpha-block"
     commands:
@@ -134,7 +144,7 @@ steps:
     agents:
       queue: ${ENG_BK_AGENT}
     timeout_in_minutes: 45
-  
+
   - block: ":whale: Publish to npm"
     key: "publish-block"
     prompt: "Confirm publishing to npm?"
@@ -142,7 +152,7 @@ steps:
       - "android-test"
       - "ios-test"
     if: build.message =~ /hotfix/i || build.branch =~ /^release/i
-  
+
   - label: ":npm: Publish to npm"
     depends_on: "publish-block"
     if: build.message =~ /hotfix/i || build.branch =~ /^release/i
