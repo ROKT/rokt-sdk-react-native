@@ -88,7 +88,7 @@ public class RNRoktWidgetModule extends ReactContextBaseJavaModule {
         Activity currentActivity = getCurrentActivity();
         if (currentActivity != null && appVersion != null && roktTagId != null) {
             Rokt.INSTANCE.setFrameworkType(Rokt.SdkFrameworkType.ReactNative.INSTANCE);
-            Rokt.INSTANCE.init(roktTagId, appVersion, currentActivity, true, new HashSet<>(), readableMapToMapOfStrings(fontsMap));
+            Rokt.INSTANCE.init(roktTagId, appVersion, currentActivity, new HashSet<>(), readableMapToMapOfStrings(fontsMap));
         } else {
             logDebug("Activity, roktTagId and AppVersion cannot be null");
         }
