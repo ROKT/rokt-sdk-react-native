@@ -1,49 +1,20 @@
+package com.rokt.reactnativesdk
 
-package com.rokt.reactnativesdk;
-
-import android.app.Activity;
-import android.util.Log;
-import android.view.View;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-
-import com.facebook.react.bridge.Arguments;
-import com.facebook.react.bridge.Callback;
-import com.facebook.react.bridge.ReactApplicationContext;
-import com.facebook.react.bridge.ReactContext;
-import com.facebook.react.bridge.ReactContextBaseJavaModule;
-import com.facebook.react.bridge.ReactMethod;
-import com.facebook.react.bridge.ReadableArray;
-import com.facebook.react.bridge.ReadableMap;
-import com.facebook.react.bridge.WritableMap;
-import com.facebook.react.bridge.ReadableType;
-import com.facebook.react.modules.core.DeviceEventManagerModule;
-import com.facebook.react.uimanager.NativeViewHierarchyManager;
-import com.facebook.react.uimanager.UIBlock;
-import com.facebook.react.uimanager.UIManagerModule;
-import com.rokt.roktsdk.Rokt;
-import com.rokt.roktsdk.Rokt.RoktEventHandler;
-import com.rokt.roktsdk.Widget;
-
-import java.lang.ref.WeakReference;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.List;
-import java.util.Set;
-import java.util.HashSet;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
-
-import android.content.Context;
-import android.graphics.Typeface;
-import android.content.res.AssetManager;
-import java.lang.ref.WeakReference;
+import android.util.Log
+import com.facebook.react.bridge.*
+import com.facebook.react.modules.core.DeviceEventManagerModule.RCTDeviceEventEmitter
+import com.facebook.react.uimanager.NativeViewHierarchyManager
+import com.facebook.react.uimanager.UIManagerModule
+import com.rokt.roktsdk.Rokt
+import com.rokt.roktsdk.Rokt.Environment.Prod
+import com.rokt.roktsdk.Rokt.RoktEventHandler
+import com.rokt.roktsdk.Rokt.RoktEventType
+import com.rokt.roktsdk.Rokt.SdkFrameworkType.ReactNative
+import com.rokt.roktsdk.Widget
+import java.lang.ref.WeakReference
 
 /**
- * Copyright 2020 Rokt Pte Ltd
+ * Copyright 2024 Rokt Pte Ltd
  *
  * Licensed under the Rokt Software Development Kit (SDK) Terms of Use
  * Version 2.0 (the "License");
@@ -52,211 +23,184 @@ import java.lang.ref.WeakReference;
  *
  * You may obtain a copy of the License at https://rokt.com/sdk-license-2-0/
  */
+class RNRoktWidgetModule internal constructor(private val reactContext: ReactApplicationContext) :
+    ReactContextBaseJavaModule(
+        reactContext
+    ) {
+    private var roktEventHandler: RoktEventHandler? = null
+    private var debug = false
 
-public class RNRoktWidgetModule extends ReactContextBaseJavaModule {
-
-    private final ReactApplicationContext reactContext;
-    private RoktEventHandler roktEventHandler;
-    private Boolean debug = false;
-
-    Map<Long, Rokt.RoktCallback> listeners = new LinkedHashMap<Long, Rokt.RoktCallback>() {
-        @Override
-        protected boolean removeEldestEntry(Map.Entry<Long, Rokt.RoktCallback> eldest) {
-            int MAX_LISTENERS = 5;
-            return this.size() > MAX_LISTENERS;
-        }
-    };
-
-    RNRoktWidgetModule(ReactApplicationContext reactContext) {
-        super(reactContext);
-        this.reactContext = reactContext;
+    private val listeners: MutableMap<Long, Rokt.RoktCallback> = object : LinkedHashMap<Long, Rokt.RoktCallback>() {
+        override fun removeEldestEntry(eldest: Map.Entry<Long, Rokt.RoktCallback>): Boolean = this.size > MAX_LISTENERS
     }
 
     @ReactMethod
-    public void initialize(String roktTagId, String appVersion) {
-        Activity currentActivity = getCurrentActivity();
+    fun initialize(roktTagId: String?, appVersion: String?) {
+        val currentActivity = currentActivity
         if (currentActivity != null && appVersion != null && roktTagId != null) {
-            Rokt.INSTANCE.setFrameworkType(Rokt.SdkFrameworkType.ReactNative.INSTANCE);
-            Rokt.INSTANCE.init(roktTagId, appVersion, currentActivity);
+            Rokt.setFrameworkType(ReactNative)
+            Rokt.init(roktTagId, appVersion, currentActivity)
         } else {
-            logDebug("Activity, roktTagId and AppVersion cannot be null");
+            logDebug("Activity, roktTagId and AppVersion cannot be null")
         }
     }
 
     @ReactMethod
-    public void initializeWithFontFiles(String roktTagId, String appVersion, final ReadableMap fontsMap) {
-        Activity currentActivity = getCurrentActivity();
+    fun initializeWithFontFiles(roktTagId: String?, appVersion: String?, fontsMap: ReadableMap?) {
+        val currentActivity = currentActivity
         if (currentActivity != null && appVersion != null && roktTagId != null) {
-            Rokt.INSTANCE.setFrameworkType(Rokt.SdkFrameworkType.ReactNative.INSTANCE);
-            Rokt.INSTANCE.init(roktTagId, appVersion, currentActivity, new HashSet<>(), readableMapToMapOfStrings(fontsMap));
+            Rokt.setFrameworkType(ReactNative)
+            Rokt.init(roktTagId, appVersion, currentActivity, HashSet(), readableMapToMapOfStrings(fontsMap))
         } else {
-            logDebug("Activity, roktTagId and AppVersion cannot be null");
+            logDebug("Activity, roktTagId and AppVersion cannot be null")
         }
     }
 
     @ReactMethod
-    public void execute(final String viewName, final ReadableMap attributes, final ReadableMap placeholders) {
+    fun execute(viewName: String?, attributes: ReadableMap?, placeholders: ReadableMap?) {
         if (viewName == null) {
-            logDebug("Execute failed. ViewName cannot be null");
-            return;
+            logDebug("Execute failed. ViewName cannot be null")
+            return
         }
 
-        UIManagerModule uiManager = reactContext.getNativeModule(UIManagerModule.class);
-        uiManager.addUIBlock(new UIBlock() {
-            @Override
-            public void execute(NativeViewHierarchyManager nativeViewHierarchyManager) {
-                Rokt.INSTANCE.execute(viewName, readableMapToMapOfStrings(attributes), createRoktCallback(), safeUnwrapPlaceholders(placeholders, nativeViewHierarchyManager));
-            }
-        });
+        val uiManager = reactContext.getNativeModule(UIManagerModule::class.java)
+        uiManager?.addUIBlock { nativeViewHierarchyManager ->
+            Rokt.execute(
+                viewName,
+                readableMapToMapOfStrings(attributes),
+                createRoktCallback(),
+                safeUnwrapPlaceholders(placeholders, nativeViewHierarchyManager)
+            )
+        }
     }
 
     @ReactMethod
-    public void execute2Step(final String viewName, final ReadableMap attributes, final ReadableMap placeholders) {
+    fun execute2Step(viewName: String?, attributes: ReadableMap?, placeholders: ReadableMap?) {
         if (viewName == null) {
-            logDebug("Execute failed. ViewName cannot be null");
-            return;
+            logDebug("Execute failed. ViewName cannot be null")
+            return
         }
 
-        UIManagerModule uiManager = reactContext.getNativeModule(UIManagerModule.class);
-        uiManager.addUIBlock(new UIBlock() {
-            @Override
-            public void execute(NativeViewHierarchyManager nativeViewHierarchyManager) {
-                Rokt.INSTANCE.execute2Step(viewName, readableMapToMapOfStrings(attributes), createRoktCallback(), safeUnwrapPlaceholders(placeholders, nativeViewHierarchyManager), new Rokt.RoktEventCallback() {
-                    @Override
-                    public void onEvent(Rokt.RoktEventType roktEventType, final Rokt.RoktEventHandler roktEventHandler) {
-                        setRoktEventHandler(roktEventHandler);
-                        if (roktEventType == Rokt.RoktEventType.FirstPositiveEngagement) {
-                            logDebug("onFirstPositiveEvent was fired");
-                            sendEvent(reactContext, "FirstPositiveResponse", null);
+        val uiManager = reactContext.getNativeModule(UIManagerModule::class.java)
+        uiManager?.addUIBlock { nativeViewHierarchyManager ->
+            Rokt.execute2Step(
+                viewName,
+                readableMapToMapOfStrings(attributes),
+                createRoktCallback(),
+                safeUnwrapPlaceholders(placeholders, nativeViewHierarchyManager),
+                object : Rokt.RoktEventCallback {
+                    override fun onEvent(eventType: RoktEventType, roktEventHandler: RoktEventHandler) {
+                        setRoktEventHandler(roktEventHandler)
+                        if (eventType == RoktEventType.FirstPositiveEngagement) {
+                            logDebug("onFirstPositiveEvent was fired")
+                            sendEvent(reactContext, "FirstPositiveResponse", null)
                         }
                     }
-                });
-            }
-        });
-    }
-
-
-    private void sendEvent(ReactContext reactContext,
-                           String eventName,
-                           @Nullable WritableMap params) {
-        if (reactContext != null) {
-            reactContext
-                    .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
-                    .emit(eventName, params);
-        }
-    }
-
-    @ReactMethod
-    public void setFulfillmentAttributes(final ReadableMap attributes) {
-        if (this.roktEventHandler != null) {
-            Map<String, String> fulfillmentAttributes = readableMapToMapOfStrings(attributes);
-            if (fulfillmentAttributes != null) {
-                roktEventHandler.setFulfillmentAttributes(fulfillmentAttributes);
-                logDebug("Calling setFulfillmentAttributes");
-            } else {
-                logDebug("Fulfillment attributes must be a map of Strings");
-            }
-        } else {
-            logDebug("RoktEventHandler is null, make sure you run execute2Step before calling setFulfillmentAttributes");
-        }
-    }
-
-    private void setRoktEventHandler(RoktEventHandler roktEventHandler) {
-        this.roktEventHandler = roktEventHandler;
-    }
-
-    @Override
-    public String getName() {
-        return "RNRoktWidget";
-    }
-
-    @ReactMethod
-    public void setEnvironmentToStage() {
-        Rokt.INSTANCE.setEnvironment(Rokt.Environment.Stage.INSTANCE);
-    }
-
-    @ReactMethod
-    public void setEnvironmentToProd() {
-        Rokt.INSTANCE.setEnvironment(Rokt.Environment.Prod.INSTANCE);
-    }
-
-    @ReactMethod
-    public void toggleDebug(Boolean enabled) {
-        this.debug = enabled;
-    }
-
-    private void logDebug(String message) {
-        if (debug) {
-            Log.d("Rokt", message);
-        }
-    }
-
-    private Map<String, String> readableMapToMapOfStrings(final ReadableMap attributes) {
-        if (attributes != null) {
-            Map<String, Object> map = attributes.toHashMap();
-            Map<String, String> newMap = new HashMap<String, String>();
-            for (Map.Entry<String, Object> entry : map.entrySet()) {
-                if (entry.getValue() instanceof String) {
-                    newMap.put(entry.getKey(), (String) entry.getValue());
                 }
-            }
-            return newMap;
+            )
         }
-
-        return null;
     }
 
 
-    private Rokt.RoktCallback createRoktCallback() {
-        Rokt.RoktCallback callback = new Rokt.RoktCallback() {
-            @Override
-            public void onLoad() {
-                sendCallback("onLoad", null);
-            }
-
-            @Override
-            public void onUnload(@NonNull Rokt.UnloadReasons unloadReasons) {
-                sendCallback("onUnLoad", unloadReasons.toString());
-            }
-
-            @Override
-            public void onShouldShowLoadingIndicator() {
-                sendCallback("onShouldShowLoadingIndicator", null);
-            }
-
-            @Override
-            public void onShouldHideLoadingIndicator() {
-                sendCallback("onShouldHideLoadingIndicator", null);
-            }
-        };
-        listeners.put(System.currentTimeMillis(), callback);
-        return callback;
+    private fun sendEvent(
+        reactContext: ReactContext?,
+        eventName: String,
+        params: WritableMap?
+    ) {
+        reactContext?.getJSModule(RCTDeviceEventEmitter::class.java)?.emit(eventName, params)
     }
 
-    private void sendCallback(final String eventValue, @Nullable final String reason) {
-        WritableMap params = Arguments.createMap();
-        params.putString("callbackValue", eventValue);
+    @ReactMethod
+    fun setFulfillmentAttributes(attributes: ReadableMap?) {
+        if (roktEventHandler != null) {
+            val fulfillmentAttributes = readableMapToMapOfStrings(attributes)
+            roktEventHandler?.setFulfillmentAttributes(fulfillmentAttributes)
+            logDebug("Calling setFulfillmentAttributes")
+        } else {
+            logDebug("RoktEventHandler is null, make sure you run execute2Step before calling setFulfillmentAttributes")
+        }
+    }
+
+    private fun setRoktEventHandler(roktEventHandler: RoktEventHandler) {
+        this.roktEventHandler = roktEventHandler
+    }
+
+    override fun getName(): String {
+        return "RNRoktWidget"
+    }
+
+    @ReactMethod
+    fun setEnvironmentToStage() {
+        Rokt.setEnvironment(Rokt.Environment.Stage)
+    }
+
+    @ReactMethod
+    fun setEnvironmentToProd() {
+        Rokt.setEnvironment(Prod)
+    }
+
+    @ReactMethod
+    fun toggleDebug(enabled: Boolean) {
+        this.debug = enabled
+    }
+
+    private fun logDebug(message: String) {
+        if (debug) {
+            Log.d("Rokt", message)
+        }
+    }
+
+    private fun readableMapToMapOfStrings(attributes: ReadableMap?): Map<String, String> =
+        attributes?.toHashMap()?.filter { it.value is String }?.mapValues { it.value as String } ?: emptyMap()
+
+
+    private fun createRoktCallback(): Rokt.RoktCallback {
+        val callback: Rokt.RoktCallback = object : Rokt.RoktCallback {
+            override fun onLoad() {
+                sendCallback("onLoad", null)
+            }
+
+            override fun onUnload(reason: Rokt.UnloadReasons) {
+                sendCallback("onUnLoad", reason.toString())
+            }
+
+            override fun onShouldShowLoadingIndicator() {
+                sendCallback("onShouldShowLoadingIndicator", null)
+            }
+
+            override fun onShouldHideLoadingIndicator() {
+                sendCallback("onShouldHideLoadingIndicator", null)
+            }
+        }
+        listeners[System.currentTimeMillis()] = callback
+        return callback
+    }
+
+    private fun sendCallback(eventValue: String, reason: String?) {
+        val params = Arguments.createMap()
+        params.putString("callbackValue", eventValue)
         if (reason != null) {
-            params.putString("reason", reason);
+            params.putString("reason", reason)
         }
-        sendEvent(reactContext, "RoktCallback", params);
+        sendEvent(reactContext, "RoktCallback", params)
     }
 
-    private Map<String, WeakReference<Widget>> safeUnwrapPlaceholders(final ReadableMap placeholders, final NativeViewHierarchyManager nativeViewHierarchyManager) {
-        final Map<String, WeakReference<Widget>> placeholderMap = new HashMap<>();
+    private fun safeUnwrapPlaceholders(
+        placeholders: ReadableMap?,
+        nativeViewHierarchyManager: NativeViewHierarchyManager
+    ): Map<String, WeakReference<Widget>> {
+        val placeholderMap: MutableMap<String, WeakReference<Widget>> = HashMap()
 
         if (placeholders != null) {
-            for (Map.Entry<String, Object> entry : placeholders.toHashMap().entrySet()) {
-                if (entry.getValue() instanceof Double) {
-                    int tag = ((Double) entry.getValue()).intValue();
-                    View view = nativeViewHierarchyManager.resolveView(tag);
-                    if (view instanceof Widget) {
-                        placeholderMap.put(entry.getKey(), new WeakReference(view));
-                    }
-                }
-            }
+            placeholderMap.putAll(placeholders.toHashMap()
+                .filterValues { value -> value is Double }
+                .mapValues { pair -> (pair.value as Double).toInt() }
+                .mapValues { pair -> nativeViewHierarchyManager.resolveView(pair.value) as? Widget }
+                .filterValues { value -> value != null }
+                .mapValues { WeakReference(it.value as Widget) })
         }
-
-        return placeholderMap;
+        return placeholderMap
     }
 }
+
+private const val MAX_LISTENERS = 5
