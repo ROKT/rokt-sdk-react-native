@@ -113,7 +113,6 @@ steps:
   - label: ":npm: Publish to npm"
     depends_on:
       - "android-test"
-      - "ios-test"
     commands:
       - git fetch --all --tags --force
       - git checkout "v$(buildkite-agent meta-data get VERSION)"
