@@ -84,10 +84,14 @@ steps:
     commands:
       - . ~/.zshrc
       - rbenv local 3.2.2
-      - cd RoktSampleApp
+      - cd Rokt.Widget
+      - ls -l
+      - npm install && npm run build && npm run build:plugin && npm pack
+      - cd ../RoktSampleApp
       - xcrun simctl boot "iPhone 15" || true
       - nvm use 12
       - npm cache clean --force
+      - ls 
       - npm install pm2 -g
       - npm install
       - pm2 stop all || true
