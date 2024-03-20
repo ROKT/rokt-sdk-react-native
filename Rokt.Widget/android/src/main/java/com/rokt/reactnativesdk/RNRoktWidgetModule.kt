@@ -1,6 +1,10 @@
 package com.rokt.reactnativesdk
 
 import android.util.Log
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.facebook.react.bridge.*
 import com.facebook.react.modules.core.DeviceEventManagerModule.RCTDeviceEventEmitter
 import com.facebook.react.uimanager.NativeViewHierarchyManager
@@ -11,6 +15,7 @@ import com.rokt.roktsdk.Rokt.RoktEventHandler
 import com.rokt.roktsdk.Rokt.RoktEventType
 import com.rokt.roktsdk.Rokt.SdkFrameworkType.ReactNative
 import com.rokt.roktsdk.Widget
+import kotlinx.coroutines.launch
 import java.lang.ref.WeakReference
 
 /**
@@ -40,6 +45,7 @@ class RNRoktWidgetModule internal constructor(private val reactContext: ReactApp
         if (currentActivity != null && appVersion != null && roktTagId != null) {
             Rokt.setFrameworkType(ReactNative)
             Rokt.init(roktTagId, appVersion, currentActivity)
+            startRoktEventListener()
         } else {
             logDebug("Activity, roktTagId and AppVersion cannot be null")
         }
@@ -51,6 +57,7 @@ class RNRoktWidgetModule internal constructor(private val reactContext: ReactApp
         if (currentActivity != null && appVersion != null && roktTagId != null) {
             Rokt.setFrameworkType(ReactNative)
             Rokt.init(roktTagId, appVersion, currentActivity, HashSet(), readableMapToMapOfStrings(fontsMap))
+            startRoktEventListener()
         } else {
             logDebug("Activity, roktTagId and AppVersion cannot be null")
         }
@@ -200,6 +207,18 @@ class RNRoktWidgetModule internal constructor(private val reactContext: ReactApp
                 .mapValues { WeakReference(it.value as Widget) })
         }
         return placeholderMap
+    }
+
+    private fun startRoktEventListener() {
+        (currentActivity as? LifecycleOwner)?.lifecycleScope?.launch {
+            (currentActivity as LifecycleOwner).repeatOnLifecycle(Lifecycle.State.STARTED) {
+                Rokt.roktEvents().collect { event ->
+                    val params = Arguments.createMap()
+                    params.putString("event", event.javaClass.simpleName)
+                    sendEvent(reactContext, "RoktEvents", params)
+                }
+            }
+        }
     }
 }
 

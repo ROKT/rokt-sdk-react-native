@@ -16,5 +16,7 @@
 - (void)onWidgetHeightChanges:(CGFloat)widgetHeight placement:(NSString*) selectedPlacement;
 - (void)onFirstPositiveResponse;
 - (void)onRoktCallbackReceived:(NSString*)eventValue;
+// TODO: Consume the method to propagate the events
+- (void)onRoktEvents:(NSString*)eventValue;
 
 @end

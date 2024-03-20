@@ -39,7 +39,7 @@ RCT_EXPORT_MODULE(RoktEventManager);
 
 - (NSArray<NSString *> *)supportedEvents
 {
-  return @[@"WidgetHeightChanges", @"FirstPositiveResponse", @"RoktCallback"];
+  return @[@"WidgetHeightChanges", @"FirstPositiveResponse", @"RoktCallback", @"RoktEvents"];
 }
 
 - (void)onWidgetHeightChanges:(CGFloat)widgetHeight placement:(NSString*) selectedPlacement
@@ -63,6 +63,14 @@ RCT_EXPORT_MODULE(RoktEventManager);
     if (hasListeners) {
         [self sendEventWithName:@"RoktCallback" body:@{@"callbackValue": eventValue}];
     }
+}
+
+- (void)onRoktEvents:(NSString*)eventValue
+{
+     if (hasListeners) {
+        // TODO: Implement events
+        [self sendEventWithName:@"RoktEvents" body:@{@"event": eventValue}];
+     }
 }
 
 @end
