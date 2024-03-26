@@ -354,7 +354,7 @@ PODS:
   - RNCCheckbox (0.5.16):
     - BEMCheckBox (~> 1.4)
     - React-Core
-  - rokt-react-native-sdk (4.2.0):
+  - rokt-react-native-sdk (4.2.2):
     - React
     - Rokt-Widget (~> 4.2.0)
   - Rokt-Widget (4.2.0)
@@ -559,7 +559,7 @@ SPEC CHECKSUMS:
   React-runtimeexecutor: ea78653fbc68bd6f2d3f5e7e311bc5a9dc8bfeca
   ReactCommon: f4bb9e5209ea5c3c6ab25e100895119e58d6e50a
   RNCCheckbox: 75255b03e604bbcc26411eb31c4cbe3e3865f538
-  rokt-react-native-sdk: 8d09d50ed60a2e82f8945ed6ce76d76d0dde70b9
+  rokt-react-native-sdk: b85f37d68f13540c84bbe0cc6400d647aad49344
   Rokt-Widget: cb1623a572507cdefc957a4e8174e73f888f4c36
   SocketRocket: f32cd54efbe0f095c4d7594881e52619cfe80b17
   Yoga: 8a90b50af67eaa9fe94fd03e550bfeab06096873
