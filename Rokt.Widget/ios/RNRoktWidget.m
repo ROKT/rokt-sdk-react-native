@@ -72,20 +72,23 @@ RCT_EXPORT_METHOD(execute:(NSString *)viewName
             nativePlaceholders[key] = view;
         }
         
-        RoktEventManager *event = [RoktEventManager allocWithZone: nil];
-        
+        self.eventManager = [RoktEventManager allocWithZone: nil];
+        [Rokt eventsWithViewName:viewName onEvent:^(RoktEvent * roktEvent) {
+            [self.eventManager onRoktEvents:roktEvent viewName:viewName];
+        }];
+
         [Rokt executeWithViewName:viewName attributes:finalAttributes
                        placements:nativePlaceholders
-                           onLoad:^{ [event onRoktCallbackReceived:@"onLoad"];}
+                           onLoad:^{ [self.eventManager onRoktCallbackReceived:@"onLoad"];}
                          onUnLoad:^{
-	    [event onRoktCallbackReceived:@"onUnLoad"];
+	    [self.eventManager onRoktCallbackReceived:@"onUnLoad"];
             RCTLogInfo(@"unloaded");
         }
-     onShouldShowLoadingIndicator:^{ [event onRoktCallbackReceived:@"onShouldShowLoadingIndicator"];}
-     onShouldHideLoadingIndicator:^{ [event onRoktCallbackReceived:@"onShouldHideLoadingIndicator"];}
+     onShouldShowLoadingIndicator:^{ [self.eventManager onRoktCallbackReceived:@"onShouldShowLoadingIndicator"];}
+     onShouldHideLoadingIndicator:^{ [self.eventManager onRoktCallbackReceived:@"onShouldHideLoadingIndicator"];}
              onEmbeddedSizeChange:^(NSString *selectedPlacement, CGFloat widgetHeight){
             
-            [event onWidgetHeightChanges:widgetHeight placement:selectedPlacement];
+            [self.eventManager onWidgetHeightChanges:widgetHeight placement:selectedPlacement];
             
         }];
         
@@ -116,27 +119,31 @@ RCT_EXPORT_METHOD(execute2Step:(NSString *)viewName
             nativePlaceholders[key] = view;
         }
         
-        RoktEventManager *event = [RoktEventManager allocWithZone: nil];
+        self.eventManager = [RoktEventManager allocWithZone: nil];
+
+        [Rokt eventsWithViewName:viewName onEvent:^(RoktEvent * roktEvent) {
+            [self.eventManager onRoktEvents:roktEvent viewName:viewName];
+        }];
         
         [Rokt execute2stepWithViewName:viewName attributes:finalAttributes
                             placements:nativePlaceholders
-                                onLoad:^{ [event onRoktCallbackReceived:@"onLoad"];}
+                                onLoad:^{ [self.eventManager onRoktCallbackReceived:@"onLoad"];}
                               onUnLoad:^{
-	    [event onRoktCallbackReceived:@"onUnLoad"];
+	    [self.eventManager onRoktCallbackReceived:@"onUnLoad"];
             RCTLogInfo(@"unloaded");
         }
-          onShouldShowLoadingIndicator:^{ [event onRoktCallbackReceived:@"onShouldShowLoadingIndicator"];}
-     onShouldHideLoadingIndicator:^{ [event onRoktCallbackReceived:@"onShouldHideLoadingIndicator"];}
+          onShouldShowLoadingIndicator:^{ [self.eventManager onRoktCallbackReceived:@"onShouldShowLoadingIndicator"];}
+     onShouldHideLoadingIndicator:^{ [self.eventManager onRoktCallbackReceived:@"onShouldHideLoadingIndicator"];}
                   onEmbeddedSizeChange:^(NSString *selectedPlacement, CGFloat widgetHeight){
             
-            [event onWidgetHeightChanges:widgetHeight placement:selectedPlacement];
+            [self.eventManager onWidgetHeightChanges:widgetHeight placement:selectedPlacement];
             
         }
                                onEvent:^(RoktEventType roktEventType, RoktEventHandler* roktEventHandler){
             self.roktEventHandler = roktEventHandler;
             if (roktEventType == RoktEventTypeFirstPositiveEngagement) {
                 RCTLogInfo(@"firstPositiveEvent was fired");
-                [event onFirstPositiveResponse];
+                [self.eventManager onFirstPositiveResponse];
             }
         }];
         
@@ -148,6 +155,9 @@ RCT_EXPORT_METHOD(setFulfillmentAttributes:(NSDictionary *)attributes) {
     if (self.roktEventHandler != nil) {
         RCTLogInfo(@"calling setFulfillmentAttributesWithAttributes");
         [self.roktEventHandler setFulfillmentAttributesWithAttributes:attributes];
+    }
+    if (self.eventManager != nil && self.eventManager.firstPositiveEngagement != nil) {
+        [self.eventManager.firstPositiveEngagement setFulfillmentAttributesWithAttributes:attributes];
     }
 }
 

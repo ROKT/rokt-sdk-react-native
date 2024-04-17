@@ -45,7 +45,6 @@ class RNRoktWidgetModule internal constructor(private val reactContext: ReactApp
         if (currentActivity != null && appVersion != null && roktTagId != null) {
             Rokt.setFrameworkType(ReactNative)
             Rokt.init(roktTagId, appVersion, currentActivity)
-            startRoktEventListener()
         } else {
             logDebug("Activity, roktTagId and AppVersion cannot be null")
         }
@@ -57,7 +56,6 @@ class RNRoktWidgetModule internal constructor(private val reactContext: ReactApp
         if (currentActivity != null && appVersion != null && roktTagId != null) {
             Rokt.setFrameworkType(ReactNative)
             Rokt.init(roktTagId, appVersion, currentActivity, HashSet(), readableMapToMapOfStrings(fontsMap))
-            startRoktEventListener()
         } else {
             logDebug("Activity, roktTagId and AppVersion cannot be null")
         }
@@ -71,6 +69,7 @@ class RNRoktWidgetModule internal constructor(private val reactContext: ReactApp
         }
 
         val uiManager = reactContext.getNativeModule(UIManagerModule::class.java)
+        startRoktEventListener(viewName)
         uiManager?.addUIBlock { nativeViewHierarchyManager ->
             Rokt.execute(
                 viewName,
@@ -209,12 +208,13 @@ class RNRoktWidgetModule internal constructor(private val reactContext: ReactApp
         return placeholderMap
     }
 
-    private fun startRoktEventListener() {
+    private fun startRoktEventListener(viewName: String) {
         (currentActivity as? LifecycleOwner)?.lifecycleScope?.launch {
-            (currentActivity as LifecycleOwner).repeatOnLifecycle(Lifecycle.State.STARTED) {
-                Rokt.roktEvents().collect { event ->
+            (currentActivity as LifecycleOwner).repeatOnLifecycle(Lifecycle.State.CREATED) {
+                Rokt.roktEvents(viewName).collect { event ->
                     val params = Arguments.createMap()
                     params.putString("event", event.javaClass.simpleName)
+                    params.putString("viewName", viewName)
                     sendEvent(reactContext, "RoktEvents", params)
                 }
             }

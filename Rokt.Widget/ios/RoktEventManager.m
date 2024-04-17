@@ -9,6 +9,7 @@
 //  You may obtain a copy of the License at https://rokt.com/sdk-license-2-0/
 
 #import "RoktEventManager.h"
+#import <Rokt_Widget/Rokt_Widget-Swift.h>
 
 @implementation RoktEventManager
 {
@@ -65,11 +66,47 @@ RCT_EXPORT_MODULE(RoktEventManager);
     }
 }
 
-- (void)onRoktEvents:(NSString*)eventValue
+- (void)onRoktEvents:(RoktEvent *)event viewName:(NSString *)viewName
 {
      if (hasListeners) {
-        // TODO: Implement events
-        [self sendEventWithName:@"RoktEvents" body:@{@"event": eventValue}];
+         NSString *placementId;
+         NSString *eventName;
+         if ([event isKindOfClass:[ShowLoadingIndicator class]]) {
+             eventName = @"ShowLoadingIndicator";
+         } else if ([event isKindOfClass:[HideLoadingIndicator class]]) {
+             eventName = @"HideLoadingIndicator";
+         } else if ([event isKindOfClass:[PlacementInteractive class]]) {
+             placementId = ((PlacementInteractive *)event).placementId;
+             eventName = @"PlacementInteractive";
+         } else if ([event isKindOfClass:[PlacementReady class]]) {
+             placementId = ((PlacementReady *)event).placementId;
+             eventName = @"PlacementReady";
+         } else if ([event isKindOfClass:[OfferEngagement class]]) {
+             placementId = ((OfferEngagement *)event).placementId;
+             eventName = @"OfferEngagement";
+         } else if ([event isKindOfClass:[PositiveEngagement class]]) {
+             placementId = ((PositiveEngagement *)event).placementId;
+             eventName = @"PositiveEngagement";
+         } else if ([event isKindOfClass:[PlacementClosed class]]) {
+             placementId = ((PlacementClosed *)event).placementId;
+             eventName = @"PlacementClosed";
+         } else if ([event isKindOfClass:[PlacementCompleted class]]) {
+             placementId = ((PlacementCompleted *)event).placementId;
+             eventName = @"PlacementCompleted";
+         } else if ([event isKindOfClass:[PlacementFailure class]]) {
+             placementId = ((PlacementFailure *)event).placementId;
+             eventName = @"PlacementFailure";
+         } else if ([event isKindOfClass:[FirstPositiveEngagement class]]) {
+             placementId = ((FirstPositiveEngagement *)event).placementId;
+             eventName = @"FirstPositiveEngagement";
+             self.firstPositiveEngagement = (FirstPositiveEngagement *)event;
+         }
+         NSMutableDictionary *payload = [@{@"event": eventName, @"viewName": viewName} mutableCopy];
+         if (placementId != nil) {
+             [payload setObject:placementId forKey:@"placementId"];
+         }
+
+         [self sendEventWithName:@"RoktEvents" body:payload];
      }
 }
 

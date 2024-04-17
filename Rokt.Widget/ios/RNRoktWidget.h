@@ -14,9 +14,11 @@
 #import <React/RCTBridgeModule.h>
 #endif
 #import <Rokt_Widget/Rokt_Widget-Swift.h>
+#import "RoktEventManager.h"
 
 
 @interface RNRoktWidget : NSObject <RCTBridgeModule>
     @property (nonatomic) RoktEventHandler *roktEventHandler;
+    @property (nonatomic) RoktEventManager * _Nullable eventManager;
 @end
   

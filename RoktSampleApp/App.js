@@ -85,14 +85,7 @@ export default class App extends Component {
   );
 
   eventSubscription = eventManagerEmitter.addListener('RoktEvents', (data) => {
-    switch (data.event) {
-      case 'ShowLoadingIndicator':
-        console.log('Received ShowLoadingIndicator');
-        break;
-      default:
-        console.log('Some event received ' + data.event);
-        break;
-    }
+    console.log(`*** ROKT EVENT *** ${JSON.stringify(data)}`);
   });
 
   encrypt(text, publicKey) {
