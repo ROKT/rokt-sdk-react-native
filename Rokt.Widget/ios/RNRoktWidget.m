@@ -154,10 +154,14 @@ RCT_EXPORT_METHOD(execute2Step:(NSString *)viewName
 RCT_EXPORT_METHOD(setFulfillmentAttributes:(NSDictionary *)attributes) {
     if (self.roktEventHandler != nil) {
         RCTLogInfo(@"calling setFulfillmentAttributesWithAttributes");
-        [self.roktEventHandler setFulfillmentAttributesWithAttributes:attributes];
+        [self.bridge.uiManager addUIBlock:^(RCTUIManager *uiManager, NSDictionary<NSNumber *,UIView *> *viewRegistry) {
+            [self.roktEventHandler setFulfillmentAttributesWithAttributes:attributes];
+        }];
     }
     if (self.eventManager != nil && self.eventManager.firstPositiveEngagement != nil) {
-        [self.eventManager.firstPositiveEngagement setFulfillmentAttributesWithAttributes:attributes];
+        [self.bridge.uiManager addUIBlock:^(RCTUIManager *uiManager, NSDictionary<NSNumber *,UIView *> *viewRegistry) {
+            [self.eventManager.firstPositiveEngagement setFulfillmentAttributesWithAttributes:attributes];
+        }];
     }
 }
 
