@@ -33,8 +33,8 @@ export abstract class Rokt {
         RNRoktWidget.setEnvironmentToProd();
     }
 
-    public static toggleDebug(enabled: boolean): void {
-        RNRoktWidget.toggleDebug(enabled);
+    public static setLoggingEnabled(enabled: boolean): void {
+        RNRoktWidget.setLoggingEnabled(enabled);
     }
 
 }
@@ -55,5 +55,5 @@ interface RNRoktWidget {
     setFulfillmentAttributes(attributes: Record<string, string>): void;
     setEnvironmentToStage(): void;
     setEnvironmentToProd(): void;
-    toggleDebug(enabled: boolean): void;
+    setLoggingEnabled(enabled: boolean): void;
 }

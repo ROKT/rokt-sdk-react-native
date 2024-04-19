@@ -156,8 +156,9 @@ class RNRoktWidgetModule internal constructor(private val reactContext: ReactApp
     }
 
     @ReactMethod
-    fun toggleDebug(enabled: Boolean) {
+    fun setLoggingEnabled(enabled: Boolean) {
         this.debug = enabled
+        Rokt.setLoggingEnabled(enabled)
     }
 
     private fun logDebug(message: String) {

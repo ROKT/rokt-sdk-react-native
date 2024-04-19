@@ -104,6 +104,7 @@ export default class App extends Component {
   }
 
   onInitHandler = () => {
+    Rokt.setLoggingEnabled(true);
     if (isNotEmpty(this.state.tagId)) {
       if (this.state.stageEnabled) {
         console.log('Executing on Stage');
