@@ -76,13 +76,17 @@ export default class App extends Component {
       Rokt.setFulfillmentAttributes(FULLFILLMENT_ATTRIBUTES);
     },
   );
-   
+
   callBackSubscription = eventManagerEmitter.addListener(
     'RoktCallback',
     (data) => {
       console.log('roktCallback received: ' + data.callbackValue);
     },
   );
+
+  eventSubscription = eventManagerEmitter.addListener('RoktEvents', (data) => {
+    console.log(`*** ROKT EVENT *** ${JSON.stringify(data)}`);
+  });
 
   encrypt(text, publicKey) {
     var publicBytes = forge.util.decode64(publicKey);

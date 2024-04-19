@@ -1,16 +1,23 @@
 package com.rokt.reactnativesdk
 
 import android.util.Log
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.facebook.react.bridge.*
 import com.facebook.react.modules.core.DeviceEventManagerModule.RCTDeviceEventEmitter
 import com.facebook.react.uimanager.NativeViewHierarchyManager
 import com.facebook.react.uimanager.UIManagerModule
+import com.rokt.roktsdk.FulfillmentAttributes
 import com.rokt.roktsdk.Rokt
 import com.rokt.roktsdk.Rokt.Environment.Prod
 import com.rokt.roktsdk.Rokt.RoktEventHandler
 import com.rokt.roktsdk.Rokt.RoktEventType
 import com.rokt.roktsdk.Rokt.SdkFrameworkType.ReactNative
+import com.rokt.roktsdk.RoktEvent
 import com.rokt.roktsdk.Widget
+import kotlinx.coroutines.launch
 import java.lang.ref.WeakReference
 
 /**
@@ -28,6 +35,7 @@ class RNRoktWidgetModule internal constructor(private val reactContext: ReactApp
         reactContext
     ) {
     private var roktEventHandler: RoktEventHandler? = null
+    private var fulfillmentAttributesCallback: FulfillmentAttributes? = null
     private var debug = false
 
     private val listeners: MutableMap<Long, Rokt.RoktCallback> = object : LinkedHashMap<Long, Rokt.RoktCallback>() {
@@ -64,6 +72,7 @@ class RNRoktWidgetModule internal constructor(private val reactContext: ReactApp
         }
 
         val uiManager = reactContext.getNativeModule(UIManagerModule::class.java)
+        startRoktEventListener(viewName)
         uiManager?.addUIBlock { nativeViewHierarchyManager ->
             Rokt.execute(
                 viewName,
@@ -82,6 +91,7 @@ class RNRoktWidgetModule internal constructor(private val reactContext: ReactApp
         }
 
         val uiManager = reactContext.getNativeModule(UIManagerModule::class.java)
+        startRoktEventListener(viewName)
         uiManager?.addUIBlock { nativeViewHierarchyManager ->
             Rokt.execute2Step(
                 viewName,
@@ -118,6 +128,12 @@ class RNRoktWidgetModule internal constructor(private val reactContext: ReactApp
             logDebug("Calling setFulfillmentAttributes")
         } else {
             logDebug("RoktEventHandler is null, make sure you run execute2Step before calling setFulfillmentAttributes")
+        }
+
+        if (fulfillmentAttributesCallback != null) {
+            val fulfillmentAttributes = readableMapToMapOfStrings(attributes)
+            fulfillmentAttributesCallback?.sendAttributes(fulfillmentAttributes)
+            logDebug("Calling setFulfillmentAttributes")
         }
     }
 
@@ -200,6 +216,65 @@ class RNRoktWidgetModule internal constructor(private val reactContext: ReactApp
                 .mapValues { WeakReference(it.value as Widget) })
         }
         return placeholderMap
+    }
+
+    private fun startRoktEventListener(viewName: String) {
+        (currentActivity as? LifecycleOwner)?.lifecycleScope?.launch {
+            (currentActivity as LifecycleOwner).repeatOnLifecycle(Lifecycle.State.CREATED) {
+                Rokt.events(viewName).collect { event ->
+                    val params = Arguments.createMap()
+                    var eventName: String = ""
+                    val placementId: String? = when (event) {
+                        is RoktEvent.FirstPositiveEngagement -> {
+                            eventName = "FirstPositiveEngagement"
+                            fulfillmentAttributesCallback = event.fulfillmentAttributes
+                            event.id
+                        }
+                        RoktEvent.HideLoadingIndicator -> {
+                            eventName = "HideLoadingIndicator"
+                            null
+                        }
+                        is RoktEvent.OfferEngagement -> {
+                            eventName = "OfferEngagement"
+                            event.id
+                        }
+                        is RoktEvent.PlacementClosed -> {
+                            eventName = "PlacementClosed"
+                            event.id
+                        }
+                        is RoktEvent.PlacementCompleted -> {
+                            eventName = "PlacementCompleted"
+                            event.id
+                        }
+                        is RoktEvent.PlacementFailure -> {
+                            eventName = "PlacementFailure"
+                            event.id
+                        }
+                        is RoktEvent.PlacementInteractive -> {
+                            eventName = "PlacementInteractive"
+                            event.id
+                        }
+                        is RoktEvent.PlacementReady -> {
+                            eventName = "PlacementReady"
+                            event.id
+                        }
+                        is RoktEvent.PositiveEngagement -> {
+                            eventName = "PositiveEngagement"
+                            event.id
+                        }
+                        RoktEvent.ShowLoadingIndicator -> {
+                            eventName = "ShowLoadingIndicator"
+                            null
+                        }
+                    }
+
+                    placementId?.let { params.putString("placementId", it) }
+                    params.putString("event", eventName)
+                    params.putString("viewName", viewName)
+                    sendEvent(reactContext, "RoktEvents", params)
+                }
+            }
+        }
     }
 }
 

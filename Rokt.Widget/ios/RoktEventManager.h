@@ -10,11 +10,14 @@
 
 #import <React/RCTBridgeModule.h>
 #import <React/RCTEventEmitter.h>
+#import <Rokt_Widget/Rokt_Widget-Swift.h>
 
 @interface RoktEventManager : RCTEventEmitter <RCTBridgeModule>
+@property (nonatomic) FirstPositiveEngagement * _Nullable firstPositiveEngagement;
 + (id)allocWithZone:(NSZone *)zone;
 - (void)onWidgetHeightChanges:(CGFloat)widgetHeight placement:(NSString*) selectedPlacement;
 - (void)onFirstPositiveResponse;
 - (void)onRoktCallbackReceived:(NSString*)eventValue;
+- (void)onRoktEvents:(RoktEvent *)event viewName:(NSString *)viewName;
 
 @end
