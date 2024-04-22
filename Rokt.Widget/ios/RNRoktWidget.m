@@ -187,5 +187,10 @@ RCT_EXPORT_METHOD(setEnvironmentToProd){
     [Rokt setEnvironmentWithEnvironment: RoktEnvironmentProd];
 }
 
+RCT_EXPORT_METHOD(setLoggingEnabled: (BOOL *)enabled)
+{
+    [Rokt setLoggingEnabledWithEnable:enabled];
+}
+
 @end
 
