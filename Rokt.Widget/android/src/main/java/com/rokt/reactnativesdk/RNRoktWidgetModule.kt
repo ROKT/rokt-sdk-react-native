@@ -1,5 +1,7 @@
 package com.rokt.reactnativesdk
 
+import android.app.Activity
+import android.os.Handler
 import android.util.Log
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
@@ -44,23 +46,15 @@ class RNRoktWidgetModule internal constructor(private val reactContext: ReactApp
 
     @ReactMethod
     fun initialize(roktTagId: String?, appVersion: String?) {
-        val currentActivity = currentActivity
-        if (currentActivity != null && appVersion != null && roktTagId != null) {
-            Rokt.setFrameworkType(ReactNative)
-            Rokt.init(roktTagId, appVersion, currentActivity)
-        } else {
-            logDebug("Activity, roktTagId and AppVersion cannot be null")
+        initRokt(roktTagId, appVersion) { activity ->
+            Rokt.init(requireNotNull(roktTagId), requireNotNull(appVersion), activity)
         }
     }
 
     @ReactMethod
     fun initializeWithFontFiles(roktTagId: String?, appVersion: String?, fontsMap: ReadableMap?) {
-        val currentActivity = currentActivity
-        if (currentActivity != null && appVersion != null && roktTagId != null) {
-            Rokt.setFrameworkType(ReactNative)
-            Rokt.init(roktTagId, appVersion, currentActivity, HashSet(), readableMapToMapOfStrings(fontsMap))
-        } else {
-            logDebug("Activity, roktTagId and AppVersion cannot be null")
+        initRokt(roktTagId, appVersion) { activity ->
+            Rokt.init(requireNotNull(roktTagId), requireNotNull(appVersion), activity, HashSet(), readableMapToMapOfStrings(fontsMap))
         }
     }
 
@@ -111,6 +105,23 @@ class RNRoktWidgetModule internal constructor(private val reactContext: ReactApp
         }
     }
 
+    private fun initRokt(roktTagId: String?, appVersion: String?, init: (activity: Activity) -> Unit) {
+        if (roktTagId == null || appVersion == null) {
+            logDebug("roktTagId and appVersion cannot be null")
+            return
+        }
+        Rokt.setFrameworkType(ReactNative)
+        if (currentActivity == null) {
+            // When the init was called from ReactComponent init and the activity is not fully resumed,
+            // the currentActivity could be null.
+            // Add a delay in this scenario and call the init
+            Handler(reactContext.mainLooper).postDelayed({
+                currentActivity?.let(init) ?: logDebug("Failed to initialize Rokt. Activity is null!!")
+            }, 500)
+        } else {
+            currentActivity?.let(init)
+        }
+    }
 
     private fun sendEvent(
         reactContext: ReactContext?,
