@@ -104,6 +104,7 @@ steps:
           download: "Rokt.Widget/*.tgz"
     agents:
       queue: ${MAC_BK_AGENT}
+      "aws:instance-id": i-0daacd0bb27950615
     timeout_in_minutes: 45
 
   - block: ":whale: Publish Alpha Version to npm"
