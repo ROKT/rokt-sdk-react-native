@@ -46,14 +46,14 @@ class RNRoktWidgetModule internal constructor(private val reactContext: ReactApp
 
     @ReactMethod
     fun initialize(roktTagId: String?, appVersion: String?) {
-        initRokt(roktTagId, appVersion) { activity ->
+        initRokt(roktTagId, appVersion, 4) { activity ->
             Rokt.init(requireNotNull(roktTagId), requireNotNull(appVersion), activity)
         }
     }
 
     @ReactMethod
     fun initializeWithFontFiles(roktTagId: String?, appVersion: String?, fontsMap: ReadableMap?) {
-        initRokt(roktTagId, appVersion) { activity ->
+        initRokt(roktTagId, appVersion, 4) { activity ->
             Rokt.init(requireNotNull(roktTagId), requireNotNull(appVersion), activity, HashSet(), readableMapToMapOfStrings(fontsMap))
         }
     }
@@ -105,7 +105,7 @@ class RNRoktWidgetModule internal constructor(private val reactContext: ReactApp
         }
     }
 
-    private fun initRokt(roktTagId: String?, appVersion: String?, init: (activity: Activity) -> Unit) {
+    private fun initRokt(roktTagId: String?, appVersion: String?, retryCount: Int, init: (activity: Activity) -> Unit) {
         if (roktTagId == null || appVersion == null) {
             logDebug("roktTagId and appVersion cannot be null")
             return
@@ -114,10 +114,17 @@ class RNRoktWidgetModule internal constructor(private val reactContext: ReactApp
         if (currentActivity == null) {
             // When the init was called from ReactComponent init and the activity is not fully resumed,
             // the currentActivity could be null.
-            // Add a delay in this scenario and call the init
+            // Add a delay in this scenario and call the init.
+            // Recursive call initRokt to retry until retryCount becomes 0
             Handler(reactContext.mainLooper).postDelayed({
-                currentActivity?.let(init) ?: logDebug("Failed to initialize Rokt. Activity is null!!")
-            }, 500)
+                currentActivity?.let(init) ?: run {
+                    if (retryCount == 0) {
+                        logDebug("Failed to initialize Rokt. Activity is null!!")
+                    } else {
+                        initRokt(roktTagId, appVersion, retryCount - 1, init)
+                    }
+                }
+            }, 100)
         } else {
             currentActivity?.let(init)
         }
