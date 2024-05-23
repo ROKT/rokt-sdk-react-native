@@ -45,7 +45,6 @@ steps:
       - npm install
       - mkdir android/app/src/main/assets/ && npx react-native bundle --platform android --dev false --entry-file index.js --bundle-output android/app/src/main/assets/index.android.bundle
       - cd android
-      - gem install fastlane
       - bundle install
       - bundle exec fastlane deviceFarmUITest
     plugins:
@@ -122,7 +121,6 @@ steps:
       - cd - && cd RoktSampleApp
       - npm install
       - cd android
-      - gem install fastlane
       - bundle install
       - bundle exec fastlane automatedPublish dist_tag:$(../../.buildkite/bin/extract_dist_tag.sh $(buildkite-agent meta-data get VERSION))
     plugins:
