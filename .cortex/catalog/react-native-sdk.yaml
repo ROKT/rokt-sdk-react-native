@@ -1,0 +1,35 @@
+#checkov:skip=CKV_OPENAPI_4:Not required to have auth schema defs
+openapi: 3.0.0
+info:
+  title: Rokt React Native SDK
+  x-cortex-tag: react-native-sdk
+  x-cortex-type: service
+  description: |
+    React Native SDK and example app.
+  x-cortex-git:
+    github:
+      repository: ROKT/rokt-sdk-react-native
+
+  x-cortex-owners:
+    - type: group
+      name: mobile-integrations
+      provider: CORTEX
+  x-cortex-groups:
+    - lang-javascript
+    - lang-kotlin
+    - lang-objectivec
+
+  x-cortex-oncall:
+    opsgenie:
+      type: SCHEDULE
+      id: Mobile Integrations_schedule
+
+  x-cortex-ci-cd:
+    buildkite:
+      pipelines:
+        - slug: react-native-sdk
+
+  x-cortex-link:
+    - name: Mobile SDK Detailed Error View
+      type: dashboard
+      url: https://rokt.datadoghq.com/dashboard/nsi-c8c-gtd
