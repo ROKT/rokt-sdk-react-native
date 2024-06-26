@@ -15,7 +15,7 @@ export abstract class Rokt {
 
     public static execute(viewName: string, attributes: Record<string, string>, placeholders: Record<string, number | null>, roktConfig?: IRoktConfig): void {
         if (roktConfig) {
-            ; // TODO implement
+            return // TODO implement
         } else {
             RNRoktWidget.execute(viewName, attributes, placeholders);
         }
@@ -23,7 +23,7 @@ export abstract class Rokt {
 
     public static execute2Step(viewName: string, attributes: Record<string, string>, placeholders: Record<string, number | null>, roktConfig?: IRoktConfig): void {
         if (roktConfig) {
-            ; // TODO implement
+            return // TODO implement
         } else {
             RNRoktWidget.execute2Step(viewName, attributes, placeholders);
         }
