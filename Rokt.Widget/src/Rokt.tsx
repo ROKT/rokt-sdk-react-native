@@ -13,12 +13,20 @@ export abstract class Rokt {
         }
     }
 
-    public static execute(viewName: string, attributes: Record<string, string>, placeholders: Record<string, number | null>, roktConfig?: RoktConfig): void {
-        RNRoktWidget.execute(viewName, attributes, placeholders, roktConfig);
+    public static execute(viewName: string, attributes: Record<string, string>, placeholders: Record<string, number | null>, roktConfig?: IRoktConfig): void {
+        if (roktConfig) {
+            ; // TODO implement
+        } else {
+            RNRoktWidget.execute(viewName, attributes, placeholders);
+        }
     }
 
-    public static execute2Step(viewName: string, attributes: Record<string, string>, placeholders: Record<string, number | null>, roktConfig?: RoktConfig): void {
-        RNRoktWidget.execute2Step(viewName, attributes, placeholders, roktConfig);
+    public static execute2Step(viewName: string, attributes: Record<string, string>, placeholders: Record<string, number | null>, roktConfig?: IRoktConfig): void {
+        if (roktConfig) {
+            ; // TODO implement
+        } else {
+            RNRoktWidget.execute2Step(viewName, attributes, placeholders);
+        }
     }
 
     public static setFulfillmentAttributes(attributes: Record<string, string>): void {
@@ -50,8 +58,8 @@ interface RNRoktWidget {
     initialize(roktTagId: string, appVersion: string): void;
     initializeWithFonts(roktTagId: string, appVersion: string, fontPostScriptNames?: string[]): void;
     initializeWithFontFiles(roktTagId: string, appVersion: string, fontsMap?: Record<string, string>): void;
-    execute(viewName: string, attributes: Record<string, string>, placeholders: Record<string, number | null>, roktConfig?: RoktConfig): void;
-    execute2Step(viewName: string, attributes: Record<string, string>, placeholders: Record<string, number | null>, roktConfig?: RoktConfig): void;
+    execute(viewName: string, attributes: Record<string, string>, placeholders: Record<string, number | null>, roktConfig?: IRoktConfig): void;
+    execute2Step(viewName: string, attributes: Record<string, string>, placeholders: Record<string, number | null>, roktConfig?: IRoktConfig): void;
     setFulfillmentAttributes(attributes: Record<string, string>): void;
     setEnvironmentToStage(): void;
     setEnvironmentToProd(): void;
