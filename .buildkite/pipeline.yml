@@ -120,7 +120,6 @@ steps:
       - cd - && cd RoktSampleApp
       - npm install
       - cd android
-      - gem install fastlane
       - bundle install
       - bundle exec fastlane publishAlphaSDK
     plugins:
@@ -156,7 +155,6 @@ steps:
       - cd - && cd RoktSampleApp
       - npm install
       - cd android
-      - gem install fastlane
       - bundle install
       - bundle exec fastlane publishSDK
     plugins:
