@@ -13,12 +13,12 @@ export abstract class Rokt {
         }
     }
 
-    public static execute(viewName: string, attributes: Record<string, string>, placeholders: Record<string, number | null>): void {
-        RNRoktWidget.execute(viewName, attributes, placeholders);
+    public static execute(viewName: string, attributes: Record<string, string>, placeholders: Record<string, number | null>, roktConfig?: RoktConfig): void {
+        RNRoktWidget.execute(viewName, attributes, placeholders, roktConfig);
     }
 
-    public static execute2Step(viewName: string, attributes: Record<string, string>, placeholders: Record<string, number | null>): void {
-        RNRoktWidget.execute2Step(viewName, attributes, placeholders);
+    public static execute2Step(viewName: string, attributes: Record<string, string>, placeholders: Record<string, number | null>, roktConfig?: RoktConfig): void {
+        RNRoktWidget.execute2Step(viewName, attributes, placeholders, roktConfig);
     }
 
     public static setFulfillmentAttributes(attributes: Record<string, string>): void {
@@ -50,10 +50,38 @@ interface RNRoktWidget {
     initialize(roktTagId: string, appVersion: string): void;
     initializeWithFonts(roktTagId: string, appVersion: string, fontPostScriptNames?: string[]): void;
     initializeWithFontFiles(roktTagId: string, appVersion: string, fontsMap?: Record<string, string>): void;
-    execute(viewName: string, attributes: Record<string, string>, placeholders: Record<string, number | null>): void;
-    execute2Step(viewName: string, attributes: Record<string, string>, placeholders: Record<string, number | null>): void;
+    execute(viewName: string, attributes: Record<string, string>, placeholders: Record<string, number | null>, roktConfig?: RoktConfig): void;
+    execute2Step(viewName: string, attributes: Record<string, string>, placeholders: Record<string, number | null>, roktConfig?: RoktConfig): void;
     setFulfillmentAttributes(attributes: Record<string, string>): void;
     setEnvironmentToStage(): void;
     setEnvironmentToProd(): void;
     setLoggingEnabled(enabled: boolean): void;
+}
+
+export interface IRoktConfig {
+    readonly colorMode?: ColorMode;
+}
+
+class RoktConfig implements IRoktConfig {
+    constructor(roktConfig: RoktConfig) {
+        Object.assign(this, roktConfig);
+    }
+}
+
+export class RoktConfigBuilder implements Partial<IRoktConfig> {
+    readonly colorMode?: ColorMode;
+
+    public withColorMode(value: ColorMode): this & Pick<IRoktConfig, 'colorMode'> {
+        return Object.assign(this, {colorMode: value})
+    }
+
+    public build(this: IRoktConfig) {
+        return new RoktConfig(this);
+    }
+}
+
+export enum ColorMode {
+    LIGHT = "LIGHT",
+    DARK = "DARK",
+    SYSTEM = "SYSTEM"
 }
