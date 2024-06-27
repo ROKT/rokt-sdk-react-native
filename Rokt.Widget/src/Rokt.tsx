@@ -89,7 +89,7 @@ export class RoktConfigBuilder implements Partial<IRoktConfig> {
 }
 
 export enum ColorMode {
-    LIGHT = "LIGHT",
-    DARK = "DARK",
-    SYSTEM = "SYSTEM"
+    Light = "LIGHT",
+    Dark = "DARK",
+    System = "SYSTEM"
 }
