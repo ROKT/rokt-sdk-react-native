@@ -5,5 +5,5 @@ import { Rokt, IRoktConfig, RoktConfigBuilder, ColorMode } from './Rokt'
 
 const { RoktEventManager } = NativeModules;
 
-export {RoktEmbeddedView, Rokt, RoktEventManager, RoktConfigBuilder, ColorMode};
-export type {IRoktConfig};
+export {RoktEmbeddedView, Rokt, RoktEventManager, RoktConfigBuilder};
+export type {IRoktConfig, ColorMode};
