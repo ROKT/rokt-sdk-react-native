@@ -23,7 +23,7 @@ export abstract class Rokt {
 
     public static execute2Step(viewName: string, attributes: Record<string, string>, placeholders: Record<string, number | null>, roktConfig?: IRoktConfig): void {
         if (roktConfig) {
-            RNRoktWidget.executeWithConfig(viewName, attributes, placeholders, roktConfig)
+            RNRoktWidget.execute2StepWithConfig(viewName, attributes, placeholders, roktConfig)
         } else {
             RNRoktWidget.execute2Step(viewName, attributes, placeholders);
         }
