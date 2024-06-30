@@ -274,9 +274,6 @@ class RNRoktWidgetModule internal constructor(private val reactContext: ReactApp
     ) : RoktConfig {
         val builder = RoktConfig.Builder()
         val configMap: Map<String, String> = readableMapToMapOfStrings(roktConfig)
-        if (configMap.isEmpty()) {
-            return builder.build()
-        }
         configMap["colorMode"]?.let {
             builder.colorMode(it.toColorMode())
         }
