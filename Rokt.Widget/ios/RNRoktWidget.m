@@ -95,6 +95,59 @@ RCT_EXPORT_METHOD(execute:(NSString *)viewName
     }];
 }
 
+RCT_EXPORT_METHOD(executeWithConfig:(NSString *)viewName
+                  attributes:(NSDictionary *)attributes
+                  placeholders:(NSDictionary *)placeholders
+                  roktConfig:(NSDictionary *)roktConfig
+                  )
+{
+    if (viewName == nil) {
+        RCTLog(@"Execute failed. ViewName cannot be null");
+        return;
+    }
+    NSMutableDictionary *finalAttributes = [self convertAttributesToDictionary:attributes];
+    
+    NSMutableDictionary *nativePlaceholders = [[NSMutableDictionary alloc]initWithCapacity:placeholders.count];
+
+    NSMutableDictionary *configMap = [self convertAttributesToDictionary:roktConfig];
+
+    RoktConfig *config = [self buildRoktConfig:configMap];
+
+    [self.bridge.uiManager addUIBlock:^(RCTUIManager *uiManager, NSDictionary<NSNumber *,UIView *> *viewRegistry) {
+        for(id key in placeholders){
+            RoktEmbeddedView *view = viewRegistry[[placeholders objectForKey:key]];
+            if (!view || ![view isKindOfClass:[RoktEmbeddedView class]]) {
+                RCTLogError(@"Cannot find RoktEmbeddedView with tag #%@", key);
+                return;
+            }
+            
+            nativePlaceholders[key] = view;
+        }
+        
+        self.eventManager = [RoktEventManager allocWithZone: nil];
+        [Rokt eventsWithViewName:viewName onEvent:^(RoktEvent * roktEvent) {
+            [self.eventManager onRoktEvents:roktEvent viewName:viewName];
+        }];
+
+        [Rokt executeWithViewName:viewName attributes:finalAttributes
+                       placements:nativePlaceholders
+                       config:config
+                           onLoad:^{ [self.eventManager onRoktCallbackReceived:@"onLoad"];}
+                         onUnLoad:^{
+	    [self.eventManager onRoktCallbackReceived:@"onUnLoad"];
+            RCTLogInfo(@"unloaded");
+        }
+     onShouldShowLoadingIndicator:^{ [self.eventManager onRoktCallbackReceived:@"onShouldShowLoadingIndicator"];}
+     onShouldHideLoadingIndicator:^{ [self.eventManager onRoktCallbackReceived:@"onShouldHideLoadingIndicator"];}
+             onEmbeddedSizeChange:^(NSString *selectedPlacement, CGFloat widgetHeight){
+            
+            [self.eventManager onWidgetHeightChanges:widgetHeight placement:selectedPlacement];
+            
+        }];
+        
+    }];
+}
+
 RCT_EXPORT_METHOD(execute2Step:(NSString *)viewName
                   attributes:(NSDictionary *)attributes
                   placeholders:(NSDictionary *)placeholders
@@ -151,6 +204,68 @@ RCT_EXPORT_METHOD(execute2Step:(NSString *)viewName
     
 }
 
+RCT_EXPORT_METHOD(execute2StepWithConfig:(NSString *)viewName
+                  attributes:(NSDictionary *)attributes
+                  placeholders:(NSDictionary *)placeholders
+                  roktConfig:(NSDictionary *)roktConfig
+                  )
+{
+    if (viewName == nil) {
+        RCTLog(@"Execute failed. ViewName cannot be null");
+        return;
+    }
+    NSMutableDictionary *finalAttributes = [self convertAttributesToDictionary:attributes];
+    
+    NSMutableDictionary *nativePlaceholders = [[NSMutableDictionary alloc]initWithCapacity:placeholders.count];
+
+     NSMutableDictionary *configMap = [self convertAttributesToDictionary:roktConfig];
+
+    RoktConfig *config = [self buildRoktConfig:configMap];
+    
+    [self.bridge.uiManager addUIBlock:^(RCTUIManager *uiManager, NSDictionary<NSNumber *,UIView *> *viewRegistry) {
+        for(id key in placeholders){
+            RoktEmbeddedView *view = viewRegistry[[placeholders objectForKey:key]];
+            if (!view || ![view isKindOfClass:[RoktEmbeddedView class]]) {
+                RCTLogError(@"Cannot find RoktEmbeddedView with tag #%@", key);
+                return;
+            }
+            
+            nativePlaceholders[key] = view;
+        }
+        
+        self.eventManager = [RoktEventManager allocWithZone: nil];
+
+        [Rokt eventsWithViewName:viewName onEvent:^(RoktEvent * roktEvent) {
+            [self.eventManager onRoktEvents:roktEvent viewName:viewName];
+        }];
+        
+        [Rokt execute2stepWithViewName:viewName attributes:finalAttributes
+                            placements:nativePlaceholders
+                            config:config
+                                onLoad:^{ [self.eventManager onRoktCallbackReceived:@"onLoad"];}
+                              onUnLoad:^{
+	    [self.eventManager onRoktCallbackReceived:@"onUnLoad"];
+            RCTLogInfo(@"unloaded");
+        }
+          onShouldShowLoadingIndicator:^{ [self.eventManager onRoktCallbackReceived:@"onShouldShowLoadingIndicator"];}
+     onShouldHideLoadingIndicator:^{ [self.eventManager onRoktCallbackReceived:@"onShouldHideLoadingIndicator"];}
+                  onEmbeddedSizeChange:^(NSString *selectedPlacement, CGFloat widgetHeight){
+            
+            [self.eventManager onWidgetHeightChanges:widgetHeight placement:selectedPlacement];
+            
+        }
+                               onEvent:^(RoktEventType roktEventType, RoktEventHandler* roktEventHandler){
+            self.roktEventHandler = roktEventHandler;
+            if (roktEventType == RoktEventTypeFirstPositiveEngagement) {
+                RCTLogInfo(@"firstPositiveEvent was fired");
+                [self.eventManager onFirstPositiveResponse];
+            }
+        }];
+        
+    }];
+    
+}
+
 RCT_EXPORT_METHOD(setFulfillmentAttributes:(NSDictionary *)attributes) {
     if (self.roktEventHandler != nil) {
         RCTLogInfo(@"calling setFulfillmentAttributesWithAttributes");
@@ -178,6 +293,31 @@ RCT_EXPORT_METHOD(setFulfillmentAttributes:(NSDictionary *)attributes) {
     [finalAttributes removeObjectsForKeys:[keys allObjects]];
     return finalAttributes;
     
+}
+
+- (ColorMode)stringToColorMode:(NSString*)colorString
+{
+    if ([colorString isEqualToString:@"Light"]) {
+        return ColorModeLight;
+    }
+    else if ([colorString isEqualToString:@"Dark"]) {
+        return ColorModeDark;
+    }
+    else {
+        return ColorModeSystem;
+    }
+}
+
+- (RoktConfig*)buildRoktConfig:(NSDictionary*)config
+{
+    Builder *builder = [[Builder alloc] init];
+    NSString *colorMode = config[@"colorMode"];
+    
+    if (colorMode != nil) {
+        ColorMode value = [self stringToColorMode:colorMode];
+        [builder colorMode:value];
+    }
+    return [builder build];
 }
 
 RCT_EXPORT_METHOD(setEnvironmentToStage) {
