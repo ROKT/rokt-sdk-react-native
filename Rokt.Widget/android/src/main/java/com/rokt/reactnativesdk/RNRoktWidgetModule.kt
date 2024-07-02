@@ -13,6 +13,7 @@ import com.facebook.react.uimanager.NativeViewHierarchyManager
 import com.facebook.react.uimanager.UIManagerModule
 import com.rokt.roktsdk.FulfillmentAttributes
 import com.rokt.roktsdk.Rokt
+import com.rokt.roktsdk.RoktConfig
 import com.rokt.roktsdk.Rokt.Environment.Prod
 import com.rokt.roktsdk.Rokt.RoktEventHandler
 import com.rokt.roktsdk.Rokt.RoktEventType
@@ -60,6 +61,15 @@ class RNRoktWidgetModule internal constructor(private val reactContext: ReactApp
 
     @ReactMethod
     fun execute(viewName: String?, attributes: ReadableMap?, placeholders: ReadableMap?) {
+        executeInternal(viewName, attributes, placeholders)
+    }
+
+    @ReactMethod
+    fun executeWithConfig(viewName: String?, attributes: ReadableMap?, placeholders: ReadableMap?, roktConfig: ReadableMap?) {
+        executeInternal(viewName, attributes, placeholders, roktConfig)
+    }
+
+    private fun executeInternal(viewName: String?, attributes: ReadableMap?, placeholders: ReadableMap?, roktConfig: ReadableMap? = null) {
         if (viewName == null) {
             logDebug("Execute failed. ViewName cannot be null")
             return
@@ -67,18 +77,30 @@ class RNRoktWidgetModule internal constructor(private val reactContext: ReactApp
 
         val uiManager = reactContext.getNativeModule(UIManagerModule::class.java)
         startRoktEventListener(viewName)
+
+        val config = roktConfig?.let { buildRoktConfig(it) }
         uiManager?.addUIBlock { nativeViewHierarchyManager ->
             Rokt.execute(
-                viewName,
-                readableMapToMapOfStrings(attributes),
-                createRoktCallback(),
-                safeUnwrapPlaceholders(placeholders, nativeViewHierarchyManager)
+                viewName = viewName,
+                attributes = readableMapToMapOfStrings(attributes),
+                callback = createRoktCallback(),
+                placeholders = safeUnwrapPlaceholders(placeholders, nativeViewHierarchyManager),
+                config = config
             )
         }
     }
 
     @ReactMethod
     fun execute2Step(viewName: String?, attributes: ReadableMap?, placeholders: ReadableMap?) {
+        execute2StepInternal(viewName, attributes, placeholders)
+    }
+
+    @ReactMethod
+    fun execute2StepWithConfig(viewName: String?, attributes: ReadableMap?, placeholders: ReadableMap?, roktConfig: ReadableMap?) {
+        execute2StepInternal(viewName, attributes, placeholders, roktConfig)
+    }
+
+    private fun execute2StepInternal(viewName: String?, attributes: ReadableMap?, placeholders: ReadableMap?, roktConfig: ReadableMap? = null) {
         if (viewName == null) {
             logDebug("Execute failed. ViewName cannot be null")
             return
@@ -86,13 +108,14 @@ class RNRoktWidgetModule internal constructor(private val reactContext: ReactApp
 
         val uiManager = reactContext.getNativeModule(UIManagerModule::class.java)
         startRoktEventListener(viewName)
+        val config = roktConfig?.let { buildRoktConfig(it) }
         uiManager?.addUIBlock { nativeViewHierarchyManager ->
             Rokt.execute2Step(
-                viewName,
-                readableMapToMapOfStrings(attributes),
-                createRoktCallback(),
-                safeUnwrapPlaceholders(placeholders, nativeViewHierarchyManager),
-                object : Rokt.RoktEventCallback {
+                viewName = viewName,
+                attributes = readableMapToMapOfStrings(attributes),
+                callback = createRoktCallback(),
+                placeholders = safeUnwrapPlaceholders(placeholders, nativeViewHierarchyManager),
+                roktEventCallback = object : Rokt.RoktEventCallback {
                     override fun onEvent(eventType: RoktEventType, roktEventHandler: RoktEventHandler) {
                         setRoktEventHandler(roktEventHandler)
                         if (eventType == RoktEventType.FirstPositiveEngagement) {
@@ -100,7 +123,8 @@ class RNRoktWidgetModule internal constructor(private val reactContext: ReactApp
                             sendEvent(reactContext, "FirstPositiveResponse", null)
                         }
                     }
-                }
+                },
+                config = config
             )
         }
     }
@@ -235,6 +259,26 @@ class RNRoktWidgetModule internal constructor(private val reactContext: ReactApp
                 .mapValues { WeakReference(it.value as Widget) })
         }
         return placeholderMap
+    }
+
+    private fun String.toColorMode(): RoktConfig.ColorMode {
+        return when (this) {
+            "Dark" -> RoktConfig.ColorMode.DARK
+            "Light" -> RoktConfig.ColorMode.LIGHT
+            else -> RoktConfig.ColorMode.SYSTEM
+        }
+    }
+
+    private fun buildRoktConfig(
+        roktConfig: ReadableMap?
+    ) : RoktConfig {
+        val builder = RoktConfig.Builder()
+        val configMap: Map<String, String> = readableMapToMapOfStrings(roktConfig)
+        configMap["colorMode"]?.let {
+            builder.colorMode(it.toColorMode())
+        }
+
+        return builder.build()
     }
 
     private fun startRoktEventListener(viewName: String) {
