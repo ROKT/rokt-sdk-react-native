@@ -57,7 +57,7 @@ RCT_EXPORT_METHOD(execute:(NSString *)viewName
         RCTLog(@"Execute failed. ViewName cannot be null");
         return;
     }
-    NSMutableDictionary *finalAttributes = [self convertAttributesToDictionary:attributes];
+    NSMutableDictionary *finalAttributes = [self convertToMutableDictionaryOfStrings:attributes];
     
     NSMutableDictionary *nativePlaceholders = [[NSMutableDictionary alloc]initWithCapacity:placeholders.count];
     
@@ -105,11 +105,11 @@ RCT_EXPORT_METHOD(executeWithConfig:(NSString *)viewName
         RCTLog(@"Execute failed. ViewName cannot be null");
         return;
     }
-    NSMutableDictionary *finalAttributes = [self convertAttributesToDictionary:attributes];
+    NSMutableDictionary *finalAttributes = [self convertToMutableDictionaryOfStrings:attributes];
     
     NSMutableDictionary *nativePlaceholders = [[NSMutableDictionary alloc]initWithCapacity:placeholders.count];
 
-    NSMutableDictionary *configMap = [self convertAttributesToDictionary:roktConfig];
+    NSMutableDictionary *configMap = [self convertToMutableDictionaryOfStrings:roktConfig];
 
     RoktConfig *config = [self buildRoktConfig:configMap];
 
@@ -157,7 +157,7 @@ RCT_EXPORT_METHOD(execute2Step:(NSString *)viewName
         RCTLog(@"Execute failed. ViewName cannot be null");
         return;
     }
-    NSMutableDictionary *finalAttributes = [self convertAttributesToDictionary:attributes];
+    NSMutableDictionary *finalAttributes = [self convertToMutableDictionaryOfStrings:attributes];
     
     NSMutableDictionary *nativePlaceholders = [[NSMutableDictionary alloc]initWithCapacity:placeholders.count];
     
@@ -214,11 +214,11 @@ RCT_EXPORT_METHOD(execute2StepWithConfig:(NSString *)viewName
         RCTLog(@"Execute failed. ViewName cannot be null");
         return;
     }
-    NSMutableDictionary *finalAttributes = [self convertAttributesToDictionary:attributes];
+    NSMutableDictionary *finalAttributes = [self convertToMutableDictionaryOfStrings:attributes];
     
     NSMutableDictionary *nativePlaceholders = [[NSMutableDictionary alloc]initWithCapacity:placeholders.count];
 
-     NSMutableDictionary *configMap = [self convertAttributesToDictionary:roktConfig];
+     NSMutableDictionary *configMap = [self convertToMutableDictionaryOfStrings:roktConfig];
 
     RoktConfig *config = [self buildRoktConfig:configMap];
     
@@ -280,7 +280,7 @@ RCT_EXPORT_METHOD(setFulfillmentAttributes:(NSDictionary *)attributes) {
     }
 }
 
-- (NSMutableDictionary*)convertAttributesToDictionary:(NSDictionary*)attributes
+- (NSMutableDictionary*)convertToMutableDictionaryOfStrings:(NSDictionary*)attributes
 {
     NSMutableDictionary *finalAttributes = [attributes mutableCopy];
     NSArray *keysForNullValues = [finalAttributes allKeysForObject:[NSNull null]];
