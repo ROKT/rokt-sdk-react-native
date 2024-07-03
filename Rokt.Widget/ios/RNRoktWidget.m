@@ -297,10 +297,10 @@ RCT_EXPORT_METHOD(setFulfillmentAttributes:(NSDictionary *)attributes) {
 
 - (ColorMode)stringToColorMode:(NSString*)colorString
 {
-    if ([colorString isEqualToString:@"Light"]) {
+    if ([colorString isEqualToString:@"light"]) {
         return ColorModeLight;
     }
-    else if ([colorString isEqualToString:@"Dark"]) {
+    else if ([colorString isEqualToString:@"dark"]) {
         return ColorModeDark;
     }
     else {

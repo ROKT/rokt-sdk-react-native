@@ -263,8 +263,8 @@ class RNRoktWidgetModule internal constructor(private val reactContext: ReactApp
 
     private fun String.toColorMode(): RoktConfig.ColorMode {
         return when (this) {
-            "Dark" -> RoktConfig.ColorMode.DARK
-            "Light" -> RoktConfig.ColorMode.LIGHT
+            "dark" -> RoktConfig.ColorMode.DARK
+            "light" -> RoktConfig.ColorMode.LIGHT
             else -> RoktConfig.ColorMode.SYSTEM
         }
     }
