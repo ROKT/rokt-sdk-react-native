@@ -1,37 +1,45 @@
 import { ConfigPlugin, withProjectBuildGradle, withMainApplication } from '@expo/config-plugins';
+import { addImports } from "@expo/config-plugins/build/android/codeMod";
 
 const IMPORT_STATEMENT = 'com.rokt.reactnativesdk.RoktEmbeddedViewPackage';
 const ADD_PACKAGE = 'packages.add(new RoktEmbeddedViewPackage());'
 const GRADLE_MAVEN =
   'allprojects { repositories { maven { url "https://apps.rokt.com/msdk" } } }';
 
-
-function addJavaImports(javaSource: string, javaImports: string[]): string {
-    const lines = javaSource.split('\n');
-    const lineIndexWithPackageDeclaration = lines.findIndex((line) => line.match(/^package .*;$/));
-    for (const javaImport of javaImports) {
-      if (!javaSource.includes(javaImport)) {
-        const importStatement = `import ${javaImport};`;
-        lines.splice(lineIndexWithPackageDeclaration + 1, 0, importStatement);
-      }
-    }
-    return lines.join('\n');
-}
-
-function addGetPackage(javaSource: string, javaInsert: string): string {
+function addRoktJavaPackage(javaSource: string, javaInsert: string): string {
     const lines = javaSource.split('\n');
     const getPackageIndex = lines.findIndex((line) => line.match(/return packages;/));
     lines.splice(getPackageIndex, 0, javaInsert);
     return lines.join('\n');
 }
 
-const withRoktMainApplication: ConfigPlugin = (config) => {
-    return withMainApplication(config, (config) => {
-        if (config.modResults.language === 'java') {
-            let content = config.modResults.contents;
-            content = addJavaImports(content, [IMPORT_STATEMENT]);
-            content = addGetPackage(content, ADD_PACKAGE);
-            config.modResults.contents = content;
+function addRoktKotlinPackage(kotlinSource: string): string {
+    return kotlinSource.replace(
+        'return PackageList(this).packages',
+        'return PackageList(this).packages.apply { add(RoktEmbeddedViewPackage()) }'
+    );
+}
+
+const withRoktMainApplication: ConfigPlugin = (configuration) => {
+    return withMainApplication(configuration, (config) => {
+        if (['java', 'kt'].includes(config.modResults.language)) {
+            const isJava = config.modResults.language === 'java';
+            try {
+                config.modResults.contents = addImports(
+                    config.modResults.contents,
+                    [IMPORT_STATEMENT],
+                    isJava,
+                );
+                if (isJava) {
+                    config.modResults.contents = addRoktJavaPackage(config.modResults.contents, ADD_PACKAGE);
+                } else {
+                    config.modResults.contents = addRoktKotlinPackage(config.modResults.contents);
+                }
+            } catch (e) {
+                throw new Error(
+                    "Cannot add RoktSDK to the project's MainApplication.",
+                );
+            }
         }
         return config
     });
@@ -40,7 +48,7 @@ const withRoktMainApplication: ConfigPlugin = (config) => {
 const withRoktProjectBuildGradle: ConfigPlugin = (config) => {
     return withProjectBuildGradle(config, (config) => {
         let content = config.modResults.contents;
-        if (!content.includes('rokt-eng-us')) {
+        if (!content.includes('rokt-eng-us') && !content.includes('apps.rokt.com')) {
             content = `${content} \n ${GRADLE_MAVEN}`
         }
         config.modResults.contents = content;
