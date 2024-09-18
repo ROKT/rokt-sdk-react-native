@@ -36,6 +36,7 @@ RCT_EXPORT_METHOD(initialize:(NSString *)roktTagId appVersion: (NSString * _Null
         RCTLog(@"roktTagId cannot be null");
         return;
     }
+    [self subscribeGlobalEvents];
     [Rokt initWithRoktTagId:roktTagId];
 }
 
@@ -45,6 +46,7 @@ RCT_EXPORT_METHOD(initializeWithFonts:(NSString *)roktTagId appVersion: (NSStrin
         RCTLog(@"roktTagId cannot be null");
         return;
     }
+    [self subscribeGlobalEvents];
     [Rokt initWithRoktTagId:roktTagId];
 }
 
@@ -71,11 +73,8 @@ RCT_EXPORT_METHOD(execute:(NSString *)viewName
             
             nativePlaceholders[key] = view;
         }
-        
-        self.eventManager = [RoktEventManager allocWithZone: nil];
-        [Rokt eventsWithViewName:viewName onEvent:^(RoktEvent * roktEvent) {
-            [self.eventManager onRoktEvents:roktEvent viewName:viewName];
-        }];
+
+        [self subscribeViewEvents:viewName];
 
         [Rokt executeWithViewName:viewName attributes:finalAttributes
                        placements:nativePlaceholders
@@ -124,10 +123,7 @@ RCT_EXPORT_METHOD(executeWithConfig:(NSString *)viewName
             nativePlaceholders[key] = view;
         }
         
-        self.eventManager = [RoktEventManager allocWithZone: nil];
-        [Rokt eventsWithViewName:viewName onEvent:^(RoktEvent * roktEvent) {
-            [self.eventManager onRoktEvents:roktEvent viewName:viewName];
-        }];
+        [self subscribeViewEvents:viewName];
 
         [Rokt executeWithViewName:viewName attributes:finalAttributes
                        placements:nativePlaceholders
@@ -172,11 +168,7 @@ RCT_EXPORT_METHOD(execute2Step:(NSString *)viewName
             nativePlaceholders[key] = view;
         }
         
-        self.eventManager = [RoktEventManager allocWithZone: nil];
-
-        [Rokt eventsWithViewName:viewName onEvent:^(RoktEvent * roktEvent) {
-            [self.eventManager onRoktEvents:roktEvent viewName:viewName];
-        }];
+        [self subscribeViewEvents:viewName];
         
         [Rokt execute2stepWithViewName:viewName attributes:finalAttributes
                             placements:nativePlaceholders
@@ -318,6 +310,24 @@ RCT_EXPORT_METHOD(setFulfillmentAttributes:(NSDictionary *)attributes) {
         [builder colorMode:value];
     }
     return [builder build];
+}
+
+- (void)subscribeGlobalEvents
+{
+    self.eventManager = [RoktEventManager allocWithZone: nil];
+    [Rokt globalEventsOnEvent:^(RoktEvent * _Nonnull roktEvent) {
+        [self.eventManager onRoktEvents:roktEvent viewName:nil];
+    }];
+}
+
+- (void)subscribeViewEvents:(NSString* _Nonnull) viewName
+{
+    if (self.eventManager == nil) {
+        self.eventManager = [RoktEventManager allocWithZone: nil];
+    }
+    [Rokt eventsWithViewName:viewName onEvent:^(RoktEvent * _Nonnull roktEvent) {
+        [self.eventManager onRoktEvents:roktEvent viewName:viewName];
+    }];
 }
 
 RCT_EXPORT_METHOD(setEnvironmentToStage) {
