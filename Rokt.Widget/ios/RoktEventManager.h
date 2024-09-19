@@ -18,6 +18,6 @@
 - (void)onWidgetHeightChanges:(CGFloat)widgetHeight placement:(NSString*) selectedPlacement;
 - (void)onFirstPositiveResponse;
 - (void)onRoktCallbackReceived:(NSString*)eventValue;
-- (void)onRoktEvents:(RoktEvent *)event viewName:(NSString *)viewName;
+- (void)onRoktEvents:(RoktEvent * _Nonnull)event viewName:(NSString * _Nullable)viewName;
 
 @end

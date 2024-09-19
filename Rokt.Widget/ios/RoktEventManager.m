@@ -66,11 +66,12 @@ RCT_EXPORT_MODULE(RoktEventManager);
     }
 }
 
-- (void)onRoktEvents:(RoktEvent *)event viewName:(NSString *)viewName
+- (void)onRoktEvents:(RoktEvent * _Nonnull)event viewName:(NSString * _Nullable)viewName
 {
      if (hasListeners) {
          NSString *placementId;
-         NSString *eventName;
+         NSString *eventName = @"";
+         NSString *status;
          if ([event isKindOfClass:[ShowLoadingIndicator class]]) {
              eventName = @"ShowLoadingIndicator";
          } else if ([event isKindOfClass:[HideLoadingIndicator class]]) {
@@ -100,10 +101,19 @@ RCT_EXPORT_MODULE(RoktEventManager);
              placementId = ((FirstPositiveEngagement *)event).placementId;
              eventName = @"FirstPositiveEngagement";
              self.firstPositiveEngagement = (FirstPositiveEngagement *)event;
+         } else if ([event isKindOfClass:[InitComplete class]]) {
+             eventName = @"InitComplete";
+             status = ((InitComplete *)event).success ? @"true" : @"false";
          }
-         NSMutableDictionary *payload = [@{@"event": eventName, @"viewName": viewName} mutableCopy];
+         NSMutableDictionary *payload = [@{@"event": eventName} mutableCopy];
+         if (viewName != nil) {
+             [payload setObject:viewName forKey:@"viewName"];
+         }
          if (placementId != nil) {
              [payload setObject:placementId forKey:@"placementId"];
+         }
+         if (status != nil) {
+             [payload setObject:status forKey:@"status"];
          }
 
          [self sendEventWithName:@"RoktEvents" body:payload];

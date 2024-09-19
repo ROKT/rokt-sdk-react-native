@@ -20,6 +20,7 @@ import com.rokt.roktsdk.Rokt.RoktEventType
 import com.rokt.roktsdk.Rokt.SdkFrameworkType.ReactNative
 import com.rokt.roktsdk.RoktEvent
 import com.rokt.roktsdk.Widget
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import java.lang.ref.WeakReference
 
@@ -41,21 +42,33 @@ class RNRoktWidgetModule internal constructor(private val reactContext: ReactApp
     private var fulfillmentAttributesCallback: FulfillmentAttributes? = null
     private var debug = false
 
-    private val listeners: MutableMap<Long, Rokt.RoktCallback> = object : LinkedHashMap<Long, Rokt.RoktCallback>() {
-        override fun removeEldestEntry(eldest: Map.Entry<Long, Rokt.RoktCallback>): Boolean = this.size > MAX_LISTENERS
-    }
+    private val listeners: MutableMap<Long, Rokt.RoktCallback> =
+        object : LinkedHashMap<Long, Rokt.RoktCallback>() {
+            override fun removeEldestEntry(eldest: Map.Entry<Long, Rokt.RoktCallback>): Boolean =
+                this.size > MAX_LISTENERS
+        }
 
     @ReactMethod
     fun initialize(roktTagId: String?, appVersion: String?) {
         initRokt(roktTagId, appVersion, 4) { activity ->
-            Rokt.init(requireNotNull(roktTagId), requireNotNull(appVersion), activity)
+            Rokt.init(
+                roktTagId = requireNotNull(roktTagId),
+                appVersion = requireNotNull(appVersion),
+                activity = activity
+            )
         }
     }
 
     @ReactMethod
     fun initializeWithFontFiles(roktTagId: String?, appVersion: String?, fontsMap: ReadableMap?) {
         initRokt(roktTagId, appVersion, 4) { activity ->
-            Rokt.init(requireNotNull(roktTagId), requireNotNull(appVersion), activity, HashSet(), readableMapToMapOfStrings(fontsMap))
+            Rokt.init(
+                roktTagId = requireNotNull(roktTagId),
+                appVersion = requireNotNull(appVersion),
+                activity = activity,
+                fontPostScriptNames = HashSet(),
+                fontFilePathMap = readableMapToMapOfStrings(fontsMap)
+            )
         }
     }
 
@@ -65,18 +78,28 @@ class RNRoktWidgetModule internal constructor(private val reactContext: ReactApp
     }
 
     @ReactMethod
-    fun executeWithConfig(viewName: String?, attributes: ReadableMap?, placeholders: ReadableMap?, roktConfig: ReadableMap?) {
+    fun executeWithConfig(
+        viewName: String?,
+        attributes: ReadableMap?,
+        placeholders: ReadableMap?,
+        roktConfig: ReadableMap?
+    ) {
         executeInternal(viewName, attributes, placeholders, roktConfig)
     }
 
-    private fun executeInternal(viewName: String?, attributes: ReadableMap?, placeholders: ReadableMap?, roktConfig: ReadableMap? = null) {
+    private fun executeInternal(
+        viewName: String?,
+        attributes: ReadableMap?,
+        placeholders: ReadableMap?,
+        roktConfig: ReadableMap? = null
+    ) {
         if (viewName == null) {
             logDebug("Execute failed. ViewName cannot be null")
             return
         }
 
         val uiManager = reactContext.getNativeModule(UIManagerModule::class.java)
-        startRoktEventListener(viewName)
+        startRoktEventListener(Rokt.events(viewName), viewName)
 
         val config = roktConfig?.let { buildRoktConfig(it) }
         uiManager?.addUIBlock { nativeViewHierarchyManager ->
@@ -96,18 +119,28 @@ class RNRoktWidgetModule internal constructor(private val reactContext: ReactApp
     }
 
     @ReactMethod
-    fun execute2StepWithConfig(viewName: String?, attributes: ReadableMap?, placeholders: ReadableMap?, roktConfig: ReadableMap?) {
+    fun execute2StepWithConfig(
+        viewName: String?,
+        attributes: ReadableMap?,
+        placeholders: ReadableMap?,
+        roktConfig: ReadableMap?
+    ) {
         execute2StepInternal(viewName, attributes, placeholders, roktConfig)
     }
 
-    private fun execute2StepInternal(viewName: String?, attributes: ReadableMap?, placeholders: ReadableMap?, roktConfig: ReadableMap? = null) {
+    private fun execute2StepInternal(
+        viewName: String?,
+        attributes: ReadableMap?,
+        placeholders: ReadableMap?,
+        roktConfig: ReadableMap? = null
+    ) {
         if (viewName == null) {
             logDebug("Execute failed. ViewName cannot be null")
             return
         }
 
         val uiManager = reactContext.getNativeModule(UIManagerModule::class.java)
-        startRoktEventListener(viewName)
+        startRoktEventListener(Rokt.events(viewName), viewName)
         val config = roktConfig?.let { buildRoktConfig(it) }
         uiManager?.addUIBlock { nativeViewHierarchyManager ->
             Rokt.execute2Step(
@@ -116,7 +149,10 @@ class RNRoktWidgetModule internal constructor(private val reactContext: ReactApp
                 callback = createRoktCallback(),
                 placeholders = safeUnwrapPlaceholders(placeholders, nativeViewHierarchyManager),
                 roktEventCallback = object : Rokt.RoktEventCallback {
-                    override fun onEvent(eventType: RoktEventType, roktEventHandler: RoktEventHandler) {
+                    override fun onEvent(
+                        eventType: RoktEventType,
+                        roktEventHandler: RoktEventHandler
+                    ) {
                         setRoktEventHandler(roktEventHandler)
                         if (eventType == RoktEventType.FirstPositiveEngagement) {
                             logDebug("onFirstPositiveEvent was fired")
@@ -129,12 +165,19 @@ class RNRoktWidgetModule internal constructor(private val reactContext: ReactApp
         }
     }
 
-    private fun initRokt(roktTagId: String?, appVersion: String?, retryCount: Int, init: (activity: Activity) -> Unit) {
+    private fun initRokt(
+        roktTagId: String?,
+        appVersion: String?,
+        retryCount: Int,
+        init: (activity: Activity) -> Unit
+    ) {
         if (roktTagId == null || appVersion == null) {
             logDebug("roktTagId and appVersion cannot be null")
             return
         }
         Rokt.setFrameworkType(ReactNative)
+        Rokt.globalEvents()
+        startRoktEventListener(Rokt.globalEvents())
         if (currentActivity == null) {
             // When the init was called from ReactComponent init and the activity is not fully resumed,
             // the currentActivity could be null.
@@ -210,7 +253,8 @@ class RNRoktWidgetModule internal constructor(private val reactContext: ReactApp
     }
 
     private fun readableMapToMapOfStrings(attributes: ReadableMap?): Map<String, String> =
-        attributes?.toHashMap()?.filter { it.value is String }?.mapValues { it.value as String } ?: emptyMap()
+        attributes?.toHashMap()?.filter { it.value is String }?.mapValues { it.value as String }
+            ?: emptyMap()
 
 
     private fun createRoktCallback(): Rokt.RoktCallback {
@@ -271,7 +315,7 @@ class RNRoktWidgetModule internal constructor(private val reactContext: ReactApp
 
     private fun buildRoktConfig(
         roktConfig: ReadableMap?
-    ) : RoktConfig {
+    ): RoktConfig {
         val builder = RoktConfig.Builder()
         val configMap: Map<String, String> = readableMapToMapOfStrings(roktConfig)
         configMap["colorMode"]?.let {
@@ -281,59 +325,74 @@ class RNRoktWidgetModule internal constructor(private val reactContext: ReactApp
         return builder.build()
     }
 
-    private fun startRoktEventListener(viewName: String) {
+    private fun startRoktEventListener(flow: Flow<RoktEvent>, viewName: String? = null) {
         (currentActivity as? LifecycleOwner)?.lifecycleScope?.launch {
             (currentActivity as LifecycleOwner).repeatOnLifecycle(Lifecycle.State.CREATED) {
-                Rokt.events(viewName).collect { event ->
+                flow.collect { event ->
                     val params = Arguments.createMap()
-                    var eventName: String = ""
+                    var eventName = ""
                     val placementId: String? = when (event) {
                         is RoktEvent.FirstPositiveEngagement -> {
                             eventName = "FirstPositiveEngagement"
                             fulfillmentAttributesCallback = event.fulfillmentAttributes
                             event.id
                         }
+
                         RoktEvent.HideLoadingIndicator -> {
                             eventName = "HideLoadingIndicator"
                             null
                         }
+
                         is RoktEvent.OfferEngagement -> {
                             eventName = "OfferEngagement"
                             event.id
                         }
+
                         is RoktEvent.PlacementClosed -> {
                             eventName = "PlacementClosed"
                             event.id
                         }
+
                         is RoktEvent.PlacementCompleted -> {
                             eventName = "PlacementCompleted"
                             event.id
                         }
+
                         is RoktEvent.PlacementFailure -> {
                             eventName = "PlacementFailure"
                             event.id
                         }
+
                         is RoktEvent.PlacementInteractive -> {
                             eventName = "PlacementInteractive"
                             event.id
                         }
+
                         is RoktEvent.PlacementReady -> {
                             eventName = "PlacementReady"
                             event.id
                         }
+
                         is RoktEvent.PositiveEngagement -> {
                             eventName = "PositiveEngagement"
                             event.id
                         }
+
                         RoktEvent.ShowLoadingIndicator -> {
                             eventName = "ShowLoadingIndicator"
+                            null
+                        }
+
+                        is RoktEvent.InitComplete -> {
+                            eventName = "InitComplete"
+                            params.putString("status", event.success.toString())
                             null
                         }
                     }
 
                     placementId?.let { params.putString("placementId", it) }
                     params.putString("event", eventName)
-                    params.putString("viewName", viewName)
+                    viewName?.let { params.putString("viewName", it) }
                     sendEvent(reactContext, "RoktEvents", params)
                 }
             }
