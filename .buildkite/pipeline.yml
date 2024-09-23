@@ -90,7 +90,7 @@ steps:
       - npm install
       - pm2 stop all || true
       - pm2 delete all || true
-      - pm2 start --name reactnative npm -- start
+      - pm2 start --name reactnative npm -- start 
       - cd ios
       - bundle check || bundle install --path vendor/bundle 
       - bundle exec pod install --verbose --repo-update 
@@ -101,6 +101,9 @@ steps:
     plugins:
       - artifacts#v1.9.0:
           download: "Rokt.Widget/*.tgz"
+          upload:
+            - RoktSampleApp/package-lock.json
+
     agents:
       queue: ${MAC_BK_AGENT}
     timeout_in_minutes: 45
