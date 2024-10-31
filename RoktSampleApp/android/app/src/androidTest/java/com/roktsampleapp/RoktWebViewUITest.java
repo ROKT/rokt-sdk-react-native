@@ -89,7 +89,7 @@ public class RoktWebViewUITest {
             "    \"firstname\": \"Jenny\",\n" +
             "    \"lastname\": \"Smith\",\n" +
             "    \"age\": \"101\",\n" +
-            "    \"mobile\": \"(323) 867-5309\",\n" +
+            "    \"mobile\": \"1112223333\",\n" +
             "    \"zipcode\": \"7176\",\n" +
             "    \"sandbox\": \"true\",\n" +
             "    \"rokt.mobile.e2etest\": \"true\"\n" +
