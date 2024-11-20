@@ -27,7 +27,8 @@ The CI system used is  **Buildkite**  [https://buildkite.com/rokt/react-native-s
 ### NPM install on Sample app
 1. Go to *RoktSampleApp* directory
 2. `npm install`
-3. If installation errors on Rokt.Widget/rokt-react-native-sdk-X.X.X.tgz not found (where X.X.X is the Rokt SDK version), follow [README on *Rokt.Widget* directory](https://github.com/ROKT/rokt-sdk-react-native/tree/release-3.10.x/Rokt.Widget#readme) first
+
+To clear the cache, delete `node_modules` and `package.json` and re-run `npm install`
 
 ### Start with npx
 Make sure you have your Android device or Emulator turned on.
@@ -37,7 +38,8 @@ go to *RoktSampleApp* directory and run `npx react-native start --reset-cache`
 ## iOS
 
 ### Install the pod
-go to *RoktSampleApp/ios* directory and run `pod install` (if pod install failed, run `pod update` to get the latest libraries)
+go to *RoktSampleApp/ios* directory and run `bundle exec pod install --repo-update` 
+if pod install failed from rokt-react-native-sdk podfile, run `bundle exec pod update Rokt-Widget`
 
 ## Run iOS
 Make sure you have your iOS device or Simulator turned on.
@@ -52,12 +54,15 @@ Make sure you have your iOS device or Simulator turned on.
 go to *RoktSampleApp* directory and run `npx react-native run-android` 
 
 ## Note
-To test the SDK changes locally follow the below steps:
-1. Create a package in SDK with a new version. 
-2. Go to RoktSampleApp root, modify the ```package.json``` of RoktSampleApp.
-3. Delete the ```package-lock.json``` and run the ```npm install``` again.
-4. For iOS, go to ios directory and run ``` pod install ```.
+To test the SDK changes locally
 
+### Create a package in SDK with a new version. 
+1. Go to *Rokt.Widget* directory
+2. change the version ```X.X.X``` in ```package.json``` to a new version. 
+3. `npm install`
+4. `npm run build` to build the `dist` folder
+5. `npm pack` to build the new ```rokt-react-native-sdk-X.X.X.tgz```
+6. go to `RoktSampleApp` project ```package.json``` to point to ```rokt-react-native-sdk-X.X.X.tgz``` file
 
 # Copyright
 Copyright 2020 Rokt Pte Ltd Licensed under the Rokt Software Development Kit (SDK) Terms of Use Version 2.0 (the "License"); You may not use this file except in compliance with the License. You may obtain a copy of the License at https://rokt.com/sdk-license-2-0/

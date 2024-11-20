@@ -11,7 +11,7 @@
 
 #import <Foundation/Foundation.h>
 #import <React/RCTViewManager.h>
-#import <Rokt_Widget/Rokt-Widget-umbrella.h>
+#import <Rokt_Widget/Rokt_Widget-Swift.h>
 
 @interface RoktNativeWidgetManager : RCTViewManager
 @end
