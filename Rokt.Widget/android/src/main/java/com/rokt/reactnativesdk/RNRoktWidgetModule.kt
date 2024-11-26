@@ -11,6 +11,7 @@ import com.facebook.react.bridge.*
 import com.facebook.react.modules.core.DeviceEventManagerModule.RCTDeviceEventEmitter
 import com.facebook.react.uimanager.NativeViewHierarchyManager
 import com.facebook.react.uimanager.UIManagerModule
+import com.rokt.roktsdk.CacheConfig
 import com.rokt.roktsdk.FulfillmentAttributes
 import com.rokt.roktsdk.Rokt
 import com.rokt.roktsdk.RoktConfig
@@ -321,8 +322,28 @@ class RNRoktWidgetModule internal constructor(private val reactContext: ReactApp
         configMap["colorMode"]?.let {
             builder.colorMode(it.toColorMode())
         }
-
+        roktConfig?.getMap("cacheConfig")?.let {
+            builder.cacheConfig(buildCacheConfig(it))
+        }
         return builder.build()
+    }
+
+    private fun buildCacheConfig(cacheConfigMap: ReadableMap?): CacheConfig {
+        val cacheDurationInSeconds =
+            if (cacheConfigMap?.hasKey("cacheDurationInSeconds") == true) {
+                cacheConfigMap.getDouble("cacheDurationInSeconds").toLong()
+            } else {
+                0L
+            }
+        val cacheAttributes = if (cacheConfigMap?.hasKey("cacheAttributes") == true) {
+            cacheConfigMap.getMap("cacheAttributes")?.toHashMap()?.mapValues { it.value as String }
+        } else {
+            null
+        }
+        return CacheConfig(
+            cacheDurationInSeconds = cacheDurationInSeconds,
+            cacheAttributes = cacheAttributes
+        )
     }
 
     private fun startRoktEventListener(flow: Flow<RoktEvent>, viewName: String? = null) {
