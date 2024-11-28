@@ -1,8 +1,11 @@
 rootProject.name = 'RoktSampleApp'
-include ':@rokt_react-native-sdk'
-project(':@rokt_react-native-sdk').projectDir = new File(rootProject.projectDir, '../node_modules/@rokt/react-native-sdk/android')
-
-include ':react-native-community-checkbox'
-project(':react-native-community-checkbox').projectDir = new File(rootProject.projectDir, '../node_modules/@react-native-community/checkbox/android')
-
+apply from: file("../node_modules/@react-native-community/cli-platform-android/native_modules.gradle"); applyNativeModulesSettingsGradle(settings)
 include ':app'
+includeBuild('../node_modules/react-native-gradle-plugin')
+
+if (settings.hasProperty("newArchEnabled") && settings.newArchEnabled == "true") {
+    include(":ReactAndroid")
+    project(":ReactAndroid").projectDir = file('../node_modules/react-native/ReactAndroid')
+    include(":ReactAndroid:hermes-engine")
+    project(":ReactAndroid:hermes-engine").projectDir = file('../node_modules/react-native/ReactAndroid/hermes-engine')
+}

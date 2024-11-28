@@ -15,8 +15,8 @@
     "@rokt/react-native-sdk": "file:../Rokt.Widget/rokt-react-native-sdk-4.6.0.tgz",
     "crypto-js": "^4.0.0",
     "node-forge": "^1.3.1",
-    "react": "18.0.0",
-    "react-native": "^0.69.7",
+    "react": "18.1.0",
+    "react-native": "0.70.6",
     "react-native-toast-message": "2.1.5"
   },
   "devDependencies": {
