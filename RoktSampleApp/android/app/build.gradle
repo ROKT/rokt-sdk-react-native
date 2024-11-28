@@ -130,13 +130,6 @@ def reactNativeArchitectures() {
 }
 
 android {
-    packagingOptions {
-        pickFirst 'lib/x86/libc++_shared.so'
-        pickFirst 'lib/x86_64/libc++_shared.so'
-        pickFirst 'lib/armeabi-v7a/libc++_shared.so'
-        pickFirst 'lib/arm64-v8a/libc++_shared.so'
-    }
-
     ndkVersion rootProject.ext.ndkVersion
 
     compileSdkVersion rootProject.ext.compileSdkVersion
@@ -264,8 +257,6 @@ dependencies {
 
     implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.0.0"
 
-    implementation "com.facebook.soloader:soloader:0.9.0+"
-
     debugImplementation("com.facebook.flipper:flipper:${FLIPPER_VERSION}") {
         exclude group:'com.facebook.fbjni'
     }
@@ -279,15 +270,6 @@ dependencies {
         exclude group:'com.facebook.flipper'
     }
 
-    if (enableHermes) {
-        //noinspection GradleDynamicVersion
-        implementation("com.facebook.react:hermes-engine:+") { // From node_modules
-            exclude group:'com.facebook.fbjni'
-        }
-    } else {
-        implementation jscFlavor
-    }
-
     androidTestImplementation 'androidx.test:core:1.5.0'
 
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
@@ -299,15 +281,14 @@ dependencies {
 
     androidTestImplementation "androidx.test.espresso:espresso-intents:3.3.0"
     androidTestImplementation"androidx.test.espresso:espresso-idling-resource:3.3.0"
-}
 
-configurations.all {
-    resolutionStrategy {
-        eachDependency {
-            if (requested.group == "androidx.lifecycle" && requested.name == "lifecycle-livedata-core") {
-                useVersion("2.5.1")
-            }
+    if (enableHermes) {
+        //noinspection GradleDynamicVersion
+        implementation("com.facebook.react:hermes-engine:+") { // From node_modules
+            exclude group:'com.facebook.fbjni'
         }
+    } else {
+        implementation jscFlavor
     }
 }
 
@@ -332,6 +313,16 @@ if (isNewArchitectureEnabled()) {
 task copyDownloadableDepsToLibs(type: Copy) {
     from configurations.implementation
     into 'libs'
+}
+
+configurations.all {
+    resolutionStrategy {
+        eachDependency {
+            if (requested.group == "androidx.lifecycle" && requested.name == "lifecycle-livedata-core") {
+                useVersion("2.5.1")
+            }
+        }
+    }
 }
 
 apply from: file("../../node_modules/@react-native-community/cli-platform-android/native_modules.gradle"); applyNativeModulesAppBuildGradle(project)

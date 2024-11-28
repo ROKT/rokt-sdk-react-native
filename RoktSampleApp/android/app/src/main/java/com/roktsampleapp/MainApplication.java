@@ -8,10 +8,14 @@ import com.facebook.react.ReactInstanceManager;
 import com.facebook.react.ReactNativeHost;
 import com.facebook.react.ReactPackage;
 import com.facebook.react.config.ReactFeatureFlags;
+import com.facebook.react.shell.MainReactPackage;
 import com.facebook.soloader.SoLoader;
+import com.reactnativecommunity.checkbox.ReactCheckBoxPackage;
+import com.rokt.reactnativesdk.RNRoktWidgetPackage;
 import com.rokt.reactnativesdk.RoktEmbeddedViewPackage;
 import com.roktsampleapp.newarchitecture.MainApplicationReactNativeHost;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Arrays;
 import java.util.List;
 
 public class MainApplication extends Application implements ReactApplication {
@@ -23,14 +27,14 @@ public class MainApplication extends Application implements ReactApplication {
           return BuildConfig.DEBUG;
         }
 
-        @Override
-        protected List<ReactPackage> getPackages() {
-          @SuppressWarnings("UnnecessaryLocalVariable")
-          List<ReactPackage> packages = new PackageList(this).getPackages();
-          // Packages that cannot be autolinked yet can be added manually here, for example:
-          packages.add(new RoktEmbeddedViewPackage());
-          return packages;
-        }
+          @Override
+          protected List<ReactPackage> getPackages() {
+              return Arrays.<ReactPackage>asList(
+                      new MainReactPackage(),
+                      new ReactCheckBoxPackage(),
+                      new RNRoktWidgetPackage(),
+                      new RoktEmbeddedViewPackage());
+          }
 
         @Override
         protected String getJSMainModuleName() {
