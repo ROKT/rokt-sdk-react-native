@@ -109,7 +109,7 @@ RCT_EXPORT_METHOD(executeWithConfig:(NSString *)viewName
     
     NSMutableDictionary *nativePlaceholders = [[NSMutableDictionary alloc]initWithCapacity:placeholders.count];
 
-    NSMutableDictionary *configMap = [self convertToMutableDictionaryOfStrings:roktConfig];
+    NSMutableDictionary *configMap = [roktConfig mutableCopy];
 
     RoktConfig *config = [self buildRoktConfig:configMap];
 
@@ -304,11 +304,20 @@ RCT_EXPORT_METHOD(setFulfillmentAttributes:(NSDictionary *)attributes) {
 - (RoktConfig*)buildRoktConfig:(NSDictionary*)config
 {
     Builder *builder = [[Builder alloc] init];
-    NSString *colorMode = config[@"colorMode"];
+    NSMutableDictionary *configMap = [self convertToMutableDictionaryOfStrings:config];
+    NSString *colorMode = configMap[@"colorMode"];
+    NSMutableDictionary *cacheConfig = config[@"cacheConfig"];
     
     if (colorMode != nil) {
         ColorMode value = [self stringToColorMode:colorMode];
         [builder colorMode:value];
+    }
+    if (cacheConfig != nil) {
+        NSDictionary *cacheAttributes = cacheConfig[@"cacheAttributes"];
+        NSNumber *duration = cacheConfig[@"cacheDurationInSeconds"];
+        NSTimeInterval cacheDurationInSeconds = duration ? [duration doubleValue] : CacheConfig.maxCacheDuration;
+        CacheConfig *cacheConfig = [[CacheConfig alloc] initWithCacheDuration:cacheDurationInSeconds cacheAttributes:cacheAttributes];
+        [builder cacheConfig:(cacheConfig)];
     }
     return [builder build];
 }
