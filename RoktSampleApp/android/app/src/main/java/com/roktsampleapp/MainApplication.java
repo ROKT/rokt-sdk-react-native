@@ -27,14 +27,14 @@ public class MainApplication extends Application implements ReactApplication {
           return BuildConfig.DEBUG;
         }
 
-          @Override
+        @Override
           protected List<ReactPackage> getPackages() {
-              return Arrays.<ReactPackage>asList(
-                      new MainReactPackage(),
-                      new ReactCheckBoxPackage(),
-                      new RNRoktWidgetPackage(),
-                      new RoktEmbeddedViewPackage());
-          }
+            return Arrays.<ReactPackage>asList(
+              new MainReactPackage(),
+              new ReactCheckBoxPackage(),
+              new RNRoktWidgetPackage(),
+              new RoktEmbeddedViewPackage());
+        }
 
         @Override
         protected String getJSMainModuleName() {
