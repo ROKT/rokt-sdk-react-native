@@ -21,6 +21,7 @@ import com.rokt.roktsdk.Rokt.RoktEventType
 import com.rokt.roktsdk.Rokt.SdkFrameworkType.ReactNative
 import com.rokt.roktsdk.RoktEvent
 import com.rokt.roktsdk.Widget
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import java.lang.ref.WeakReference
@@ -43,6 +44,7 @@ class RNRoktWidgetModule internal constructor(private val reactContext: ReactApp
     private var fulfillmentAttributesCallback: FulfillmentAttributes? = null
     private var debug = false
 
+    private val eventSubscriptions = mutableMapOf<String, Job?>()
     private val listeners: MutableMap<Long, Rokt.RoktCallback> =
         object : LinkedHashMap<Long, Rokt.RoktCallback>() {
             override fun removeEldestEntry(eldest: Map.Entry<Long, Rokt.RoktCallback>): Boolean =
@@ -177,7 +179,7 @@ class RNRoktWidgetModule internal constructor(private val reactContext: ReactApp
             return
         }
         Rokt.setFrameworkType(ReactNative)
-        Rokt.globalEvents()
+        eventSubscriptions.clear()
         startRoktEventListener(Rokt.globalEvents())
         if (currentActivity == null) {
             // When the init was called from ReactComponent init and the activity is not fully resumed,
@@ -347,7 +349,11 @@ class RNRoktWidgetModule internal constructor(private val reactContext: ReactApp
     }
 
     private fun startRoktEventListener(flow: Flow<RoktEvent>, viewName: String? = null) {
-        (currentActivity as? LifecycleOwner)?.lifecycleScope?.launch {
+        val activeJob = eventSubscriptions[viewName.orEmpty()]?.takeIf { it.isActive }
+        if (activeJob != null) {
+            return
+        }
+        val job = (currentActivity as? LifecycleOwner)?.lifecycleScope?.launch {
             (currentActivity as LifecycleOwner).repeatOnLifecycle(Lifecycle.State.CREATED) {
                 flow.collect { event ->
                     val params = Arguments.createMap()
@@ -418,6 +424,7 @@ class RNRoktWidgetModule internal constructor(private val reactContext: ReactApp
                 }
             }
         }
+        eventSubscriptions[viewName.orEmpty()] = job
     }
 }
 
