@@ -89,7 +89,7 @@ steps:
       - git checkout "v$(buildkite-agent meta-data get VERSION)"
       - cd RoktSampleApp
       - xcrun simctl boot "iPhone 15" || true
-      - nvm use 12
+      - nvm use 16
       - npm install pm2 -g
       - npm install
       - pm2 stop all || true
