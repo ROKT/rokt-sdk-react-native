@@ -80,7 +80,7 @@ export default class App extends Component {
   callBackSubscription = eventManagerEmitter.addListener(
     'RoktCallback',
     (data) => {
-      console.log('roktCallback received: ' + data.callbackValue);
+      console.log('roktCallback received ' + data.callbackValue);
     },
   );
 
