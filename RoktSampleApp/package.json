@@ -12,7 +12,7 @@
   "dependencies": {
     "react": "18.2.0",
     "react-native": "0.71.15",
-    "@rokt/react-native-sdk": "file:../Rokt.Widget/rokt-react-native-sdk-4.7.0-alpha.2.tgz",
+    "@rokt/react-native-sdk": "file:../Rokt.Widget/rokt-react-native-sdk-4.8.0-alpha.4.tgz",
     "crypto-js": "^4.0.0",
     "node-forge": "^1.3.1",
     "@react-native-community/checkbox": "^0.5.12",
