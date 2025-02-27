@@ -2,6 +2,7 @@ env:
   ENG_ACCOUNT: "035088524874"
   ECR_HOST: ${ENG_ACCOUNT}.dkr.ecr.us-west-2.amazonaws.com
   MAC_BK_AGENT: eng-prod-us-west-2-mac-arm-macos-build-medium
+  COMPUTE_ENG_BK_AGENT: eng-prod-us-west-2-intel-linux-build-large
   ENG_BK_AGENT: eng-default
 
 steps:
@@ -74,7 +75,7 @@ steps:
             - DEVICE_FARM_STAGE_DEVICE_POOL
             - DEVICE_FARM_STAGE_PROJECT_NAME
     agents:
-      queue: ${ENG_BK_AGENT}
+      queue: ${COMPUTE_ENG_BK_AGENT}
     timeout_in_minutes: 45
 
   - label: ":ios: iOS Build and Test"
