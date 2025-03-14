@@ -415,6 +415,12 @@ class RNRoktWidgetModule internal constructor(private val reactContext: ReactApp
                             params.putString("status", event.success.toString())
                             null
                         }
+
+                        is RoktEvent.OpenUrl -> {
+                            eventName = "OpenUrl"
+                            params.putString("url", event.url)
+                            event.id
+                        }
                     }
 
                     placementId?.let { params.putString("placementId", it) }

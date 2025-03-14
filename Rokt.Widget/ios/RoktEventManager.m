@@ -72,6 +72,7 @@ RCT_EXPORT_MODULE(RoktEventManager);
          NSString *placementId;
          NSString *eventName = @"";
          NSString *status;
+         NSString *url;
          if ([event isKindOfClass:[ShowLoadingIndicator class]]) {
              eventName = @"ShowLoadingIndicator";
          } else if ([event isKindOfClass:[HideLoadingIndicator class]]) {
@@ -104,6 +105,10 @@ RCT_EXPORT_MODULE(RoktEventManager);
          } else if ([event isKindOfClass:[InitComplete class]]) {
              eventName = @"InitComplete";
              status = ((InitComplete *)event).success ? @"true" : @"false";
+         } else if ([event isKindOfClass:[OpenUrl class]]) {
+             eventName = @"OpenUrl";
+             placementId = ((OpenUrl *)event).placementId;
+             url = ((OpenUrl *)event).url;
          }
          NSMutableDictionary *payload = [@{@"event": eventName} mutableCopy];
          if (viewName != nil) {
@@ -114,6 +119,9 @@ RCT_EXPORT_MODULE(RoktEventManager);
          }
          if (status != nil) {
              [payload setObject:status forKey:@"status"];
+         }
+         if (url != nil) {
+             [payload setObject:url forKey:@"url"];
          }
 
          [self sendEventWithName:@"RoktEvents" body:payload];
