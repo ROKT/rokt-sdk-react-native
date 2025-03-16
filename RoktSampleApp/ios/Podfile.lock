@@ -419,8 +419,8 @@ PODS:
     - React-Core
   - rokt-react-native-sdk (4.8.1):
     - React
-    - Rokt-Widget (~> 4.8.1)
-  - Rokt-Widget (4.8.1)
+    - Rokt-Widget (~> 4.9.0-alpha.2)
+  - Rokt-Widget (4.9.0-alpha.2)
   - SocketRocket (0.6.1)
   - Yoga (1.14.0)
   - YogaKit (1.18.1):
@@ -632,8 +632,8 @@ SPEC CHECKSUMS:
   React-runtimeexecutor: 8f2ddd9db7874ec7de84f5c55d73aeaaf82908e2
   ReactCommon: 309d965cb51f058d07dea65bc04dcf462911f0a4
   RNCCheckbox: a3ca9978cb0846b981d28da4e9914bd437403d77
-  rokt-react-native-sdk: 1ada9a3f93409f6a67ee4ade5d87a4d83d13f7d3
-  Rokt-Widget: 3c3d3c2ba915b5243c07eef5b8bb5aeee8701724
+  rokt-react-native-sdk: b8fc32065b6e2529332aa8402b5467731228e0cf
+  Rokt-Widget: e75b96dd6f0eff92a17344b9c9641a3c04aa9779
   SocketRocket: f32cd54efbe0f095c4d7594881e52619cfe80b17
   Yoga: 68c9c592c3e80ec37ff28db20eedb13d84aae5df
   YogaKit: f782866e155069a2cca2517aafea43200b01fd5a
