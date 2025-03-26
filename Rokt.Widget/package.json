@@ -45,5 +45,13 @@
   },
   "dependencies": {
     "@expo/config-plugins": "^7.2.5"
+  },
+  "codegenConfig": {
+    "name": "RNRoktWidgetSpec",
+    "type": "modules",
+    "jsSrcsDir": "dist",
+    "android": {
+      "javaPackageName": "com.rokt.reactnativesdk"
+    }
   }
 }

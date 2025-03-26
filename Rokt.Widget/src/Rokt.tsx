@@ -1,48 +1,51 @@
 import 'react-native'
-import { NativeModules } from 'react-native';
+import { NativeModules, Platform } from 'react-native';
+import type { Spec as RNRoktWidgetType } from './NativeRoktWidget';
 
-const RNRoktWidget = NativeModules.RNRoktWidget;
+// Get the RoktModule - fallback to the NativeModules version in case TurboModule isn't available
+// The TurboModule will be used automatically when available by React Native
+const RoktModule = NativeModules.RNRoktWidget;
 
 export abstract class Rokt {
 
     public static initialize(roktTagId: string, appVersion: string, fontFilesMap?: Record<string, string>): void {
         if (fontFilesMap) {
-            RNRoktWidget.initializeWithFontFiles(roktTagId, appVersion, fontFilesMap);
+            RoktModule.initializeWithFontFiles(roktTagId, appVersion, fontFilesMap);
         } else {
-            RNRoktWidget.initialize(roktTagId, appVersion);
+            RoktModule.initialize(roktTagId, appVersion);
         }
     }
 
     public static execute(viewName: string, attributes: Record<string, string>, placeholders: Record<string, number | null>, roktConfig?: IRoktConfig): void {
         if (roktConfig) {
-            RNRoktWidget.executeWithConfig(viewName, attributes, placeholders, roktConfig)
+            RoktModule.executeWithConfig(viewName, attributes, placeholders, roktConfig)
         } else {
-            RNRoktWidget.execute(viewName, attributes, placeholders);
+            RoktModule.execute(viewName, attributes, placeholders);
         }
     }
 
     public static execute2Step(viewName: string, attributes: Record<string, string>, placeholders: Record<string, number | null>, roktConfig?: IRoktConfig): void {
         if (roktConfig) {
-            RNRoktWidget.execute2StepWithConfig(viewName, attributes, placeholders, roktConfig)
+            RoktModule.execute2StepWithConfig(viewName, attributes, placeholders, roktConfig)
         } else {
-            RNRoktWidget.execute2Step(viewName, attributes, placeholders);
+            RoktModule.execute2Step(viewName, attributes, placeholders);
         }
     }
 
     public static setFulfillmentAttributes(attributes: Record<string, string>): void {
-        RNRoktWidget.setFulfillmentAttributes(attributes);
+        RoktModule.setFulfillmentAttributes(attributes);
     }
 
     public static setEnvironmentToStage(): void {
-        RNRoktWidget.setEnvironmentToStage();
+        RoktModule.setEnvironmentToStage();
     }
 
     public static setEnvironmentToProd(): void {
-        RNRoktWidget.setEnvironmentToProd();
+        RoktModule.setEnvironmentToProd();
     }
 
     public static setLoggingEnabled(enabled: boolean): void {
-        RNRoktWidget.setLoggingEnabled(enabled);
+        RoktModule.setLoggingEnabled(enabled);
     }
 
 }
@@ -50,7 +53,7 @@ export abstract class Rokt {
 
 declare module 'react-native' {
     interface NativeModulesStatic {
-        RNRoktWidget: RNRoktWidget
+        RNRoktWidget: RNRoktWidgetType
     }
 }
 
