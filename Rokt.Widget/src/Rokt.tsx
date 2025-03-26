@@ -1,12 +1,13 @@
 import 'react-native'
 import { NativeModules } from 'react-native';
 
-const RNRoktWidget = NativeModules.RNRoktWidget;
+//const RNRoktWidget = NativeModules.RNRoktWidget;
+const RNRoktWidget = require('./NativeRoktWidget').default;
 
 export abstract class Rokt {
 
     public static initialize(roktTagId: string, appVersion: string, fontFilesMap?: Record<string, string>): void {
-        if (fontFilesMap) {
+        console.log('Sahil Checking if initialize method exists:', typeof RNRoktWidget.initialize === 'function' ? 'Yes' : 'No');        if (fontFilesMap) {
             RNRoktWidget.initializeWithFontFiles(roktTagId, appVersion, fontFilesMap);
         } else {
             RNRoktWidget.initialize(roktTagId, appVersion);

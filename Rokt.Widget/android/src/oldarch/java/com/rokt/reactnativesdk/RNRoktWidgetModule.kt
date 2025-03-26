@@ -53,6 +53,7 @@ class RNRoktWidgetModule internal constructor(private val reactContext: ReactApp
 
     @ReactMethod
     fun initialize(roktTagId: String?, appVersion: String?) {
+        println("Sahil initialize method called in plugin old architecture")
         initRokt(roktTagId, appVersion, 4) { activity ->
             Rokt.init(
                 roktTagId = requireNotNull(roktTagId),
@@ -414,12 +415,6 @@ class RNRoktWidgetModule internal constructor(private val reactContext: ReactApp
                             eventName = "InitComplete"
                             params.putString("status", event.success.toString())
                             null
-                        }
-
-                        is RoktEvent.OpenUrl -> {
-                            eventName = "OpenUrl"
-                            params.putString("url", event.url)
-                            event.id
                         }
                     }
 

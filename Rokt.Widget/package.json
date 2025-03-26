@@ -33,17 +33,25 @@
   },
   "devDependencies": {
     "@types/jest": "^27.5.1",
-    "@types/react": "^17.0.2",
+    "@types/react": "^19.0.0",
     "@types/react-native": "^0.68.0",
     "@typescript-eslint/eslint-plugin": "^5.59.7",
     "@typescript-eslint/parser": "^5.59.7",
     "eslint": "^8.41.0",
-    "react": "17.0.2",
-    "react-native": "0.68.0",
+    "react": "19.0.0",
+    "react-native": "0.78.1",
     "typescript": "^5.0.4",
     "expo-module-scripts": "^2.0.0"
   },
   "dependencies": {
     "@expo/config-plugins": "^7.2.5"
+  },
+  "codegenConfig": {
+    "name": "RNRoktWidgetSpec",
+    "type": "modules",
+    "jsSrcsDir": "src",
+    "android": {
+      "javaPackageName": "com.rokt.reactnativesdk"
+    }
   }
 }

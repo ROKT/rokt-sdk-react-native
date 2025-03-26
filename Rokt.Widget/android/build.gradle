@@ -7,13 +7,22 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:4.0.1'
+        classpath 'com.android.tools.build:gradle:7.2.1'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
 }
 
+def isNewArchitectureEnabled() {
+    // The new architecture is not yet public
+    // We can only use the new architecture in build time, not runtime
+    return project.hasProperty("newArchEnabled") ? project.newArchEnabled.toBoolean() : false
+}
+
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
+if (isNewArchitectureEnabled()) {
+    apply plugin: 'com.facebook.react'
+}
 
 android {
     compileSdkVersion 32
@@ -24,14 +33,24 @@ android {
         targetSdkVersion 32
         versionCode 2
         versionName "2.0"
+        buildConfigField "boolean", "IS_NEW_ARCHITECTURE_ENABLED", isNewArchitectureEnabled().toString()
     }
     lintOptions {
         abortOnError false
     }
     buildFeatures {
-        buildConfig = false
+        buildConfig = true
     }
     namespace 'com.rokt.reactnativesdk'
+    sourceSets {
+        main {
+            if (isNewArchitectureEnabled()) {
+                java.srcDirs += ['src/newarch']
+            } else {
+                java.srcDirs += ['src/oldarch']
+            }
+        }
+    }
 }
 
 repositories {
@@ -67,5 +86,13 @@ dependencies {
     implementation "com.facebook.react:react-native:+"  // From node_modules
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation "androidx.lifecycle:lifecycle-runtime-ktx:2.6.1"
-    implementation ('com.rokt:roktsdk:4.9.0-alpha.1')
+    implementation ('com.rokt:roktsdk:4.8.1')
+}
+
+if (isNewArchitectureEnabled()) {
+    react {
+        jsRootDir = file("../src/")
+        libraryName = "RNRoktWidget"
+        codegenJavaPackageName = "com.rokt.reactnativesdk"
+    }
 }
