@@ -1,26 +1,22 @@
-package com.rokt.reactnativesdk
-
+import android.widget.TextView
 import com.facebook.react.bridge.Arguments
+import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.bridge.ReactContext
-import com.facebook.react.common.MapBuilder
+import com.facebook.react.module.annotations.ReactModule
+import com.facebook.react.uimanager.SimpleViewManager
 import com.facebook.react.uimanager.ThemedReactContext
-import com.facebook.react.uimanager.ViewGroupManager
+import com.facebook.react.uimanager.annotations.ReactProp
 import com.facebook.react.uimanager.events.RCTEventEmitter
+import com.facebook.react.viewmanagers.RoktNativeWidgetManagerInterface
 import com.rokt.roktsdk.RoktWidgetDimensionCallBack
 import com.rokt.roktsdk.Widget
 
-/**
- * Copyright 2024 Rokt Pte Ltd
- *
- * Licensed under the Rokt Software Development Kit (SDK) Terms of Use
- * Version 2.0 (the "License");
- *
- * You may not use this file except in compliance with the License.
- *
- * You may obtain a copy of the License at https://rokt.com/sdk-license-2-0/
- */
-class RoktEmbeddedViewManager : ViewGroupManager<Widget>() {
-    override fun getName(): String = "RoktNativeWidget"
+@ReactModule(name = RoktEmbeddedViewManager.REACT_CLASS)
+class RoktEmbeddedViewManager : SimpleViewManager<Widget>(), RoktNativeWidgetManagerInterface<Widget> {
+    companion object {
+        const val REACT_CLASS = "RoktNativeWidget"
+    }
+    override fun getName(): String = REACT_CLASS
 
     override fun createViewInstance(reactContext: ThemedReactContext): Widget {
         val widget = Widget(reactContext)
@@ -28,20 +24,10 @@ class RoktEmbeddedViewManager : ViewGroupManager<Widget>() {
         return widget
     }
 
-    override fun getExportedCustomDirectEventTypeConstants(): Map<String, Any>? {
-        return MapBuilder.builder<String, Any>()
-            .put(
-                "onWidgetHeightChanged",
-                MapBuilder.of("registrationName", "onWidgetHeightChanged")
-            )
-            .put(
-                "onWidgetMarginChanged",
-                MapBuilder.of("registrationName", "onWidgetMarginChanged")
-            )
-            .build()
+    @ReactProp(name = "placeholderName")
+    override fun setPlaceholderName(view: Widget?, value: String?) {
+        view?.tag = value
     }
-
-    override fun needsCustomLayoutForChildren(): Boolean = false
 
     private fun setUpWidgetListeners(widget: Widget) {
         widget.registerDimensionListener(object : RoktWidgetDimensionCallBack {

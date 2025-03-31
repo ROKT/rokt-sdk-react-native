@@ -9,8 +9,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.facebook.react.bridge.*
 import com.facebook.react.modules.core.DeviceEventManagerModule.RCTDeviceEventEmitter
-import com.facebook.react.uimanager.NativeViewHierarchyManager
-import com.facebook.react.uimanager.UIManagerModule
+import com.facebook.react.uimanager.UIManagerHelper
 import com.rokt.roktsdk.CacheConfig
 import com.rokt.roktsdk.FulfillmentAttributes
 import com.rokt.roktsdk.Rokt
@@ -25,6 +24,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import java.lang.ref.WeakReference
+import java.util.concurrent.CountDownLatch
 
 /**
  * Copyright 2024 Rokt Pte Ltd
@@ -42,7 +42,7 @@ class RNRoktWidgetModule internal constructor(private val reactContext: ReactApp
     ) {
     private var roktEventHandler: RoktEventHandler? = null
     private var fulfillmentAttributesCallback: FulfillmentAttributes? = null
-    private var debug = false
+    private var debug = true
 
     private val eventSubscriptions = mutableMapOf<String, Job?>()
     private val listeners: MutableMap<Long, Rokt.RoktCallback> =
@@ -102,19 +102,77 @@ class RNRoktWidgetModule internal constructor(private val reactContext: ReactApp
             return
         }
 
-        val uiManager = reactContext.getNativeModule(UIManagerModule::class.java)
         startRoktEventListener(Rokt.events(viewName), viewName)
-
         val config = roktConfig?.let { buildRoktConfig(it) }
-        uiManager?.addUIBlock { nativeViewHierarchyManager ->
-            Rokt.execute(
-                viewName = viewName,
-                attributes = readableMapToMapOfStrings(attributes),
-                callback = createRoktCallback(),
-                placeholders = safeUnwrapPlaceholders(placeholders, nativeViewHierarchyManager),
-                config = config
-            )
+
+        // Process placeholders for Fabric
+        val placeholdersMap = HashMap<String, WeakReference<Widget>>()
+
+        if (placeholders != null) {
+            // Use CountDownLatch to wait for UI thread processing
+            val latch = CountDownLatch(1)
+
+            // Run view resolution on UI thread
+            UiThreadUtil.runOnUiThread {
+                try {
+                    val iterator = placeholders.keySetIterator()
+                    while (iterator.hasNextKey()) {
+                        val key = iterator.nextKey()
+                        try {
+                            // Get the tag value as an integer
+                            val reactTag = when {
+                                placeholders.getType(key) == ReadableType.Number ->
+                                    placeholders.getDouble(key).toInt()
+                                else -> {
+                                    logDebug("Invalid view tag for key: $key")
+                                    continue
+                                }
+                            }
+
+                            // Get the UIManager for this specific tag
+                            val uiManager = UIManagerHelper.getUIManagerForReactTag(reactContext, reactTag)
+                            if (uiManager == null) {
+                                logDebug("UIManager not found for tag: $reactTag")
+                                continue
+                            }
+
+                            // Resolve the view using the manager (now on UI thread)
+                            val view = uiManager.resolveView(reactTag)
+                            println("Sahil Rokt key is $key")
+                            if (view is Widget) {
+                                placeholdersMap[key] = WeakReference(view)
+                                logDebug("Successfully found Widget for key: $key with tag: $reactTag")
+                            } else {
+                                logDebug("View with tag $reactTag is not a Widget: ${view?.javaClass?.simpleName}")
+                            }
+                        } catch (e: Exception) {
+                            logDebug("Error processing placeholder for key $key: ${e.message}")
+                            e.printStackTrace()
+                        }
+                    }
+                } finally {
+                    latch.countDown()
+                }
+            }
+
+            try {
+                // Wait for UI thread to finish processing
+                latch.await()
+            } catch (e: InterruptedException) {
+                logDebug("Interrupted while waiting for UI thread: ${e.message}")
+            }
         }
+
+        println("Sahil Rokt calling execute with $viewName and placeholders $placeholdersMap")
+
+        // Execute Rokt with the placeholders we gathered
+        Rokt.execute(
+            viewName = viewName,
+            attributes = readableMapToMapOfStrings(attributes),
+            callback = createRoktCallback(),
+            placeholders = placeholdersMap,
+            config = config
+        )
     }
 
     @ReactMethod
@@ -143,30 +201,86 @@ class RNRoktWidgetModule internal constructor(private val reactContext: ReactApp
             return
         }
 
-        val uiManager = reactContext.getNativeModule(UIManagerModule::class.java)
         startRoktEventListener(Rokt.events(viewName), viewName)
         val config = roktConfig?.let { buildRoktConfig(it) }
-        uiManager?.addUIBlock { nativeViewHierarchyManager ->
-            Rokt.execute2Step(
-                viewName = viewName,
-                attributes = readableMapToMapOfStrings(attributes),
-                callback = createRoktCallback(),
-                placeholders = safeUnwrapPlaceholders(placeholders, nativeViewHierarchyManager),
-                roktEventCallback = object : Rokt.RoktEventCallback {
-                    override fun onEvent(
-                        eventType: RoktEventType,
-                        roktEventHandler: RoktEventHandler
-                    ) {
-                        setRoktEventHandler(roktEventHandler)
-                        if (eventType == RoktEventType.FirstPositiveEngagement) {
-                            logDebug("onFirstPositiveEvent was fired")
-                            sendEvent(reactContext, "FirstPositiveResponse", null)
+
+        // Process placeholders for Fabric
+        val placeholdersMap = HashMap<String, WeakReference<Widget>>()
+
+        if (placeholders != null) {
+            // Use CountDownLatch to wait for UI thread processing
+            val latch = CountDownLatch(1)
+
+            // Run view resolution on UI thread
+            UiThreadUtil.runOnUiThread {
+                try {
+                    val iterator = placeholders.keySetIterator()
+                    while (iterator.hasNextKey()) {
+                        val key = iterator.nextKey()
+                        try {
+                            // Get the tag value as an integer
+                            val reactTag = when {
+                                placeholders.getType(key) == ReadableType.Number ->
+                                    placeholders.getDouble(key).toInt()
+                                else -> {
+                                    logDebug("Invalid view tag for key: $key")
+                                    continue
+                                }
+                            }
+
+                            // Get the UIManager for this specific tag
+                            val uiManager = UIManagerHelper.getUIManagerForReactTag(reactContext, reactTag)
+                            if (uiManager == null) {
+                                logDebug("UIManager not found for tag: $reactTag")
+                                continue
+                            }
+
+                            // Resolve the view using the manager (now on UI thread)
+                            val view = uiManager.resolveView(reactTag)
+                            if (view is Widget) {
+                                placeholdersMap[key] = WeakReference(view)
+                                logDebug("Successfully found Widget for key: $key with tag: $reactTag")
+                            } else {
+                                logDebug("View with tag $reactTag is not a Widget: ${view?.javaClass?.simpleName}")
+                            }
+                        } catch (e: Exception) {
+                            logDebug("Error processing placeholder for key $key: ${e.message}")
+                            e.printStackTrace()
                         }
                     }
-                },
-                config = config
-            )
+                } finally {
+                    latch.countDown()
+                }
+            }
+
+            try {
+                // Wait for UI thread to finish processing
+                latch.await()
+            } catch (e: InterruptedException) {
+                logDebug("Interrupted while waiting for UI thread: ${e.message}")
+            }
         }
+
+        // Execute Rokt with the placeholders we gathered
+        Rokt.execute2Step(
+            viewName = viewName,
+            attributes = readableMapToMapOfStrings(attributes),
+            callback = createRoktCallback(),
+            placeholders = placeholdersMap,
+            roktEventCallback = object : Rokt.RoktEventCallback {
+                override fun onEvent(
+                    eventType: RoktEventType,
+                    roktEventHandler: RoktEventHandler
+                ) {
+                    setRoktEventHandler(roktEventHandler)
+                    if (eventType == RoktEventType.FirstPositiveEngagement) {
+                        logDebug("onFirstPositiveEvent was fired")
+                        sendEvent(reactContext, "FirstPositiveResponse", null)
+                    }
+                }
+            },
+            config = config
+        )
     }
 
     private fun initRokt(
@@ -290,23 +404,6 @@ class RNRoktWidgetModule internal constructor(private val reactContext: ReactApp
             params.putString("reason", reason)
         }
         sendEvent(reactContext, "RoktCallback", params)
-    }
-
-    private fun safeUnwrapPlaceholders(
-        placeholders: ReadableMap?,
-        nativeViewHierarchyManager: NativeViewHierarchyManager
-    ): Map<String, WeakReference<Widget>> {
-        val placeholderMap: MutableMap<String, WeakReference<Widget>> = HashMap()
-
-        if (placeholders != null) {
-            placeholderMap.putAll(placeholders.toHashMap()
-                .filterValues { value -> value is Double }
-                .mapValues { pair -> (pair.value as Double).toInt() }
-                .mapValues { pair -> nativeViewHierarchyManager.resolveView(pair.value) as? Widget }
-                .filterValues { value -> value != null }
-                .mapValues { WeakReference(it.value as Widget) })
-        }
-        return placeholderMap
     }
 
     private fun String.toColorMode(): RoktConfig.ColorMode {

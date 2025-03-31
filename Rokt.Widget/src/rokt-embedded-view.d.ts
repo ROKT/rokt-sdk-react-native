@@ -1,1 +1,1 @@
-export * from './rokt-embedded-view.ios'
+export * from './rokt-embedded-view.android'
