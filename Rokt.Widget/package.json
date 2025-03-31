@@ -20,6 +20,7 @@
     "ios",
     "index.js",
     "dist",
+    "src",
     "LICENSE",
     "README.md",
     "rokt-react-native-sdk.podspec",
