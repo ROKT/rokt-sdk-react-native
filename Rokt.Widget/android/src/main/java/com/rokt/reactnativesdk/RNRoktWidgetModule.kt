@@ -421,6 +421,11 @@ class RNRoktWidgetModule internal constructor(private val reactContext: ReactApp
                             params.putString("url", event.url)
                             event.id
                         }
+
+                        else -> {
+                            eventName = "Unknown"
+                            null
+                        }
                     }
 
                     placementId?.let { params.putString("placementId", it) }
