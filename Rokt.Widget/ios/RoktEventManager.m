@@ -73,6 +73,16 @@ RCT_EXPORT_MODULE(RoktEventManager);
          NSString *eventName = @"";
          NSString *status;
          NSString *url;
+         NSString *cartItemId;
+         NSString *catalogItemId;
+         NSString *currency;
+         NSString *itemDescription;
+         NSString *linkedProductId;
+         NSString *providerData;
+         NSDecimalNumber *quantity;
+         NSDecimalNumber *totalPrice;
+         NSDecimalNumber *unitPrice;
+         
          if ([event isKindOfClass:[ShowLoadingIndicator class]]) {
              eventName = @"ShowLoadingIndicator";
          } else if ([event isKindOfClass:[HideLoadingIndicator class]]) {
@@ -109,6 +119,23 @@ RCT_EXPORT_MODULE(RoktEventManager);
              eventName = @"OpenUrl";
              placementId = ((OpenUrl *)event).placementId;
              url = ((OpenUrl *)event).url;
+         } else if ([event isKindOfClass:[CartItemInstantPurchase class]]) {
+             CartItemInstantPurchase *cartEvent = (CartItemInstantPurchase *)event;
+             eventName = @"CartItemInstantPurchase";
+             // Required properties
+             placementId = cartEvent.placementId;
+             cartItemId = cartEvent.cartItemId;
+             catalogItemId = cartEvent.catalogItemId;
+             currency = cartEvent.currency;
+             providerData = cartEvent.providerData;
+             // Optional properties
+             linkedProductId = cartEvent.linkedProductId;
+             // Overridden description property
+             itemDescription = cartEvent.description;
+             // Decimal properties
+             quantity = cartEvent.quantity;
+             totalPrice = cartEvent.totalPrice;
+             unitPrice = cartEvent.unitPrice;
          }
          NSMutableDictionary *payload = [@{@"event": eventName} mutableCopy];
          if (viewName != nil) {
@@ -122,6 +149,33 @@ RCT_EXPORT_MODULE(RoktEventManager);
          }
          if (url != nil) {
              [payload setObject:url forKey:@"url"];
+         }
+         if (cartItemId != nil) {
+             [payload setObject:cartItemId forKey:@"cartItemId"];
+         }
+         if (catalogItemId != nil) {
+             [payload setObject:catalogItemId forKey:@"catalogItemId"];
+         }
+         if (currency != nil) {
+             [payload setObject:currency forKey:@"currency"];
+         }
+         if (itemDescription != nil) {
+             [payload setObject:itemDescription forKey:@"description"];
+         }
+         if (linkedProductId != nil) {
+             [payload setObject:linkedProductId forKey:@"linkedProductId"];
+         }
+         if (providerData != nil) {
+             [payload setObject:providerData forKey:@"providerData"];
+         }
+         if (quantity != nil) {
+             [payload setObject:quantity forKey:@"quantity"];
+         }
+         if (totalPrice != nil) {
+             [payload setObject:totalPrice forKey:@"totalPrice"];
+         }
+         if (unitPrice != nil) {
+             [payload setObject:unitPrice forKey:@"unitPrice"];
          }
 
          [self sendEventWithName:@"RoktEvents" body:payload];
