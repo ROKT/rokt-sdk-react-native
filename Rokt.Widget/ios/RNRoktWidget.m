@@ -352,5 +352,19 @@ RCT_EXPORT_METHOD(setLoggingEnabled: (BOOL *)enabled)
     [Rokt setLoggingEnabledWithEnable:enabled];
 }
 
+RCT_EXPORT_METHOD(purchaseFinalized:(NSString *)placementId
+                  catalogItemId:(NSString *)catalogItemId
+                  success:(BOOL)success)
+{
+    if (placementId == nil || catalogItemId == nil) {
+        RCTLog(@"purchaseFinalized failed. placementId and catalogItemId cannot be null");
+        return;
+    }
+    // Call the native iOS implementation
+    [Rokt purchaseFinalizedWithPlacementId:placementId
+                            catalogItemId:catalogItemId
+                                success:success];
+}
+
 @end
 

@@ -229,6 +229,12 @@ class RNRoktWidgetModule internal constructor(private val reactContext: ReactApp
         this.roktEventHandler = roktEventHandler
     }
 
+    @ReactMethod
+    fun purchaseFinalized(placementId: String, catalogItemId: String, success: Boolean) {
+        Rokt.purchaseFinalized(placementId, catalogItemId, success)
+    }
+
+
     override fun getName(): String {
         return "RNRoktWidget"
     }
@@ -420,6 +426,19 @@ class RNRoktWidgetModule internal constructor(private val reactContext: ReactApp
                             eventName = "OpenUrl"
                             params.putString("url", event.url)
                             event.id
+                        }
+
+                        is RoktEvent.CartItemInstantPurchase -> {
+                            eventName = "CartItemInstantPurchase"
+                            params.putString("cartItemId", event.cartItemId)
+                            params.putString("catalogItemId", event.catalogItemId)
+                            params.putString("currency", event.currency)
+                            params.putString("description", event.description)
+                            params.putString("linkedProductId", event.linkedProductId)
+                            params.putDouble("totalPrice", event.totalPrice)
+                            params.putInt("quantity", event.quantity)
+                            params.putDouble("unitPrice", event.unitPrice)
+                            event.placementId
                         }
 
                         else -> {

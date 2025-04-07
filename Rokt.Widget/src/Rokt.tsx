@@ -33,6 +33,10 @@ export abstract class Rokt {
         RNRoktWidget.setFulfillmentAttributes(attributes);
     }
 
+    public static purchaseFinalized(placementId: string, catalogItemId: string, success: boolean): void {
+        RNRoktWidget.purchaseFinalized(placementId, catalogItemId, success);
+    }
+
     public static setEnvironmentToStage(): void {
         RNRoktWidget.setEnvironmentToStage();
     }
@@ -63,6 +67,7 @@ interface RNRoktWidget {
     execute2Step(viewName: string, attributes: Record<string, string>, placeholders: Record<string, number | null>): void;
     execute2StepWithConfig(viewName: string, attributes: Record<string, string>, placeholders: Record<string, number | null>, roktConfig?: IRoktConfig): void;
     setFulfillmentAttributes(attributes: Record<string, string>): void;
+    purchaseFinalized(placementId: string, catalogItemId: string, success: boolean): void;
     setEnvironmentToStage(): void;
     setEnvironmentToProd(): void;
     setLoggingEnabled(enabled: boolean): void;

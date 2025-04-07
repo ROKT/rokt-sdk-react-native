@@ -86,6 +86,13 @@ export default class App extends Component {
 
   eventSubscription = eventManagerEmitter.addListener('RoktEvents', (data) => {
     console.log(`*** ROKT EVENT *** ${JSON.stringify(data)}`);
+    // Check if the event is CartItemInstantPurchase
+    if (data.event === 'CartItemInstantPurchase') {
+      console.log('CartItemInstantPurchase event received, calling purchaseFinalized');
+      // Call purchaseFinalized with the required parameters
+      // placementId, catalogItemId, and status (true for successful purchase)
+      Rokt.purchaseFinalized(data.placementId, data.catalogItemId, true);
+    }
   });
 
   encrypt(text, publicKey) {
