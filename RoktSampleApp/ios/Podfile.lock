@@ -417,10 +417,10 @@ PODS:
   - RNCCheckbox (0.5.17):
     - BEMCheckBox (~> 1.4)
     - React-Core
-  - rokt-react-native-sdk (4.8.1):
+  - rokt-react-native-sdk (4.9.0):
     - React
-    - Rokt-Widget (~> 4.9.1-alpha.1)
-  - Rokt-Widget (4.9.1-alpha.1)
+    - Rokt-Widget (~> 4.9.1)
+  - Rokt-Widget (4.9.1)
   - SocketRocket (0.6.1)
   - Yoga (1.14.0)
   - YogaKit (1.18.1):
@@ -632,12 +632,12 @@ SPEC CHECKSUMS:
   React-runtimeexecutor: 8f2ddd9db7874ec7de84f5c55d73aeaaf82908e2
   ReactCommon: 309d965cb51f058d07dea65bc04dcf462911f0a4
   RNCCheckbox: a3ca9978cb0846b981d28da4e9914bd437403d77
-  rokt-react-native-sdk: 474561023dceecce98ba8bbd63de3f4f9be4b60d
-  Rokt-Widget: d7a9167c7785114b05882525e3886a0198b7867f
+  rokt-react-native-sdk: a02ea4abe71e38dfe51fb9d0095faaa4d9dada05
+  Rokt-Widget: abe26e969921be4be5cfa7ad02dfe4d12addd723
   SocketRocket: f32cd54efbe0f095c4d7594881e52619cfe80b17
   Yoga: 68c9c592c3e80ec37ff28db20eedb13d84aae5df
   YogaKit: f782866e155069a2cca2517aafea43200b01fd5a
 
 PODFILE CHECKSUM: 67c6e0fe118aec20d62d8440469a30652639e413
 
-COCOAPODS: 1.16.2
+COCOAPODS: 1.15.2
