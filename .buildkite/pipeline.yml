@@ -97,7 +97,7 @@ steps:
       - bundle exec pod install --verbose --repo-update 
       - cd -
       - gem install xcpretty -v 0.3.0
-      - export RCT_NO_LAUNCH_PACKAGER=true && set -o pipefail && xcodebuild -workspace ios/RoktSampleApp.xcworkspace -destination 'platform=iOS Simulator,name=iPhone 15' -scheme RoktSampleApp -parallelizeTargets -configuration Debug -derivedDataPath ios/build -UseModernBuildSystem=YES clean test | xcpretty -k
+      - export RCT_NO_LAUNCH_PACKAGER=true && set -o pipefail && xcodebuild -workspace ios/RoktSampleApp.xcworkspace -destination 'platform=iOS Simulator,name=iPhone 15' -scheme RoktSampleApp -parallelizeTargets -configuration Debug -derivedDataPath ios/build -UseModernBuildSystem=YES clean test
       - pm2 stop reactnative && pm2 delete reactnative
     plugins:
       - artifacts#v1.9.0:
