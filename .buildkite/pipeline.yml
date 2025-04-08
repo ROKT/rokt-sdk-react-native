@@ -66,7 +66,7 @@ steps:
             - "RoktSampleApp/android/app/build/outputs/apk/debug/*.apk"
             - "RoktSampleApp/android/app/build/outputs/apk/androidTest/debug/*.apk"
       - docker#v5.6.0:
-          image: "${ECR_HOST}/cached/reactnativecommunity/react-native-android:7.0"
+          image: "reactnativecommunity/react-native-android:v13.1"
           user: "root"
           mount-buildkite-agent: true
           environment:
@@ -130,7 +130,7 @@ steps:
               secret-id: "stage-react-native-buildkite"
               json-key: ".NPM_TOKEN"
       - docker#v5.6.0:
-          image: "${ECR_HOST}/cached/reactnativecommunity/react-native-android:7.0"
+          image: reactnativecommunity/react-native-android:v13.1
           user: "root"
           mount-buildkite-agent: true
           environment:
@@ -165,7 +165,7 @@ steps:
               secret-id: "stage-react-native-buildkite"
               json-key: ".NPM_TOKEN"
       - docker#v5.6.0:
-          image: "${ECR_HOST}/cached/reactnativecommunity/react-native-android:7.0"
+          image: reactnativecommunity/react-native-android:v13.1
           user: "root"
           mount-buildkite-agent: true
           environment:
