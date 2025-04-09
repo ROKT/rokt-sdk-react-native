@@ -85,8 +85,9 @@ steps:
       - . ~/.zshrc
       - rbenv local 3.2.2
       - cd RoktSampleApp
+      - xcrun simctl shutdown "iPhone 15" || true
       - xcrun simctl boot "iPhone 15" || true
-      - nvm use 16
+      - nvm install 18 && nvm use 18
       - npm install pm2 -g
       - npm install
       - pm2 stop all || true
@@ -97,7 +98,7 @@ steps:
       - bundle exec pod install --verbose --repo-update 
       - cd -
       - gem install xcpretty -v 0.3.0
-      - export RCT_NO_LAUNCH_PACKAGER=true && set -o pipefail && xcodebuild -workspace ios/RoktSampleApp.xcworkspace -destination 'platform=iOS Simulator,name=iPhone 15' -scheme RoktSampleApp -parallelizeTargets -configuration Debug -derivedDataPath ios/build -UseModernBuildSystem=YES clean test
+      - set -o pipefail && xcodebuild -workspace ios/RoktSampleApp.xcworkspace -destination 'platform=iOS Simulator,name=iPhone 15' -scheme RoktSampleApp -parallelizeTargets -configuration Debug -derivedDataPath ios/build -UseModernBuildSystem=YES clean test | xcpretty -k
       - pm2 stop reactnative && pm2 delete reactnative
     plugins:
       - artifacts#v1.9.0:
@@ -130,7 +131,7 @@ steps:
               secret-id: "stage-react-native-buildkite"
               json-key: ".NPM_TOKEN"
       - docker#v5.6.0:
-          image: reactnativecommunity/react-native-android:v13.1
+          image: "reactnativecommunity/react-native-android:v13.1"
           user: "root"
           mount-buildkite-agent: true
           environment:
@@ -165,7 +166,7 @@ steps:
               secret-id: "stage-react-native-buildkite"
               json-key: ".NPM_TOKEN"
       - docker#v5.6.0:
-          image: reactnativecommunity/react-native-android:v13.1
+          image: "${ECR_HOST}/cached/reactnativecommunity/react-native-android:7.0"
           user: "root"
           mount-buildkite-agent: true
           environment:
