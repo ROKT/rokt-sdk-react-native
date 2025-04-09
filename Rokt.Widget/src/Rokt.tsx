@@ -1,7 +1,7 @@
 import 'react-native'
 import { NativeModules } from 'react-native';
 
-const RNRoktWidget = NativeModules.RNRoktWidget;
+const RNRoktWidget = require('./NativeRoktWidget').default;
 
 export abstract class Rokt {
 

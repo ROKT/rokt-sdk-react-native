@@ -1,8 +1,10 @@
 package com.rokt.reactnativesdk
 
-import com.facebook.react.ReactPackage
+import com.facebook.react.BaseReactPackage
 import com.facebook.react.bridge.NativeModule
 import com.facebook.react.bridge.ReactApplicationContext
+import com.facebook.react.module.model.ReactModuleInfo
+import com.facebook.react.module.model.ReactModuleInfoProvider
 import com.facebook.react.uimanager.ViewManager
 
 /**
@@ -15,9 +17,30 @@ import com.facebook.react.uimanager.ViewManager
  *
  * You may obtain a copy of the License at https://rokt.com/sdk-license-2-0/
  */
-class RoktEmbeddedViewPackage : ReactPackage {
-    override fun createNativeModules(reactContext: ReactApplicationContext): List<NativeModule> = emptyList()
+class RoktEmbeddedViewPackage : BaseReactPackage() {
+    override fun createViewManagers(reactContext: ReactApplicationContext): List<ViewManager<*, *>> {
+        return listOf(RoktEmbeddedViewManager())
+    }
 
-    override fun createViewManagers(reactContext: ReactApplicationContext): List<ViewManager<*, *>> =
-        listOf<ViewManager<*, *>>(RoktEmbeddedViewManager())
+    override fun getModule(
+        s: String, reactApplicationContext: ReactApplicationContext
+    ): NativeModule? {
+        when (s) {
+            RoktEmbeddedViewManager.REACT_CLASS -> RoktEmbeddedViewManager()
+        }
+        return null
+    }
+
+    override fun getReactModuleInfoProvider(): ReactModuleInfoProvider = ReactModuleInfoProvider {
+        mapOf(
+            RoktEmbeddedViewManager.REACT_CLASS to ReactModuleInfo(
+                RoktEmbeddedViewManager.REACT_CLASS,
+                RoktEmbeddedViewManager.REACT_CLASS,
+                false, // canOverrideExistingModule
+                false, // needsEagerInit
+                false, // isCxxModule
+                BuildConfig.IS_NEW_ARCHITECTURE_ENABLED // isTurboModule
+            )
+        )
+    }
 }

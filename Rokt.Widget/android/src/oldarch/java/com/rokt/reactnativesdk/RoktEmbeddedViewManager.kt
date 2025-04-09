@@ -20,7 +20,10 @@ import com.rokt.roktsdk.Widget
  * You may obtain a copy of the License at https://rokt.com/sdk-license-2-0/
  */
 class RoktEmbeddedViewManager : ViewGroupManager<Widget>() {
-    override fun getName(): String = "RoktNativeWidget"
+    companion object {
+        const val REACT_CLASS = "RoktNativeWidget"
+    }
+    override fun getName(): String = REACT_CLASS
 
     override fun createViewInstance(reactContext: ThemedReactContext): Widget {
         val widget = Widget(reactContext)
