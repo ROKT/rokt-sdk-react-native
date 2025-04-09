@@ -21,17 +21,11 @@
 
 - (NSURL *)bundleURL
 {
-  #if DEBUG
-  #ifdef IS_TESTING // Check for the macro defined in test target settings
-  // Running tests, load pre-compiled bundle
-  return [[NSBundle mainBundle] URLForResource:@"main" withExtension:@"jsbundle"];
-  #else
-  // Not running tests (normal Debug build), load from Metro
+#if DEBUG
   return [[RCTBundleURLProvider sharedSettings] jsBundleURLForBundleRoot:@"index"];
-  #endif
-  #else // Release build
-      return [[NSBundle mainBundle] URLForResource:@"main" withExtension:@"jsbundle"];
-  #endif
+#else
+  return [[NSBundle mainBundle] URLForResource:@"main" withExtension:@"jsbundle"];
+#endif
 }
 
 - (BOOL)bridgelessEnabled
