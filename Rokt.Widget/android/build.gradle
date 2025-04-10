@@ -12,8 +12,17 @@ buildscript {
     }
 }
 
+def isNewArchitectureEnabled() {
+    // The new architecture is not yet public
+    // We can only use the new architecture in build time, not runtime
+    return project.hasProperty("newArchEnabled") ? project.newArchEnabled.toBoolean() : false
+}
+
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
+if (isNewArchitectureEnabled()) {
+    apply plugin: 'com.facebook.react'
+}
 
 android {
     compileSdkVersion 32
@@ -24,14 +33,24 @@ android {
         targetSdkVersion 32
         versionCode 2
         versionName "2.0"
+        buildConfigField "boolean", "IS_NEW_ARCHITECTURE_ENABLED", isNewArchitectureEnabled().toString()
     }
     lintOptions {
         abortOnError false
     }
     buildFeatures {
-        buildConfig = false
+        buildConfig = true
     }
     namespace 'com.rokt.reactnativesdk'
+    sourceSets {
+        main {
+            if (isNewArchitectureEnabled()) {
+                java.srcDirs += ['src/newarch']
+            } else {
+                java.srcDirs += ['src/oldarch']
+            }
+        }
+    }
 }
 
 repositories {

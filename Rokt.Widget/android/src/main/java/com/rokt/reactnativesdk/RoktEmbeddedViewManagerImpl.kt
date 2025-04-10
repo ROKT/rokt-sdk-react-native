@@ -2,9 +2,7 @@ package com.rokt.reactnativesdk
 
 import com.facebook.react.bridge.Arguments
 import com.facebook.react.bridge.ReactContext
-import com.facebook.react.common.MapBuilder
 import com.facebook.react.uimanager.ThemedReactContext
-import com.facebook.react.uimanager.ViewGroupManager
 import com.facebook.react.uimanager.events.RCTEventEmitter
 import com.rokt.roktsdk.RoktWidgetDimensionCallBack
 import com.rokt.roktsdk.Widget
@@ -19,29 +17,24 @@ import com.rokt.roktsdk.Widget
  *
  * You may obtain a copy of the License at https://rokt.com/sdk-license-2-0/
  */
-class RoktEmbeddedViewManager : ViewGroupManager<Widget>() {
-    override fun getName(): String = "RoktNativeWidget"
+class RoktEmbeddedViewManagerImpl {
+    companion object {
+        const val REACT_CLASS = "RoktNativeWidget"
+        const val EVENT_HEIGHT_CHANGED = "onWidgetHeightChanged"
+        const val EVENT_MARGIN_CHANGED = "onWidgetMarginChanged"
+    }
 
-    override fun createViewInstance(reactContext: ThemedReactContext): Widget {
+    fun getName(): String = REACT_CLASS
+
+    fun createViewInstance(reactContext: ThemedReactContext): Widget {
         val widget = Widget(reactContext)
         setUpWidgetListeners(widget)
         return widget
     }
 
-    override fun getExportedCustomDirectEventTypeConstants(): Map<String, Any>? {
-        return MapBuilder.builder<String, Any>()
-            .put(
-                "onWidgetHeightChanged",
-                MapBuilder.of("registrationName", "onWidgetHeightChanged")
-            )
-            .put(
-                "onWidgetMarginChanged",
-                MapBuilder.of("registrationName", "onWidgetMarginChanged")
-            )
-            .build()
+    fun setPlaceholderName(view: Widget?, value: String?) {
+        view?.tag = value
     }
-
-    override fun needsCustomLayoutForChildren(): Boolean = false
 
     private fun setUpWidgetListeners(widget: Widget) {
         widget.registerDimensionListener(object : RoktWidgetDimensionCallBack {
@@ -59,7 +52,7 @@ class RoktEmbeddedViewManager : ViewGroupManager<Widget>() {
         val event = Arguments.createMap()
         event.putString("height", height.toString())
         context.getJSModule(RCTEventEmitter::class.java)
-            .receiveEvent(id, "onWidgetHeightChanged", event)
+            .receiveEvent(id, EVENT_HEIGHT_CHANGED, event)
     }
 
     fun changeMargin(context: ReactContext, id: Int, start: Int, top: Int, end: Int, bottom: Int) {
@@ -69,6 +62,6 @@ class RoktEmbeddedViewManager : ViewGroupManager<Widget>() {
         event.putString("marginRight", end.toString())
         event.putString("marginBottom", bottom.toString())
         context.getJSModule(RCTEventEmitter::class.java)
-            .receiveEvent(id, "onWidgetMarginChanged", event)
+            .receiveEvent(id, EVENT_MARGIN_CHANGED, event)
     }
 }
