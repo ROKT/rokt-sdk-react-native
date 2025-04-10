@@ -1,15 +1,22 @@
 import 'react-native'
 import { NativeModules } from 'react-native';
-
-// Declare global for New Architecture check
-declare var global: { __turboModuleProxy: {} | undefined };
+import type { Spec as RoktNativeInterface } from './NativeRoktWidget';
+// Import the default export for direct access
+import NativeRoktDefault from './NativeRoktWidget';
 
 // Check if the New Architecture is enabled
 // and select the appropriate Native Module
-let RNRoktWidget: RNRoktWidget;
-if (global.__turboModuleProxy) {
+let RNRoktWidget: RoktNativeInterface;
+
+// Safe type assertion for global object
+declare const global: {
+  __turboModuleProxy?: unknown;
+};
+
+if (global.__turboModuleProxy !== undefined) {
   console.log("Rokt SDK: Using New Architecture (TurboModule)");
-  RNRoktWidget = require('./NativeRoktWidget').default;
+  // Use the imported default export
+  RNRoktWidget = NativeRoktDefault;
 } else {
   console.log("Rokt SDK: Using Old Architecture (NativeModules)");
   RNRoktWidget = NativeModules.RNRoktWidget;
@@ -71,10 +78,11 @@ export abstract class Rokt {
 
 declare module 'react-native' {
     interface NativeModulesStatic {
-        RNRoktWidget: RNRoktWidget
+        RNRoktWidget: RoktNativeInterface
     }
 }
 
+// Define the interface that matches the native module for cleaner code
 interface RNRoktWidget {
     initialize(roktTagId: string, appVersion: string): void;
     initializeWithFonts(roktTagId: string, appVersion: string, fontPostScriptNames?: string[]): void;
