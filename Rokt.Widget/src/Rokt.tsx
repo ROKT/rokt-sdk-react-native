@@ -1,5 +1,24 @@
 import 'react-native'
-import RNRoktWidget from './NativeRoktWidget';
+import { NativeModules } from 'react-native';
+
+// Declare global for New Architecture check
+declare var global: { __turboModuleProxy: {} | undefined };
+
+// Check if the New Architecture is enabled
+// and select the appropriate Native Module
+let RNRoktWidget: RNRoktWidget;
+if (global.__turboModuleProxy) {
+  console.log("Rokt SDK: Using New Architecture (TurboModule)");
+  RNRoktWidget = require('./NativeRoktWidget').default;
+} else {
+  console.log("Rokt SDK: Using Old Architecture (NativeModules)");
+  RNRoktWidget = NativeModules.RNRoktWidget;
+}
+
+// Ensure the module is available
+if (!RNRoktWidget) {
+  throw new Error('Rokt Native Module is not available. Did you forget to link the library?');
+}
 
 export abstract class Rokt {
 

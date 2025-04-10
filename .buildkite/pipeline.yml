@@ -78,6 +78,35 @@ steps:
       queue: ${COMPUTE_ENG_BK_AGENT}
     timeout_in_minutes: 45
 
+  - label: ":ios: iOS Build and Test"
+    key: "ios-test"
+    depends_on: "pack"
+    commands:
+      - . ~/.zshrc
+      - rbenv local 3.2.2
+      - cd RoktSampleApp
+      - xcrun simctl shutdown "iPhone 15" || true
+      - xcrun simctl boot "iPhone 15" || true
+      - nvm install 18 && nvm use 18
+      - npm install pm2 -g
+      - npm install
+      - pm2 stop all || true
+      - pm2 delete all || true
+      - pm2 start --name reactnative npm -- start
+      - cd ios
+      - bundle check || bundle install --path vendor/bundle 
+      - bundle exec pod install --verbose --repo-update 
+      - cd -
+      - gem install xcpretty -v 0.3.0
+      - set -o pipefail && xcodebuild -workspace ios/RoktSampleApp.xcworkspace -destination 'platform=iOS Simulator,name=iPhone 15' -scheme RoktSampleApp -parallelizeTargets -configuration Debug -derivedDataPath ios/build -UseModernBuildSystem=YES clean test | xcpretty -k
+      - pm2 stop reactnative && pm2 delete reactnative
+    plugins:
+      - artifacts#v1.9.0:
+          download: "Rokt.Widget/*.tgz"
+    agents:
+      queue: ${MAC_BK_AGENT}
+    timeout_in_minutes: 45
+
   - block: ":whale: Publish Alpha Version to npm"
     key: "alpha-block"
     prompt: "Confirm publishing alpha version to npm?"

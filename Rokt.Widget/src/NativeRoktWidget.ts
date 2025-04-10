@@ -1,7 +1,7 @@
 import type { TurboModule } from 'react-native/Libraries/TurboModule/RCTExport';
 import { TurboModuleRegistry } from 'react-native';
 
-type ColorMode = "light" | "dark" | "system";
+type ColorMode = string;
 
 type CacheConfig = {
   readonly cacheDurationInSeconds?: number;
