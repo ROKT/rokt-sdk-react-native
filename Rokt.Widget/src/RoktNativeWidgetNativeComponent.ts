@@ -26,6 +26,7 @@ export interface NativeProps extends ViewProps {
 
 // Define the native component using codegen
 // This MUST match the name in the @ReactModule annotation in your ViewManager class
+// eslint-disable-next-line @typescript-eslint/no-unsafe-call
 export default codegenNativeComponent<NativeProps>(
   'RoktNativeWidget'
 ) as HostComponent<NativeProps>; 
