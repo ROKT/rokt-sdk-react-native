@@ -3,15 +3,10 @@ package com.rokt.reactnativesdk
 import com.facebook.react.bridge.*
 import com.facebook.react.uimanager.NativeViewHierarchyManager
 import com.facebook.react.uimanager.UIManagerModule
-import com.rokt.reactnativesdk.RNRoktWidgetModuleImpl.Companion.MAX_LISTENERS
-import com.rokt.roktsdk.CacheConfig
-import com.rokt.roktsdk.FulfillmentAttributes
 import com.rokt.roktsdk.Rokt
 import com.rokt.roktsdk.Rokt.RoktEventHandler
 import com.rokt.roktsdk.Rokt.RoktEventType
-import com.rokt.roktsdk.RoktConfig
 import com.rokt.roktsdk.Widget
-import kotlinx.coroutines.Job
 import java.lang.ref.WeakReference
 
 /**
@@ -28,16 +23,6 @@ class RNRoktWidgetModule internal constructor(private val reactContext: ReactApp
     ReactContextBaseJavaModule(
         reactContext
     ) {
-    private var roktEventHandler: RoktEventHandler? = null
-    private var fulfillmentAttributesCallback: FulfillmentAttributes? = null
-    private var debug = false
-
-    private val eventSubscriptions = mutableMapOf<String, Job?>()
-    private val listeners: MutableMap<Long, Rokt.RoktCallback> =
-        object : LinkedHashMap<Long, Rokt.RoktCallback>() {
-            override fun removeEldestEntry(eldest: Map.Entry<Long, Rokt.RoktCallback>): Boolean =
-                this.size > MAX_LISTENERS
-        }
 
     private val impl = RNRoktWidgetModuleImpl(reactContext)
 
@@ -188,45 +173,5 @@ class RNRoktWidgetModule internal constructor(private val reactContext: ReactApp
                 .mapValues { WeakReference(it.value as Widget) })
         }
         return placeholderMap
-    }
-
-    private fun String.toColorMode(): RoktConfig.ColorMode {
-        return when (this) {
-            "dark" -> RoktConfig.ColorMode.DARK
-            "light" -> RoktConfig.ColorMode.LIGHT
-            else -> RoktConfig.ColorMode.SYSTEM
-        }
-    }
-
-    private fun buildRoktConfig(
-        roktConfig: ReadableMap?
-    ): RoktConfig {
-        val builder = RoktConfig.Builder()
-        val configMap: Map<String, String> = impl.readableMapToMapOfStrings(roktConfig)
-        configMap["colorMode"]?.let {
-            builder.colorMode(it.toColorMode())
-        }
-        roktConfig?.getMap("cacheConfig")?.let {
-            builder.cacheConfig(buildCacheConfig(it))
-        }
-        return builder.build()
-    }
-
-    private fun buildCacheConfig(cacheConfigMap: ReadableMap?): CacheConfig {
-        val cacheDurationInSeconds =
-            if (cacheConfigMap?.hasKey("cacheDurationInSeconds") == true) {
-                cacheConfigMap.getDouble("cacheDurationInSeconds").toLong()
-            } else {
-                0L
-            }
-        val cacheAttributes = if (cacheConfigMap?.hasKey("cacheAttributes") == true) {
-            cacheConfigMap.getMap("cacheAttributes")?.toHashMap()?.mapValues { it.value as String }
-        } else {
-            null
-        }
-        return CacheConfig(
-            cacheDurationInSeconds = cacheDurationInSeconds,
-            cacheAttributes = cacheAttributes
-        )
     }
 }

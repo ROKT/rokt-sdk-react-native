@@ -27,7 +27,6 @@ class RNRoktWidgetModule internal constructor(private val reactContext: ReactApp
 
     @ReactMethod
     override fun initialize(roktTagId: String?, appVersion: String?) {
-        println("Sahil initialize method called in plugin new architecture")
         impl.initialize(roktTagId, appVersion, currentActivity)
     }
 
@@ -68,7 +67,6 @@ class RNRoktWidgetModule internal constructor(private val reactContext: ReactApp
         // Process placeholders for Fabric
         val placeholdersMap = processPlaceholders(placeholders)
 
-        println("Sahil Rokt calling execute with $viewName and placeholders $placeholdersMap")
 
         // Execute Rokt with the placeholders we gathered
         Rokt.execute(
