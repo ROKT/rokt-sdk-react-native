@@ -1,18 +1,13 @@
 import type { TurboModule } from 'react-native/Libraries/TurboModule/RCTExport';
 import { TurboModuleRegistry } from 'react-native';
-// Remove the IRoktConfig import
-// import { IRoktConfig } from './Rokt';
 
-// Define the ColorMode type inline
 type ColorMode = "light" | "dark" | "system";
 
-// Define CacheConfig inline
 type CacheConfig = {
   readonly cacheDurationInSeconds?: number;
   readonly cacheAttributes?: {[key: string]: string};
 };
 
-// Define RoktConfig inline
 type RoktConfigType = {
   readonly colorMode?: ColorMode;
   readonly cacheConfig?: CacheConfig;
@@ -36,5 +31,4 @@ export interface Spec extends TurboModule {
 }
 
 
-// Also log what's available in NativeModules for comparison
 export default TurboModuleRegistry.getEnforcing<Spec>('RNRoktWidget');
