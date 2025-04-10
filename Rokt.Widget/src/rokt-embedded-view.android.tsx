@@ -9,13 +9,12 @@
  * You may obtain a copy of the License at https://rokt.com/sdk-license-2-0/
  */
 
-import { StyleSheet, Alert, View } from 'react-native';
+import { StyleSheet } from 'react-native';
 import React, { Component } from 'react';
 import RoktNativeWidgetNativeComponent from './RoktNativeWidgetNativeComponent';
 
 /**
  * PUBLIC API: Props that users of RoktEmbeddedView can set
- * This is simplified to only expose the placeholderName prop to users
  */
 export interface RoktEmbeddedViewProps {
   // Placeholder name to use
@@ -34,6 +33,24 @@ export interface RoktEmbeddedViewState {
   marginBottom: number;
 }
 
+/**
+ * Native event types for type safety
+ */
+interface HeightChangedEvent {
+  nativeEvent: {
+    height: string;
+  }
+}
+
+interface MarginChangedEvent {
+  nativeEvent: {
+    marginTop?: string;
+    marginLeft?: string;
+    marginRight?: string;
+    marginBottom?: string;
+  }
+}
+
 const styles = StyleSheet.create({
   widget: {
     flex: 1,
@@ -50,8 +67,6 @@ const styles = StyleSheet.create({
 export class RoktEmbeddedView extends Component<RoktEmbeddedViewProps, RoktEmbeddedViewState> {
   constructor(props: RoktEmbeddedViewProps) {
     super(props);
-    console.log('[ROKT] RoktEmbeddedView constructor called ***');
-
     this.state = { height: 0, placeholderName: this.props.placeholderName, marginTop: 0, marginRight: 0, marginLeft: 0, marginBottom: 0 };
   }
 
@@ -59,7 +74,7 @@ export class RoktEmbeddedView extends Component<RoktEmbeddedViewProps, RoktEmbed
    * Handles the height changed event from the native component
    * This is an internal implementation detail not exposed to users
    */
-  private handleHeightChanged = (event: any) => {
+  private handleHeightChanged = (event: HeightChangedEvent) => {
     if (event && event.nativeEvent && event.nativeEvent.height) {
       this.setState({ height: parseInt(event.nativeEvent.height) });
     }
@@ -69,7 +84,7 @@ export class RoktEmbeddedView extends Component<RoktEmbeddedViewProps, RoktEmbed
    * Handles the margin changed event from the native component
    * This is an internal implementation detail not exposed to users
    */
-  private handleMarginChanged = (event: any) => {
+  private handleMarginChanged = (event: MarginChangedEvent) => {
     if (event && event.nativeEvent) {
       const { marginTop, marginLeft, marginRight, marginBottom } = event.nativeEvent;
       this.setState({
@@ -81,12 +96,7 @@ export class RoktEmbeddedView extends Component<RoktEmbeddedViewProps, RoktEmbed
     }
   }
 
-  override componentDidMount() {
-    console.log('[ROKT] RoktEmbeddedView componentDidMount:::');
-  }
-
   override render() {
-    console.log('[ROKT] RoktEmbeddedView render called');
     try {
       // Get the placeholderName from props
       const { placeholderName } = this.props;

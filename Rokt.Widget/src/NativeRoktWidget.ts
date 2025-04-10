@@ -1,5 +1,5 @@
 import type { TurboModule } from 'react-native/Libraries/TurboModule/RCTExport';
-import { TurboModuleRegistry, NativeModules } from 'react-native';
+import { TurboModuleRegistry } from 'react-native';
 // Remove the IRoktConfig import
 // import { IRoktConfig } from './Rokt';
 
