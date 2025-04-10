@@ -25,7 +25,7 @@ class RNRoktWidgetPackage : TurboReactPackage() {
         name: String,
         reactContext: ReactApplicationContext
     ): NativeModule? {
-        if (name == "RNRoktWidget") {
+        if (name == RNRoktWidgetModuleImpl.REACT_CLASS) {
             return RNRoktWidgetModule(reactContext)
         } else {
             return null
@@ -36,13 +36,12 @@ class RNRoktWidgetPackage : TurboReactPackage() {
             val moduleInfos: MutableMap<String, ReactModuleInfo> =
                 HashMap<String, ReactModuleInfo>()
             moduleInfos.put(
-                "RNRoktWidget",
+                RNRoktWidgetModuleImpl.REACT_CLASS,
                 ReactModuleInfo(
-                    "RNRoktWidget",
-                    "RNRoktWidget",
+                    RNRoktWidgetModuleImpl.REACT_CLASS,
+                    RNRoktWidgetModuleImpl.REACT_CLASS,
                     false,  // canOverrideExistingModule
                     false,  // needsEagerInit
-                    true,  // hasConstants
                     false,  // isCxxModule
                     BuildConfig.IS_NEW_ARCHITECTURE_ENABLED // isTurboModule
                 )

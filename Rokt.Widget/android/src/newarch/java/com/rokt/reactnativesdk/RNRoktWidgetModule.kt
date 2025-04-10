@@ -1,28 +1,11 @@
 package com.rokt.reactnativesdk
 
-import android.app.Activity
-import android.os.Handler
-import android.util.Log
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
 import com.facebook.react.bridge.*
-import com.facebook.react.modules.core.DeviceEventManagerModule.RCTDeviceEventEmitter
 import com.facebook.react.uimanager.UIManagerHelper
-import com.rokt.roktsdk.CacheConfig
-import com.rokt.roktsdk.FulfillmentAttributes
 import com.rokt.roktsdk.Rokt
-import com.rokt.roktsdk.RoktConfig
-import com.rokt.roktsdk.Rokt.Environment.Prod
 import com.rokt.roktsdk.Rokt.RoktEventHandler
 import com.rokt.roktsdk.Rokt.RoktEventType
-import com.rokt.roktsdk.Rokt.SdkFrameworkType.ReactNative
-import com.rokt.roktsdk.RoktEvent
 import com.rokt.roktsdk.Widget
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.launch
 import java.lang.ref.WeakReference
 import java.util.concurrent.CountDownLatch
 
@@ -40,40 +23,17 @@ class RNRoktWidgetModule internal constructor(private val reactContext: ReactApp
     NativeRoktWidgetSpec(
         reactContext
     ) {
-    private var roktEventHandler: RoktEventHandler? = null
-    private var fulfillmentAttributesCallback: FulfillmentAttributes? = null
-    private var debug = true
-
-    private val eventSubscriptions = mutableMapOf<String, Job?>()
-    private val listeners: MutableMap<Long, Rokt.RoktCallback> =
-        object : LinkedHashMap<Long, Rokt.RoktCallback>() {
-            override fun removeEldestEntry(eldest: Map.Entry<Long, Rokt.RoktCallback>): Boolean =
-                this.size > MAX_LISTENERS
-        }
+    private val impl = RNRoktWidgetModuleImpl(reactContext)
 
     @ReactMethod
     override fun initialize(roktTagId: String?, appVersion: String?) {
         println("Sahil initialize method called in plugin new architecture")
-        initRokt(roktTagId, appVersion, 4) { activity ->
-            Rokt.init(
-                roktTagId = requireNotNull(roktTagId),
-                appVersion = requireNotNull(appVersion),
-                activity = activity
-            )
-        }
+        impl.initialize(roktTagId, appVersion, currentActivity)
     }
 
     @ReactMethod
     override fun initializeWithFontFiles(roktTagId: String?, appVersion: String?, fontsMap: ReadableMap?) {
-        initRokt(roktTagId, appVersion, 4) { activity ->
-            Rokt.init(
-                roktTagId = requireNotNull(roktTagId),
-                appVersion = requireNotNull(appVersion),
-                activity = activity,
-                fontPostScriptNames = HashSet(),
-                fontFilePathMap = readableMapToMapOfStrings(fontsMap)
-            )
-        }
+        impl.initializeWithFontFiles(roktTagId, appVersion, fontsMap, currentActivity)
     }
 
     @ReactMethod
@@ -98,78 +58,23 @@ class RNRoktWidgetModule internal constructor(private val reactContext: ReactApp
         roktConfig: ReadableMap? = null
     ) {
         if (viewName == null) {
-            logDebug("Execute failed. ViewName cannot be null")
+            impl.logDebug("Execute failed. ViewName cannot be null")
             return
         }
 
-        startRoktEventListener(Rokt.events(viewName), viewName)
-        val config = roktConfig?.let { buildRoktConfig(it) }
+        impl.startRoktEventListener(Rokt.events(viewName), currentActivity, viewName)
+        val config = roktConfig?.let { impl.buildRoktConfig(it) }
 
         // Process placeholders for Fabric
-        val placeholdersMap = HashMap<String, WeakReference<Widget>>()
-
-        if (placeholders != null) {
-            // Use CountDownLatch to wait for UI thread processing
-            val latch = CountDownLatch(1)
-
-            // Run view resolution on UI thread
-            UiThreadUtil.runOnUiThread {
-                try {
-                    val iterator = placeholders.keySetIterator()
-                    while (iterator.hasNextKey()) {
-                        val key = iterator.nextKey()
-                        try {
-                            // Get the tag value as an integer
-                            val reactTag = when {
-                                placeholders.getType(key) == ReadableType.Number ->
-                                    placeholders.getDouble(key).toInt()
-                                else -> {
-                                    logDebug("Invalid view tag for key: $key")
-                                    continue
-                                }
-                            }
-
-                            // Get the UIManager for this specific tag
-                            val uiManager = UIManagerHelper.getUIManagerForReactTag(reactContext, reactTag)
-                            if (uiManager == null) {
-                                logDebug("UIManager not found for tag: $reactTag")
-                                continue
-                            }
-
-                            // Resolve the view using the manager (now on UI thread)
-                            val view = uiManager.resolveView(reactTag)
-                            println("Sahil Rokt key is $key")
-                            if (view is Widget) {
-                                placeholdersMap[key] = WeakReference(view)
-                                logDebug("Successfully found Widget for key: $key with tag: $reactTag")
-                            } else {
-                                logDebug("View with tag $reactTag is not a Widget: ${view?.javaClass?.simpleName}")
-                            }
-                        } catch (e: Exception) {
-                            logDebug("Error processing placeholder for key $key: ${e.message}")
-                            e.printStackTrace()
-                        }
-                    }
-                } finally {
-                    latch.countDown()
-                }
-            }
-
-            try {
-                // Wait for UI thread to finish processing
-                latch.await()
-            } catch (e: InterruptedException) {
-                logDebug("Interrupted while waiting for UI thread: ${e.message}")
-            }
-        }
+        val placeholdersMap = processPlaceholders(placeholders)
 
         println("Sahil Rokt calling execute with $viewName and placeholders $placeholdersMap")
 
         // Execute Rokt with the placeholders we gathered
         Rokt.execute(
             viewName = viewName,
-            attributes = readableMapToMapOfStrings(attributes),
-            callback = createRoktCallback(),
+            attributes = impl.readableMapToMapOfStrings(attributes),
+            callback = impl.createRoktCallback(),
             placeholders = placeholdersMap,
             config = config
         )
@@ -197,14 +102,43 @@ class RNRoktWidgetModule internal constructor(private val reactContext: ReactApp
         roktConfig: ReadableMap? = null
     ) {
         if (viewName == null) {
-            logDebug("Execute failed. ViewName cannot be null")
+            impl.logDebug("Execute failed. ViewName cannot be null")
             return
         }
 
-        startRoktEventListener(Rokt.events(viewName), viewName)
-        val config = roktConfig?.let { buildRoktConfig(it) }
+        impl.startRoktEventListener(Rokt.events(viewName), currentActivity, viewName)
+        val config = roktConfig?.let { impl.buildRoktConfig(it) }
 
         // Process placeholders for Fabric
+        val placeholdersMap = processPlaceholders(placeholders)
+
+        // Execute Rokt with the placeholders we gathered
+        Rokt.execute2Step(
+            viewName = viewName,
+            attributes = impl.readableMapToMapOfStrings(attributes),
+            callback = impl.createRoktCallback(),
+            placeholders = placeholdersMap,
+            roktEventCallback = object : Rokt.RoktEventCallback {
+                override fun onEvent(
+                    eventType: RoktEventType,
+                    roktEventHandler: RoktEventHandler
+                ) {
+                    impl.setRoktEventHandler(roktEventHandler)
+                    if (eventType == RoktEventType.FirstPositiveEngagement) {
+                        impl.logDebug("onFirstPositiveEvent was fired")
+                        impl.sendEvent(reactContext, "FirstPositiveResponse", null)
+                    }
+                }
+            },
+            config = config
+        )
+    }
+
+    /**
+     * Process placeholders from ReadableMap to a map of Widgets for use with Rokt.
+     * This method handles the Fabric-specific view resolution.
+     */
+    private fun processPlaceholders(placeholders: ReadableMap?): Map<String, WeakReference<Widget>> {
         val placeholdersMap = HashMap<String, WeakReference<Widget>>()
 
         if (placeholders != null) {
@@ -223,7 +157,7 @@ class RNRoktWidgetModule internal constructor(private val reactContext: ReactApp
                                 placeholders.getType(key) == ReadableType.Number ->
                                     placeholders.getDouble(key).toInt()
                                 else -> {
-                                    logDebug("Invalid view tag for key: $key")
+                                    impl.logDebug("Invalid view tag for key: $key")
                                     continue
                                 }
                             }
@@ -231,7 +165,7 @@ class RNRoktWidgetModule internal constructor(private val reactContext: ReactApp
                             // Get the UIManager for this specific tag
                             val uiManager = UIManagerHelper.getUIManagerForReactTag(reactContext, reactTag)
                             if (uiManager == null) {
-                                logDebug("UIManager not found for tag: $reactTag")
+                                impl.logDebug("UIManager not found for tag: $reactTag")
                                 continue
                             }
 
@@ -239,12 +173,12 @@ class RNRoktWidgetModule internal constructor(private val reactContext: ReactApp
                             val view = uiManager.resolveView(reactTag)
                             if (view is Widget) {
                                 placeholdersMap[key] = WeakReference(view)
-                                logDebug("Successfully found Widget for key: $key with tag: $reactTag")
+                                impl.logDebug("Successfully found Widget for key: $key with tag: $reactTag")
                             } else {
-                                logDebug("View with tag $reactTag is not a Widget: ${view?.javaClass?.simpleName}")
+                                impl.logDebug("View with tag $reactTag is not a Widget: ${view?.javaClass?.simpleName}")
                             }
                         } catch (e: Exception) {
-                            logDebug("Error processing placeholder for key $key: ${e.message}")
+                            impl.logDebug("Error processing placeholder for key $key: ${e.message}")
                             e.printStackTrace()
                         }
                     }
@@ -257,302 +191,39 @@ class RNRoktWidgetModule internal constructor(private val reactContext: ReactApp
                 // Wait for UI thread to finish processing
                 latch.await()
             } catch (e: InterruptedException) {
-                logDebug("Interrupted while waiting for UI thread: ${e.message}")
+                impl.logDebug("Interrupted while waiting for UI thread: ${e.message}")
             }
         }
 
-        // Execute Rokt with the placeholders we gathered
-        Rokt.execute2Step(
-            viewName = viewName,
-            attributes = readableMapToMapOfStrings(attributes),
-            callback = createRoktCallback(),
-            placeholders = placeholdersMap,
-            roktEventCallback = object : Rokt.RoktEventCallback {
-                override fun onEvent(
-                    eventType: RoktEventType,
-                    roktEventHandler: RoktEventHandler
-                ) {
-                    setRoktEventHandler(roktEventHandler)
-                    if (eventType == RoktEventType.FirstPositiveEngagement) {
-                        logDebug("onFirstPositiveEvent was fired")
-                        sendEvent(reactContext, "FirstPositiveResponse", null)
-                    }
-                }
-            },
-            config = config
-        )
-    }
-
-    private fun initRokt(
-        roktTagId: String?,
-        appVersion: String?,
-        retryCount: Int,
-        init: (activity: Activity) -> Unit
-    ) {
-        if (roktTagId == null || appVersion == null) {
-            logDebug("roktTagId and appVersion cannot be null")
-            return
-        }
-        Rokt.setFrameworkType(ReactNative)
-        eventSubscriptions.clear()
-        startRoktEventListener(Rokt.globalEvents())
-        if (currentActivity == null) {
-            // When the init was called from ReactComponent init and the activity is not fully resumed,
-            // the currentActivity could be null.
-            // Add a delay in this scenario and call the init.
-            // Recursive call initRokt to retry until retryCount becomes 0
-            Handler(reactContext.mainLooper).postDelayed({
-                currentActivity?.let(init) ?: run {
-                    if (retryCount == 0) {
-                        logDebug("Failed to initialize Rokt. Activity is null!!")
-                    } else {
-                        initRokt(roktTagId, appVersion, retryCount - 1, init)
-                    }
-                }
-            }, 100)
-        } else {
-            currentActivity?.let(init)
-        }
-    }
-
-    private fun sendEvent(
-        reactContext: ReactContext?,
-        eventName: String,
-        params: WritableMap?
-    ) {
-        reactContext?.getJSModule(RCTDeviceEventEmitter::class.java)?.emit(eventName, params)
+        return placeholdersMap
     }
 
     @ReactMethod
     override fun setFulfillmentAttributes(attributes: ReadableMap?) {
-        if (roktEventHandler != null) {
-            val fulfillmentAttributes = readableMapToMapOfStrings(attributes)
-            roktEventHandler?.setFulfillmentAttributes(fulfillmentAttributes)
-            logDebug("Calling setFulfillmentAttributes")
-        } else {
-            logDebug("RoktEventHandler is null, make sure you run execute2Step before calling setFulfillmentAttributes")
-        }
-
-        if (fulfillmentAttributesCallback != null) {
-            val fulfillmentAttributes = readableMapToMapOfStrings(attributes)
-            fulfillmentAttributesCallback?.sendAttributes(fulfillmentAttributes)
-            logDebug("Calling setFulfillmentAttributes")
-        }
-    }
-
-    private fun setRoktEventHandler(roktEventHandler: RoktEventHandler) {
-        this.roktEventHandler = roktEventHandler
+        impl.setFulfillmentAttributes(attributes)
     }
 
     override fun getName(): String {
-        return "RNRoktWidget"
+        return impl.getName()
     }
 
     @ReactMethod
     override fun setEnvironmentToStage() {
-        Rokt.setEnvironment(Rokt.Environment.Stage)
+        impl.setEnvironmentToStage()
     }
 
     @ReactMethod
     override fun setEnvironmentToProd() {
-        Rokt.setEnvironment(Prod)
+        impl.setEnvironmentToProd()
     }
 
     @ReactMethod
     override fun setLoggingEnabled(enabled: Boolean) {
-        this.debug = enabled
-        Rokt.setLoggingEnabled(enabled)
+        impl.setLoggingEnabled(enabled)
     }
 
     @ReactMethod
     override fun purchaseFinalized(placementId: String, catalogItemId: String, success: Boolean) {
-        Rokt.purchaseFinalized(placementId, catalogItemId, success)
-    }
-
-    private fun logDebug(message: String) {
-        if (debug) {
-            Log.d("Rokt", message)
-        }
-    }
-
-    private fun readableMapToMapOfStrings(attributes: ReadableMap?): Map<String, String> =
-        attributes?.toHashMap()?.filter { it.value is String }?.mapValues { it.value as String }
-            ?: emptyMap()
-
-
-    private fun createRoktCallback(): Rokt.RoktCallback {
-        val callback: Rokt.RoktCallback = object : Rokt.RoktCallback {
-            override fun onLoad() {
-                sendCallback("onLoad", null)
-            }
-
-            override fun onUnload(reason: Rokt.UnloadReasons) {
-                sendCallback("onUnLoad", reason.toString())
-            }
-
-            override fun onShouldShowLoadingIndicator() {
-                sendCallback("onShouldShowLoadingIndicator", null)
-            }
-
-            override fun onShouldHideLoadingIndicator() {
-                sendCallback("onShouldHideLoadingIndicator", null)
-            }
-        }
-        listeners[System.currentTimeMillis()] = callback
-        return callback
-    }
-
-    private fun sendCallback(eventValue: String, reason: String?) {
-        val params = Arguments.createMap()
-        params.putString("callbackValue", eventValue)
-        if (reason != null) {
-            params.putString("reason", reason)
-        }
-        sendEvent(reactContext, "RoktCallback", params)
-    }
-
-    private fun String.toColorMode(): RoktConfig.ColorMode {
-        return when (this) {
-            "dark" -> RoktConfig.ColorMode.DARK
-            "light" -> RoktConfig.ColorMode.LIGHT
-            else -> RoktConfig.ColorMode.SYSTEM
-        }
-    }
-
-    private fun buildRoktConfig(
-        roktConfig: ReadableMap?
-    ): RoktConfig {
-        val builder = RoktConfig.Builder()
-        val configMap: Map<String, String> = readableMapToMapOfStrings(roktConfig)
-        configMap["colorMode"]?.let {
-            builder.colorMode(it.toColorMode())
-        }
-        roktConfig?.getMap("cacheConfig")?.let {
-            builder.cacheConfig(buildCacheConfig(it))
-        }
-        return builder.build()
-    }
-
-    private fun buildCacheConfig(cacheConfigMap: ReadableMap?): CacheConfig {
-        val cacheDurationInSeconds =
-            if (cacheConfigMap?.hasKey("cacheDurationInSeconds") == true) {
-                cacheConfigMap.getDouble("cacheDurationInSeconds").toLong()
-            } else {
-                0L
-            }
-        val cacheAttributes = if (cacheConfigMap?.hasKey("cacheAttributes") == true) {
-            cacheConfigMap.getMap("cacheAttributes")?.toHashMap()?.mapValues { it.value as String }
-        } else {
-            null
-        }
-        return CacheConfig(
-            cacheDurationInSeconds = cacheDurationInSeconds,
-            cacheAttributes = cacheAttributes
-        )
-    }
-
-    private fun startRoktEventListener(flow: Flow<RoktEvent>, viewName: String? = null) {
-        val activeJob = eventSubscriptions[viewName.orEmpty()]?.takeIf { it.isActive }
-        if (activeJob != null) {
-            return
-        }
-        val job = (currentActivity as? LifecycleOwner)?.lifecycleScope?.launch {
-            (currentActivity as LifecycleOwner).repeatOnLifecycle(Lifecycle.State.CREATED) {
-                flow.collect { event ->
-                    val params = Arguments.createMap()
-                    var eventName = ""
-                    val placementId: String? = when (event) {
-                        is RoktEvent.FirstPositiveEngagement -> {
-                            eventName = "FirstPositiveEngagement"
-                            fulfillmentAttributesCallback = event.fulfillmentAttributes
-                            event.id
-                        }
-
-                        RoktEvent.HideLoadingIndicator -> {
-                            eventName = "HideLoadingIndicator"
-                            null
-                        }
-
-                        is RoktEvent.OfferEngagement -> {
-                            eventName = "OfferEngagement"
-                            event.id
-                        }
-
-                        is RoktEvent.PlacementClosed -> {
-                            eventName = "PlacementClosed"
-                            event.id
-                        }
-
-                        is RoktEvent.PlacementCompleted -> {
-                            eventName = "PlacementCompleted"
-                            event.id
-                        }
-
-                        is RoktEvent.PlacementFailure -> {
-                            eventName = "PlacementFailure"
-                            event.id
-                        }
-
-                        is RoktEvent.PlacementInteractive -> {
-                            eventName = "PlacementInteractive"
-                            event.id
-                        }
-
-                        is RoktEvent.PlacementReady -> {
-                            eventName = "PlacementReady"
-                            event.id
-                        }
-
-                        is RoktEvent.PositiveEngagement -> {
-                            eventName = "PositiveEngagement"
-                            event.id
-                        }
-
-                        RoktEvent.ShowLoadingIndicator -> {
-                            eventName = "ShowLoadingIndicator"
-                            null
-                        }
-
-                        is RoktEvent.InitComplete -> {
-                            eventName = "InitComplete"
-                            params.putString("status", event.success.toString())
-                            null
-                        }
-
-                        is RoktEvent.OpenUrl -> {
-                            eventName = "OpenUrl"
-                            params.putString("url", event.url)
-                            event.id
-                        }
-
-                        is RoktEvent.CartItemInstantPurchase -> {
-                            eventName = "CartItemInstantPurchase"
-                            params.putString("cartItemId", event.cartItemId)
-                            params.putString("catalogItemId", event.catalogItemId)
-                            params.putString("currency", event.currency)
-                            params.putString("description", event.description)
-                            params.putString("linkedProductId", event.linkedProductId)
-                            params.putDouble("totalPrice", event.totalPrice)
-                            params.putInt("quantity", event.quantity)
-                            params.putDouble("unitPrice", event.unitPrice)
-                            event.placementId
-                        }
-
-                        else -> {
-                            eventName = "Unknown"
-                            null
-                        }
-                    }
-
-                    placementId?.let { params.putString("placementId", it) }
-                    params.putString("event", eventName)
-                    viewName?.let { params.putString("viewName", it) }
-                    sendEvent(reactContext, "RoktEvents", params)
-                }
-            }
-        }
-        eventSubscriptions[viewName.orEmpty()] = job
+        impl.purchaseFinalized(placementId, catalogItemId, success)
     }
 }
-
-private const val MAX_LISTENERS = 5

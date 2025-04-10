@@ -26,16 +26,16 @@ class RoktEmbeddedViewPackage : BaseReactPackage() {
         s: String, reactApplicationContext: ReactApplicationContext
     ): NativeModule? {
         when (s) {
-            RoktEmbeddedViewManager.REACT_CLASS -> RoktEmbeddedViewManager()
+            RoktEmbeddedViewManagerImpl.REACT_CLASS -> RoktEmbeddedViewManager()
         }
         return null
     }
 
     override fun getReactModuleInfoProvider(): ReactModuleInfoProvider = ReactModuleInfoProvider {
         mapOf(
-            RoktEmbeddedViewManager.REACT_CLASS to ReactModuleInfo(
-                RoktEmbeddedViewManager.REACT_CLASS,
-                RoktEmbeddedViewManager.REACT_CLASS,
+            RoktEmbeddedViewManagerImpl.REACT_CLASS to ReactModuleInfo(
+                RoktEmbeddedViewManagerImpl.REACT_CLASS,
+                RoktEmbeddedViewManagerImpl.REACT_CLASS,
                 false, // canOverrideExistingModule
                 false, // needsEagerInit
                 false, // isCxxModule
