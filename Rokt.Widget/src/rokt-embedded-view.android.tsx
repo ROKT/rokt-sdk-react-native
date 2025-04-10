@@ -50,6 +50,7 @@ const styles = StyleSheet.create({
 export class RoktEmbeddedView extends Component<RoktEmbeddedViewProps, RoktEmbeddedViewState> {
   constructor(props: RoktEmbeddedViewProps) {
     super(props);
+    console.log('[ROKT] RoktEmbeddedView constructor called ***');
 
     this.state = { height: 0, placeholderName: this.props.placeholderName, marginTop: 0, marginRight: 0, marginLeft: 0, marginBottom: 0 };
   }
@@ -80,11 +81,17 @@ export class RoktEmbeddedView extends Component<RoktEmbeddedViewProps, RoktEmbed
     }
   }
 
+  override componentDidMount() {
+    console.log('[ROKT] RoktEmbeddedView componentDidMount:::');
+  }
+
   override render() {
+    console.log('[ROKT] RoktEmbeddedView render called');
     try {
       // Get the placeholderName from props
       const { placeholderName } = this.props;
 
+      console.log('[ROKT] Rendering RoktNativeWidget with placeholderName=>', placeholderName);
       // Return the native component with the props
       return (
         <RoktNativeWidgetNativeComponent
