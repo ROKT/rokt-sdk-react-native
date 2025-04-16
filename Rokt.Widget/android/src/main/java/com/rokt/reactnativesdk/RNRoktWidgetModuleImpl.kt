@@ -9,22 +9,17 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.facebook.react.bridge.*
 import com.facebook.react.modules.core.DeviceEventManagerModule.RCTDeviceEventEmitter
-import com.facebook.react.uimanager.NativeViewHierarchyManager
-import com.facebook.react.uimanager.UIManagerModule
 import com.rokt.roktsdk.CacheConfig
 import com.rokt.roktsdk.FulfillmentAttributes
 import com.rokt.roktsdk.Rokt
 import com.rokt.roktsdk.RoktConfig
 import com.rokt.roktsdk.Rokt.Environment.Prod
 import com.rokt.roktsdk.Rokt.RoktEventHandler
-import com.rokt.roktsdk.Rokt.RoktEventType
 import com.rokt.roktsdk.Rokt.SdkFrameworkType.ReactNative
 import com.rokt.roktsdk.RoktEvent
-import com.rokt.roktsdk.Widget
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
-import java.lang.ref.WeakReference
 
 /**
  * Copyright 2024 Rokt Pte Ltd
@@ -36,10 +31,7 @@ import java.lang.ref.WeakReference
  *
  * You may obtain a copy of the License at https://rokt.com/sdk-license-2-0/
  */
-class RNRoktWidgetModule internal constructor(private val reactContext: ReactApplicationContext) :
-    ReactContextBaseJavaModule(
-        reactContext
-    ) {
+class RNRoktWidgetModuleImpl(private val reactContext: ReactApplicationContext) {
     private var roktEventHandler: RoktEventHandler? = null
     private var fulfillmentAttributesCallback: FulfillmentAttributes? = null
     private var debug = false
@@ -51,9 +43,10 @@ class RNRoktWidgetModule internal constructor(private val reactContext: ReactApp
                 this.size > MAX_LISTENERS
         }
 
-    @ReactMethod
-    fun initialize(roktTagId: String?, appVersion: String?) {
-        initRokt(roktTagId, appVersion, 4) { activity ->
+    fun getName(): String = REACT_CLASS
+
+    fun initialize(roktTagId: String?, appVersion: String?, currentActivity: Activity?) {
+        initRokt(roktTagId, appVersion, 4, currentActivity) { activity ->
             Rokt.init(
                 roktTagId = requireNotNull(roktTagId),
                 appVersion = requireNotNull(appVersion),
@@ -62,9 +55,8 @@ class RNRoktWidgetModule internal constructor(private val reactContext: ReactApp
         }
     }
 
-    @ReactMethod
-    fun initializeWithFontFiles(roktTagId: String?, appVersion: String?, fontsMap: ReadableMap?) {
-        initRokt(roktTagId, appVersion, 4) { activity ->
+    fun initializeWithFontFiles(roktTagId: String?, appVersion: String?, fontsMap: ReadableMap?, currentActivity: Activity?) {
+        initRokt(roktTagId, appVersion, 4, currentActivity) { activity ->
             Rokt.init(
                 roktTagId = requireNotNull(roktTagId),
                 appVersion = requireNotNull(appVersion),
@@ -75,140 +67,6 @@ class RNRoktWidgetModule internal constructor(private val reactContext: ReactApp
         }
     }
 
-    @ReactMethod
-    fun execute(viewName: String?, attributes: ReadableMap?, placeholders: ReadableMap?) {
-        executeInternal(viewName, attributes, placeholders)
-    }
-
-    @ReactMethod
-    fun executeWithConfig(
-        viewName: String?,
-        attributes: ReadableMap?,
-        placeholders: ReadableMap?,
-        roktConfig: ReadableMap?
-    ) {
-        executeInternal(viewName, attributes, placeholders, roktConfig)
-    }
-
-    private fun executeInternal(
-        viewName: String?,
-        attributes: ReadableMap?,
-        placeholders: ReadableMap?,
-        roktConfig: ReadableMap? = null
-    ) {
-        if (viewName == null) {
-            logDebug("Execute failed. ViewName cannot be null")
-            return
-        }
-
-        val uiManager = reactContext.getNativeModule(UIManagerModule::class.java)
-        startRoktEventListener(Rokt.events(viewName), viewName)
-
-        val config = roktConfig?.let { buildRoktConfig(it) }
-        uiManager?.addUIBlock { nativeViewHierarchyManager ->
-            Rokt.execute(
-                viewName = viewName,
-                attributes = readableMapToMapOfStrings(attributes),
-                callback = createRoktCallback(),
-                placeholders = safeUnwrapPlaceholders(placeholders, nativeViewHierarchyManager),
-                config = config
-            )
-        }
-    }
-
-    @ReactMethod
-    fun execute2Step(viewName: String?, attributes: ReadableMap?, placeholders: ReadableMap?) {
-        execute2StepInternal(viewName, attributes, placeholders)
-    }
-
-    @ReactMethod
-    fun execute2StepWithConfig(
-        viewName: String?,
-        attributes: ReadableMap?,
-        placeholders: ReadableMap?,
-        roktConfig: ReadableMap?
-    ) {
-        execute2StepInternal(viewName, attributes, placeholders, roktConfig)
-    }
-
-    private fun execute2StepInternal(
-        viewName: String?,
-        attributes: ReadableMap?,
-        placeholders: ReadableMap?,
-        roktConfig: ReadableMap? = null
-    ) {
-        if (viewName == null) {
-            logDebug("Execute failed. ViewName cannot be null")
-            return
-        }
-
-        val uiManager = reactContext.getNativeModule(UIManagerModule::class.java)
-        startRoktEventListener(Rokt.events(viewName), viewName)
-        val config = roktConfig?.let { buildRoktConfig(it) }
-        uiManager?.addUIBlock { nativeViewHierarchyManager ->
-            Rokt.execute2Step(
-                viewName = viewName,
-                attributes = readableMapToMapOfStrings(attributes),
-                callback = createRoktCallback(),
-                placeholders = safeUnwrapPlaceholders(placeholders, nativeViewHierarchyManager),
-                roktEventCallback = object : Rokt.RoktEventCallback {
-                    override fun onEvent(
-                        eventType: RoktEventType,
-                        roktEventHandler: RoktEventHandler
-                    ) {
-                        setRoktEventHandler(roktEventHandler)
-                        if (eventType == RoktEventType.FirstPositiveEngagement) {
-                            logDebug("onFirstPositiveEvent was fired")
-                            sendEvent(reactContext, "FirstPositiveResponse", null)
-                        }
-                    }
-                },
-                config = config
-            )
-        }
-    }
-
-    private fun initRokt(
-        roktTagId: String?,
-        appVersion: String?,
-        retryCount: Int,
-        init: (activity: Activity) -> Unit
-    ) {
-        if (roktTagId == null || appVersion == null) {
-            logDebug("roktTagId and appVersion cannot be null")
-            return
-        }
-        Rokt.setFrameworkType(ReactNative)
-        eventSubscriptions.clear()
-        startRoktEventListener(Rokt.globalEvents())
-        if (currentActivity == null) {
-            // When the init was called from ReactComponent init and the activity is not fully resumed,
-            // the currentActivity could be null.
-            // Add a delay in this scenario and call the init.
-            // Recursive call initRokt to retry until retryCount becomes 0
-            Handler(reactContext.mainLooper).postDelayed({
-                currentActivity?.let(init) ?: run {
-                    if (retryCount == 0) {
-                        logDebug("Failed to initialize Rokt. Activity is null!!")
-                    } else {
-                        initRokt(roktTagId, appVersion, retryCount - 1, init)
-                    }
-                }
-            }, 100)
-        } else {
-            currentActivity?.let(init)
-        }
-    }
-
-    private fun sendEvent(
-        reactContext: ReactContext?,
-        eventName: String,
-        params: WritableMap?
-    ) {
-        reactContext?.getJSModule(RCTDeviceEventEmitter::class.java)?.emit(eventName, params)
-    }
-
-    @ReactMethod
     fun setFulfillmentAttributes(attributes: ReadableMap?) {
         if (roktEventHandler != null) {
             val fulfillmentAttributes = readableMapToMapOfStrings(attributes)
@@ -225,48 +83,28 @@ class RNRoktWidgetModule internal constructor(private val reactContext: ReactApp
         }
     }
 
-    private fun setRoktEventHandler(roktEventHandler: RoktEventHandler) {
-        this.roktEventHandler = roktEventHandler
-    }
-
-    @ReactMethod
     fun purchaseFinalized(placementId: String, catalogItemId: String, success: Boolean) {
         Rokt.purchaseFinalized(placementId, catalogItemId, success)
     }
 
-
-    override fun getName(): String {
-        return "RNRoktWidget"
-    }
-
-    @ReactMethod
     fun setEnvironmentToStage() {
         Rokt.setEnvironment(Rokt.Environment.Stage)
     }
 
-    @ReactMethod
     fun setEnvironmentToProd() {
         Rokt.setEnvironment(Prod)
     }
 
-    @ReactMethod
     fun setLoggingEnabled(enabled: Boolean) {
         this.debug = enabled
         Rokt.setLoggingEnabled(enabled)
     }
 
-    private fun logDebug(message: String) {
-        if (debug) {
-            Log.d("Rokt", message)
-        }
+    fun setRoktEventHandler(roktEventHandler: RoktEventHandler) {
+        this.roktEventHandler = roktEventHandler
     }
 
-    private fun readableMapToMapOfStrings(attributes: ReadableMap?): Map<String, String> =
-        attributes?.toHashMap()?.filter { it.value is String }?.mapValues { it.value as String }
-            ?: emptyMap()
-
-
-    private fun createRoktCallback(): Rokt.RoktCallback {
+    fun createRoktCallback(): Rokt.RoktCallback {
         val callback: Rokt.RoktCallback = object : Rokt.RoktCallback {
             override fun onLoad() {
                 sendCallback("onLoad", null)
@@ -288,7 +126,7 @@ class RNRoktWidgetModule internal constructor(private val reactContext: ReactApp
         return callback
     }
 
-    private fun sendCallback(eventValue: String, reason: String?) {
+    fun sendCallback(eventValue: String, reason: String?) {
         val params = Arguments.createMap()
         params.putString("callbackValue", eventValue)
         if (reason != null) {
@@ -297,24 +135,25 @@ class RNRoktWidgetModule internal constructor(private val reactContext: ReactApp
         sendEvent(reactContext, "RoktCallback", params)
     }
 
-    private fun safeUnwrapPlaceholders(
-        placeholders: ReadableMap?,
-        nativeViewHierarchyManager: NativeViewHierarchyManager
-    ): Map<String, WeakReference<Widget>> {
-        val placeholderMap: MutableMap<String, WeakReference<Widget>> = HashMap()
-
-        if (placeholders != null) {
-            placeholderMap.putAll(placeholders.toHashMap()
-                .filterValues { value -> value is Double }
-                .mapValues { pair -> (pair.value as Double).toInt() }
-                .mapValues { pair -> nativeViewHierarchyManager.resolveView(pair.value) as? Widget }
-                .filterValues { value -> value != null }
-                .mapValues { WeakReference(it.value as Widget) })
-        }
-        return placeholderMap
+    fun sendEvent(
+        reactContext: ReactContext?,
+        eventName: String,
+        params: WritableMap?
+    ) {
+        reactContext?.getJSModule(RCTDeviceEventEmitter::class.java)?.emit(eventName, params)
     }
 
-    private fun String.toColorMode(): RoktConfig.ColorMode {
+    fun readableMapToMapOfStrings(attributes: ReadableMap?): Map<String, String> =
+        attributes?.toHashMap()?.filter { it.value is String }?.mapValues { it.value as String }
+            ?: emptyMap()
+
+    fun logDebug(message: String) {
+        if (debug) {
+            Log.d("Rokt", message)
+        }
+    }
+
+    fun String.toColorMode(): RoktConfig.ColorMode {
         return when (this) {
             "dark" -> RoktConfig.ColorMode.DARK
             "light" -> RoktConfig.ColorMode.LIGHT
@@ -322,9 +161,7 @@ class RNRoktWidgetModule internal constructor(private val reactContext: ReactApp
         }
     }
 
-    private fun buildRoktConfig(
-        roktConfig: ReadableMap?
-    ): RoktConfig {
+    fun buildRoktConfig(roktConfig: ReadableMap?): RoktConfig {
         val builder = RoktConfig.Builder()
         val configMap: Map<String, String> = readableMapToMapOfStrings(roktConfig)
         configMap["colorMode"]?.let {
@@ -336,7 +173,7 @@ class RNRoktWidgetModule internal constructor(private val reactContext: ReactApp
         return builder.build()
     }
 
-    private fun buildCacheConfig(cacheConfigMap: ReadableMap?): CacheConfig {
+    fun buildCacheConfig(cacheConfigMap: ReadableMap?): CacheConfig {
         val cacheDurationInSeconds =
             if (cacheConfigMap?.hasKey("cacheDurationInSeconds") == true) {
                 cacheConfigMap.getDouble("cacheDurationInSeconds").toLong()
@@ -354,7 +191,7 @@ class RNRoktWidgetModule internal constructor(private val reactContext: ReactApp
         )
     }
 
-    private fun startRoktEventListener(flow: Flow<RoktEvent>, viewName: String? = null) {
+    fun startRoktEventListener(flow: Flow<RoktEvent>, currentActivity: Activity?, viewName: String? = null) {
         val activeJob = eventSubscriptions[viewName.orEmpty()]?.takeIf { it.isActive }
         if (activeJob != null) {
             return
@@ -456,6 +293,42 @@ class RNRoktWidgetModule internal constructor(private val reactContext: ReactApp
         }
         eventSubscriptions[viewName.orEmpty()] = job
     }
-}
 
-private const val MAX_LISTENERS = 5
+    private fun initRokt(
+        roktTagId: String?,
+        appVersion: String?,
+        retryCount: Int,
+        currentActivity: Activity?,
+        init: (activity: Activity) -> Unit
+    ) {
+        if (roktTagId == null || appVersion == null) {
+            logDebug("roktTagId and appVersion cannot be null")
+            return
+        }
+        Rokt.setFrameworkType(ReactNative)
+        eventSubscriptions.clear()
+        startRoktEventListener(Rokt.globalEvents(), currentActivity)
+        if (currentActivity == null) {
+            // When the init was called from ReactComponent init and the activity is not fully resumed,
+            // the currentActivity could be null.
+            // Add a delay in this scenario and call the init.
+            // Recursive call initRokt to retry until retryCount becomes 0
+            Handler(reactContext.mainLooper).postDelayed({
+                currentActivity?.let(init) ?: run {
+                    if (retryCount == 0) {
+                        logDebug("Failed to initialize Rokt. Activity is null!!")
+                    } else {
+                        initRokt(roktTagId, appVersion, retryCount - 1, reactContext.currentActivity, init)
+                    }
+                }
+            }, 100)
+        } else {
+            currentActivity.let(init)
+        }
+    }
+
+    companion object {
+        const val MAX_LISTENERS = 5
+        const val REACT_CLASS = "RNRoktWidget"
+    }
+}
