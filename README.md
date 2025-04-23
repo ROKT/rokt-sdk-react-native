@@ -81,14 +81,14 @@ For iOS development, ensure you have:
    - Android: `npx react-native run-android`
    - iOS: `npx react-native run-ios`
 
-### Building for Release
-1. For SDK releases, update the version number in package.json
-2. Test thoroughly across supported platforms
-3. Create a release branch following the naming convention `release/vX.Y.Z`
-4. Once tested and approved, the release can be published to npm using:
-   ```shell
-   npm publish
-   ```
+### Publishing
+This SDK is published to a NPM package repository. The publishing step uses the fastlane lanes ```publishAlphaSDK``` or ```publishSDK``` for publishing the alpha or production version respectively to NPM. The fastlane file is located inside ```RoktSampleApp/android```
+The steps are configured in `publish.gradle`.
+Publishing  Alpha and prod are possible through Buildkite based on the Git branch names as explained in above step.
+
+#### Automated Publishing
+The SDK can be released via the **Mobile Release Pipeline**. Follow the instructions in the Mobile Release Pipeline repo to release. You can still release the SDK manually by following the steps in the above section.  
+The appropriate dist tag will be applied automatically when publishing if one is set (e.g. `1.2.3-alpha.1` will set the dist tag as `alpha`). If not, the default `latest` tag will be used.
 
 ## Integration Guide
 
