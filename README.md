@@ -12,6 +12,10 @@ This repository contains the React Native SDK [Rokt.Widget](Rokt.Widget) and a S
 
 The React Native SDK enables you to integrate Rokt into your React Native mobile apps to drive more value from—and for—your customers. The SDK is built to be lightweight, secure, and simple to integrate and maintain, resulting in minimal lift for your engineering team. The RoktSampleApp includes bare-minimum UI to demonstrate the usage of React Native SDK for partners.
 
+For detailed information about each component, please refer to:
+- [Rokt.Widget README](Rokt.Widget/README.md) - Documentation for the SDK implementation
+- [RoktSampleApp README](RoktSampleApp/README.md) - Guide for the sample application
+
 ## Service Architecture
 
 The React Native SDK uses a bridge architecture to connect your JavaScript/TypeScript application code to the native Rokt Widget SDK implementations:
@@ -41,8 +45,6 @@ When you call methods from the TypeScript layer, the following happens:
 2. The React Native bridge serializes parameters and routes the call to the appropriate native module (`RNRoktWidget` on iOS or `RNRoktWidgetModule` on Android)
 3. The native module translates the call to the corresponding native Rokt Widget SDK method (e.g., `Rokt.initialize()`, `Rokt.execute()`)
 4. Results and callbacks are serialized and passed back through the bridge to your JavaScript code
-
-- **React Native Bridge**: The SDK provides a JavaScript interface that communicates with native Android and iOS modules
 
 ### Workflow
 1. **Initialization**: Call `Rokt.initialize()` with your ROKT_TAG_ID to prepare the SDK
