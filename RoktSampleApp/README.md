@@ -5,6 +5,7 @@
 
 ## Resident Experts
 
+- Thomson Thomas - thomson.thomas@rokt.com
 - Danial Motahari - danial.motahari@rokt.com
 - Sahil Suri - sahil.suri@rokt.com
 
@@ -28,7 +29,7 @@ The CI system used is  **Buildkite**  [https://buildkite.com/rokt/react-native-s
 1. Go to *RoktSampleApp* directory
 2. `npm install`
 
-To clear the cache, delete `node_modules` and `package.json` and re-run `npm install`
+To clear the cache, delete `node_modules` and `package-lock.json` and re-run `npm install`
 
 ### Start with npx
 Make sure you have your Android device or Emulator turned on.
@@ -56,7 +57,7 @@ go to *RoktSampleApp* directory and run `npx react-native run-android`
 ## Note
 To test the SDK changes locally
 
-### Create a package in SDK with a new version. 
+### Update version of Rokt Widget. 
 1. Go to *Rokt.Widget* directory
 2. change the version ```X.X.X``` in ```package.json``` to a new version. 
 3. `npm install`
