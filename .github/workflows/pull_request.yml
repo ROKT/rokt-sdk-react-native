@@ -59,7 +59,7 @@ jobs:
       - name: Install dependencies
         run: |
           cd RoktSampleApp
-          npm ci
+          npm install
           mkdir android/app/src/main/assets/ 
           npx react-native bundle --platform android --dev false --entry-file index.js --bundle-output android/app/src/main/assets/index.android.bundle
 
