@@ -127,6 +127,7 @@ jobs:
           bundle install --path vendor/bundle 
           bundle exec pod install --verbose --repo-update
           cd -
+          npx react-native bundle --platform ios --dev false --entry-file index.js --bundle-output ios/main.jsbundle --assets-dest ios
           gem install xcpretty -v 0.3.0
 
       - uses: futureware-tech/simulator-action@dab10d813144ef59b48d401cd95da151222ef8cd #v4.0.0
