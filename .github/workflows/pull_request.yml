@@ -137,7 +137,6 @@ jobs:
       - name: Build and test iOS app
         run: |
           cd RoktSampleApp
-          export RCT_NO_LAUNCH_PACKAGER=true
           set -o pipefail
-          xcodebuild -workspace ios/RoktSampleApp.xcworkspace -destination 'platform=iOS Simulator,id=${{ steps.simulator.outputs.udid }}' -scheme RoktSampleApp -parallelizeTargets -configuration Debug -derivedDataPath ios/build -UseModernBuildSystem=YES clean test
+          xcodebuild -workspace ios/RoktSampleApp.xcworkspace -destination 'platform=iOS Simulator,id=${{ steps.simulator.outputs.udid }}' -scheme RoktSampleApp -parallelizeTargets -configuration Debug -derivedDataPath ios/build -UseModernBuildSystem=YES clean test | xcpretty -k
           
