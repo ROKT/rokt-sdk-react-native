@@ -4,6 +4,11 @@ on:
   push:
   workflow_dispatch:
 
+env:
+  NODE_VERSION: 17
+  RUBY_VERSION: 3.1.2
+  JAVA_VERSION: 17
+
 jobs:
   lint:
     runs-on: ubuntu-latest
@@ -12,7 +17,7 @@ jobs:
 
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
-          node-version: 17
+          node-version: ${{ env.NODE_VERSION }}
 
       - name: tslint
         run: |
@@ -29,7 +34,7 @@ jobs:
 
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
-          node-version: 17
+          node-version: ${{ env.NODE_VERSION }}
 
       - name: Build Tarball
         run: |
@@ -57,11 +62,11 @@ jobs:
 
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
-          node-version: 17
+          node-version: ${{ env.NODE_VERSION }}
 
       - uses: actions/setup-java@3a4f6e1af504cf6a31855fa899c6aa5355ba6c12 #v4.7.0
         with:
-          java-version: 17
+          java-version: ${{ env.JAVA_VERSION }}
           distribution: microsoft
 
       - name: Download Tarball
@@ -86,3 +91,53 @@ jobs:
         run: |
           cd RoktSampleApp/android
           ./gradlew app:assembleAndroidTest
+
+
+  build-and-test-ios:
+    needs: build-tarball
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - uses: ruby/setup-ruby@1a615958ad9d422dd932dc1d5823942ee002799f #v1.227.0
+        with:
+          ruby-version: ${{ env.RUBY_VERSION }}
+          bundler-cache: true
+          rubygems: latest
+
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - uses: maxim-lobanov/setup-xcode@60606e260d2fc5762a71e64e74b2174e8ea3c8bd #v1.6.0
+        with:
+          xcode-version: 16.2
+
+      - name: Download Tarball
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: ${{ needs.build-tarball.outputs.tarball }}
+          path: Rokt.Widget
+
+      - name: Install dependencies
+        run: |
+          cd RoktSampleApp
+          npm install
+          cd ios
+          bundle install --path vendor/bundle 
+          bundle exec pod install --verbose --repo-update
+          cd -
+          gem install xcpretty -v 0.3.0
+
+      - uses: futureware-tech/simulator-action@dab10d813144ef59b48d401cd95da151222ef8cd #v4.0.0
+        id: simulator
+        with:
+          model: iPhone 15
+
+      - name: Build and test iOS app
+        run: |
+          cd RoktSampleApp
+          export RCT_NO_LAUNCH_PACKAGER=true
+          set -o pipefail
+          xcodebuild -workspace ios/RoktSampleApp.xcworkspace -destination 'platform=iOS Simulator,id=${{ steps.simulator.outputs.udid }}' -scheme RoktSampleApp -parallelizeTargets -configuration Debug -derivedDataPath ios/build -UseModernBuildSystem=YES clean test | xcpretty -k
+          
