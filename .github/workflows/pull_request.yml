@@ -107,7 +107,7 @@ jobs:
 
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
-          node-version: ${{ env.NODE_VERSION }}
+          node-version: 16
 
       - uses: maxim-lobanov/setup-xcode@60606e260d2fc5762a71e64e74b2174e8ea3c8bd #v1.6.0
         with:
@@ -139,5 +139,5 @@ jobs:
           cd RoktSampleApp
           export RCT_NO_LAUNCH_PACKAGER=true
           set -o pipefail
-          xcodebuild -workspace ios/RoktSampleApp.xcworkspace -destination 'platform=iOS Simulator,id=${{ steps.simulator.outputs.udid }}' -scheme RoktSampleApp -parallelizeTargets -configuration Debug -derivedDataPath ios/build -UseModernBuildSystem=YES clean test | xcpretty -k
+          xcodebuild -workspace ios/RoktSampleApp.xcworkspace -destination 'platform=iOS Simulator,id=${{ steps.simulator.outputs.udid }}' -scheme RoktSampleApp -parallelizeTargets -configuration Debug -derivedDataPath ios/build -UseModernBuildSystem=YES clean test
           
