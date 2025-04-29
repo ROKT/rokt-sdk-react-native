@@ -40,3 +40,35 @@ jobs:
         with:
           name: tarball
           path: Rokt.Widget/*.tgz
+  
+  build-and-test-android:
+    needs: build-tarball
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 17
+
+      - name: Download Tarball
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          path: Rokt.Widget/
+          
+      - name: Install dependencies
+        run: |
+          cd RoktSampleApp
+          npm ci
+          mkdir android/app/src/main/assets/ 
+          npx react-native bundle --platform android --dev false --entry-file index.js --bundle-output android/app/src/main/assets/index.android.bundle
+
+      - name: Build app APK
+        run: |
+          cd RoktSampleApp/android
+          ./gradlew assemble
+      
+      - name: Build test APK
+        run: |
+          cd RoktSampleApp/android
+          ./gradlew assembleAndroidTest
