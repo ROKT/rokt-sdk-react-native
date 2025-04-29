@@ -61,7 +61,7 @@ jobs:
 
       - uses: actions/setup-java@3a4f6e1af504cf6a31855fa899c6aa5355ba6c12 #v4.7.0
         with:
-          java-version: 11
+          java-version: 17
           distribution: microsoft
 
       - name: Download Tarball
@@ -85,4 +85,4 @@ jobs:
       - name: Build test APK
         run: |
           cd RoktSampleApp/android
-          ./gradlew assembleAndroidTest
+          ./gradlew app:assembleAndroidTest
