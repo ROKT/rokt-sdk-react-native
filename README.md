@@ -2,8 +2,7 @@
 
 ## Resident Experts
 
-- Danial Motahari - danial.motahari@rokt.com
-- Sahil Suri - sahil.suri@rokt.com
+- James Newman - james.newman@rokt.com
 - Thomson Thomas - thomson.thomas@rokt.com
 
 ## Overview
