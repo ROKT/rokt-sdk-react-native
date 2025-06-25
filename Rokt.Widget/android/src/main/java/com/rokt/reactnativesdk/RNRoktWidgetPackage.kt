@@ -25,10 +25,10 @@ class RNRoktWidgetPackage : TurboReactPackage() {
         name: String,
         reactContext: ReactApplicationContext
     ): NativeModule? {
-        if (name == RNRoktWidgetModuleImpl.REACT_CLASS) {
-            return RNRoktWidgetModule(reactContext)
+        return if (name == RNRoktWidgetModuleImpl.REACT_CLASS) {
+            RNRoktWidgetModule(reactContext)
         } else {
-            return null
+            null
         }
     }
     override fun getReactModuleInfoProvider(): ReactModuleInfoProvider {
@@ -40,10 +40,10 @@ class RNRoktWidgetPackage : TurboReactPackage() {
                 ReactModuleInfo(
                     RNRoktWidgetModuleImpl.REACT_CLASS,
                     RNRoktWidgetModuleImpl.REACT_CLASS,
-                    false,  // canOverrideExistingModule
-                    false,  // needsEagerInit
-                    false,  // isCxxModule
-                    BuildConfig.IS_NEW_ARCHITECTURE_ENABLED // isTurboModule
+                    _canOverrideExistingModule = false,  // canOverrideExistingModule
+                    _needsEagerInit = false,  // needsEagerInit
+                    isCxxModule = false,  // isCxxModule
+                    isTurboModule = BuildConfig.IS_NEW_ARCHITECTURE_ENABLED // isTurboModule
                 )
             )
             moduleInfos.toMap()

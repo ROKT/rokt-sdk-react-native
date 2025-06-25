@@ -200,7 +200,7 @@ class RNRoktWidgetModuleImpl(private val reactContext: ReactApplicationContext) 
             (currentActivity as LifecycleOwner).repeatOnLifecycle(Lifecycle.State.CREATED) {
                 flow.collect { event ->
                     val params = Arguments.createMap()
-                    var eventName = ""
+                    var eventName: String
                     val placementId: String? = when (event) {
                         is RoktEvent.FirstPositiveEngagement -> {
                             eventName = "FirstPositiveEngagement"
