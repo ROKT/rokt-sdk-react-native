@@ -45,9 +45,9 @@ android {
     sourceSets {
         main {
             if (isNewArchitectureEnabled()) {
-                java.srcDirs += ['src/newarch']
+                java.srcDirs += ['src/newarch/java']
             } else {
-                java.srcDirs += ['src/oldarch']
+                java.srcDirs += ['src/oldarch/java']
             }
         }
     }
@@ -67,10 +67,6 @@ repositories {
             url("$rootDir/../node_modules/jsc-android/dist")
         }
 
-        maven {
-            url  "https://apps.rokt.com/msdk"
-        }
-
         google()
         mavenCentral()
         maven {
@@ -86,5 +82,5 @@ dependencies {
     implementation "com.facebook.react:react-native:+"  // From node_modules
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation "androidx.lifecycle:lifecycle-runtime-ktx:2.6.1"
-    implementation ('com.rokt:roktsdk:4.9.0')
+    implementation ('com.rokt:roktsdk:4.10.0')
 }
