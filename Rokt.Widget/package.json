@@ -7,7 +7,7 @@
   "react-native": "src/index",
   "scripts": {
     "lint": "eslint .",
-    "build": "rm -rf ./dist && tsc && cp ./src/rokt-embedded-view.d.ts ./dist/",
+    "build": "rm -rf ./dist && tsc",
     "test": "echo \"Error: no test specified\" && exit 1",
     "build:plugin": "tsc --build plugin",
     "clean:plugin": "expo-module clean plugin"

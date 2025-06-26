@@ -26,4 +26,4 @@ export interface NativeProps extends ViewProps {
 
 export default codegenNativeComponent<NativeProps>(
   'RoktNativeWidget'
-) as HostComponent<NativeProps>; 
+) as HostComponent<NativeProps>;

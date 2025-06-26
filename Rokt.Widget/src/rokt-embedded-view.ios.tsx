@@ -43,6 +43,39 @@ export interface RoktEmbeddedViewState {
   marginBottom: number
 }
 
+// Define the native component props interface
+interface RoktNativeWidgetProps extends ViewProps {
+  placeholderName?: string;
+  onWidgetHeightChanged?: (event: HeightChangedEvent) => void;
+  onWidgetMarginChanged?: (event: MarginChangedEvent) => void;
+}
+
+// Architecture detection
+declare const global: {
+  __turboModuleProxy?: unknown;
+};
+
+const isNewArchitecture = global.__turboModuleProxy !== undefined;
+
+// Conditional component loading based on architecture
+let WidgetNativeComponent: HostComponent<RoktNativeWidgetProps>;
+
+if (isNewArchitecture) {
+  console.log('[ROKT] iOS: Using New Architecture (Fabric)');
+  try {
+    // Try to import the new architecture component
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const NativeComponent = require('./RoktNativeWidgetNativeComponent') as { default: HostComponent<RoktNativeWidgetProps> };
+    WidgetNativeComponent = NativeComponent.default;
+  } catch (error) {
+    console.warn('[ROKT] iOS: New architecture component not available, falling back to old architecture');
+    WidgetNativeComponent = requireNativeComponent('RoktNativeWidget');
+  }
+} else {
+  console.log('[ROKT] iOS: Using Old Architecture (Bridge)');
+  WidgetNativeComponent = requireNativeComponent('RoktNativeWidget');
+}
+
 const eventManagerEmitter = new NativeEventEmitter(RoktEventManager);
 
 export class RoktEmbeddedView extends Component<RoktEmbeddedViewProps, RoktEmbeddedViewState> {
@@ -50,7 +83,6 @@ export class RoktEmbeddedView extends Component<RoktEmbeddedViewProps, RoktEmbed
   subscription = eventManagerEmitter.addListener(
     'WidgetHeightChanges',
     (widgetChanges: WidgetChangeEvent) => {
-      console.log
       if (widgetChanges.selectedPlacement == this.state.placeholderName) {
         this.setState({ height: parseInt(widgetChanges.height) })
       }
@@ -64,8 +96,27 @@ export class RoktEmbeddedView extends Component<RoktEmbeddedViewProps, RoktEmbed
   }
 
   override render() {
+    const architectureType = isNewArchitecture ? 'New Architecture' : 'Old Architecture';
+    console.log(`[ROKT] iOS Rendering RoktNativeWidget (${architectureType}) with placeholderName=>`, this.state.placeholderName);
+
     return (
-      <WidgetNativeComponent style={[styles.widget, { height: this.state.height }]} />
+      <WidgetNativeComponent
+        style={[styles.widget, { height: this.state.height }]}
+        placeholderName={this.state.placeholderName}
+        onWidgetHeightChanged={(event) => {
+          if (event.height) {
+            this.setState({ height: parseInt(event.height) });
+          }
+        }}
+        onWidgetMarginChanged={(event) => {
+          this.setState({
+            marginTop: parseInt(event.marginTop || '0'),
+            marginRight: parseInt(event.marginRight || '0'),
+            marginLeft: parseInt(event.marginLeft || '0'),
+            marginBottom: parseInt(event.marginBottom || '0')
+          });
+        }}
+      />
     );
   }
 
@@ -74,8 +125,6 @@ export class RoktEmbeddedView extends Component<RoktEmbeddedViewProps, RoktEmbed
   }
 
 }
-
-const WidgetNativeComponent: HostComponent<ViewProps> = requireNativeComponent('RoktNativeWidget')
 
 const styles = StyleSheet.create({
   widget: {
