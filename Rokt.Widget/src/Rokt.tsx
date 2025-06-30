@@ -83,21 +83,6 @@ declare module 'react-native' {
 }
 
 // Define the interface that matches the native module for cleaner code
-interface RNRoktWidget {
-    initialize(roktTagId: string, appVersion: string): void;
-    initializeWithFonts(roktTagId: string, appVersion: string, fontPostScriptNames?: string[]): void;
-    initializeWithFontFiles(roktTagId: string, appVersion: string, fontsMap?: Record<string, string>): void;
-    execute(viewName: string, attributes: Record<string, string>, placeholders: Record<string, number | null>): void;
-    executeWithConfig(viewName: string, attributes: Record<string, string>, placeholders: Record<string, number | null>, roktConfig?: IRoktConfig): void;
-    execute2Step(viewName: string, attributes: Record<string, string>, placeholders: Record<string, number | null>): void;
-    execute2StepWithConfig(viewName: string, attributes: Record<string, string>, placeholders: Record<string, number | null>, roktConfig?: IRoktConfig): void;
-    setFulfillmentAttributes(attributes: Record<string, string>): void;
-    purchaseFinalized(placementId: string, catalogItemId: string, success: boolean): void;
-    setEnvironmentToStage(): void;
-    setEnvironmentToProd(): void;
-    setLoggingEnabled(enabled: boolean): void;
-}
-
 export interface IRoktConfig {
     readonly colorMode?: ColorMode;
     readonly cacheConfig?: CacheConfig;
