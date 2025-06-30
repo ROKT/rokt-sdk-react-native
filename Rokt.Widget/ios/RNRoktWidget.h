@@ -8,23 +8,17 @@
 //  You may not use this file except in compliance with the License.
 //  You may obtain a copy of the License at https://rokt.com/sdk-license-2-0/
 
-#import <Rokt_Widget/Rokt_Widget-Swift.h>
 #import "RoktEventManager.h"
 
 #ifdef RCT_NEW_ARCH_ENABLED
 #import <RNRoktWidgetSpec/RNRoktWidgetSpec.h>
+#import <React/RCTBridge.h>
+
+@interface RNRoktWidget : NSObject <NativeRoktWidgetSpec>
+@property (nonatomic, weak, nullable) RCTBridge *bridge;
 #else
 #import <React/RCTBridgeModule.h>
-#endif
-
-NS_ASSUME_NONNULL_BEGIN
-
-#ifdef RCT_NEW_ARCH_ENABLED
-@interface RNRoktWidget : NSObject <NativeRoktWidgetSpec>
-#else
 @interface RNRoktWidget : NSObject <RCTBridgeModule>
 #endif
 
 @end
-
-NS_ASSUME_NONNULL_END
