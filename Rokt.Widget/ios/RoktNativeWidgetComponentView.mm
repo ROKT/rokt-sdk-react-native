@@ -11,13 +11,15 @@
 #ifdef RCT_NEW_ARCH_ENABLED
 #import <SafariServices/SafariServices.h>
 #import "RoktNativeWidgetComponentView.h"
-#import "RCTFabricComponentsPlugins.h"
+
 #import <Rokt_Widget/Rokt_Widget-Swift.h>
 #import <React/renderer/components/RNRoktWidgetSpec/ComponentDescriptors.h>
+#import <react/renderer/components/RNRoktWidgetSpec/Props.h>
+#import <React/renderer/components/RNRoktWidgetSpec/RCTComponentViewHelpers.h>
 
 using namespace facebook::react;
 
-@interface RoktNativeWidgetComponentView () <RCTComponentViewProtocol>
+@interface RoktNativeWidgetComponentView () <RCTRoktNativeWidgetViewProtocol>
 @property (nonatomic, nullable) RoktEmbeddedView *roktEmbeddedView;
 @property (nonatomic, nullable) NSString *placeholderName;
 @end
@@ -49,8 +51,9 @@ using namespace facebook::react;
   [super updateProps:props oldProps:oldProps];
 }
 
-Class<RCTComponentViewProtocol> RoktNativeWidgetCls(void)
-{
+// Export function for codegen compatibility
+// This may be referenced by generated code even though we use the class name in package.json
+extern "C" Class<RCTComponentViewProtocol> RoktNativeWidgetCls(void) {
   return RoktNativeWidgetComponentView.class;
 }
 

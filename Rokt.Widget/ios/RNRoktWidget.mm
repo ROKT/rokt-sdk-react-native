@@ -41,6 +41,12 @@
     return self.bridge.uiManager.methodQueue;
 }
 
+- (void)setMethodQueue:(dispatch_queue_t)methodQueue
+{
+    // No-op setter to satisfy TurboModule requirements
+    // We always return the UI manager's method queue
+}
+
 
 RCT_EXPORT_MODULE()
 RCT_EXPORT_METHOD(initialize:(NSString *)roktTagId appVersion: (NSString *)fakeApp)

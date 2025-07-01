@@ -52,6 +52,11 @@
     "jsSrcsDir": "src",
     "android": {
       "javaPackageName": "com.rokt.reactnativesdk"
+    },
+    "ios": {
+      "componentProvider": {
+        "RoktNativeWidget": "RoktNativeWidgetComponentView"
+      }
     }
   }
 }

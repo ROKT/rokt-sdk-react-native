@@ -22,7 +22,7 @@
 @implementation RNRoktWidgetModuleProvider
 
 + (void)load {
-    // Module will be automatically registered by React Native's codegen
+    // Component registration is now handled automatically by the codegen system
     NSLog(@"[ROKT] iOS: New Architecture module provider loaded");
 }
 

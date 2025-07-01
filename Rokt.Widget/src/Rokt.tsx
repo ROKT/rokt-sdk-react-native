@@ -1,5 +1,5 @@
 import 'react-native'
-import { NativeModules } from 'react-native';
+import { NativeModules, UIManager } from 'react-native';
 import type { Spec as RoktNativeInterface } from './NativeRoktWidget';
 // Import the default export for direct access
 import NativeRoktDefault from './NativeRoktWidget';
@@ -8,12 +8,25 @@ import NativeRoktDefault from './NativeRoktWidget';
 // and select the appropriate Native Module
 let RNRoktWidget: RoktNativeInterface;
 
-if (NativeModules.RNRoktWidget == null) {
-  console.log("Rokt SDK: Using New Architecture (TurboModule)");
+const isNewArchitecture = (() => {
+  // Check if Fabric renderer is enabled
+  const hasFabricUIManager = UIManager &&
+                            typeof UIManager.hasViewManagerConfig === 'function' &&
+                            UIManager.hasViewManagerConfig('RCTView');
+
+  if (hasFabricUIManager) {
+    return true;
+  }
+
+  // Fallback: check TurboModule presence
+  const turboModuleCheck = NativeModules.RNRoktWidget == null;
+  return turboModuleCheck;
+})();
+
+if (isNewArchitecture) {
   // Use the imported default export
   RNRoktWidget = NativeRoktDefault;
 } else {
-  console.log("Rokt SDK: Using Old Architecture (NativeModules)");
   RNRoktWidget = NativeModules.RNRoktWidget;
 }
 

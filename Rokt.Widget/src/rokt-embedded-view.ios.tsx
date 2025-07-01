@@ -9,7 +9,7 @@
  * You may obtain a copy of the License at https://rokt.com/sdk-license-2-0/
  */
 
-import { requireNativeComponent, StyleSheet, NativeEventEmitter, NativeModules, HostComponent, ViewProps, NativeModule } from 'react-native';
+import { requireNativeComponent, StyleSheet, NativeEventEmitter, NativeModules, HostComponent, ViewProps, NativeModule, UIManager } from 'react-native';
 import React, { Component } from 'react';
 
 const RoktEventManager = NativeModules.RoktEventManager as NativeModule
@@ -50,25 +50,37 @@ interface RoktNativeWidgetProps extends ViewProps {
   onWidgetMarginChanged?: (event: MarginChangedEvent) => void;
 }
 
-// Architecture detection
-const isNewArchitecture = (NativeModules as { RNRoktWidget?: unknown }).RNRoktWidget == null;
+// Architecture detection - Updated for RN 0.80+ compatibility
+// In RN 0.80+, check for Fabric renderer using a more reliable method
+const isNewArchitecture = (() => {
+  // Check if Fabric renderer is enabled by looking at UIManager properties
+  // This is a safer approach that works in RN 0.80+
+  const hasFabricUIManager = UIManager &&
+                            typeof UIManager.hasViewManagerConfig === 'function' &&
+                            UIManager.hasViewManagerConfig('RCTView');
+
+  if (hasFabricUIManager) {
+    return true;
+  }
+
+  // Fallback: check TurboModule presence (less reliable in 0.80+)
+  const turboModuleCheck = (NativeModules as { RNRoktWidget?: unknown }).RNRoktWidget == null;
+  return turboModuleCheck;
+})();
 
 // Conditional component loading based on architecture
 let WidgetNativeComponent: HostComponent<RoktNativeWidgetProps>;
 
 if (isNewArchitecture) {
-  console.log('[ROKT] iOS: Using New Architecture (Fabric)');
   try {
     // Try to import the new architecture component
     // eslint-disable-next-line @typescript-eslint/no-var-requires
     const NativeComponent = require('./RoktNativeWidgetNativeComponent') as { default: HostComponent<RoktNativeWidgetProps> };
     WidgetNativeComponent = NativeComponent.default;
   } catch (error) {
-    console.warn('[ROKT] iOS: New architecture component not available, falling back to old architecture');
     WidgetNativeComponent = requireNativeComponent('RoktNativeWidget');
   }
 } else {
-  console.log('[ROKT] iOS: Using Old Architecture (Bridge)');
   WidgetNativeComponent = requireNativeComponent('RoktNativeWidget');
 }
 
@@ -92,9 +104,6 @@ export class RoktEmbeddedView extends Component<RoktEmbeddedViewProps, RoktEmbed
   }
 
   override render() {
-    const architectureType = isNewArchitecture ? 'New Architecture' : 'Old Architecture';
-    console.log(`[ROKT] iOS Rendering RoktNativeWidget (${architectureType}) with placeholderName=>`, this.state.placeholderName);
-
     return (
       <WidgetNativeComponent
         style={[styles.widget, { height: this.state.height }]}

@@ -9,6 +9,7 @@
 //  You may obtain a copy of the License at https://rokt.com/sdk-license-2-0/
 
 #ifdef RCT_NEW_ARCH_ENABLED
+#import <SafariServices/SafariServices.h>
 #import <React/RCTViewComponentView.h>
 #import <UIKit/UIKit.h>
 #import <Rokt_Widget/Rokt_Widget-Swift.h>

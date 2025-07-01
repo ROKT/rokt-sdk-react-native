@@ -101,7 +101,6 @@ export class RoktEmbeddedView extends Component<RoktEmbeddedViewProps, RoktEmbed
       // Get the placeholderName from props
       const { placeholderName } = this.props;
 
-      console.log('[ROKT] Rendering RoktNativeWidget with placeholderName=>', placeholderName);
       // Return the native component with the props
       return (
         <RoktNativeWidgetNativeComponent
