@@ -51,11 +51,7 @@ interface RoktNativeWidgetProps extends ViewProps {
 }
 
 // Architecture detection
-declare const global: {
-  __turboModuleProxy?: unknown;
-};
-
-const isNewArchitecture = global.__turboModuleProxy !== undefined;
+const isNewArchitecture = (NativeModules as { RNRoktWidget?: unknown }).RNRoktWidget == null;
 
 // Conditional component loading based on architecture
 let WidgetNativeComponent: HostComponent<RoktNativeWidgetProps>;

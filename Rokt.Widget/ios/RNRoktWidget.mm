@@ -34,14 +34,12 @@
 
 @implementation RNRoktWidget
 
-#if !defined(RCT_NEW_ARCH_ENABLED)
 @synthesize bridge = _bridge;
 
 - (dispatch_queue_t)methodQueue
 {
     return self.bridge.uiManager.methodQueue;
 }
-#endif
 
 
 RCT_EXPORT_MODULE()
@@ -342,75 +340,59 @@ RCT_EXPORT_METHOD(purchaseFinalized:(NSString *)placementId
 
 - (void)executeRoktWithViewName:(NSString *)viewName attributes:(NSDictionary *)attributes placeholders:(NSDictionary *)placeholders config:(RoktConfig *)config
 {
-    void (^uiBlock)(void) = ^{
-        [self.bridge.uiManager addUIBlock:^(RCTUIManager *uiManager, NSDictionary<NSNumber *,UIView *> *viewRegistry) {
-            NSMutableDictionary *nativePlaceholders = [self getNativePlaceholders:placeholders viewRegistry:viewRegistry];
+    [self.bridge.uiManager addUIBlock:^(RCTUIManager *uiManager, NSDictionary<NSNumber *,UIView *> *viewRegistry) {
+        NSMutableDictionary *nativePlaceholders = [self getNativePlaceholders:placeholders viewRegistry:viewRegistry];
 
-            [self subscribeViewEvents:viewName];
+        [self subscribeViewEvents:viewName];
 
-            [Rokt executeWithViewName:viewName attributes:attributes
-                           placements:nativePlaceholders
-                               config:config
-                               onLoad:^{ [self.eventManager onRoktCallbackReceived:@"onLoad"];}
-                             onUnLoad:^{
-            [self.eventManager onRoktCallbackReceived:@"onUnLoad"];
-                RCTLogInfo(@"unloaded");
-            }
-         onShouldShowLoadingIndicator:^{ [self.eventManager onRoktCallbackReceived:@"onShouldShowLoadingIndicator"];}
-         onShouldHideLoadingIndicator:^{ [self.eventManager onRoktCallbackReceived:@"onShouldHideLoadingIndicator"];}
-                 onEmbeddedSizeChange:^(NSString *selectedPlacement, CGFloat widgetHeight){
-                    [self.eventManager onWidgetHeightChanges:widgetHeight placement:selectedPlacement];
-                }];
-        }];
-    };
-
-#ifdef RCT_NEW_ARCH_ENABLED
-    dispatch_async(self.bridge.uiManager.methodQueue, uiBlock);
-#else
-    uiBlock();
-#endif
+        [Rokt executeWithViewName:viewName attributes:attributes
+                       placements:nativePlaceholders
+                           config:config
+                           onLoad:^{ [self.eventManager onRoktCallbackReceived:@"onLoad"];}
+                         onUnLoad:^{
+        [self.eventManager onRoktCallbackReceived:@"onUnLoad"];
+            RCTLogInfo(@"unloaded");
+        }
+     onShouldShowLoadingIndicator:^{ [self.eventManager onRoktCallbackReceived:@"onShouldShowLoadingIndicator"];}
+     onShouldHideLoadingIndicator:^{ [self.eventManager onRoktCallbackReceived:@"onShouldHideLoadingIndicator"];}
+             onEmbeddedSizeChange:^(NSString *selectedPlacement, CGFloat widgetHeight){
+                [self.eventManager onWidgetHeightChanges:widgetHeight placement:selectedPlacement];
+            }];
+    }];
 }
 
 - (void)executeRokt2StepWithViewName:(NSString *)viewName attributes:(NSDictionary *)attributes placeholders:(NSDictionary *)placeholders config:(RoktConfig *)config
 {
-    void (^uiBlock)(void) = ^{
-        [self.bridge.uiManager addUIBlock:^(RCTUIManager *uiManager, NSDictionary<NSNumber *,UIView *> *viewRegistry) {
-            NSMutableDictionary *nativePlaceholders = [self getNativePlaceholders:placeholders viewRegistry:viewRegistry];
+    [self.bridge.uiManager addUIBlock:^(RCTUIManager *uiManager, NSDictionary<NSNumber *,UIView *> *viewRegistry) {
+        NSMutableDictionary *nativePlaceholders = [self getNativePlaceholders:placeholders viewRegistry:viewRegistry];
 
-            self.eventManager = [RoktEventManager allocWithZone: nil];
+        self.eventManager = [RoktEventManager allocWithZone: nil];
 
-            [Rokt eventsWithViewName:viewName onEvent:^(RoktEvent * roktEvent) {
-                [self.eventManager onRoktEvents:roktEvent viewName:viewName];
-            }];
-
-            [Rokt execute2stepWithViewName:viewName attributes:attributes
-                                placements:nativePlaceholders
-                                    config:config
-                                    onLoad:^{ [self.eventManager onRoktCallbackReceived:@"onLoad"];}
-                                  onUnLoad:^{
-            [self.eventManager onRoktCallbackReceived:@"onUnLoad"];
-                RCTLogInfo(@"unloaded");
-            }
-              onShouldShowLoadingIndicator:^{ [self.eventManager onRoktCallbackReceived:@"onShouldShowLoadingIndicator"];}
-         onShouldHideLoadingIndicator:^{ [self.eventManager onRoktCallbackReceived:@"onShouldHideLoadingIndicator"];}
-                      onEmbeddedSizeChange:^(NSString *selectedPlacement, CGFloat widgetHeight){
-                [self.eventManager onWidgetHeightChanges:widgetHeight placement:selectedPlacement];
-            }
-                                   onEvent:^(RoktEventType roktEventType, RoktEventHandler* roktEventHandler){
-                self.roktEventHandler = roktEventHandler;
-                if (roktEventType == RoktEventTypeFirstPositiveEngagement) {
-                    RCTLogInfo(@"firstPositiveEvent was fired");
-                    [self.eventManager onFirstPositiveResponse];
-                }
-            }];
+        [Rokt eventsWithViewName:viewName onEvent:^(RoktEvent * roktEvent) {
+            [self.eventManager onRoktEvents:roktEvent viewName:viewName];
         }];
-    };
 
-#ifdef RCT_NEW_ARCH_ENABLED
-    dispatch_async(self.bridge.uiManager.methodQueue, uiBlock);
-#else
-    uiBlock();
-#endif
+        [Rokt execute2stepWithViewName:viewName attributes:attributes
+                            placements:nativePlaceholders
+                                config:config
+                                onLoad:^{ [self.eventManager onRoktCallbackReceived:@"onLoad"];}
+                              onUnLoad:^{
+        [self.eventManager onRoktCallbackReceived:@"onUnLoad"];
+            RCTLogInfo(@"unloaded");
+        }
+          onShouldShowLoadingIndicator:^{ [self.eventManager onRoktCallbackReceived:@"onShouldShowLoadingIndicator"];}
+          onShouldHideLoadingIndicator:^{ [self.eventManager onRoktCallbackReceived:@"onShouldHideLoadingIndicator"];}
+                  onEmbeddedSizeChange:^(NSString *selectedPlacement, CGFloat widgetHeight){
+            [self.eventManager onWidgetHeightChanges:widgetHeight placement:selectedPlacement];
+        }
+                               onEvent:^(RoktEventType roktEventType, RoktEventHandler* roktEventHandler){
+            self.roktEventHandler = roktEventHandler;
+            if (roktEventType == RoktEventTypeFirstPositiveEngagement) {
+                RCTLogInfo(@"firstPositiveEvent was fired");
+                [self.eventManager onFirstPositiveResponse];
+            }
+        }];
+    }];
 }
 
 #ifdef RCT_NEW_ARCH_ENABLED

@@ -8,12 +8,7 @@ import NativeRoktDefault from './NativeRoktWidget';
 // and select the appropriate Native Module
 let RNRoktWidget: RoktNativeInterface;
 
-// Safe type assertion for global object
-declare const global: {
-  __turboModuleProxy?: unknown;
-};
-
-if (global.__turboModuleProxy !== undefined) {
+if (NativeModules.RNRoktWidget == null) {
   console.log("Rokt SDK: Using New Architecture (TurboModule)");
   // Use the imported default export
   RNRoktWidget = NativeRoktDefault;
