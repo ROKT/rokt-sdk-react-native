@@ -12,12 +12,16 @@
 #import <React/RCTEventEmitter.h>
 #import <Rokt_Widget/Rokt_Widget-Swift.h>
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface RoktEventManager : RCTEventEmitter <RCTBridgeModule>
 @property (nonatomic) FirstPositiveEngagement * _Nullable firstPositiveEngagement;
-+ (id)allocWithZone:(NSZone *)zone;
-- (void)onWidgetHeightChanges:(CGFloat)widgetHeight placement:(NSString*) selectedPlacement;
++ (instancetype _Nonnull)allocWithZone:(NSZone * _Nullable)zone;
+- (void)onWidgetHeightChanges:(CGFloat)widgetHeight placement:(NSString * _Nonnull)selectedPlacement;
 - (void)onFirstPositiveResponse;
-- (void)onRoktCallbackReceived:(NSString*)eventValue;
+- (void)onRoktCallbackReceived:(NSString * _Nonnull)eventValue;
 - (void)onRoktEvents:(RoktEvent * _Nonnull)event viewName:(NSString * _Nullable)viewName;
 
 @end
+
+NS_ASSUME_NONNULL_END

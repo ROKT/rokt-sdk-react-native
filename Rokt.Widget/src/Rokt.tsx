@@ -1,5 +1,5 @@
 import 'react-native'
-import { NativeModules } from 'react-native';
+import { NativeModules, UIManager } from 'react-native';
 import type { Spec as RoktNativeInterface } from './NativeRoktWidget';
 // Import the default export for direct access
 import NativeRoktDefault from './NativeRoktWidget';
@@ -8,17 +8,25 @@ import NativeRoktDefault from './NativeRoktWidget';
 // and select the appropriate Native Module
 let RNRoktWidget: RoktNativeInterface;
 
-// Safe type assertion for global object
-declare const global: {
-  __turboModuleProxy?: unknown;
-};
+const isNewArchitecture = (() => {
+  // Check if Fabric renderer is enabled
+  const hasFabricUIManager = UIManager &&
+                            typeof UIManager.hasViewManagerConfig === 'function' &&
+                            UIManager.hasViewManagerConfig('RCTView');
 
-if (global.__turboModuleProxy !== undefined) {
-  console.log("Rokt SDK: Using New Architecture (TurboModule)");
+  if (hasFabricUIManager) {
+    return true;
+  }
+
+  // Fallback: check TurboModule presence
+  const turboModuleCheck = NativeModules.RNRoktWidget == null;
+  return turboModuleCheck;
+})();
+
+if (isNewArchitecture) {
   // Use the imported default export
   RNRoktWidget = NativeRoktDefault;
 } else {
-  console.log("Rokt SDK: Using Old Architecture (NativeModules)");
   RNRoktWidget = NativeModules.RNRoktWidget;
 }
 
@@ -83,21 +91,6 @@ declare module 'react-native' {
 }
 
 // Define the interface that matches the native module for cleaner code
-interface RNRoktWidget {
-    initialize(roktTagId: string, appVersion: string): void;
-    initializeWithFonts(roktTagId: string, appVersion: string, fontPostScriptNames?: string[]): void;
-    initializeWithFontFiles(roktTagId: string, appVersion: string, fontsMap?: Record<string, string>): void;
-    execute(viewName: string, attributes: Record<string, string>, placeholders: Record<string, number | null>): void;
-    executeWithConfig(viewName: string, attributes: Record<string, string>, placeholders: Record<string, number | null>, roktConfig?: IRoktConfig): void;
-    execute2Step(viewName: string, attributes: Record<string, string>, placeholders: Record<string, number | null>): void;
-    execute2StepWithConfig(viewName: string, attributes: Record<string, string>, placeholders: Record<string, number | null>, roktConfig?: IRoktConfig): void;
-    setFulfillmentAttributes(attributes: Record<string, string>): void;
-    purchaseFinalized(placementId: string, catalogItemId: string, success: boolean): void;
-    setEnvironmentToStage(): void;
-    setEnvironmentToProd(): void;
-    setLoggingEnabled(enabled: boolean): void;
-}
-
 export interface IRoktConfig {
     readonly colorMode?: ColorMode;
     readonly cacheConfig?: CacheConfig;
