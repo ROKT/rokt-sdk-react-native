@@ -1,1 +1,1 @@
-module.exports = require('./plugin/build/withRoktSDK') 
+module.exports = require("./plugin/build/withRoktSDK");

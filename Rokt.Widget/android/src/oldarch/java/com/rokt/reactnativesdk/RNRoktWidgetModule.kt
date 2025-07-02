@@ -21,9 +21,8 @@ import java.lang.ref.WeakReference
  */
 class RNRoktWidgetModule internal constructor(private val reactContext: ReactApplicationContext) :
     ReactContextBaseJavaModule(
-        reactContext
+        reactContext,
     ) {
-
     private val impl = RNRoktWidgetModuleImpl(reactContext)
 
     @ReactMethod
@@ -46,7 +45,7 @@ class RNRoktWidgetModule internal constructor(private val reactContext: ReactApp
         viewName: String?,
         attributes: ReadableMap?,
         placeholders: ReadableMap?,
-        roktConfig: ReadableMap?
+        roktConfig: ReadableMap?,
     ) {
         executeInternal(viewName, attributes, placeholders, roktConfig)
     }
@@ -55,7 +54,7 @@ class RNRoktWidgetModule internal constructor(private val reactContext: ReactApp
         viewName: String?,
         attributes: ReadableMap?,
         placeholders: ReadableMap?,
-        roktConfig: ReadableMap? = null
+        roktConfig: ReadableMap? = null,
     ) {
         if (viewName == null) {
             impl.logDebug("Execute failed. ViewName cannot be null")
@@ -72,7 +71,7 @@ class RNRoktWidgetModule internal constructor(private val reactContext: ReactApp
                 attributes = impl.readableMapToMapOfStrings(attributes),
                 callback = impl.createRoktCallback(),
                 placeholders = safeUnwrapPlaceholders(placeholders, nativeViewHierarchyManager),
-                config = config
+                config = config,
             )
         }
     }
@@ -87,7 +86,7 @@ class RNRoktWidgetModule internal constructor(private val reactContext: ReactApp
         viewName: String?,
         attributes: ReadableMap?,
         placeholders: ReadableMap?,
-        roktConfig: ReadableMap?
+        roktConfig: ReadableMap?,
     ) {
         execute2StepInternal(viewName, attributes, placeholders, roktConfig)
     }
@@ -96,7 +95,7 @@ class RNRoktWidgetModule internal constructor(private val reactContext: ReactApp
         viewName: String?,
         attributes: ReadableMap?,
         placeholders: ReadableMap?,
-        roktConfig: ReadableMap? = null
+        roktConfig: ReadableMap? = null,
     ) {
         if (viewName == null) {
             impl.logDebug("Execute failed. ViewName cannot be null")
@@ -112,11 +111,9 @@ class RNRoktWidgetModule internal constructor(private val reactContext: ReactApp
                 attributes = impl.readableMapToMapOfStrings(attributes),
                 callback = impl.createRoktCallback(),
                 placeholders = safeUnwrapPlaceholders(placeholders, nativeViewHierarchyManager),
-                roktEventCallback = object : Rokt.RoktEventCallback {
-                    override fun onEvent(
-                        eventType: RoktEventType,
-                        roktEventHandler: RoktEventHandler
-                    ) {
+                roktEventCallback =
+                object : Rokt.RoktEventCallback {
+                    override fun onEvent(eventType: RoktEventType, roktEventHandler: RoktEventHandler) {
                         impl.setRoktEventHandler(roktEventHandler)
                         if (eventType == RoktEventType.FirstPositiveEngagement) {
                             impl.logDebug("onFirstPositiveEvent was fired")
@@ -124,7 +121,7 @@ class RNRoktWidgetModule internal constructor(private val reactContext: ReactApp
                         }
                     }
                 },
-                config = config
+                config = config,
             )
         }
     }
@@ -139,9 +136,7 @@ class RNRoktWidgetModule internal constructor(private val reactContext: ReactApp
         impl.purchaseFinalized(placementId, catalogItemId, success)
     }
 
-    override fun getName(): String {
-        return impl.getName()
-    }
+    override fun getName(): String = impl.getName()
 
     @ReactMethod
     fun setEnvironmentToStage() {
@@ -160,17 +155,20 @@ class RNRoktWidgetModule internal constructor(private val reactContext: ReactApp
 
     private fun safeUnwrapPlaceholders(
         placeholders: ReadableMap?,
-        nativeViewHierarchyManager: NativeViewHierarchyManager
+        nativeViewHierarchyManager: NativeViewHierarchyManager,
     ): Map<String, WeakReference<Widget>> {
         val placeholderMap: MutableMap<String, WeakReference<Widget>> = HashMap()
 
         if (placeholders != null) {
-            placeholderMap.putAll(placeholders.toHashMap()
-                .filterValues { value -> value is Double }
-                .mapValues { pair -> (pair.value as Double).toInt() }
-                .mapValues { pair -> nativeViewHierarchyManager.resolveView(pair.value) as? Widget }
-                .filterValues { value -> value != null }
-                .mapValues { WeakReference(it.value as Widget) })
+            placeholderMap.putAll(
+                placeholders
+                    .toHashMap()
+                    .filterValues { value -> value is Double }
+                    .mapValues { pair -> (pair.value as Double).toInt() }
+                    .mapValues { pair -> nativeViewHierarchyManager.resolveView(pair.value) as? Widget }
+                    .filterValues { value -> value != null }
+                    .mapValues { WeakReference(it.value as Widget) },
+            )
         }
         return placeholderMap
     }

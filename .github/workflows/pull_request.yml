@@ -1,0 +1,51 @@
+name: React Native Pull Request
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+  pull-requests: read
+  checks: write
+  id-token: write
+
+jobs:
+  trunk-check:
+    name: Trunk code check
+    runs-on: ubuntu-latest
+    permissions:
+      checks: write
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - name: Trunk Check
+        uses: trunk-io/trunk-action@75699af9e26881e564e9d832ef7dc3af25ec031b # v1.2.4
+        with:
+          check-mode: pull_request
+
+  build-test-ios:
+    name: Build & Test iOS
+    needs: trunk-check
+    runs-on: macos-latest
+    steps:
+      - name: Build & Test iOS
+        run: |
+          echo "TODO: Build & Test iOS"
+
+  build-test-android:
+    name: Build & Test Android
+    needs: trunk-check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Build & Test Android
+        run: |
+          echo "TODO: Build & Test Android"
+
+  pr-notify:
+    if: >
+      github.event_name == 'pull_request' &&
+      github.event.pull_request.draft == false
+    needs: [build-test-ios, build-test-android]
+    name: Notify GChat
+    uses: ROKT/rokt-workflows/.github/workflows/oss_pr_opened_notification.yml@main
+    secrets:
+      gchat_webhook: ${{ secrets.GCHAT_PRS_WEBHOOK }}

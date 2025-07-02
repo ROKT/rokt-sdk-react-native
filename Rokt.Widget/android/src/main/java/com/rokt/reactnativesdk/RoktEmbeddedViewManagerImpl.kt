@@ -37,21 +37,24 @@ class RoktEmbeddedViewManagerImpl {
     }
 
     private fun setUpWidgetListeners(widget: Widget) {
-        widget.registerDimensionListener(object : RoktWidgetDimensionCallBack {
-            override fun onHeightChanged(height: Int) {
-                changeHeight(widget.context as ReactContext, height, widget.id)
-            }
+        widget.registerDimensionListener(
+            object : RoktWidgetDimensionCallBack {
+                override fun onHeightChanged(height: Int) {
+                    changeHeight(widget.context as ReactContext, height, widget.id)
+                }
 
-            override fun onMarginChanged(start: Int, top: Int, end: Int, bottom: Int) {
-                changeMargin(widget.context as ReactContext, widget.id, start, top, end, bottom)
-            }
-        })
+                override fun onMarginChanged(start: Int, top: Int, end: Int, bottom: Int) {
+                    changeMargin(widget.context as ReactContext, widget.id, start, top, end, bottom)
+                }
+            },
+        )
     }
 
     fun changeHeight(context: ReactContext, height: Int, id: Int) {
         val event = Arguments.createMap()
         event.putString("height", height.toString())
-        context.getJSModule(RCTEventEmitter::class.java)
+        context
+            .getJSModule(RCTEventEmitter::class.java)
             .receiveEvent(id, EVENT_HEIGHT_CHANGED, event)
     }
 
@@ -61,7 +64,8 @@ class RoktEmbeddedViewManagerImpl {
         event.putString("marginTop", top.toString())
         event.putString("marginRight", end.toString())
         event.putString("marginBottom", bottom.toString())
-        context.getJSModule(RCTEventEmitter::class.java)
+        context
+            .getJSModule(RCTEventEmitter::class.java)
             .receiveEvent(id, EVENT_MARGIN_CHANGED, event)
     }
 }

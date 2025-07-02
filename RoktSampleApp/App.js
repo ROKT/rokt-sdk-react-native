@@ -68,27 +68,26 @@ export default class App extends Component {
     };
   }
 
-  subscription = eventManagerEmitter.addListener(
-    'FirstPositiveResponse',
-    (x) => {
-      console.log('Widget OnFirstPositiveEvent Callback');
-      // Send unhashed email on first positive response
-      Rokt.setFulfillmentAttributes(FULLFILLMENT_ATTRIBUTES);
-    },
-  );
+  subscription = eventManagerEmitter.addListener('FirstPositiveResponse', x => {
+    console.log('Widget OnFirstPositiveEvent Callback');
+    // Send unhashed email on first positive response
+    Rokt.setFulfillmentAttributes(FULLFILLMENT_ATTRIBUTES);
+  });
 
   callBackSubscription = eventManagerEmitter.addListener(
     'RoktCallback',
-    (data) => {
+    data => {
       console.log('roktCallback received: ' + data.callbackValue);
     },
   );
 
-  eventSubscription = eventManagerEmitter.addListener('RoktEvents', (data) => {
+  eventSubscription = eventManagerEmitter.addListener('RoktEvents', data => {
     console.log(`*** ROKT EVENT *** ${JSON.stringify(data)}`);
     // Check if the event is CartItemInstantPurchase
     if (data.event === 'CartItemInstantPurchase') {
-      console.log('CartItemInstantPurchase event received, calling purchaseFinalized');
+      console.log(
+        'CartItemInstantPurchase event received, calling purchaseFinalized',
+      );
       // Call purchaseFinalized with the required parameters
       // placementId, catalogItemId, and status (true for successful purchase)
       Rokt.purchaseFinalized(data.placementId, data.catalogItemId, true);
@@ -127,7 +126,7 @@ export default class App extends Component {
     }
   };
 
-  showToast = (message) => {
+  showToast = message => {
     Toast.show({
       text1: 'Invalid form',
       text2: message,
@@ -243,7 +242,7 @@ export default class App extends Component {
                   testID="input_tag_id"
                   style={styles.textInput}
                   value={this.state.tagId}
-                  onChangeText={(tagId) => this.setState({tagId})}
+                  onChangeText={tagId => this.setState({tagId})}
                 />
 
                 <View style={styles.horizontalContainer}>
@@ -256,7 +255,7 @@ export default class App extends Component {
                       testID="input_view_name"
                       style={styles.textInput}
                       value={this.state.viewName}
-                      onChangeText={(viewName) => this.setState({viewName})}
+                      onChangeText={viewName => this.setState({viewName})}
                     />
                   </View>
                   <View>
@@ -268,7 +267,7 @@ export default class App extends Component {
                       style={styles.textInput}
                       testID="input_view_country"
                       value={this.state.country}
-                      onChangeText={(country) => this.setState({country})}
+                      onChangeText={country => this.setState({country})}
                     />
                   </View>
                 </View>
@@ -281,7 +280,7 @@ export default class App extends Component {
                   testID="input_target_element"
                   style={styles.textInput}
                   value={this.state.targetElement1}
-                  onChangeText={(targetElement1) =>
+                  onChangeText={targetElement1 =>
                     this.setState({targetElement1})
                   }
                 />
@@ -291,7 +290,7 @@ export default class App extends Component {
                 <TextInput
                   style={styles.textInput}
                   value={this.state.targetElement2}
-                  onChangeText={(targetElement2) =>
+                  onChangeText={targetElement2 =>
                     this.setState({targetElement2})
                   }
                 />
@@ -305,7 +304,7 @@ export default class App extends Component {
                   numberOfLines={4}
                   style={styles.multiLineText}
                   value={this.state.attributes}
-                  onChangeText={(attributes) => {
+                  onChangeText={attributes => {
                     console.log(attributes);
                     this.setState({attributes: attributes});
                   }}
