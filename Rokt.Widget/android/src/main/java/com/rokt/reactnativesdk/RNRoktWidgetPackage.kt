@@ -1,6 +1,7 @@
 package com.rokt.reactnativesdk
 
-import com.facebook.react.TurboReactPackage
+import com.facebook.react.BaseReactPackage
+import com.facebook.react.bridge.ModuleSpec
 import com.facebook.react.bridge.NativeModule
 import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.module.model.ReactModuleInfo
@@ -17,7 +18,7 @@ import java.util.*
  *
  * You may obtain a copy of the License at https://rokt.com/sdk-license-2-0/
  */
-class RNRoktWidgetPackage : TurboReactPackage() {
+class RNRoktWidgetPackage : BaseReactPackage() {
     override fun createNativeModules(reactContext: ReactApplicationContext): List<NativeModule> =
         listOf(RNRoktWidgetModule(reactContext))
 
@@ -31,6 +32,7 @@ class RNRoktWidgetPackage : TurboReactPackage() {
             null
         }
     }
+
     override fun getReactModuleInfoProvider(): ReactModuleInfoProvider {
         return ReactModuleInfoProvider {
             val moduleInfos: MutableMap<String, ReactModuleInfo> =
@@ -40,13 +42,17 @@ class RNRoktWidgetPackage : TurboReactPackage() {
                 ReactModuleInfo(
                     RNRoktWidgetModuleImpl.REACT_CLASS,
                     RNRoktWidgetModuleImpl.REACT_CLASS,
-                    _canOverrideExistingModule = false,  // canOverrideExistingModule
-                    _needsEagerInit = false,  // needsEagerInit
-                    isCxxModule = false,  // isCxxModule
-                    isTurboModule = BuildConfig.IS_NEW_ARCHITECTURE_ENABLED // isTurboModule
+                     false,  // canOverrideExistingModule
+                     false,  // needsEagerInit
+                     false,  // isCxxModule
+                     BuildConfig.IS_NEW_ARCHITECTURE_ENABLED, // isTurboModule
                 )
             )
             moduleInfos.toMap()
         }
     }
+
+    override fun getViewManagers(reactContext: ReactApplicationContext): List<ModuleSpec> = listOf(
+        ModuleSpec.viewManagerSpec { RoktEmbeddedViewManager() }
+    )
 }

@@ -13,9 +13,8 @@ buildscript {
 }
 
 def isNewArchitectureEnabled() {
-    // The new architecture is not yet public
-    // We can only use the new architecture in build time, not runtime
-    return project.hasProperty("newArchEnabled") ? project.newArchEnabled.toBoolean() : false
+    // React Native 0.80+ uses this standard detection approach
+    return project.hasProperty("newArchEnabled") && project.newArchEnabled.toBoolean()
 }
 
 apply plugin: 'com.android.library'
