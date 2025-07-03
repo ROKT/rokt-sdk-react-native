@@ -1,0 +1,52 @@
+name: Build and Package Rokt.Widget
+description: Builds TypeScript, builds plugin, creates package tarball, and optionally uploads artifacts
+
+inputs:
+  upload-artifacts:
+    description: Whether to upload build artifacts
+    required: false
+    default: "true"
+  retention-days:
+    description: Number of days to retain artifacts
+    required: false
+    default: "30"
+  working-directory:
+    description: Working directory for the build process
+    required: false
+    default: Rokt.Widget
+
+runs:
+  using: composite
+  steps:
+    - name: Install dependencies
+      shell: bash
+      run: npm ci
+      working-directory: ${{ inputs.working-directory }}
+
+    - name: Run linting
+      shell: bash
+      run: npm run lint
+      working-directory: ${{ inputs.working-directory }}
+
+    - name: Build TypeScript
+      shell: bash
+      run: npm run build
+      working-directory: ${{ inputs.working-directory }}
+
+    - name: Build plugin
+      shell: bash
+      run: npm run build:plugin
+      working-directory: ${{ inputs.working-directory }}
+
+    - name: Create package tarball
+      shell: bash
+      run: npm pack
+      working-directory: ${{ inputs.working-directory }}
+
+    - name: Upload package artifact
+      if: ${{ inputs.upload-artifacts == 'true' }}
+      uses: actions/upload-artifact@v4
+      with:
+        name: rokt-widget-package
+        path: ${{ inputs.working-directory }}/*.tgz
+        retention-days: ${{ inputs.retention-days }}
