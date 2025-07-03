@@ -1,0 +1,20 @@
+name: Build Android
+description: Builds the Android app
+
+runs:
+  using: composite
+  steps:
+    - name: Build Android
+      shell: bash
+      run: |
+        ls -la Rokt.Widget/
+        cd RoktSampleApp
+        npm install
+        npx react-native build-android
+
+    - name: Upload Android artifact
+      uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 #v4.6.2
+      with:
+        name: rokt-sdk-react-native-android
+        path: RoktSampleApp/android/app/build/outputs/apk/debug/app-debug.apk
+        retention-days: 7

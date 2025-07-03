@@ -15,6 +15,11 @@ inputs:
     required: false
     default: Rokt.Widget
 
+outputs:
+  package-filename:
+    description: The name of the created package tarball file
+    value: ${{ steps.package-tarball.outputs.filename }}
+
 runs:
   using: composite
   steps:
@@ -39,14 +44,18 @@ runs:
       working-directory: ${{ inputs.working-directory }}
 
     - name: Create package tarball
+      id: package-tarball
       shell: bash
-      run: npm pack
+      run: |
+        npm pack
+        PACKAGE_FILE=$(ls *.tgz | head -1)
+        echo "filename=$PACKAGE_FILE" >> $GITHUB_OUTPUT
       working-directory: ${{ inputs.working-directory }}
 
     - name: Upload package artifact
       if: ${{ inputs.upload-artifacts == 'true' }}
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 #v4.6.2
       with:
         name: rokt-widget-package
-        path: ${{ inputs.working-directory }}/*.tgz
+        path: ${{ inputs.working-directory }}/${{ steps.package-tarball.outputs.filename }}
         retention-days: ${{ inputs.retention-days }}
