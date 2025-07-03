@@ -1,0 +1,31 @@
+name: Build Android
+description: Builds the Android app
+
+runs:
+  using: composite
+  steps:
+    - name: Clear npm cache and regenerate package-lock
+      shell: bash
+      run: |
+        echo "Clearing npm cache and regenerating package-lock.json..."
+        cd RoktSampleApp
+        npm cache clean --force
+        rm -f package-lock.json
+        npm install
+        echo "Package-lock.json regenerated successfully"
+
+    - name: Build Android
+      shell: bash
+      run: |
+        cd RoktSampleApp
+        mkdir android/app/src/main/assets/ && npx react-native bundle --platform android --dev false --entry-file index.js --bundle-output android/app/src/main/assets/index.android.bundle --assets-dest android/app/src/main/res
+        npx react-native build-android
+        cd android
+        ./gradlew assembleDebug
+
+    - name: Upload Android artifact
+      uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 #v4.6.2
+      with:
+        name: rokt-sdk-react-native-android
+        path: RoktSampleApp/android/app/build/outputs/apk/debug/app-debug.apk
+        retention-days: 7

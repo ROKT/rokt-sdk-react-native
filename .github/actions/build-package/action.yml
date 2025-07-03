@@ -1,0 +1,61 @@
+name: Build and Package Rokt.Widget
+description: Builds TypeScript, builds plugin, creates package tarball, and optionally uploads artifacts
+
+inputs:
+  upload-artifacts:
+    description: Whether to upload build artifacts
+    required: false
+    default: "true"
+  retention-days:
+    description: Number of days to retain artifacts
+    required: false
+    default: "30"
+  working-directory:
+    description: Working directory for the build process
+    required: false
+    default: Rokt.Widget
+
+outputs:
+  package-filename:
+    description: The name of the created package tarball file
+    value: ${{ steps.package-tarball.outputs.filename }}
+
+runs:
+  using: composite
+  steps:
+    - name: Install dependencies
+      shell: bash
+      run: npm ci
+      working-directory: ${{ inputs.working-directory }}
+
+    - name: Run linting
+      shell: bash
+      run: npm run lint
+      working-directory: ${{ inputs.working-directory }}
+
+    - name: Build TypeScript
+      shell: bash
+      run: npm run build
+      working-directory: ${{ inputs.working-directory }}
+
+    - name: Build plugin
+      shell: bash
+      run: npm run build:plugin
+      working-directory: ${{ inputs.working-directory }}
+
+    - name: Create package tarball
+      id: package-tarball
+      shell: bash
+      run: |
+        npm pack
+        PACKAGE_FILE=$(ls *.tgz | head -1)
+        echo "filename=$PACKAGE_FILE" >> $GITHUB_OUTPUT
+      working-directory: ${{ inputs.working-directory }}
+
+    - name: Upload package artifact
+      if: ${{ inputs.upload-artifacts == 'true' }}
+      uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 #v4.6.2
+      with:
+        name: rokt-widget-package
+        path: ${{ inputs.working-directory }}/${{ steps.package-tarball.outputs.filename }}
+        retention-days: ${{ inputs.retention-days }}

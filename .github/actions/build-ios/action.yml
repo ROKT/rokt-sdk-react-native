@@ -1,0 +1,36 @@
+name: Build iOS
+description: Builds the iOS app
+
+runs:
+  using: composite
+  steps:
+    - name: Clear npm cache and regenerate package-lock
+      shell: bash
+      run: |
+        echo "Clearing npm cache and regenerating package-lock.json..."
+        cd RoktSampleApp
+        npm cache clean --force
+        rm -f package-lock.json
+        npm install
+        echo "Package-lock.json regenerated successfully"
+
+    - name: Install CocoaPods
+      shell: bash
+      run: |
+        echo "Installing CocoaPods..."
+        sudo gem install cocoapods
+        pod --version
+
+    - name: Install iOS dependencies
+      shell: bash
+      run: |
+        echo "Installing iOS dependencies..."
+        cd RoktSampleApp/ios
+        pod install
+        echo "iOS dependencies installed successfully"
+
+    - name: Build iOS
+      shell: bash
+      run: |
+        cd RoktSampleApp
+        npx react-native build-ios
