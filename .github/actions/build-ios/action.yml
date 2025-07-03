@@ -4,12 +4,35 @@ description: Builds the iOS app
 runs:
   using: composite
   steps:
+    - name: Clear npm cache and regenerate package-lock
+      shell: bash
+      run: |
+        echo "Clearing npm cache and regenerating package-lock.json..."
+        cd RoktSampleApp
+        npm cache clean --force
+        rm -f package-lock.json
+        npm install
+        echo "Package-lock.json regenerated successfully"
+
+    - name: Install CocoaPods
+      shell: bash
+      run: |
+        echo "Installing CocoaPods..."
+        sudo gem install cocoapods
+        pod --version
+
+    - name: Install iOS dependencies
+      shell: bash
+      run: |
+        echo "Installing iOS dependencies..."
+        cd RoktSampleApp/ios
+        pod install
+        echo "iOS dependencies installed successfully"
+
     - name: Build iOS
       shell: bash
       run: |
-        ls -la Rokt.Widget/
         cd RoktSampleApp
-        npm install
         npx react-native build-ios
         app_path=$(find ~/Library/Developer/Xcode/DerivedData -name "RoktSampleApp.app" -type d | head -1)
         if [ -z "$app_path" ]; then
@@ -20,7 +43,7 @@ runs:
           echo "Error: Could not find built app"
           exit 1
         fi
-        cp -r $app_path RoktSampleApp/ios/RoktSampleApp.app
+        cp -rf $app_path RoktSampleApp/ios/RoktSampleApp.app
 
     - name: Upload iOS artifact
       uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 #v4.6.2

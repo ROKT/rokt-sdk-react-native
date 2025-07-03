@@ -59,34 +59,7 @@ jobs:
         uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         with:
           name: rokt-widget-package
-          path: temp-artifacts/
-
-      - name: Move package file to correct location
-        shell: bash
-        run: |
-          echo "Moving package file from temp location..."
-          ls -la temp-artifacts/
-          if [ -f "temp-artifacts/${{ needs.build-package.outputs.package-filename }}" ]; then
-            mv "temp-artifacts/${{ needs.build-package.outputs.package-filename }}" "Rokt.Widget/"
-            echo "Package file moved successfully"
-          else
-            echo "Error: Package file not found in temp location"
-            exit 1
-          fi
-
-      - name: Verify package file integrity
-        shell: bash
-        run: |
-          echo "Verifying package file integrity..."
-          ls -la Rokt.Widget/
-          if [ -f "Rokt.Widget/${{ needs.build-package.outputs.package-filename }}" ]; then
-            echo "Package file found, verifying integrity..."
-            tar -tzf "Rokt.Widget/${{ needs.build-package.outputs.package-filename }}" > /dev/null
-            echo "Package file integrity verified successfully"
-          else
-            echo "Error: Package file not found"
-            exit 1
-          fi
+          path: Rokt.Widget/
 
       - name: Setup Node.js
         uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
@@ -110,34 +83,7 @@ jobs:
         uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         with:
           name: rokt-widget-package
-          path: temp-artifacts/
-
-      - name: Move package file to correct location
-        shell: bash
-        run: |
-          echo "Moving package file from temp location..."
-          ls -la temp-artifacts/
-          if [ -f "temp-artifacts/${{ needs.build-package.outputs.package-filename }}" ]; then
-            mv "temp-artifacts/${{ needs.build-package.outputs.package-filename }}" "Rokt.Widget/"
-            echo "Package file moved successfully"
-          else
-            echo "Error: Package file not found in temp location"
-            exit 1
-          fi
-
-      - name: Verify package file integrity
-        shell: bash
-        run: |
-          echo "Verifying package file integrity..."
-          ls -la Rokt.Widget/
-          if [ -f "Rokt.Widget/${{ needs.build-package.outputs.package-filename }}" ]; then
-            echo "Package file found, verifying integrity..."
-            tar -tzf "Rokt.Widget/${{ needs.build-package.outputs.package-filename }}" > /dev/null
-            echo "Package file integrity verified successfully"
-          else
-            echo "Error: Package file not found"
-            exit 1
-          fi
+          path: Rokt.Widget/
 
       - name: Setup Node.js
         uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
