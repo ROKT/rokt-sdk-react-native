@@ -1,6 +1,25 @@
 name: Build Android
 description: Builds the Android app
 
+inputs:
+  upload-artifacts:
+    description: Whether to upload build artifacts
+    required: false
+    default: "true"
+  retention-days:
+    description: Number of days to retain artifacts
+    required: false
+    default: "7"
+  working-directory:
+    description: Working directory for the build process
+    required: false
+    default: RoktSampleApp
+
+outputs:
+  apk-filename:
+    description: The name of the created APK file
+    value: ${{ steps.build-android.outputs.apk-filename }}
+
 runs:
   using: composite
   steps:
@@ -8,24 +27,72 @@ runs:
       shell: bash
       run: |
         echo "Clearing npm cache and regenerating package-lock.json..."
-        cd RoktSampleApp
+        cd ${{ inputs.working-directory }}
         npm cache clean --force
         rm -f package-lock.json
         npm install
         echo "Package-lock.json regenerated successfully"
 
     - name: Build Android
+      id: build-android
       shell: bash
       run: |
-        cd RoktSampleApp
+        cd ${{ inputs.working-directory }}
         mkdir android/app/src/main/assets/ && npx react-native bundle --platform android --dev false --entry-file index.js --bundle-output android/app/src/main/assets/index.android.bundle --assets-dest android/app/src/main/res
         npx react-native build-android
         cd android
         ./gradlew assembleDebug
 
+        # Get APK filename and create descriptive artifact name
+        APK_FILE=$(find app/build/outputs/apk/debug -name "*.apk" | head -1)
+        APK_BASENAME=$(basename "$APK_FILE")
+        echo "apk-filename=$APK_BASENAME" >> $GITHUB_OUTPUT
+
+        # Extract version from app/build.gradle for artifact naming
+        VERSION=$(grep -o 'versionName "[^"]*"' app/build.gradle | cut -d'"' -f2)
+        echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+        # Create a more descriptive artifact name
+        ARTIFACT_NAME="rokt-android-v${VERSION}-${GITHUB_SHA::8}"
+        echo "artifact-name=$ARTIFACT_NAME" >> $GITHUB_OUTPUT
+
+    - name: Create artifact metadata
+      shell: bash
+      run: |
+        cd ${{ inputs.working-directory }}
+        cat > android-artifact-info.txt << EOF
+        APK: ${{ steps.build-android.outputs.apk-filename }}
+        Version: ${{ steps.build-android.outputs.version }}
+        Commit: ${{ github.sha }}
+        Branch: ${{ github.ref_name }}
+        Workflow: ${{ github.workflow }}
+        Build Date: $(date -u +"%Y-%m-%d %H:%M:%S UTC")
+        Platform: Android
+        Build Type: Debug
+        EOF
+
     - name: Upload Android artifact
+      if: ${{ inputs.upload-artifacts == 'true' }}
       uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 #v4.6.2
       with:
-        name: rokt-sdk-react-native-android
-        path: RoktSampleApp/android/app/build/outputs/apk/debug/app-debug.apk
-        retention-days: 7
+        name: ${{ steps.build-android.outputs.artifact-name }}
+        path: |
+          ${{ inputs.working-directory }}/android/app/build/outputs/apk/debug/${{ steps.build-android.outputs.apk-filename }}
+          ${{ inputs.working-directory }}/android-artifact-info.txt
+        retention-days: ${{ inputs.retention-days }}
+
+    - name: Create artifact summary
+      if: ${{ inputs.upload-artifacts == 'true' }}
+      shell: bash
+      run: |
+        echo "## 📱 Android APK Artifact Created" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "**APK:** ${{ steps.build-android.outputs.apk-filename }}" >> $GITHUB_STEP_SUMMARY
+        echo "**Version:** ${{ steps.build-android.outputs.version }}" >> $GITHUB_STEP_SUMMARY
+        echo "**Artifact Name:** ${{ steps.build-android.outputs.artifact-name }}" >> $GITHUB_STEP_SUMMARY
+        echo "**Commit:** ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+        echo "**Branch:** ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+        echo "**Platform:** Android" >> $GITHUB_STEP_SUMMARY
+        echo "**Build Type:** Debug" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "The Android APK artifact has been uploaded and is available for download in the Actions tab." >> $GITHUB_STEP_SUMMARY

@@ -50,12 +50,49 @@ runs:
         npm pack
         PACKAGE_FILE=$(ls *.tgz | head -1)
         echo "filename=$PACKAGE_FILE" >> $GITHUB_OUTPUT
+
+        # Extract version from package.json for artifact naming
+        VERSION=$(node -p "require('./package.json').version")
+        echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+        # Create a more descriptive artifact name
+        ARTIFACT_NAME="rokt-widget-v${VERSION}-${GITHUB_SHA::8}"
+        echo "artifact-name=$ARTIFACT_NAME" >> $GITHUB_OUTPUT
+      working-directory: ${{ inputs.working-directory }}
+
+    - name: Create artifact metadata
+      shell: bash
+      run: |
+        cat > artifact-info.txt << EOF
+        Package: ${{ steps.package-tarball.outputs.filename }}
+        Version: ${{ steps.package-tarball.outputs.version }}
+        Commit: ${{ github.sha }}
+        Branch: ${{ github.ref_name }}
+        Workflow: ${{ github.workflow }}
+        Build Date: $(date -u +"%Y-%m-%d %H:%M:%S UTC")
+        EOF
       working-directory: ${{ inputs.working-directory }}
 
     - name: Upload package artifact
       if: ${{ inputs.upload-artifacts == 'true' }}
       uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 #v4.6.2
       with:
-        name: rokt-widget-package
-        path: ${{ inputs.working-directory }}/${{ steps.package-tarball.outputs.filename }}
+        name: ${{ steps.package-tarball.outputs.artifact-name }}
+        path: |
+          ${{ inputs.working-directory }}/${{ steps.package-tarball.outputs.filename }}
+          ${{ inputs.working-directory }}/artifact-info.txt
         retention-days: ${{ inputs.retention-days }}
+
+    - name: Create artifact summary
+      if: ${{ inputs.upload-artifacts == 'true' }}
+      shell: bash
+      run: |
+        echo "## 📦 Package Artifact Created" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "**Package:** ${{ steps.package-tarball.outputs.filename }}" >> $GITHUB_STEP_SUMMARY
+        echo "**Version:** ${{ steps.package-tarball.outputs.version }}" >> $GITHUB_STEP_SUMMARY
+        echo "**Artifact Name:** ${{ steps.package-tarball.outputs.artifact-name }}" >> $GITHUB_STEP_SUMMARY
+        echo "**Commit:** ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+        echo "**Branch:** ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "The package artifact has been uploaded and is available for download in the Actions tab." >> $GITHUB_STEP_SUMMARY

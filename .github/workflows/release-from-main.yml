@@ -36,7 +36,21 @@ jobs:
         uses: ./.github/actions/build-package
         with:
           upload-artifacts: "true"
-          retention-days: "7"
+          retention-days: "90"
+
+      - name: Display artifact information
+        shell: bash
+        run: |
+          echo "## 📦 Build Artifacts Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Package Filename:** ${{ steps.build-and-package.outputs.package-filename }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Artifact Pattern:** rokt-widget-v*-*" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Available Artifacts:" >> $GITHUB_STEP_SUMMARY
+          echo "- Package tarball with version and commit hash" >> $GITHUB_STEP_SUMMARY
+          echo "- Build metadata file" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Artifacts can be downloaded from the Actions tab or used by subsequent jobs." >> $GITHUB_STEP_SUMMARY
 
   build-test-ios:
     name: Build & Test iOS
@@ -49,7 +63,7 @@ jobs:
       - name: Download artifacts
         uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         with:
-          name: rokt-widget-package
+          pattern: rokt-widget-v*-*
           path: Rokt.Widget/
 
       - name: Setup Node.js
@@ -58,13 +72,66 @@ jobs:
           node-version: 18
 
       - name: Build & Test iOS
+        id: build-ios
         uses: ./.github/actions/build-ios
+        with:
+          upload-artifacts: "true"
+          retention-days: "90"
+
+      - name: Display iOS artifact information
+        shell: bash
+        run: |
+          echo "## 📱 iOS Build Artifacts Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**App Bundle:** ${{ steps.build-ios.outputs.app-filename }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Artifact Pattern:** rokt-ios-v*-*" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Available Artifacts:" >> $GITHUB_STEP_SUMMARY
+          echo "- iOS Simulator app bundle (zipped)" >> $GITHUB_STEP_SUMMARY
+          echo "- Test results (JUnit XML)" >> $GITHUB_STEP_SUMMARY
+          echo "- Build metadata file" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "iOS artifacts can be downloaded from the Actions tab." >> $GITHUB_STEP_SUMMARY
 
   build-test-android:
     name: Build & Test Android
-    uses: ./.github/workflows/test-android.yml
-    with:
-      flutter-version: ${{ vars.FLUTTER_VERSION }}
+    needs: build-package
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: Download artifacts
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          pattern: rokt-widget-v*-*
+          path: Rokt.Widget/
+
+      - name: Setup Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 18
+
+      - name: Build & Test Android
+        id: build-android
+        uses: ./.github/actions/build-android
+        with:
+          upload-artifacts: "true"
+          retention-days: "90"
+
+      - name: Display Android artifact information
+        shell: bash
+        run: |
+          echo "## 📱 Android Build Artifacts Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**APK Filename:** ${{ steps.build-android.outputs.apk-filename }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Artifact Pattern:** rokt-android-v*-*" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Available Artifacts:" >> $GITHUB_STEP_SUMMARY
+          echo "- Android APK with version and commit hash" >> $GITHUB_STEP_SUMMARY
+          echo "- Build metadata file" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Android artifacts can be downloaded from the Actions tab." >> $GITHUB_STEP_SUMMARY
 
   setup-and-version:
     needs: [build-test-ios, build-test-android]
@@ -90,7 +157,7 @@ jobs:
       - name: Download package artifact
         uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         with:
-          name: rokt-widget-package
+          pattern: rokt-widget-v*-*
           path: Rokt.Widget/
 
       - name: Setup Node.js

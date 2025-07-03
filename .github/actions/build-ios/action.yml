@@ -1,6 +1,25 @@
 name: Build iOS
 description: Builds the iOS app
 
+inputs:
+  upload-artifacts:
+    description: Whether to upload build artifacts
+    required: false
+    default: "true"
+  retention-days:
+    description: Number of days to retain artifacts
+    required: false
+    default: "7"
+  working-directory:
+    description: Working directory for the build process
+    required: false
+    default: RoktSampleApp
+
+outputs:
+  app-filename:
+    description: The name of the created iOS app bundle
+    value: ${{ steps.build-ios.outputs.app-filename }}
+
 runs:
   using: composite
   steps:
@@ -8,7 +27,7 @@ runs:
       shell: bash
       run: |
         echo "Clearing npm cache and regenerating package-lock.json..."
-        cd RoktSampleApp
+        cd ${{ inputs.working-directory }}
         npm cache clean --force
         rm -f package-lock.json
         npm install
@@ -25,12 +44,100 @@ runs:
       shell: bash
       run: |
         echo "Installing iOS dependencies..."
-        cd RoktSampleApp/ios
+        cd ${{ inputs.working-directory }}/ios
         pod install
         echo "iOS dependencies installed successfully"
 
-    - name: Build iOS
+    - name: Build iOS for Simulator
+      id: build-ios
       shell: bash
       run: |
-        cd RoktSampleApp
-        npx react-native build-ios
+        cd ${{ inputs.working-directory }}
+
+        # Build for iOS Simulator
+        xcodebuild -workspace ios/RoktSampleApp.xcworkspace \
+          -scheme RoktSampleApp \
+          -configuration Debug \
+          -destination 'platform=iOS Simulator,name=iPhone 15' \
+          -derivedDataPath ios/build \
+          -UseModernBuildSystem=YES \
+          build
+
+        # Find the built app bundle
+        APP_BUNDLE=$(find ios/build/Build/Products/Debug-iphonesimulator -name "*.app" -type d | head -1)
+        APP_BASENAME=$(basename "$APP_BUNDLE")
+        echo "app-filename=$APP_BASENAME" >> $GITHUB_OUTPUT
+
+        # Extract version from Info.plist
+        VERSION=$(plutil -extract CFBundleShortVersionString raw "$APP_BUNDLE/Info.plist" 2>/dev/null || echo "1.0.0")
+        echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+        # Create a more descriptive artifact name
+        ARTIFACT_NAME="rokt-ios-v${VERSION}-${GITHUB_SHA::8}"
+        echo "artifact-name=$ARTIFACT_NAME" >> $GITHUB_OUTPUT
+
+        # Create a zip archive of the app bundle for easier handling
+        cd ios/build/Build/Products/Debug-iphonesimulator
+        zip -r "$APP_BASENAME.zip" "$APP_BASENAME"
+        echo "app-archive=$APP_BASENAME.zip" >> $GITHUB_OUTPUT
+
+    - name: Run iOS Tests
+      shell: bash
+      run: |
+        cd ${{ inputs.working-directory }}
+
+        # Run tests and generate test results
+        xcodebuild -workspace ios/RoktSampleApp.xcworkspace \
+          -scheme RoktSampleApp \
+          -configuration Debug \
+          -destination 'platform=iOS Simulator,name=iPhone 15' \
+          -derivedDataPath ios/build \
+          -UseModernBuildSystem=YES \
+          test | xcpretty -r junit -o ios/build/test-results.xml || true
+
+    - name: Create artifact metadata
+      shell: bash
+      run: |
+        cd ${{ inputs.working-directory }}
+        cat > ios-artifact-info.txt << EOF
+        App Bundle: ${{ steps.build-ios.outputs.app-filename }}
+        Archive: ${{ steps.build-ios.outputs.app-archive }}
+        Version: ${{ steps.build-ios.outputs.version }}
+        Commit: ${{ github.sha }}
+        Branch: ${{ github.ref_name }}
+        Workflow: ${{ github.workflow }}
+        Build Date: $(date -u +"%Y-%m-%d %H:%M:%S UTC")
+        Platform: iOS Simulator
+        Build Type: Debug
+        Device: iPhone 15
+        EOF
+
+    - name: Upload iOS artifacts
+      if: ${{ inputs.upload-artifacts == 'true' }}
+      uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 #v4.6.2
+      with:
+        name: ${{ steps.build-ios.outputs.artifact-name }}
+        path: |
+          ${{ inputs.working-directory }}/ios/build/Build/Products/Debug-iphonesimulator/${{ steps.build-ios.outputs.app-archive }}
+          ${{ inputs.working-directory }}/ios/build/test-results.xml
+          ${{ inputs.working-directory }}/ios-artifact-info.txt
+        retention-days: ${{ inputs.retention-days }}
+
+    - name: Create artifact summary
+      if: ${{ inputs.upload-artifacts == 'true' }}
+      shell: bash
+      run: |
+        echo "## 📱 iOS App Artifact Created" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "**App Bundle:** ${{ steps.build-ios.outputs.app-filename }}" >> $GITHUB_STEP_SUMMARY
+        echo "**Archive:** ${{ steps.build-ios.outputs.app-archive }}" >> $GITHUB_STEP_SUMMARY
+        echo "**Version:** ${{ steps.build-ios.outputs.version }}" >> $GITHUB_STEP_SUMMARY
+        echo "**Artifact Name:** ${{ steps.build-ios.outputs.artifact-name }}" >> $GITHUB_STEP_SUMMARY
+        echo "**Commit:** ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+        echo "**Branch:** ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+        echo "**Platform:** iOS Simulator" >> $GITHUB_STEP_SUMMARY
+        echo "**Build Type:** Debug" >> $GITHUB_STEP_SUMMARY
+        echo "**Device:** iPhone 15" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "The iOS app artifact has been uploaded and is available for download in the Actions tab." >> $GITHUB_STEP_SUMMARY
+        echo "This includes the app bundle, test results, and build metadata." >> $GITHUB_STEP_SUMMARY
