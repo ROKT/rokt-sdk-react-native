@@ -50,6 +50,9 @@ runs:
         npm pack
         PACKAGE_FILE=$(ls *.tgz | head -1)
         echo "filename=$PACKAGE_FILE" >> $GITHUB_OUTPUT
+        # Verify the tarball integrity
+        tar -tzf "$PACKAGE_FILE" > /dev/null
+        echo "Package file integrity verified: $PACKAGE_FILE"
       working-directory: ${{ inputs.working-directory }}
 
     - name: Upload package artifact
