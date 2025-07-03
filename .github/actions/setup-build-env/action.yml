@@ -1,0 +1,36 @@
+name: Setup Build Environment
+description: Sets up common build environment (Node.js, npm, dependencies)
+
+inputs:
+  node-version:
+    description: Node.js version to use
+    required: false
+    default: "18"
+  working-directory:
+    description: Working directory for npm operations
+    required: false
+    default: RoktSampleApp
+  cache-dependency-path:
+    description: Path to package-lock.json for caching
+    required: false
+    default: ""
+
+runs:
+  using: composite
+  steps:
+    - name: Setup Node.js
+      uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+      with:
+        node-version: ${{ inputs.node-version }}
+        cache: npm
+        cache-dependency-path: ${{ inputs.cache-dependency-path || format('{0}/package-lock.json', inputs.working-directory) }}
+
+    - name: Clear npm cache and regenerate package-lock
+      shell: bash
+      run: |
+        echo "Setting up build environment..."
+        cd ${{ inputs.working-directory }}
+        npm cache clean --force
+        rm -f package-lock.json
+        npm install
+        echo "Build environment setup completed successfully"

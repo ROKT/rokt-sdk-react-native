@@ -1,0 +1,77 @@
+name: Build and Test
+description: Unified action for building and testing iOS or Android
+
+inputs:
+  platform:
+    description: Platform to build (ios or android)
+    required: true
+  upload-artifacts:
+    description: Whether to upload build artifacts
+    required: false
+    default: "true"
+  retention-days:
+    description: Number of days to retain artifacts
+    required: false
+    default: "7"
+  working-directory:
+    description: Working directory for the build process
+    required: false
+    default: RoktSampleApp
+
+outputs:
+  artifact-filename:
+    description: The name of the created artifact file
+    value: ${{ steps.build.outputs.artifact-filename }}
+  artifact-name:
+    description: The name of the artifact for download
+    value: ${{ steps.build.outputs.artifact-name }}
+
+runs:
+  using: composite
+  steps:
+    - name: Setup build environment
+      uses: ./.github/actions/setup-build-env
+      with:
+        working-directory: ${{ inputs.working-directory }}
+
+    - name: Build iOS
+      if: ${{ inputs.platform == 'ios' }}
+      id: build-ios
+      uses: ./.github/actions/build-ios
+      with:
+        upload-artifacts: ${{ inputs.upload-artifacts }}
+        retention-days: ${{ inputs.retention-days }}
+        working-directory: ${{ inputs.working-directory }}
+
+    - name: Build Android
+      if: ${{ inputs.platform == 'android' }}
+      id: build-android
+      uses: ./.github/actions/build-android
+      with:
+        upload-artifacts: ${{ inputs.upload-artifacts }}
+        retention-days: ${{ inputs.retention-days }}
+        working-directory: ${{ inputs.working-directory }}
+
+    - name: Set outputs
+      id: build
+      shell: bash
+      run: |
+        if [ "${{ inputs.platform }}" = "ios" ]; then
+          echo "artifact-filename=${{ steps.build-ios.outputs.app-filename }}" >> $GITHUB_OUTPUT
+          echo "artifact-name=${{ steps.build-ios.outputs.artifact-name }}" >> $GITHUB_OUTPUT
+        elif [ "${{ inputs.platform }}" = "android" ]; then
+          echo "artifact-filename=${{ steps.build-android.outputs.apk-filename }}" >> $GITHUB_OUTPUT
+          echo "artifact-name=${{ steps.build-android.outputs.artifact-name }}" >> $GITHUB_OUTPUT
+        fi
+
+    - name: Display artifact summary
+      uses: ./.github/actions/display-artifacts
+      with:
+        platform: ${{ inputs.platform == 'ios' && 'iOS' || 'Android' }}
+        artifact-pattern: ${{ inputs.platform == 'ios' && 'rokt-ios-v*-*' || 'rokt-android-v*-*' }}
+        primary-filename: ${{ steps.build.outputs.artifact-filename }}
+        icon: ${{ inputs.platform == 'ios' && '📱' || '🤖' }}
+        artifacts-list: |
+          ${{ inputs.platform == 'ios' && 'iOS Simulator app bundle (zipped)' || 'Android APK with version and commit hash' }}
+          ${{ inputs.platform == 'ios' && 'Test results (JUnit XML)' || '' }}
+          Build metadata file

@@ -46,19 +46,16 @@ jobs:
           upload-artifacts: "true"
           retention-days: "7"
 
-      - name: Display artifact information
-        shell: bash
-        run: |
-          echo "## 📦 Build Artifacts Summary" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**Package Filename:** ${{ steps.build-and-package.outputs.package-filename }}" >> $GITHUB_STEP_SUMMARY
-          echo "**Artifact Pattern:** rokt-widget-v*-*" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "### Available Artifacts:" >> $GITHUB_STEP_SUMMARY
-          echo "- Package tarball with version and commit hash" >> $GITHUB_STEP_SUMMARY
-          echo "- Build metadata file" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "Artifacts can be downloaded from the Actions tab or used by subsequent jobs." >> $GITHUB_STEP_SUMMARY
+      - name: Display package artifacts
+        uses: ./.github/actions/display-artifacts
+        with:
+          platform: Package
+          artifact-pattern: rokt-widget-v*-*
+          primary-filename: ${{ steps.build-and-package.outputs.package-filename }}
+          icon: 📦
+          artifacts-list: |
+            Package tarball with version and commit hash
+            Build metadata file
 
   build-test-ios:
     name: Build & Test iOS
@@ -68,38 +65,18 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
-      - name: Download artifacts
-        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+      - name: Download and flatten artifacts
+        uses: ./.github/actions/download-and-flatten
         with:
           pattern: rokt-widget-v*-*
           path: Rokt.Widget/
 
-      - name: Setup Node.js
-        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+      - name: Build and Test iOS
+        uses: ./.github/actions/build-and-test
         with:
-          node-version: 18
-
-      - name: Build & Test iOS
-        id: build-ios
-        uses: ./.github/actions/build-ios
-        with:
+          platform: ios
           upload-artifacts: "true"
           retention-days: "7"
-
-      - name: Display iOS artifact information
-        shell: bash
-        run: |
-          echo "## 📱 iOS Build Artifacts Summary" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**App Bundle:** ${{ steps.build-ios.outputs.app-filename }}" >> $GITHUB_STEP_SUMMARY
-          echo "**Artifact Pattern:** rokt-ios-v*-*" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "### Available Artifacts:" >> $GITHUB_STEP_SUMMARY
-          echo "- iOS Simulator app bundle (zipped)" >> $GITHUB_STEP_SUMMARY
-          echo "- Test results (JUnit XML)" >> $GITHUB_STEP_SUMMARY
-          echo "- Build metadata file" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "iOS artifacts can be downloaded from the Actions tab." >> $GITHUB_STEP_SUMMARY
 
   build-test-android:
     name: Build & Test Android
@@ -109,37 +86,18 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
-      - name: Download artifacts
-        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+      - name: Download and flatten artifacts
+        uses: ./.github/actions/download-and-flatten
         with:
           pattern: rokt-widget-v*-*
           path: Rokt.Widget/
 
-      - name: Setup Node.js
-        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+      - name: Build and Test Android
+        uses: ./.github/actions/build-and-test
         with:
-          node-version: 18
-
-      - name: Build & Test Android
-        id: build-android
-        uses: ./.github/actions/build-android
-        with:
+          platform: android
           upload-artifacts: "true"
           retention-days: "7"
-
-      - name: Display Android artifact information
-        shell: bash
-        run: |
-          echo "## 📱 Android Build Artifacts Summary" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**APK Filename:** ${{ steps.build-android.outputs.apk-filename }}" >> $GITHUB_STEP_SUMMARY
-          echo "**Artifact Pattern:** rokt-android-v*-*" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "### Available Artifacts:" >> $GITHUB_STEP_SUMMARY
-          echo "- Android APK with version and commit hash" >> $GITHUB_STEP_SUMMARY
-          echo "- Build metadata file" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "Android artifacts can be downloaded from the Actions tab." >> $GITHUB_STEP_SUMMARY
 
   pr-notify:
     if: >

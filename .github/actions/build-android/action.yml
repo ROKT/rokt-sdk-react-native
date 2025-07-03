@@ -19,20 +19,13 @@ outputs:
   apk-filename:
     description: The name of the created APK file
     value: ${{ steps.build-android.outputs.apk-filename }}
+  artifact-name:
+    description: The name of the artifact for download
+    value: ${{ steps.build-android.outputs.artifact-name }}
 
 runs:
   using: composite
   steps:
-    - name: Clear npm cache and regenerate package-lock
-      shell: bash
-      run: |
-        echo "Clearing npm cache and regenerating package-lock.json..."
-        cd ${{ inputs.working-directory }}
-        npm cache clean --force
-        rm -f package-lock.json
-        npm install
-        echo "Package-lock.json regenerated successfully"
-
     - name: Build Android
       id: build-android
       shell: bash

@@ -19,20 +19,13 @@ outputs:
   app-filename:
     description: The name of the created iOS app bundle
     value: ${{ steps.build-ios.outputs.app-filename }}
+  artifact-name:
+    description: The name of the artifact for download
+    value: ${{ steps.build-ios.outputs.artifact-name }}
 
 runs:
   using: composite
   steps:
-    - name: Clear npm cache and regenerate package-lock
-      shell: bash
-      run: |
-        echo "Clearing npm cache and regenerating package-lock.json..."
-        cd ${{ inputs.working-directory }}
-        npm cache clean --force
-        rm -f package-lock.json
-        npm install
-        echo "Package-lock.json regenerated successfully"
-
     - name: Install CocoaPods
       shell: bash
       run: |
