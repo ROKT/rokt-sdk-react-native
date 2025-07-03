@@ -1,6 +1,9 @@
 name: Create draft release
 
 on:
+  push:
+    branches:
+      - feat/build-pipeline-actions # TODO: Remove this after testing
   workflow_dispatch: # checkov:skip=CKV_GHA_7
     inputs:
       bump-type:
@@ -74,6 +77,7 @@ jobs:
           branch: release/${{ steps.bump-version.outputs.new_version }}
           title: "Prepare release ${{ steps.bump-version.outputs.new_version }}"
           base: main
+          draft: true # TODO: Remove this after testing
           body: |
             Preparing for release ${{ steps.bump-version.outputs.new_version }}
             - Updated package.json to new version
