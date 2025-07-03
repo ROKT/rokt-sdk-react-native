@@ -76,7 +76,7 @@ jobs:
           commit-message: "Prepare release ${{ steps.bump-version.outputs.new_version }}"
           branch: release/${{ steps.bump-version.outputs.new_version }}
           title: "Prepare release ${{ steps.bump-version.outputs.new_version }}"
-          base: main
+          base: feat/build-pipeline-actions # TODO: Change to main after testing
           draft: true # TODO: Remove this after testing
           body: |
             Preparing for release ${{ steps.bump-version.outputs.new_version }}
