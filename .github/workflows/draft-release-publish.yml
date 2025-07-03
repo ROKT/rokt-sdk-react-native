@@ -59,6 +59,13 @@ jobs:
         run: |
           npm version ${{ steps.bump-version.outputs.new_version }} --no-git-tag-version
 
+      - name: Update RoktSampleApp package.json version
+        working-directory: RoktSampleApp
+        run: |
+          npm version ${{ steps.bump-version.outputs.new_version }} --no-git-tag-version
+          # Update the @rokt/react-native-sdk dependency version
+          sed -i "s|rokt-react-native-sdk-[0-9]\+\.[0-9]\+\.[0-9]\+\.tgz|rokt-react-native-sdk-${{ steps.bump-version.outputs.new_version }}.tgz|g" package.json
+
       - name: Generate a token
         id: generate-token
         uses: actions/create-github-app-token@df432ceedc7162793a195dd1713ff69aefc7379e # v2.0.6
