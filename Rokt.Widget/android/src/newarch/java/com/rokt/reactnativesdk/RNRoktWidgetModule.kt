@@ -21,7 +21,7 @@ import java.util.concurrent.CountDownLatch
  */
 class RNRoktWidgetModule internal constructor(private val reactContext: ReactApplicationContext) :
     NativeRoktWidgetSpec(
-        reactContext
+        reactContext,
     ) {
     private val impl = RNRoktWidgetModuleImpl(reactContext)
 
@@ -45,7 +45,7 @@ class RNRoktWidgetModule internal constructor(private val reactContext: ReactApp
         viewName: String?,
         attributes: ReadableMap?,
         placeholders: ReadableMap?,
-        roktConfig: ReadableMap?
+        roktConfig: ReadableMap?,
     ) {
         executeInternal(viewName, attributes, placeholders, roktConfig)
     }
@@ -54,7 +54,7 @@ class RNRoktWidgetModule internal constructor(private val reactContext: ReactApp
         viewName: String?,
         attributes: ReadableMap?,
         placeholders: ReadableMap?,
-        roktConfig: ReadableMap? = null
+        roktConfig: ReadableMap? = null,
     ) {
         if (viewName == null) {
             impl.logDebug("Execute failed. ViewName cannot be null")
@@ -67,14 +67,13 @@ class RNRoktWidgetModule internal constructor(private val reactContext: ReactApp
         // Process placeholders for Fabric
         val placeholdersMap = processPlaceholders(placeholders)
 
-
         // Execute Rokt with the placeholders we gathered
         Rokt.execute(
             viewName = viewName,
             attributes = impl.readableMapToMapOfStrings(attributes),
             callback = impl.createRoktCallback(),
             placeholders = placeholdersMap,
-            config = config
+            config = config,
         )
     }
 
@@ -88,7 +87,7 @@ class RNRoktWidgetModule internal constructor(private val reactContext: ReactApp
         viewName: String?,
         attributes: ReadableMap?,
         placeholders: ReadableMap?,
-        roktConfig: ReadableMap?
+        roktConfig: ReadableMap?,
     ) {
         execute2StepInternal(viewName, attributes, placeholders, roktConfig)
     }
@@ -97,7 +96,7 @@ class RNRoktWidgetModule internal constructor(private val reactContext: ReactApp
         viewName: String?,
         attributes: ReadableMap?,
         placeholders: ReadableMap?,
-        roktConfig: ReadableMap? = null
+        roktConfig: ReadableMap? = null,
     ) {
         if (viewName == null) {
             impl.logDebug("Execute failed. ViewName cannot be null")
@@ -116,11 +115,9 @@ class RNRoktWidgetModule internal constructor(private val reactContext: ReactApp
             attributes = impl.readableMapToMapOfStrings(attributes),
             callback = impl.createRoktCallback(),
             placeholders = placeholdersMap,
-            roktEventCallback = object : Rokt.RoktEventCallback {
-                override fun onEvent(
-                    eventType: RoktEventType,
-                    roktEventHandler: RoktEventHandler
-                ) {
+            roktEventCallback =
+            object : Rokt.RoktEventCallback {
+                override fun onEvent(eventType: RoktEventType, roktEventHandler: RoktEventHandler) {
                     impl.setRoktEventHandler(roktEventHandler)
                     if (eventType == RoktEventType.FirstPositiveEngagement) {
                         impl.logDebug("onFirstPositiveEvent was fired")
@@ -128,7 +125,7 @@ class RNRoktWidgetModule internal constructor(private val reactContext: ReactApp
                     }
                 }
             },
-            config = config
+            config = config,
         )
     }
 
@@ -151,14 +148,15 @@ class RNRoktWidgetModule internal constructor(private val reactContext: ReactApp
                         val key = iterator.nextKey()
                         try {
                             // Get the tag value as an integer
-                            val reactTag = when {
-                                placeholders.getType(key) == ReadableType.Number ->
-                                    placeholders.getDouble(key).toInt()
-                                else -> {
-                                    impl.logDebug("Invalid view tag for key: $key")
-                                    continue
+                            val reactTag =
+                                when {
+                                    placeholders.getType(key) == ReadableType.Number ->
+                                        placeholders.getDouble(key).toInt()
+                                    else -> {
+                                        impl.logDebug("Invalid view tag for key: $key")
+                                        continue
+                                    }
                                 }
-                            }
 
                             // Get the UIManager for this specific tag
                             val uiManager = UIManagerHelper.getUIManagerForReactTag(reactContext, reactTag)
@@ -201,9 +199,7 @@ class RNRoktWidgetModule internal constructor(private val reactContext: ReactApp
         impl.setFulfillmentAttributes(attributes)
     }
 
-    override fun getName(): String {
-        return impl.getName()
-    }
+    override fun getName(): String = impl.getName()
 
     @ReactMethod
     override fun setEnvironmentToStage() {

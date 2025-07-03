@@ -9,9 +9,9 @@
  * You may obtain a copy of the License at https://rokt.com/sdk-license-2-0/
  */
 
-import { StyleSheet } from 'react-native';
-import React, { Component } from 'react';
-import RoktNativeWidgetNativeComponent from './RoktNativeWidgetNativeComponent';
+import { StyleSheet } from "react-native";
+import React, { Component } from "react";
+import RoktNativeWidgetNativeComponent from "./RoktNativeWidgetNativeComponent";
 
 /**
  * PUBLIC API: Props that users of RoktEmbeddedView can set
@@ -39,7 +39,7 @@ export interface RoktEmbeddedViewState {
 interface HeightChangedEvent {
   nativeEvent: {
     height: string;
-  }
+  };
 }
 
 interface MarginChangedEvent {
@@ -48,14 +48,14 @@ interface MarginChangedEvent {
     marginLeft?: string;
     marginRight?: string;
     marginBottom?: string;
-  }
+  };
 }
 
 const styles = StyleSheet.create({
   widget: {
     flex: 1,
-    backgroundColor: 'transparent'
-  }
+    backgroundColor: "transparent",
+  },
 });
 
 /**
@@ -64,10 +64,20 @@ const styles = StyleSheet.create({
  *
  * This component only exposes the placeholderName prop to users, hiding all the internal complexity.
  */
-export class RoktEmbeddedView extends Component<RoktEmbeddedViewProps, RoktEmbeddedViewState> {
+export class RoktEmbeddedView extends Component<
+  RoktEmbeddedViewProps,
+  RoktEmbeddedViewState
+> {
   constructor(props: RoktEmbeddedViewProps) {
     super(props);
-    this.state = { height: 0, placeholderName: this.props.placeholderName, marginTop: 0, marginRight: 0, marginLeft: 0, marginBottom: 0 };
+    this.state = {
+      height: 0,
+      placeholderName: this.props.placeholderName,
+      marginTop: 0,
+      marginRight: 0,
+      marginLeft: 0,
+      marginBottom: 0,
+    };
   }
 
   /**
@@ -78,7 +88,7 @@ export class RoktEmbeddedView extends Component<RoktEmbeddedViewProps, RoktEmbed
     if (event && event.nativeEvent && event.nativeEvent.height) {
       this.setState({ height: parseInt(event.nativeEvent.height) });
     }
-  }
+  };
 
   /**
    * Handles the margin changed event from the native component
@@ -86,15 +96,16 @@ export class RoktEmbeddedView extends Component<RoktEmbeddedViewProps, RoktEmbed
    */
   private handleMarginChanged = (event: MarginChangedEvent) => {
     if (event && event.nativeEvent) {
-      const { marginTop, marginLeft, marginRight, marginBottom } = event.nativeEvent;
+      const { marginTop, marginLeft, marginRight, marginBottom } =
+        event.nativeEvent;
       this.setState({
-        marginTop: parseInt(marginTop || '0'),
-        marginLeft: parseInt(marginLeft || '0'),
-        marginRight: parseInt(marginRight || '0'),
-        marginBottom: parseInt(marginBottom || '0')
+        marginTop: parseInt(marginTop || "0"),
+        marginLeft: parseInt(marginLeft || "0"),
+        marginRight: parseInt(marginRight || "0"),
+        marginBottom: parseInt(marginBottom || "0"),
       });
     }
-  }
+  };
 
   override render() {
     try {
@@ -120,7 +131,7 @@ export class RoktEmbeddedView extends Component<RoktEmbeddedViewProps, RoktEmbed
         />
       );
     } catch (error) {
-      console.error('[ROKT] Error rendering RoktEmbeddedView:', error);
+      console.error("[ROKT] Error rendering RoktEmbeddedView:", error);
       return null;
     }
   }

@@ -22,37 +22,31 @@ class RNRoktWidgetPackage : BaseReactPackage() {
     override fun createNativeModules(reactContext: ReactApplicationContext): List<NativeModule> =
         listOf(RNRoktWidgetModule(reactContext))
 
-    override fun getModule(
-        name: String,
-        reactContext: ReactApplicationContext
-    ): NativeModule? {
-        return if (name == RNRoktWidgetModuleImpl.REACT_CLASS) {
+    override fun getModule(name: String, reactContext: ReactApplicationContext): NativeModule? =
+        if (name == RNRoktWidgetModuleImpl.REACT_CLASS) {
             RNRoktWidgetModule(reactContext)
         } else {
             null
         }
-    }
 
-    override fun getReactModuleInfoProvider(): ReactModuleInfoProvider {
-        return ReactModuleInfoProvider {
-            val moduleInfos: MutableMap<String, ReactModuleInfo> =
-                HashMap<String, ReactModuleInfo>()
-            moduleInfos.put(
+    override fun getReactModuleInfoProvider(): ReactModuleInfoProvider = ReactModuleInfoProvider {
+        val moduleInfos: MutableMap<String, ReactModuleInfo> =
+            HashMap<String, ReactModuleInfo>()
+        moduleInfos.put(
+            RNRoktWidgetModuleImpl.REACT_CLASS,
+            ReactModuleInfo(
                 RNRoktWidgetModuleImpl.REACT_CLASS,
-                ReactModuleInfo(
-                    RNRoktWidgetModuleImpl.REACT_CLASS,
-                    RNRoktWidgetModuleImpl.REACT_CLASS,
-                     false,  // canOverrideExistingModule
-                     false,  // needsEagerInit
-                     false,  // isCxxModule
-                     BuildConfig.IS_NEW_ARCHITECTURE_ENABLED, // isTurboModule
-                )
-            )
-            moduleInfos.toMap()
-        }
+                RNRoktWidgetModuleImpl.REACT_CLASS,
+                false, // canOverrideExistingModule
+                false, // needsEagerInit
+                false, // isCxxModule
+                BuildConfig.IS_NEW_ARCHITECTURE_ENABLED, // isTurboModule
+            ),
+        )
+        moduleInfos.toMap()
     }
 
     override fun getViewManagers(reactContext: ReactApplicationContext): List<ModuleSpec> = listOf(
-        ModuleSpec.viewManagerSpec { RoktEmbeddedViewManager() }
+        ModuleSpec.viewManagerSpec { RoktEmbeddedViewManager() },
     )
 }

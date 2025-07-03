@@ -12,10 +12,10 @@ import com.facebook.react.modules.core.DeviceEventManagerModule.RCTDeviceEventEm
 import com.rokt.roktsdk.CacheConfig
 import com.rokt.roktsdk.FulfillmentAttributes
 import com.rokt.roktsdk.Rokt
-import com.rokt.roktsdk.RoktConfig
 import com.rokt.roktsdk.Rokt.Environment.Prod
 import com.rokt.roktsdk.Rokt.RoktEventHandler
 import com.rokt.roktsdk.Rokt.SdkFrameworkType.ReactNative
+import com.rokt.roktsdk.RoktConfig
 import com.rokt.roktsdk.RoktEvent
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
@@ -50,19 +50,24 @@ class RNRoktWidgetModuleImpl(private val reactContext: ReactApplicationContext) 
             Rokt.init(
                 roktTagId = requireNotNull(roktTagId),
                 appVersion = requireNotNull(appVersion),
-                activity = activity
+                activity = activity,
             )
         }
     }
 
-    fun initializeWithFontFiles(roktTagId: String?, appVersion: String?, fontsMap: ReadableMap?, currentActivity: Activity?) {
+    fun initializeWithFontFiles(
+        roktTagId: String?,
+        appVersion: String?,
+        fontsMap: ReadableMap?,
+        currentActivity: Activity?,
+    ) {
         initRokt(roktTagId, appVersion, 4, currentActivity) { activity ->
             Rokt.init(
                 roktTagId = requireNotNull(roktTagId),
                 appVersion = requireNotNull(appVersion),
                 activity = activity,
                 fontPostScriptNames = HashSet(),
-                fontFilePathMap = readableMapToMapOfStrings(fontsMap)
+                fontFilePathMap = readableMapToMapOfStrings(fontsMap),
             )
         }
     }
@@ -105,23 +110,24 @@ class RNRoktWidgetModuleImpl(private val reactContext: ReactApplicationContext) 
     }
 
     fun createRoktCallback(): Rokt.RoktCallback {
-        val callback: Rokt.RoktCallback = object : Rokt.RoktCallback {
-            override fun onLoad() {
-                sendCallback("onLoad", null)
-            }
+        val callback: Rokt.RoktCallback =
+            object : Rokt.RoktCallback {
+                override fun onLoad() {
+                    sendCallback("onLoad", null)
+                }
 
-            override fun onUnload(reason: Rokt.UnloadReasons) {
-                sendCallback("onUnLoad", reason.toString())
-            }
+                override fun onUnload(reason: Rokt.UnloadReasons) {
+                    sendCallback("onUnLoad", reason.toString())
+                }
 
-            override fun onShouldShowLoadingIndicator() {
-                sendCallback("onShouldShowLoadingIndicator", null)
-            }
+                override fun onShouldShowLoadingIndicator() {
+                    sendCallback("onShouldShowLoadingIndicator", null)
+                }
 
-            override fun onShouldHideLoadingIndicator() {
-                sendCallback("onShouldHideLoadingIndicator", null)
+                override fun onShouldHideLoadingIndicator() {
+                    sendCallback("onShouldHideLoadingIndicator", null)
+                }
             }
-        }
         listeners[System.currentTimeMillis()] = callback
         return callback
     }
@@ -135,11 +141,7 @@ class RNRoktWidgetModuleImpl(private val reactContext: ReactApplicationContext) 
         sendEvent(reactContext, "RoktCallback", params)
     }
 
-    fun sendEvent(
-        reactContext: ReactContext?,
-        eventName: String,
-        params: WritableMap?
-    ) {
+    fun sendEvent(reactContext: ReactContext?, eventName: String, params: WritableMap?) {
         reactContext?.getJSModule(RCTDeviceEventEmitter::class.java)?.emit(eventName, params)
     }
 
@@ -153,12 +155,10 @@ class RNRoktWidgetModuleImpl(private val reactContext: ReactApplicationContext) 
         }
     }
 
-    fun String.toColorMode(): RoktConfig.ColorMode {
-        return when (this) {
-            "dark" -> RoktConfig.ColorMode.DARK
-            "light" -> RoktConfig.ColorMode.LIGHT
-            else -> RoktConfig.ColorMode.SYSTEM
-        }
+    fun String.toColorMode(): RoktConfig.ColorMode = when (this) {
+        "dark" -> RoktConfig.ColorMode.DARK
+        "light" -> RoktConfig.ColorMode.LIGHT
+        else -> RoktConfig.ColorMode.SYSTEM
     }
 
     fun buildRoktConfig(roktConfig: ReadableMap?): RoktConfig {
@@ -180,14 +180,15 @@ class RNRoktWidgetModuleImpl(private val reactContext: ReactApplicationContext) 
             } else {
                 0L
             }
-        val cacheAttributes = if (cacheConfigMap?.hasKey("cacheAttributes") == true) {
-            cacheConfigMap.getMap("cacheAttributes")?.toHashMap()?.mapValues { it.value as String }
-        } else {
-            null
-        }
+        val cacheAttributes =
+            if (cacheConfigMap?.hasKey("cacheAttributes") == true) {
+                cacheConfigMap.getMap("cacheAttributes")?.toHashMap()?.mapValues { it.value as String }
+            } else {
+                null
+            }
         return CacheConfig(
             cacheDurationInSeconds = cacheDurationInSeconds,
-            cacheAttributes = cacheAttributes
+            cacheAttributes = cacheAttributes,
         )
     }
 
@@ -196,101 +197,103 @@ class RNRoktWidgetModuleImpl(private val reactContext: ReactApplicationContext) 
         if (activeJob != null) {
             return
         }
-        val job = (currentActivity as? LifecycleOwner)?.lifecycleScope?.launch {
-            (currentActivity as LifecycleOwner).repeatOnLifecycle(Lifecycle.State.CREATED) {
-                flow.collect { event ->
-                    val params = Arguments.createMap()
-                    var eventName: String
-                    val placementId: String? = when (event) {
-                        is RoktEvent.FirstPositiveEngagement -> {
-                            eventName = "FirstPositiveEngagement"
-                            fulfillmentAttributesCallback = event.fulfillmentAttributes
-                            event.id
-                        }
+        val job =
+            (currentActivity as? LifecycleOwner)?.lifecycleScope?.launch {
+                (currentActivity as LifecycleOwner).repeatOnLifecycle(Lifecycle.State.CREATED) {
+                    flow.collect { event ->
+                        val params = Arguments.createMap()
+                        var eventName: String
+                        val placementId: String? =
+                            when (event) {
+                                is RoktEvent.FirstPositiveEngagement -> {
+                                    eventName = "FirstPositiveEngagement"
+                                    fulfillmentAttributesCallback = event.fulfillmentAttributes
+                                    event.id
+                                }
 
-                        RoktEvent.HideLoadingIndicator -> {
-                            eventName = "HideLoadingIndicator"
-                            null
-                        }
+                                RoktEvent.HideLoadingIndicator -> {
+                                    eventName = "HideLoadingIndicator"
+                                    null
+                                }
 
-                        is RoktEvent.OfferEngagement -> {
-                            eventName = "OfferEngagement"
-                            event.id
-                        }
+                                is RoktEvent.OfferEngagement -> {
+                                    eventName = "OfferEngagement"
+                                    event.id
+                                }
 
-                        is RoktEvent.PlacementClosed -> {
-                            eventName = "PlacementClosed"
-                            event.id
-                        }
+                                is RoktEvent.PlacementClosed -> {
+                                    eventName = "PlacementClosed"
+                                    event.id
+                                }
 
-                        is RoktEvent.PlacementCompleted -> {
-                            eventName = "PlacementCompleted"
-                            event.id
-                        }
+                                is RoktEvent.PlacementCompleted -> {
+                                    eventName = "PlacementCompleted"
+                                    event.id
+                                }
 
-                        is RoktEvent.PlacementFailure -> {
-                            eventName = "PlacementFailure"
-                            event.id
-                        }
+                                is RoktEvent.PlacementFailure -> {
+                                    eventName = "PlacementFailure"
+                                    event.id
+                                }
 
-                        is RoktEvent.PlacementInteractive -> {
-                            eventName = "PlacementInteractive"
-                            event.id
-                        }
+                                is RoktEvent.PlacementInteractive -> {
+                                    eventName = "PlacementInteractive"
+                                    event.id
+                                }
 
-                        is RoktEvent.PlacementReady -> {
-                            eventName = "PlacementReady"
-                            event.id
-                        }
+                                is RoktEvent.PlacementReady -> {
+                                    eventName = "PlacementReady"
+                                    event.id
+                                }
 
-                        is RoktEvent.PositiveEngagement -> {
-                            eventName = "PositiveEngagement"
-                            event.id
-                        }
+                                is RoktEvent.PositiveEngagement -> {
+                                    eventName = "PositiveEngagement"
+                                    event.id
+                                }
 
-                        RoktEvent.ShowLoadingIndicator -> {
-                            eventName = "ShowLoadingIndicator"
-                            null
-                        }
+                                RoktEvent.ShowLoadingIndicator -> {
+                                    eventName = "ShowLoadingIndicator"
+                                    null
+                                }
 
-                        is RoktEvent.InitComplete -> {
-                            eventName = "InitComplete"
-                            params.putString("status", event.success.toString())
-                            null
-                        }
+                                is RoktEvent.InitComplete -> {
+                                    eventName = "InitComplete"
+                                    params.putString("status", event.success.toString())
+                                    null
+                                }
 
-                        is RoktEvent.OpenUrl -> {
-                            eventName = "OpenUrl"
-                            params.putString("url", event.url)
-                            event.id
-                        }
+                                is RoktEvent.OpenUrl -> {
+                                    eventName = "OpenUrl"
+                                    params.putString("url", event.url)
+                                    event.id
+                                }
 
-                        is RoktEvent.CartItemInstantPurchase -> {
-                            eventName = "CartItemInstantPurchase"
-                            params.putString("cartItemId", event.cartItemId)
-                            params.putString("catalogItemId", event.catalogItemId)
-                            params.putString("currency", event.currency)
-                            params.putString("description", event.description)
-                            params.putString("linkedProductId", event.linkedProductId)
-                            params.putDouble("totalPrice", event.totalPrice)
-                            params.putInt("quantity", event.quantity)
-                            params.putDouble("unitPrice", event.unitPrice)
-                            event.placementId
-                        }
+                                is RoktEvent.CartItemInstantPurchase -> {
+                                    eventName = "CartItemInstantPurchase"
+                                    params.putString("cartItemId", event.cartItemId)
+                                    params.putString("catalogItemId", event.catalogItemId)
+                                    params.putString("currency", event.currency)
+                                    params.putString("description", event.description)
+                                    params.putString("linkedProductId", event.linkedProductId)
+                                    params.putDouble("totalPrice", event.totalPrice)
+                                    params.putInt("quantity", event.quantity)
+                                    params.putDouble("unitPrice", event.unitPrice)
+                                    event.placementId
+                                }
 
-                        else -> {
-                            eventName = "Unknown"
-                            null
-                        }
+                                else -> {
+                                    eventName = "Unknown"
+                                    null
+                                }
+                            }
+
+                        placementId?.let { params.putString("placementId", it) }
+                        params.putString("event", eventName)
+                        viewName?.let { params.putString("viewName", it) }
+                        sendEvent(reactContext, "RoktEvents", params)
                     }
-
-                    placementId?.let { params.putString("placementId", it) }
-                    params.putString("event", eventName)
-                    viewName?.let { params.putString("viewName", it) }
-                    sendEvent(reactContext, "RoktEvents", params)
                 }
             }
-        }
         eventSubscriptions[viewName.orEmpty()] = job
     }
 
@@ -299,7 +302,7 @@ class RNRoktWidgetModuleImpl(private val reactContext: ReactApplicationContext) 
         appVersion: String?,
         retryCount: Int,
         currentActivity: Activity?,
-        init: (activity: Activity) -> Unit
+        init: (activity: Activity) -> Unit,
     ) {
         if (roktTagId == null || appVersion == null) {
             logDebug("roktTagId and appVersion cannot be null")
