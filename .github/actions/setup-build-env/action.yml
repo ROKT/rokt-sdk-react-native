@@ -14,16 +14,27 @@ inputs:
     description: Path to package-lock.json for caching
     required: false
     default: ""
+  enable-cache:
+    description: Whether to enable npm caching
+    required: false
+    default: "false"
 
 runs:
   using: composite
   steps:
-    - name: Setup Node.js
+    - name: Setup Node.js with cache
+      if: ${{ inputs.enable-cache == 'true' && inputs.cache-dependency-path != '' }}
       uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
       with:
         node-version: ${{ inputs.node-version }}
         cache: npm
-        cache-dependency-path: ${{ inputs.cache-dependency-path || format('{0}/package-lock.json', inputs.working-directory) }}
+        cache-dependency-path: ${{ inputs.cache-dependency-path }}
+
+    - name: Setup Node.js without cache
+      if: ${{ inputs.enable-cache != 'true' || inputs.cache-dependency-path == '' }}
+      uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+      with:
+        node-version: ${{ inputs.node-version }}
 
     - name: Clear npm cache and regenerate package-lock
       shell: bash

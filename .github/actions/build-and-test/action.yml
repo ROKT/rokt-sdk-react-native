@@ -33,6 +33,7 @@ runs:
       uses: ./.github/actions/setup-build-env
       with:
         working-directory: ${{ inputs.working-directory }}
+        enable-cache: "false"
 
     - name: Build iOS
       if: ${{ inputs.platform == 'ios' }}
