@@ -12,8 +12,29 @@ buildscript {
     }
 }
 
+def isNewArchitectureEnabled() {
+    // React Native 0.80+ uses this standard detection approach
+    return project.hasProperty("newArchEnabled") && project.newArchEnabled.toBoolean()
+}
+
+def supportsNamespace() {
+    def parsed = com.android.Version.ANDROID_GRADLE_PLUGIN_VERSION.tokenize('.')
+    def major = parsed[0].toInteger()
+    def minor = parsed[1].toInteger()
+
+    // Namespace support was added in 7.3.0
+    if (major == 7 && minor >= 3) {
+        return true
+    }
+
+    return major >= 8
+}
+
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
+if (isNewArchitectureEnabled()) {
+    apply plugin: 'com.facebook.react'
+}
 
 android {
     compileSdkVersion 32
@@ -24,14 +45,31 @@ android {
         targetSdkVersion 32
         versionCode 2
         versionName "2.0"
+        buildConfigField "boolean", "IS_NEW_ARCHITECTURE_ENABLED", isNewArchitectureEnabled().toString()
     }
     lintOptions {
         abortOnError false
     }
-    buildFeatures {
-        buildConfig = false
+    if (supportsNamespace()) {
+        namespace 'com.rokt.reactnativesdk'
+        buildFeatures {
+            buildConfig = true
+        }
+        sourceSets {
+            main {
+                manifest.srcFile "src/main/AndroidManifestNew.xml"
+            }
+        }
     }
-    namespace 'com.rokt.reactnativesdk'
+    sourceSets {
+        main {
+            if (isNewArchitectureEnabled()) {
+                java.srcDirs += ['src/newarch/java']
+            } else {
+                java.srcDirs += ['src/oldarch/java']
+            }
+        }
+    }
 }
 
 repositories {
@@ -46,10 +84,6 @@ repositories {
         maven {
             // Android JSC is installed from npm
             url("$rootDir/../node_modules/jsc-android/dist")
-        }
-
-        maven {
-            url  "https://apps.rokt.com/msdk"
         }
 
         google()
@@ -67,5 +101,5 @@ dependencies {
     implementation "com.facebook.react:react-native:+"  // From node_modules
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation "androidx.lifecycle:lifecycle-runtime-ktx:2.6.1"
-    implementation ('com.rokt:roktsdk:4.9.0')
+    implementation ('com.rokt:roktsdk:4.10.0')
 }

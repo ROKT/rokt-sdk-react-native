@@ -1,0 +1,74 @@
+name: Build Android
+description: Builds the Android app
+
+outputs:
+  apk-filename:
+    description: The name of the created APK file
+    value: ${{ steps.build-android.outputs.apk-filename }}
+  artifact-name:
+    description: The name of the artifact for download
+    value: ${{ steps.build-android.outputs.artifact-name }}
+
+runs:
+  using: composite
+  steps:
+    - name: Build Android
+      id: build-android
+      shell: bash
+      run: |
+        cd RoktSampleApp
+        mkdir android/app/src/main/assets/ && npx react-native bundle --platform android --dev false --entry-file index.js --bundle-output android/app/src/main/assets/index.android.bundle --assets-dest android/app/src/main/res
+        npx react-native build-android
+        cd android
+        ./gradlew assembleDebug
+
+        # Get APK filename and create descriptive artifact name
+        APK_FILE=$(find app/build/outputs/apk/debug -name "*.apk" | head -1)
+        APK_BASENAME=$(basename "$APK_FILE")
+        echo "apk-filename=$APK_BASENAME" >> $GITHUB_OUTPUT
+
+        # Extract version from app/build.gradle for artifact naming
+        VERSION=$(grep -o 'versionName "[^"]*"' app/build.gradle | cut -d'"' -f2)
+        echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+        # Create a more descriptive artifact name
+        ARTIFACT_NAME="rokt-android-v${VERSION}-${GITHUB_SHA::8}"
+        echo "artifact-name=$ARTIFACT_NAME" >> $GITHUB_OUTPUT
+
+    - name: Create artifact metadata
+      shell: bash
+      run: |
+        cd RoktSampleApp
+        cat > android-artifact-info.txt << EOF
+        APK: ${{ steps.build-android.outputs.apk-filename }}
+        Version: ${{ steps.build-android.outputs.version }}
+        Commit: ${{ github.sha }}
+        Branch: ${{ github.ref_name }}
+        Workflow: ${{ github.workflow }}
+        Build Date: $(date -u +"%Y-%m-%d %H:%M:%S UTC")
+        Platform: Android
+        Build Type: Debug
+        EOF
+
+    - name: Upload Android artifact
+      uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 #v4.6.2
+      with:
+        name: ${{ steps.build-android.outputs.artifact-name }}
+        path: |
+          RoktSampleApp/android/app/build/outputs/apk/debug/${{ steps.build-android.outputs.apk-filename }}
+          RoktSampleApp/android-artifact-info.txt
+
+    - name: Create artifact summary
+      shell: bash
+      run: |
+        echo "## 📱 Android APK Artifact Created" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "**APK:** ${{ steps.build-android.outputs.apk-filename }}" >> $GITHUB_STEP_SUMMARY
+        echo "**Version:** ${{ steps.build-android.outputs.version }}" >> $GITHUB_STEP_SUMMARY
+        echo "**Artifact Name:** ${{ steps.build-android.outputs.artifact-name }}" >> $GITHUB_STEP_SUMMARY
+        echo "**Commit:** ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+        echo "**Branch:** ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+        echo "**Platform:** Android" >> $GITHUB_STEP_SUMMARY
+        echo "**Build Type:** Debug" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "The Android APK artifact has been uploaded and is available for download in the Actions tab." >> $GITHUB_STEP_SUMMARY

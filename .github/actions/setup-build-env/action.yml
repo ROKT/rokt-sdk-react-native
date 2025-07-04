@@ -1,0 +1,20 @@
+name: Setup Build Environment
+description: Sets up common build environment (Node.js, npm, dependencies)
+
+runs:
+  using: composite
+  steps:
+    - name: Setup Node.js
+      uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+      with:
+        node-version: "18"
+
+    - name: Clear npm cache and regenerate package-lock
+      shell: bash
+      run: |
+        echo "Setting up build environment..."
+        cd RoktSampleApp
+        npm cache clean --force
+        rm -f package-lock.json
+        npm install
+        echo "Build environment setup completed successfully"

@@ -1,10 +1,11 @@
 package com.rokt.reactnativesdk
 
-import com.facebook.react.ReactPackage
-import com.facebook.react.bridge.JavaScriptModule
+import com.facebook.react.TurboReactPackage
+import com.facebook.react.bridge.ModuleSpec
 import com.facebook.react.bridge.NativeModule
 import com.facebook.react.bridge.ReactApplicationContext
-import com.facebook.react.uimanager.ViewManager
+import com.facebook.react.module.model.ReactModuleInfo
+import com.facebook.react.module.model.ReactModuleInfoProvider
 import java.util.*
 
 /**
@@ -17,12 +18,36 @@ import java.util.*
  *
  * You may obtain a copy of the License at https://rokt.com/sdk-license-2-0/
  */
-class RNRoktWidgetPackage : ReactPackage {
+class RNRoktWidgetPackage : TurboReactPackage() {
     override fun createNativeModules(reactContext: ReactApplicationContext): List<NativeModule> =
         listOf(RNRoktWidgetModule(reactContext))
 
-    // Deprecated from RN 0.47
-    fun createJSModules(): List<Class<out JavaScriptModule?>> = emptyList()
+    override fun getModule(name: String, reactContext: ReactApplicationContext): NativeModule? =
+        if (name == RNRoktWidgetModuleImpl.REACT_CLASS) {
+            RNRoktWidgetModule(reactContext)
+        } else {
+            null
+        }
 
-    override fun createViewManagers(reactContext: ReactApplicationContext): List<ViewManager<*, *>> = emptyList()
+    override fun getReactModuleInfoProvider(): ReactModuleInfoProvider = ReactModuleInfoProvider {
+        val moduleInfos: MutableMap<String, ReactModuleInfo> =
+            HashMap<String, ReactModuleInfo>()
+        moduleInfos.put(
+            RNRoktWidgetModuleImpl.REACT_CLASS,
+            ReactModuleInfo(
+                RNRoktWidgetModuleImpl.REACT_CLASS,
+                RNRoktWidgetModuleImpl.REACT_CLASS,
+                false, // canOverrideExistingModule
+                false, // needsEagerInit
+                true, // hasConstants
+                false, // isCxxModule
+                BuildConfig.IS_NEW_ARCHITECTURE_ENABLED, // isTurboModule
+            ),
+        )
+        moduleInfos.toMap()
+    }
+
+    override fun getViewManagers(reactContext: ReactApplicationContext): List<ModuleSpec> = listOf(
+        ModuleSpec.viewManagerSpec { RoktEmbeddedViewManager() },
+    )
 }

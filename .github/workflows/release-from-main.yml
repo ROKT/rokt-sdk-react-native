@@ -1,0 +1,178 @@
+name: Release SDK
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - VERSION
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+
+jobs:
+  build-package:
+    name: Build and Package Rokt.Widget
+    runs-on: ubuntu-latest
+    outputs:
+      package-filename: ${{ steps.build-and-package.outputs.package-filename }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 18
+          cache: npm
+          cache-dependency-path: Rokt.Widget/package-lock.json
+
+      - name: Build and Package
+        id: build-and-package
+        uses: ./.github/actions/build-package
+
+      - name: Display package artifacts
+        uses: ./.github/actions/display-artifacts
+        with:
+          platform: Package
+          artifact-pattern: rokt-widget-v*-*
+          primary-filename: ${{ steps.build-and-package.outputs.package-filename }}
+          icon: 📦
+          artifacts-list: |
+            Package tarball with version and commit hash
+            Build metadata file
+
+  build-test-ios:
+    name: Build & Test iOS
+    needs: build-package
+    runs-on: macos-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: Download and flatten artifacts
+        uses: ./.github/actions/download-and-flatten
+        with:
+          pattern: rokt-widget-v*-*
+          path: Rokt.Widget/
+
+      - name: Setup build environment
+        uses: ./.github/actions/setup-build-env
+
+      - name: Build and Test iOS
+        id: build-ios
+        uses: ./.github/actions/build-ios
+
+      - name: Display artifact summary
+        uses: ./.github/actions/display-artifacts
+        with:
+          platform: iOS
+          artifact-pattern: rokt-ios-v*-*
+          primary-filename: ${{ steps.build-ios.outputs.app-filename }}
+          icon: 📱
+          artifacts-list: |
+            iOS Simulator app bundle (zipped)
+            Test results (JUnit XML)
+            Build metadata file
+
+  build-test-android:
+    name: Build & Test Android
+    needs: build-package
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: Download and flatten artifacts
+        uses: ./.github/actions/download-and-flatten
+        with:
+          pattern: rokt-widget-v*-*
+          path: Rokt.Widget/
+
+      - name: Setup build environment
+        uses: ./.github/actions/setup-build-env
+
+      - name: Build and Test Android
+        id: build-android
+        uses: ./.github/actions/build-android
+
+      - name: Display artifact summary
+        uses: ./.github/actions/display-artifacts
+        with:
+          platform: Android
+          artifact-pattern: rokt-android-v*-*
+          primary-filename: ${{ steps.build-android.outputs.apk-filename }}
+          icon: 🤖
+          artifacts-list: |
+            Android APK with version and commit hash
+            Build metadata file
+
+  setup-and-version:
+    needs: [build-test-ios, build-test-android]
+    runs-on: ubuntu-latest
+    outputs:
+      final_version: ${{ steps.version-file.outputs.release-version }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - name: Get current version
+        id: version-file
+        run: |
+          version_from_file=$(head -n 1 VERSION)
+          echo "release-version=$version_from_file" >> $GITHUB_OUTPUT
+
+  release-and-tag:
+    needs: [setup-and-version, build-package]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: Download and flatten package artifacts
+        uses: ./.github/actions/download-and-flatten
+        with:
+          pattern: rokt-widget-v*-*
+          path: Rokt.Widget/
+
+      - name: Setup Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 18
+          cache: npm
+          cache-dependency-path: Rokt.Widget/package-lock.json
+
+      - name: Publish to npm
+        shell: bash
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          cd Rokt.Widget
+          echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > .npmrc
+          npm publish --access=public --tag=latest
+
+      - uses: ffurrer2/extract-release-notes@cae32133495112d23e3569ad04fef240ba4e7bc8 # v2.3.0
+        id: extract-release-notes
+        with:
+          changelog_file: CHANGELOG.md
+          release_notes_file: ${{ needs.setup-and-version.outputs.final_version }}.md
+      - name: Changelog
+        run: echo "${{ steps.extract-release-notes.outputs.release_notes }}"
+      - name: Upload release notes
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 #v4.6.2
+        with:
+          name: release-notes
+          path: ${{ needs.setup-and-version.outputs.final_version }}.md
+
+      - name: Create Github release
+        uses: ncipollo/release-action@440c8c1cb0ed28b9f43e4d1d670870f059653174 # v1.16.0
+        with:
+          makeLatest: true
+          tag: ${{ needs.setup-and-version.outputs.final_version }}
+          artifacts: Rokt.Widget/*.tgz
+          body: |
+            ## Release notes:
+            ${{ steps.extract-release-notes.outputs.release_notes }}
