@@ -2,18 +2,10 @@ name: Build Android
 description: Builds the Android app
 
 inputs:
-  upload-artifacts:
-    description: Whether to upload build artifacts
-    required: false
-    default: "true"
   retention-days:
     description: Number of days to retain artifacts
     required: false
     default: "7"
-  working-directory:
-    description: Working directory for the build process
-    required: false
-    default: RoktSampleApp
 
 outputs:
   apk-filename:
@@ -30,7 +22,7 @@ runs:
       id: build-android
       shell: bash
       run: |
-        cd ${{ inputs.working-directory }}
+        cd RoktSampleApp
         mkdir android/app/src/main/assets/ && npx react-native bundle --platform android --dev false --entry-file index.js --bundle-output android/app/src/main/assets/index.android.bundle --assets-dest android/app/src/main/res
         npx react-native build-android
         cd android
@@ -52,7 +44,7 @@ runs:
     - name: Create artifact metadata
       shell: bash
       run: |
-        cd ${{ inputs.working-directory }}
+        cd RoktSampleApp
         cat > android-artifact-info.txt << EOF
         APK: ${{ steps.build-android.outputs.apk-filename }}
         Version: ${{ steps.build-android.outputs.version }}
@@ -65,17 +57,15 @@ runs:
         EOF
 
     - name: Upload Android artifact
-      if: ${{ inputs.upload-artifacts == 'true' }}
       uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 #v4.6.2
       with:
         name: ${{ steps.build-android.outputs.artifact-name }}
         path: |
-          ${{ inputs.working-directory }}/android/app/build/outputs/apk/debug/${{ steps.build-android.outputs.apk-filename }}
-          ${{ inputs.working-directory }}/android-artifact-info.txt
+          RoktSampleApp/android/app/build/outputs/apk/debug/${{ steps.build-android.outputs.apk-filename }}
+          RoktSampleApp/android-artifact-info.txt
         retention-days: ${{ inputs.retention-days }}
 
     - name: Create artifact summary
-      if: ${{ inputs.upload-artifacts == 'true' }}
       shell: bash
       run: |
         echo "## 📱 Android APK Artifact Created" >> $GITHUB_STEP_SUMMARY

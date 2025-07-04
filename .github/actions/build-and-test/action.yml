@@ -5,18 +5,10 @@ inputs:
   platform:
     description: Platform to build (ios or android)
     required: true
-  upload-artifacts:
-    description: Whether to upload build artifacts
-    required: false
-    default: "true"
   retention-days:
     description: Number of days to retain artifacts
     required: false
     default: "7"
-  working-directory:
-    description: Working directory for the build process
-    required: false
-    default: RoktSampleApp
 
 outputs:
   artifact-filename:
@@ -31,27 +23,20 @@ runs:
   steps:
     - name: Setup build environment
       uses: ./.github/actions/setup-build-env
-      with:
-        working-directory: ${{ inputs.working-directory }}
-        enable-cache: "false"
 
     - name: Build iOS
       if: ${{ inputs.platform == 'ios' }}
       id: build-ios
       uses: ./.github/actions/build-ios
       with:
-        upload-artifacts: ${{ inputs.upload-artifacts }}
         retention-days: ${{ inputs.retention-days }}
-        working-directory: ${{ inputs.working-directory }}
 
     - name: Build Android
       if: ${{ inputs.platform == 'android' }}
       id: build-android
       uses: ./.github/actions/build-android
       with:
-        upload-artifacts: ${{ inputs.upload-artifacts }}
         retention-days: ${{ inputs.retention-days }}
-        working-directory: ${{ inputs.working-directory }}
 
     - name: Set outputs
       id: build

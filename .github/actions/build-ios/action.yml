@@ -2,18 +2,10 @@ name: Build iOS
 description: Builds the iOS app
 
 inputs:
-  upload-artifacts:
-    description: Whether to upload build artifacts
-    required: false
-    default: "true"
   retention-days:
     description: Number of days to retain artifacts
     required: false
     default: "7"
-  working-directory:
-    description: Working directory for the build process
-    required: false
-    default: RoktSampleApp
 
 outputs:
   app-filename:
@@ -37,7 +29,7 @@ runs:
       shell: bash
       run: |
         echo "Installing iOS dependencies..."
-        cd ${{ inputs.working-directory }}/ios
+        cd RoktSampleApp/ios
         pod install
         echo "iOS dependencies installed successfully"
 
@@ -45,7 +37,7 @@ runs:
       id: build-ios
       shell: bash
       run: |
-        cd ${{ inputs.working-directory }}
+        cd RoktSampleApp
 
         # Build for iOS Simulator
         xcodebuild -workspace ios/RoktSampleApp.xcworkspace \
@@ -77,7 +69,7 @@ runs:
     - name: Run iOS Tests
       shell: bash
       run: |
-        cd ${{ inputs.working-directory }}
+        cd RoktSampleApp
 
         # Run tests and generate test results
         xcodebuild -workspace ios/RoktSampleApp.xcworkspace \
@@ -91,7 +83,7 @@ runs:
     - name: Create artifact metadata
       shell: bash
       run: |
-        cd ${{ inputs.working-directory }}
+        cd RoktSampleApp
         cat > ios-artifact-info.txt << EOF
         App Bundle: ${{ steps.build-ios.outputs.app-filename }}
         Archive: ${{ steps.build-ios.outputs.app-archive }}
@@ -106,18 +98,16 @@ runs:
         EOF
 
     - name: Upload iOS artifacts
-      if: ${{ inputs.upload-artifacts == 'true' }}
       uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 #v4.6.2
       with:
         name: ${{ steps.build-ios.outputs.artifact-name }}
         path: |
-          ${{ inputs.working-directory }}/ios/build/Build/Products/Debug-iphonesimulator/${{ steps.build-ios.outputs.app-archive }}
-          ${{ inputs.working-directory }}/ios/build/test-results.xml
-          ${{ inputs.working-directory }}/ios-artifact-info.txt
+          RoktSampleApp/ios/build/Build/Products/Debug-iphonesimulator/${{ steps.build-ios.outputs.app-archive }}
+          RoktSampleApp/ios/build/test-results.xml
+          RoktSampleApp/ios-artifact-info.txt
         retention-days: ${{ inputs.retention-days }}
 
     - name: Create artifact summary
-      if: ${{ inputs.upload-artifacts == 'true' }}
       shell: bash
       run: |
         echo "## 📱 iOS App Artifact Created" >> $GITHUB_STEP_SUMMARY

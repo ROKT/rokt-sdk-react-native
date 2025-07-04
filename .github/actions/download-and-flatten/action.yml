@@ -8,10 +8,6 @@ inputs:
   path:
     description: Path where artifacts should be downloaded
     required: true
-  file-extension:
-    description: File extension to flatten (e.g., tgz, apk, zip)
-    required: false
-    default: tgz
 
 runs:
   using: composite
@@ -25,8 +21,8 @@ runs:
     - name: Flatten downloaded artifacts
       shell: bash
       run: |
-        # Move files with specified extension from subdirectories to target path root
-        find "${{ inputs.path }}" -name "*.${{ inputs.file-extension }}" -exec mv {} "${{ inputs.path }}/" \;
+        # Move files with tgz extension from subdirectories to target path root
+        find "${{ inputs.path }}" -name "*.tgz" -exec mv {} "${{ inputs.path }}/" \;
         # Clean up empty subdirectories
         find "${{ inputs.path }}" -type d -empty -delete 2>/dev/null || true
-        echo "Flattened *.${{ inputs.file-extension }} files in ${{ inputs.path }}"
+        echo "Flattened *.tgz files in ${{ inputs.path }}"

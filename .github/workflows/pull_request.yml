@@ -42,9 +42,6 @@ jobs:
       - name: Build and Package
         id: build-and-package
         uses: ./.github/actions/build-package
-        with:
-          upload-artifacts: "true"
-          retention-days: "7"
 
       - name: Display package artifacts
         uses: ./.github/actions/display-artifacts
@@ -75,8 +72,6 @@ jobs:
         uses: ./.github/actions/build-and-test
         with:
           platform: ios
-          upload-artifacts: "true"
-          retention-days: "7"
 
   build-test-android:
     name: Build & Test Android
@@ -96,8 +91,6 @@ jobs:
         uses: ./.github/actions/build-and-test
         with:
           platform: android
-          upload-artifacts: "true"
-          retention-days: "7"
 
   pr-notify:
     if: >

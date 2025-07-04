@@ -2,18 +2,10 @@ name: Build and Package Rokt.Widget
 description: Builds TypeScript, builds plugin, creates package tarball, and optionally uploads artifacts
 
 inputs:
-  upload-artifacts:
-    description: Whether to upload build artifacts
-    required: false
-    default: "true"
   retention-days:
     description: Number of days to retain artifacts
     required: false
-    default: "30"
-  working-directory:
-    description: Working directory for the build process
-    required: false
-    default: Rokt.Widget
+    default: "7"
 
 outputs:
   package-filename:
@@ -26,22 +18,22 @@ runs:
     - name: Install dependencies
       shell: bash
       run: npm ci
-      working-directory: ${{ inputs.working-directory }}
+      working-directory: Rokt.Widget
 
     - name: Run linting
       shell: bash
       run: npm run lint
-      working-directory: ${{ inputs.working-directory }}
+      working-directory: Rokt.Widget
 
     - name: Build TypeScript
       shell: bash
       run: npm run build
-      working-directory: ${{ inputs.working-directory }}
+      working-directory: Rokt.Widget
 
     - name: Build plugin
       shell: bash
       run: npm run build:plugin
-      working-directory: ${{ inputs.working-directory }}
+      working-directory: Rokt.Widget
 
     - name: Create package tarball
       id: package-tarball
@@ -58,7 +50,7 @@ runs:
         # Create a more descriptive artifact name
         ARTIFACT_NAME="rokt-widget-v${VERSION}-${GITHUB_SHA::8}"
         echo "artifact-name=$ARTIFACT_NAME" >> $GITHUB_OUTPUT
-      working-directory: ${{ inputs.working-directory }}
+      working-directory: Rokt.Widget
 
     - name: Create artifact metadata
       shell: bash
@@ -71,20 +63,18 @@ runs:
         Workflow: ${{ github.workflow }}
         Build Date: $(date -u +"%Y-%m-%d %H:%M:%S UTC")
         EOF
-      working-directory: ${{ inputs.working-directory }}
+      working-directory: Rokt.Widget
 
     - name: Upload package artifact
-      if: ${{ inputs.upload-artifacts == 'true' }}
       uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 #v4.6.2
       with:
         name: ${{ steps.package-tarball.outputs.artifact-name }}
         path: |
-          ${{ inputs.working-directory }}/${{ steps.package-tarball.outputs.filename }}
-          ${{ inputs.working-directory }}/artifact-info.txt
+          Rokt.Widget/${{ steps.package-tarball.outputs.filename }}
+          Rokt.Widget/artifact-info.txt
         retention-days: ${{ inputs.retention-days }}
 
     - name: Create artifact summary
-      if: ${{ inputs.upload-artifacts == 'true' }}
       shell: bash
       run: |
         echo "## 📦 Package Artifact Created" >> $GITHUB_STEP_SUMMARY
