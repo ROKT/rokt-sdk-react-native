@@ -1,6 +1,6 @@
 {
   "name": "@rokt/react-native-sdk",
-  "version": "4.9.0",
+  "version": "4.10.0",
   "description": "Rokt Mobile SDK to integrate ROKT Api into ReactNative application",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
