@@ -1,6 +1,6 @@
 package com.rokt.reactnativesdk
 
-import com.facebook.react.BaseReactPackage
+import com.facebook.react.TurboReactPackage
 import com.facebook.react.bridge.ModuleSpec
 import com.facebook.react.bridge.NativeModule
 import com.facebook.react.bridge.ReactApplicationContext
@@ -18,7 +18,7 @@ import java.util.*
  *
  * You may obtain a copy of the License at https://rokt.com/sdk-license-2-0/
  */
-class RNRoktWidgetPackage : BaseReactPackage() {
+class RNRoktWidgetPackage : TurboReactPackage() {
     override fun createNativeModules(reactContext: ReactApplicationContext): List<NativeModule> =
         listOf(RNRoktWidgetModule(reactContext))
 
@@ -39,6 +39,7 @@ class RNRoktWidgetPackage : BaseReactPackage() {
                 RNRoktWidgetModuleImpl.REACT_CLASS,
                 false, // canOverrideExistingModule
                 false, // needsEagerInit
+                true, // hasConstants
                 false, // isCxxModule
                 BuildConfig.IS_NEW_ARCHITECTURE_ENABLED, // isTurboModule
             ),

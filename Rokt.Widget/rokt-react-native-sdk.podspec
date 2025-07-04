@@ -26,18 +26,22 @@ Pod::Spec.new do |s|
     # Manual fallback for older React Native versions
     s.dependency "React-Core"
     s.compiler_flags = folly_compiler_flags
-    s.pod_target_xcconfig    = {
-        "HEADER_SEARCH_PATHS" => "\"$(PODS_ROOT)/boost\" \"$(PODS_ROOT)/Headers/Public/React-Codegen\"",
-        "OTHER_CPLUSPLUSFLAGS" => "-DFOLLY_NO_CONFIG -DFOLLY_MOBILE=1 -DFOLLY_USE_LIBCPP=1",
-        "CLANG_CXX_LANGUAGE_STANDARD" => "c++20"
+
+    # Simplified configuration for older React Native versions
+    s.pod_target_xcconfig = {
+      "HEADER_SEARCH_PATHS" => "\"$(PODS_ROOT)/boost\"",
+      "OTHER_CPLUSPLUSFLAGS" => "-DFOLLY_NO_CONFIG -DFOLLY_MOBILE=1 -DFOLLY_USE_LIBCPP=1",
+      "CLANG_CXX_LANGUAGE_STANDARD" => "c++17"
     }
-    s.dependency "React-Codegen"
+
+    # Only include essential dependencies for React Native 0.69.x
     s.dependency "RCT-Folly"
     s.dependency "RCTRequired"
     s.dependency "RCTTypeSafety"
-    s.dependency "ReactCommon/turbomodule/core"
 
+    # Only include TurboModule support if New Architecture is enabled
     if ENV['RCT_NEW_ARCH_ENABLED'] == '1' then
+      s.dependency "ReactCommon/turbomodule/core"
       s.compiler_flags << " -DRCT_NEW_ARCH_ENABLED=1"
     end
   end
