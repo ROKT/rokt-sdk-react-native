@@ -1,12 +1,6 @@
 name: Build iOS
 description: Builds the iOS app
 
-inputs:
-  retention-days:
-    description: Number of days to retain artifacts
-    required: false
-    default: "7"
-
 outputs:
   app-filename:
     description: The name of the created iOS app bundle
@@ -105,7 +99,6 @@ runs:
           RoktSampleApp/ios/build/Build/Products/Debug-iphonesimulator/${{ steps.build-ios.outputs.app-archive }}
           RoktSampleApp/ios/build/test-results.xml
           RoktSampleApp/ios-artifact-info.txt
-        retention-days: ${{ inputs.retention-days }}
 
     - name: Create artifact summary
       shell: bash

@@ -1,12 +1,6 @@
 name: Build and Package Rokt.Widget
 description: Builds TypeScript, builds plugin, creates package tarball, and optionally uploads artifacts
 
-inputs:
-  retention-days:
-    description: Number of days to retain artifacts
-    required: false
-    default: "7"
-
 outputs:
   package-filename:
     description: The name of the created package tarball file
@@ -72,7 +66,6 @@ runs:
         path: |
           Rokt.Widget/${{ steps.package-tarball.outputs.filename }}
           Rokt.Widget/artifact-info.txt
-        retention-days: ${{ inputs.retention-days }}
 
     - name: Create artifact summary
       shell: bash

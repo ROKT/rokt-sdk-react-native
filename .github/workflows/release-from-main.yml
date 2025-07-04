@@ -34,8 +34,6 @@ jobs:
       - name: Build and Package
         id: build-and-package
         uses: ./.github/actions/build-package
-        with:
-          retention-days: "90"
 
       - name: Display package artifacts
         uses: ./.github/actions/display-artifacts
@@ -62,11 +60,24 @@ jobs:
           pattern: rokt-widget-v*-*
           path: Rokt.Widget/
 
+      - name: Setup build environment
+        uses: ./.github/actions/setup-build-env
+
       - name: Build and Test iOS
-        uses: ./.github/actions/build-and-test
+        id: build-ios
+        uses: ./.github/actions/build-ios
+
+      - name: Display artifact summary
+        uses: ./.github/actions/display-artifacts
         with:
-          platform: ios
-          retention-days: "90"
+          platform: iOS
+          artifact-pattern: rokt-ios-v*-*
+          primary-filename: ${{ steps.build-ios.outputs.app-filename }}
+          icon: 📱
+          artifacts-list: |
+            iOS Simulator app bundle (zipped)
+            Test results (JUnit XML)
+            Build metadata file
 
   build-test-android:
     name: Build & Test Android
@@ -82,11 +93,23 @@ jobs:
           pattern: rokt-widget-v*-*
           path: Rokt.Widget/
 
+      - name: Setup build environment
+        uses: ./.github/actions/setup-build-env
+
       - name: Build and Test Android
-        uses: ./.github/actions/build-and-test
+        id: build-android
+        uses: ./.github/actions/build-android
+
+      - name: Display artifact summary
+        uses: ./.github/actions/display-artifacts
         with:
-          platform: android
-          retention-days: "90"
+          platform: Android
+          artifact-pattern: rokt-android-v*-*
+          primary-filename: ${{ steps.build-android.outputs.apk-filename }}
+          icon: 🤖
+          artifacts-list: |
+            Android APK with version and commit hash
+            Build metadata file
 
   setup-and-version:
     needs: [build-test-ios, build-test-android]

@@ -1,12 +1,6 @@
 name: Build Android
 description: Builds the Android app
 
-inputs:
-  retention-days:
-    description: Number of days to retain artifacts
-    required: false
-    default: "7"
-
 outputs:
   apk-filename:
     description: The name of the created APK file
@@ -63,7 +57,6 @@ runs:
         path: |
           RoktSampleApp/android/app/build/outputs/apk/debug/${{ steps.build-android.outputs.apk-filename }}
           RoktSampleApp/android-artifact-info.txt
-        retention-days: ${{ inputs.retention-days }}
 
     - name: Create artifact summary
       shell: bash
