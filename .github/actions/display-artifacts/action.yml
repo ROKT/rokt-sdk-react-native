@@ -1,0 +1,42 @@
+name: Display Artifact Summary
+description: Creates a standardized artifact summary for any platform
+
+inputs:
+  platform:
+    description: Platform name (e.g., Package, iOS, Android)
+    required: true
+  artifact-pattern:
+    description: Artifact name pattern for downloads
+    required: true
+  primary-filename:
+    description: Main artifact filename
+    required: false
+  icon:
+    description: Emoji icon for the platform
+    required: false
+    default: 📦
+  artifacts-list:
+    description: Newline-separated list of available artifacts
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Create artifact summary
+      shell: bash
+      run: |
+        echo "## ${{ inputs.icon }} ${{ inputs.platform }} Artifacts Summary" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        if [ -n "${{ inputs.primary-filename }}" ]; then
+          echo "**Primary File:** ${{ inputs.primary-filename }}" >> $GITHUB_STEP_SUMMARY
+        fi
+        echo "**Artifact Pattern:** ${{ inputs.artifact-pattern }}" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "### Available Artifacts:" >> $GITHUB_STEP_SUMMARY
+        echo "${{ inputs.artifacts-list }}" | while IFS= read -r line; do
+          if [ -n "$line" ]; then
+            echo "- $line" >> $GITHUB_STEP_SUMMARY
+          fi
+        done
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "${{ inputs.platform }} artifacts can be downloaded from the Actions tab." >> $GITHUB_STEP_SUMMARY
