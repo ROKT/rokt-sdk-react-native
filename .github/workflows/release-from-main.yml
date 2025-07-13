@@ -152,7 +152,13 @@ jobs:
         run: |
           cd Rokt.Widget
           echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > .npmrc
-          npm publish --access=public --tag=latest
+          TARBALL="rokt-react-native-sdk-${{ needs.setup-and-version.outputs.final_version }}.tgz"
+          if [ ! -f "$TARBALL" ]; then
+            echo "Error: Expected tarball $TARBALL not found in Rokt.Widget directory"
+            exit 1
+          fi
+          echo "Publishing tarball: $TARBALL"
+          npm publish "$TARBALL" --access=public --tag=latest
 
       - uses: ffurrer2/extract-release-notes@cae32133495112d23e3569ad04fef240ba4e7bc8 # v2.3.0
         id: extract-release-notes
