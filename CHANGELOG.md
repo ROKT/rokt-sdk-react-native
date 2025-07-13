@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.10.1] - 2025-07-13
+
 ### Fixed
 
 - Fix npm publish issue
@@ -22,5 +24,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Support new response action type `ExternalPaymentTrigger`
 - Sessions are now retained between app restarts
 
-[unreleased]: https://github.com/ROKT/rokt-sdk-react-native/compare/4.10.0...HEAD
+[unreleased]: https://github.com/ROKT/rokt-sdk-react-native/compare/4.10.1...HEAD
+[4.10.1]: https://github.com/ROKT/rokt-sdk-react-native/compare/4.10.0...4.10.1
 [4.10.0]: https://github.com/ROKT/rokt-sdk-react-native/compare/600533ed8b451817a169d1bebb916b3dc1aab8ee...4.10.0
