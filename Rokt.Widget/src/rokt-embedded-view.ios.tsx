@@ -17,9 +17,9 @@ import {
   HostComponent,
   ViewProps,
   NativeModule,
-  UIManager,
 } from "react-native";
 import React, { Component } from "react";
+import RoktNativeWidgetNativeComponent from "./RoktNativeWidgetNativeComponent";
 
 const RoktEventManager = NativeModules.RoktEventManager as NativeModule;
 
@@ -59,43 +59,19 @@ interface RoktNativeWidgetProps extends ViewProps {
   onWidgetMarginChanged?: (event: MarginChangedEvent) => void;
 }
 
-// Architecture detection - Updated for RN 0.80+ compatibility
-// In RN 0.80+, check for Fabric renderer using a more reliable method
-const isNewArchitecture = (() => {
-  // Check if Fabric renderer is enabled by looking at UIManager properties
-  // This is a safer approach that works in RN 0.80+
-  const hasFabricUIManager =
-    UIManager &&
-    typeof UIManager.hasViewManagerConfig === "function" &&
-    UIManager.hasViewManagerConfig("RCTView");
+declare const global: {
+  __turboModuleProxy: unknown;
+  nativeFabricUIManager: unknown;
+};
 
-  if (hasFabricUIManager) {
-    return true;
-  }
-
-  // Fallback: check TurboModule presence (less reliable in 0.80+)
-  const turboModuleCheck =
-    (NativeModules as { RNRoktWidget?: unknown }).RNRoktWidget == null;
-  return turboModuleCheck;
-})();
+const isFabricEnabled = global.nativeFabricUIManager != null;
 
 // Conditional component loading based on architecture
-let WidgetNativeComponent: HostComponent<RoktNativeWidgetProps>;
-
-if (isNewArchitecture) {
-  try {
-    // Try to import the new architecture component
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const NativeComponent = require("./RoktNativeWidgetNativeComponent") as {
-      default: HostComponent<RoktNativeWidgetProps>;
-    };
-    WidgetNativeComponent = NativeComponent.default;
-  } catch (error) {
-    WidgetNativeComponent = requireNativeComponent("RoktNativeWidget");
-  }
-} else {
-  WidgetNativeComponent = requireNativeComponent("RoktNativeWidget");
-}
+const WidgetNativeComponent = (
+  isFabricEnabled
+    ? RoktNativeWidgetNativeComponent
+    : requireNativeComponent<RoktNativeWidgetProps>("RoktLegacyNativeWidget")
+) as HostComponent<RoktNativeWidgetProps>;
 
 const eventManagerEmitter = new NativeEventEmitter(RoktEventManager);
 

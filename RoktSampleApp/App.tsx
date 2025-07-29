@@ -14,47 +14,70 @@
 
 import React, {Component} from 'react';
 import {
+  EmitterSubscription,
+  findNodeHandle,
+  NativeEventEmitter,
   SafeAreaView,
-  StyleSheet,
   ScrollView,
-  View,
+  StatusBar,
+  StyleSheet,
   Text,
   TextInput,
-  findNodeHandle,
-  StatusBar,
   TouchableOpacity,
-  NativeEventEmitter,
+  View,
 } from 'react-native';
 import CheckBox from '@react-native-community/checkbox';
 import Toast from 'react-native-toast-message';
 import {isEmpty, isNotEmpty, isValidJson} from './utils/text-utils';
 import {
   DEFAULT_ATTRIBUTES,
+  DEFAULT_COUNTRY,
   DEFAULT_TAG_ID,
   DEFAULT_VIEW_NAME,
-  DEFAULT_COUNTRY,
+  ENCRYPTION_KEY_ID_PROD,
+  ENCRYPTION_KEY_ID_STAGE,
   FULLFILLMENT_ATTRIBUTES,
   PUBLIC_KEY_PROD,
-  ENCRYPTION_KEY_ID_PROD,
   PUBLIC_KEY_STAGE,
-  ENCRYPTION_KEY_ID_STAGE,
 } from './utils/rokt-constants';
 import {Colors} from 'react-native/Libraries/NewAppScreen';
 import {Rokt, RoktEmbeddedView, RoktEventManager} from '@rokt/react-native-sdk';
 import sha256 from 'crypto-js/sha256';
 import {Buffer} from 'buffer';
+
 var forge = require('node-forge');
 
 const eventManagerEmitter = new NativeEventEmitter(RoktEventManager);
 
-export default class App extends Component {
-  constructor(props) {
+type RoktEmbeddedViewRef = React.ComponentRef<typeof RoktEmbeddedView>;
+
+interface Props {}
+
+interface State {
+  tagId: string;
+  viewName: string;
+  country: string;
+  targetElement1: string;
+  targetElement2: string;
+  attributes: string;
+  stageEnabled: boolean;
+  twoStepEnabled: boolean;
+  encryptEnabled: boolean;
+}
+
+export default class App extends Component<Props, State> {
+  private placeholder1 = React.createRef<RoktEmbeddedViewRef>();
+  private placeholder2 = React.createRef<RoktEmbeddedViewRef>();
+
+  private subscription: EmitterSubscription;
+  private callBackSubscription: EmitterSubscription;
+  private eventSubscription: EmitterSubscription;
+
+  constructor(props: Props) {
     super(props);
 
-    var attributes = JSON.stringify(DEFAULT_ATTRIBUTES);
+    let attributes = JSON.stringify(DEFAULT_ATTRIBUTES);
 
-    this.placeholder1 = React.createRef();
-    this.placeholder2 = React.createRef();
     this.state = {
       tagId: DEFAULT_TAG_ID,
       viewName: DEFAULT_VIEW_NAME,
@@ -66,40 +89,46 @@ export default class App extends Component {
       twoStepEnabled: false,
       encryptEnabled: false,
     };
+
+    this.subscription = eventManagerEmitter.addListener(
+      'FirstPositiveResponse',
+      _ => {
+        console.log('Widget OnFirstPositiveEvent Callback');
+        // Send unhashed email on first positive response
+        Rokt.setFulfillmentAttributes(FULLFILLMENT_ATTRIBUTES);
+      },
+    );
+
+    this.callBackSubscription = eventManagerEmitter.addListener(
+      'RoktCallback',
+      data => {
+        console.log('roktCallback received: ' + data.callbackValue);
+      },
+    );
+
+    this.eventSubscription = eventManagerEmitter.addListener(
+      'RoktEvents',
+      data => {
+        console.log(`*** ROKT EVENT *** ${JSON.stringify(data)}`);
+        // Check if the event is CartItemInstantPurchase
+        if (data.event === 'CartItemInstantPurchase') {
+          console.log(
+            'CartItemInstantPurchase event received, calling purchaseFinalized',
+          );
+          // Call purchaseFinalized with the required parameters
+          // placementId, catalogItemId, and status (true for successful purchase)
+          Rokt.purchaseFinalized(data.placementId, data.catalogItemId, true);
+        }
+      },
+    );
   }
 
-  subscription = eventManagerEmitter.addListener('FirstPositiveResponse', x => {
-    console.log('Widget OnFirstPositiveEvent Callback');
-    // Send unhashed email on first positive response
-    Rokt.setFulfillmentAttributes(FULLFILLMENT_ATTRIBUTES);
-  });
-
-  callBackSubscription = eventManagerEmitter.addListener(
-    'RoktCallback',
-    data => {
-      console.log('roktCallback received: ' + data.callbackValue);
-    },
-  );
-
-  eventSubscription = eventManagerEmitter.addListener('RoktEvents', data => {
-    console.log(`*** ROKT EVENT *** ${JSON.stringify(data)}`);
-    // Check if the event is CartItemInstantPurchase
-    if (data.event === 'CartItemInstantPurchase') {
-      console.log(
-        'CartItemInstantPurchase event received, calling purchaseFinalized',
-      );
-      // Call purchaseFinalized with the required parameters
-      // placementId, catalogItemId, and status (true for successful purchase)
-      Rokt.purchaseFinalized(data.placementId, data.catalogItemId, true);
-    }
-  });
-
-  encrypt(text, publicKey) {
-    var publicBytes = forge.util.decode64(publicKey);
-    var pkeyAsn1 = forge.asn1.fromDer(publicBytes);
-    var publicKey = forge.pki.publicKeyFromAsn1(pkeyAsn1);
+  encrypt(text: string, publicKey: string) {
+    const publicBytes = forge.util.decode64(publicKey);
+    const pkeyAsn1 = forge.asn1.fromDer(publicBytes);
+    const publicKeyFromAsn1 = forge.pki.publicKeyFromAsn1(pkeyAsn1);
     let toEncrypt = Buffer.from(text);
-    let encrypted = publicKey.encrypt(toEncrypt, 'RSA-OAEP', {
+    let encrypted = publicKeyFromAsn1.encrypt(toEncrypt, 'RSA-OAEP', {
       md: forge.md.sha256.create(),
     });
     return forge.util.encode64(encrypted);
@@ -107,6 +136,8 @@ export default class App extends Component {
 
   componentWillUnmount() {
     this.subscription.remove();
+    this.callBackSubscription.remove();
+    this.eventSubscription.remove();
   }
 
   onInitHandler = () => {
@@ -126,7 +157,7 @@ export default class App extends Component {
     }
   };
 
-  showToast = message => {
+  showToast = (message: string) => {
     Toast.show({
       text1: 'Invalid form',
       text2: message,
@@ -136,7 +167,7 @@ export default class App extends Component {
     });
   };
 
-  execute2Step = async (attributes, placeholders) => {
+  execute2Step = async (attributes: any, placeholders: any) => {
     try {
       // first we send hashed email
       attributes.emailsha256 = sha256(attributes.email).toString();
@@ -149,7 +180,7 @@ export default class App extends Component {
     }
   };
 
-  executeEncrypted = async (attributes, placeholders) => {
+  executeEncrypted = async (attributes: any, placeholders: any) => {
     try {
       let publicKey;
 
@@ -197,13 +228,15 @@ export default class App extends Component {
     attributes.testNullValue = null;
     attributes.testNotStringValue = 13;
 
-    var placeholders = {};
-    placeholders[this.state.targetElement1] = findNodeHandle(
-      this.placeholder1.current,
-    );
-    placeholders[this.state.targetElement2] = findNodeHandle(
-      this.placeholder2.current,
-    );
+    const placeholders: {[key: string]: number} = {};
+    const nodeHandle1 = findNodeHandle(this.placeholder1.current);
+    if (nodeHandle1 !== null) {
+      placeholders[this.state.targetElement1] = nodeHandle1;
+    }
+    const nodeHandle2 = findNodeHandle(this.placeholder2.current);
+    if (nodeHandle2 !== null) {
+      placeholders[this.state.targetElement2] = nodeHandle2;
+    }
 
     if (isEmpty(this.state.viewName)) {
       this.showToast('View Name cannot be empty');
