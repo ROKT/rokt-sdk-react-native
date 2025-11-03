@@ -1,6 +1,7 @@
 name: React Native Pull Request
 
 on:
+  workflow_dispatch:
   pull_request:
 
 permissions:
