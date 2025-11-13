@@ -1,7 +1,7 @@
 /**
  * Minimal Demo Application for Rokt React Native SDK
  * 
- * This app demonstrates basic Rokt SDK integration without any additional dependencies.
+ * This app demonstrates Rokt SDK integration with React Navigation.
  */
 
 import React, {Component} from 'react';
@@ -18,29 +18,45 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator, NativeStackScreenProps } from '@react-navigation/native-stack';
 import {Rokt, RoktEmbeddedView, RoktEventManager} from '@rokt/react-native-sdk';
 
 const eventManagerEmitter = new NativeEventEmitter(RoktEventManager);
 
 type RoktEmbeddedViewRef = React.ComponentRef<typeof RoktEmbeddedView>;
 
-interface Props {}
+// Navigation types
+type RootStackParamList = {
+  Home: undefined;
+  RoktView: {
+    viewName: string;
+    email: string;
+    firstname: string;
+    lastname: string;
+    placeholderName: string;
+  };
+};
 
-interface State {
+type HomeScreenProps = NativeStackScreenProps<RootStackParamList, 'Home'>;
+type RoktViewScreenProps = NativeStackScreenProps<RootStackParamList, 'RoktView'>;
+
+const Stack = createNativeStackNavigator<RootStackParamList>();
+
+// Home Screen Component
+interface HomeScreenState {
   tagId: string;
   viewName: string;
   placeholderName: string;
   email: string;
   firstname: string;
   lastname: string;
-  currentScreen: 'home' | 'roktView';
 }
 
-export default class App extends Component<Props, State> {
-  private placeholder = React.createRef<RoktEmbeddedViewRef>();
+class HomeScreen extends Component<HomeScreenProps, HomeScreenState> {
   private subscription: EmitterSubscription;
 
-  constructor(props: Props) {
+  constructor(props: HomeScreenProps) {
     super(props);
 
     this.state = {
@@ -50,7 +66,6 @@ export default class App extends Component<Props, State> {
       email: 'test@example.com',
       firstname: 'John',
       lastname: 'Doe',
-      currentScreen: 'home',
     };
 
     // Listen for Rokt events
@@ -78,47 +93,17 @@ export default class App extends Component<Props, State> {
       return;
     }
 
-    // Navigate to Rokt view screen
-    this.setState({ currentScreen: 'roktView' }, () => {
-      // Execute Rokt after navigation to ensure the view is mounted
-      setTimeout(() => {
-        const attributes: { [key: string]: string } = {
-          email: this.state.email,
-          firstname: this.state.firstname,
-          lastname: this.state.lastname,
-          sandbox: 'true',
-          country: 'US',
-          customertype: 'guest',
-          deliverytype: 'carryout',
-          mobile: ''
-        };
-
-        const placeholders: { [key: string]: number } = {};
-        const nodeHandle = findNodeHandle(this.placeholder.current);
-        console.log('Node handle:', nodeHandle);
-        console.log('Placeholder name:', this.state.placeholderName);
-
-        if (nodeHandle !== null) {
-          placeholders['RoktEmbedded1'] = nodeHandle;
-          console.log('Placeholders registered:', placeholders);
-        } else {
-          console.error('ERROR: Node handle is null! Placeholder not properly registered');
-        }
-
-        console.log('Executing with viewName:', this.state.viewName);
-        console.log('Attributes:', attributes);
-
-        Rokt.execute("RoktEmbeddedExperience", attributes, placeholders);
-        console.log('Rokt Execute called');
-      }, 100);
+    // Navigate to Rokt view screen with parameters
+    this.props.navigation.navigate('RoktView', {
+      viewName: this.state.viewName,
+      email: this.state.email,
+      firstname: this.state.firstname,
+      lastname: this.state.lastname,
+      placeholderName: this.state.placeholderName,
     });
   };
 
-  goBack = () => {
-    this.setState({ currentScreen: 'home' });
-  };
-
-  renderHomeScreen() {
+  render() {
     return (
       <SafeAreaView style={styles.container}>
         <ScrollView
@@ -126,7 +111,7 @@ export default class App extends Component<Props, State> {
           style={styles.scrollView}>
           <View style={styles.header}>
             <Text style={styles.title}>Rokt SDK Demo</Text>
-            <Text style={styles.subtitle}>Minimal Integration Example</Text>
+            <Text style={styles.subtitle}>React Navigation Example</Text>
           </View>
 
           <View style={styles.formContainer}>
@@ -150,6 +135,7 @@ export default class App extends Component<Props, State> {
             <TextInput
               style={styles.input}
               value={this.state.placeholderName}
+              onChangeText={placeholderName => this.setState({ placeholderName })}
               placeholder="RoktEmbedded1"
             />
 
@@ -199,44 +185,103 @@ export default class App extends Component<Props, State> {
       </SafeAreaView>
     );
   }
+}
 
-  renderRoktViewScreen() {
+// Rokt View Screen Component
+class RoktViewScreen extends Component<RoktViewScreenProps> {
+  private placeholder = React.createRef<RoktEmbeddedViewRef>();
+
+  componentDidMount() {
+    // Execute Rokt after the view is mounted
+    setTimeout(() => {
+      const { email, firstname, lastname } = this.props.route.params;
+
+      const attributes: { [key: string]: string } = {
+        email,
+        firstname,
+        lastname,
+        sandbox: 'true',
+        country: 'US',
+        customertype: 'guest',
+        deliverytype: 'carryout',
+        mobile: ''
+      };
+
+      const placeholders: { [key: string]: number } = {};
+      const nodeHandle = findNodeHandle(this.placeholder.current);
+      console.log('Node handle:', nodeHandle);
+
+      if (nodeHandle !== null) {
+        placeholders['RoktEmbedded1'] = nodeHandle;
+        console.log('Placeholders registered:', placeholders);
+      } else {
+        console.error('ERROR: Node handle is null! Placeholder not properly registered');
+      }
+
+      console.log('Executing with viewName:', this.props.route.params.viewName);
+      console.log('Attributes:', attributes);
+
+      Rokt.execute("RoktEmbeddedExperience", attributes, placeholders);
+      console.log('Rokt Execute called');
+    }, 100);
+  }
+
+  render() {
+    const { placeholderName } = this.props.route.params;
+
     return (
       <SafeAreaView style={styles.container}>
-        <View style={styles.roktScreenHeader}>
-          <TouchableOpacity style={styles.backButton} onPress={this.goBack}>
-            <Text style={styles.backButtonText}>← Back</Text>
-          </TouchableOpacity>
-          <Text style={styles.roktScreenTitle}>Rokt Offers</Text>
-        </View>
         <ScrollView
           contentInsetAdjustmentBehavior="automatic"
           style={styles.scrollView}>
           <View style={styles.placeholderContainer}>
             <Text style={styles.placeholderLabel}>
-              Rokt Placement ({this.state.placeholderName})
+              Rokt Placement ({placeholderName})
             </Text>
             <RoktEmbeddedView
               ref={this.placeholder}
               placeholderName="RoktEmbedded1"
-              style={styles.roktPlacement}
             />
           </View>
         </ScrollView>
       </SafeAreaView>
     );
   }
+}
 
-  render() {
-    return (
-      <>
-        <StatusBar barStyle="dark-content" />
-        {this.state.currentScreen === 'home'
-          ? this.renderHomeScreen()
-          : this.renderRoktViewScreen()}
-      </>
-    );
-  }
+// Main App Component
+export default function App() {
+  return (
+    <NavigationContainer>
+      <StatusBar barStyle="dark-content" />
+      <Stack.Navigator
+        initialRouteName="Home"
+        screenOptions={{
+          headerStyle: {
+            backgroundColor: '#4ba9c8',
+          },
+          headerTintColor: '#fff',
+          headerTitleStyle: {
+            fontWeight: 'bold',
+          },
+        }}>
+        <Stack.Screen
+          name="Home"
+          component={HomeScreen}
+          options={{
+            title: 'Rokt SDK Demo',
+          }}
+        />
+        <Stack.Screen
+          name="RoktView"
+          component={RoktViewScreen}
+          options={{
+            title: 'Rokt Offers',
+          }}
+        />
+      </Stack.Navigator>
+    </NavigationContainer>
+  );
 }
 
 const styles = StyleSheet.create({
@@ -331,6 +376,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,
+    minHeight: 300,
   },
   placeholderLabel: {
     fontSize: 16,
@@ -338,33 +384,4 @@ const styles = StyleSheet.create({
     color: '#333',
     marginBottom: 12,
   },
-  roktPlacement: {
-    minHeight: 100,
-  },
-  roktScreenHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#4ba9c8',
-    paddingVertical: 16,
-    paddingHorizontal: 16,
-  },
-  backButton: {
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-  },
-  backButtonText: {
-    color: '#ffffff',
-    fontSize: 18,
-    fontWeight: '600',
-  },
-  roktScreenTitle: {
-    flex: 1,
-    textAlign: 'center',
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#ffffff',
-    marginRight: 60, // Offset for back button to center the title
-  },
 });
-
-
