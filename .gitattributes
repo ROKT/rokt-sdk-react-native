@@ -1,0 +1,19 @@
+# Ensure consistent LF line endings across all platforms
+* text=auto eol=lf
+
+# Keep Windows batch files as CRLF
+*.bat text eol=crlf
+
+# Common project files (always LF)
+*.js text eol=lf
+*.jsx text eol=lf
+*.ts text eol=lf
+*.tsx text eol=lf
+*.json text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+*.sh text eol=lf
+*.gradle text eol=lf
+*.java text eol=lf
+*.kt text eol=lf
+
