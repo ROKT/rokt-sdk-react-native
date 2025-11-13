@@ -70,7 +70,7 @@ const isFabricEnabled = global.nativeFabricUIManager != null;
 const WidgetNativeComponent = (
   isFabricEnabled
     ? RoktNativeWidgetNativeComponent
-    : requireNativeComponent<RoktNativeWidgetProps>("RoktLegacyNativeWidget")
+    : requireNativeComponent<RoktNativeWidgetProps>("RoktNativeWidget")
 ) as HostComponent<RoktNativeWidgetProps>;
 
 const eventManagerEmitter = new NativeEventEmitter(RoktEventManager);
