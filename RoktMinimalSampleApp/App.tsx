@@ -33,6 +33,7 @@ interface State {
   email: string;
   firstname: string;
   lastname: string;
+  currentScreen: 'home' | 'roktView';
 }
 
 export default class App extends Component<Props, State> {
@@ -49,6 +50,7 @@ export default class App extends Component<Props, State> {
       email: 'test@example.com',
       firstname: 'John',
       lastname: 'Doe',
+      currentScreen: 'home',
     };
 
     // Listen for Rokt events
@@ -65,14 +67,8 @@ export default class App extends Component<Props, State> {
   }
 
   onInitialize = () => {
-    if (!this.state.tagId) {
-      console.error('Please enter a valid Tag ID');
-      return;
-    }
-    
     Rokt.setLoggingEnabled(true);
-    Rokt.setEnvironmentToStage(); // Use .setEnvironmentToProd() for production
-    Rokt.initialize(this.state.tagId, '1.0');
+    Rokt.initialize("2646161524817932499", '1.0');
     console.log('Rokt SDK Initialized');
   };
 
@@ -82,115 +78,162 @@ export default class App extends Component<Props, State> {
       return;
     }
 
-    const attributes: {[key: string]: string} = {
-      email: this.state.email,
-      firstname: this.state.firstname,
-      lastname: this.state.lastname,
-    };
+    // Navigate to Rokt view screen
+    this.setState({ currentScreen: 'roktView' }, () => {
+      // Execute Rokt after navigation to ensure the view is mounted
+      setTimeout(() => {
+        const attributes: { [key: string]: string } = {
+          email: this.state.email,
+          firstname: this.state.firstname,
+          lastname: this.state.lastname,
+          sandbox: 'true',
+          country: 'US',
+          customertype: 'guest',
+          deliverytype: 'carryout',
+          mobile: ''
+        };
 
-    const placeholders: {[key: string]: number} = {};
-    const nodeHandle = findNodeHandle(this.placeholder.current);
-    if (nodeHandle !== null) {
-      placeholders[this.state.placeholderName] = nodeHandle;
-    }
+        const placeholders: { [key: string]: number } = {};
+        const nodeHandle = findNodeHandle(this.placeholder.current);
+        console.log('Node handle:', nodeHandle);
+        console.log('Placeholder name:', this.state.placeholderName);
 
-    Rokt.execute(this.state.viewName, attributes, placeholders);
-    console.log('Rokt Execute called');
+        if (nodeHandle !== null) {
+          placeholders['RoktEmbedded1'] = nodeHandle;
+          console.log('Placeholders registered:', placeholders);
+        } else {
+          console.error('ERROR: Node handle is null! Placeholder not properly registered');
+        }
+
+        console.log('Executing with viewName:', this.state.viewName);
+        console.log('Attributes:', attributes);
+
+        Rokt.execute("RoktEmbeddedExperience", attributes, placeholders);
+        console.log('Rokt Execute called');
+      }, 100);
+    });
   };
+
+  goBack = () => {
+    this.setState({ currentScreen: 'home' });
+  };
+
+  renderHomeScreen() {
+    return (
+      <SafeAreaView style={styles.container}>
+        <ScrollView
+          contentInsetAdjustmentBehavior="automatic"
+          style={styles.scrollView}>
+          <View style={styles.header}>
+            <Text style={styles.title}>Rokt SDK Demo</Text>
+            <Text style={styles.subtitle}>Minimal Integration Example</Text>
+          </View>
+
+          <View style={styles.formContainer}>
+            <Text style={styles.label}>Rokt Tag ID *</Text>
+            <TextInput
+              style={styles.input}
+              value={this.state.tagId}
+              onChangeText={tagId => this.setState({ tagId })}
+              placeholder="Enter your Tag ID"
+            />
+
+            <Text style={styles.label}>View Name</Text>
+            <TextInput
+              style={styles.input}
+              value={this.state.viewName}
+              onChangeText={viewName => this.setState({ viewName })}
+              placeholder="RoktExperience"
+            />
+
+            <Text style={styles.label}>Placeholder Name</Text>
+            <TextInput
+              style={styles.input}
+              value={this.state.placeholderName}
+              placeholder="RoktEmbedded1"
+            />
+
+            <Text style={styles.sectionTitle}>Customer Attributes</Text>
+
+            <Text style={styles.label}>Email</Text>
+            <TextInput
+              style={styles.input}
+              value={this.state.email}
+              onChangeText={email => this.setState({ email })}
+              placeholder="customer@example.com"
+              keyboardType="email-address"
+              autoCapitalize="none"
+            />
+
+            <Text style={styles.label}>First Name</Text>
+            <TextInput
+              style={styles.input}
+              value={this.state.firstname}
+              onChangeText={firstname => this.setState({ firstname })}
+              placeholder="First Name"
+            />
+
+            <Text style={styles.label}>Last Name</Text>
+            <TextInput
+              style={styles.input}
+              value={this.state.lastname}
+              onChangeText={lastname => this.setState({ lastname })}
+              placeholder="Last Name"
+            />
+
+            <View style={styles.buttonContainer}>
+              <TouchableOpacity
+                style={[styles.button, styles.buttonPrimary]}
+                onPress={this.onInitialize}>
+                <Text style={styles.buttonText}>Initialize</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[styles.button, styles.buttonSecondary]}
+                onPress={this.onExecute}>
+                <Text style={styles.buttonText}>Execute</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </ScrollView>
+      </SafeAreaView>
+    );
+  }
+
+  renderRoktViewScreen() {
+    return (
+      <SafeAreaView style={styles.container}>
+        <View style={styles.roktScreenHeader}>
+          <TouchableOpacity style={styles.backButton} onPress={this.goBack}>
+            <Text style={styles.backButtonText}>← Back</Text>
+          </TouchableOpacity>
+          <Text style={styles.roktScreenTitle}>Rokt Offers</Text>
+        </View>
+        <ScrollView
+          contentInsetAdjustmentBehavior="automatic"
+          style={styles.scrollView}>
+          <View style={styles.placeholderContainer}>
+            <Text style={styles.placeholderLabel}>
+              Rokt Placement ({this.state.placeholderName})
+            </Text>
+            <RoktEmbeddedView
+              ref={this.placeholder}
+              placeholderName="RoktEmbedded1"
+              style={styles.roktPlacement}
+            />
+          </View>
+        </ScrollView>
+      </SafeAreaView>
+    );
+  }
 
   render() {
     return (
       <>
         <StatusBar barStyle="dark-content" />
-        <SafeAreaView style={styles.container}>
-          <ScrollView
-            contentInsetAdjustmentBehavior="automatic"
-            style={styles.scrollView}>
-            <View style={styles.header}>
-              <Text style={styles.title}>Rokt SDK Demo</Text>
-              <Text style={styles.subtitle}>Minimal Integration Example</Text>
-            </View>
-
-            <View style={styles.formContainer}>
-              <Text style={styles.label}>Rokt Tag ID *</Text>
-              <TextInput
-                style={styles.input}
-                value={this.state.tagId}
-                onChangeText={tagId => this.setState({tagId})}
-                placeholder="Enter your Tag ID"
-              />
-
-              <Text style={styles.label}>View Name</Text>
-              <TextInput
-                style={styles.input}
-                value={this.state.viewName}
-                onChangeText={viewName => this.setState({viewName})}
-                placeholder="RoktExperience"
-              />
-
-              <Text style={styles.label}>Placeholder Name</Text>
-              <TextInput
-                style={styles.input}
-                value={this.state.placeholderName}
-                onChangeText={placeholderName => this.setState({placeholderName})}
-                placeholder="Location1"
-              />
-
-              <Text style={styles.sectionTitle}>Customer Attributes</Text>
-
-              <Text style={styles.label}>Email</Text>
-              <TextInput
-                style={styles.input}
-                value={this.state.email}
-                onChangeText={email => this.setState({email})}
-                placeholder="customer@example.com"
-                keyboardType="email-address"
-                autoCapitalize="none"
-              />
-
-              <Text style={styles.label}>First Name</Text>
-              <TextInput
-                style={styles.input}
-                value={this.state.firstname}
-                onChangeText={firstname => this.setState({firstname})}
-                placeholder="First Name"
-              />
-
-              <Text style={styles.label}>Last Name</Text>
-              <TextInput
-                style={styles.input}
-                value={this.state.lastname}
-                onChangeText={lastname => this.setState({lastname})}
-                placeholder="Last Name"
-              />
-
-              <View style={styles.buttonContainer}>
-                <TouchableOpacity
-                  style={[styles.button, styles.buttonPrimary]}
-                  onPress={this.onInitialize}>
-                  <Text style={styles.buttonText}>Initialize</Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                  style={[styles.button, styles.buttonSecondary]}
-                  onPress={this.onExecute}>
-                  <Text style={styles.buttonText}>Execute</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-
-            <View style={styles.placeholderContainer}>
-              <Text style={styles.placeholderLabel}>
-                Rokt Placement ({this.state.placeholderName})
-              </Text>
-              <RoktEmbeddedView
-                ref={this.placeholder}
-                placeholderName={this.state.placeholderName}
-                style={styles.roktPlacement}
-              />
-            </View>
-          </ScrollView>
-        </SafeAreaView>
+        {this.state.currentScreen === 'home'
+          ? this.renderHomeScreen()
+          : this.renderRoktViewScreen()}
       </>
     );
   }
@@ -297,6 +340,30 @@ const styles = StyleSheet.create({
   },
   roktPlacement: {
     minHeight: 100,
+  },
+  roktScreenHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#4ba9c8',
+    paddingVertical: 16,
+    paddingHorizontal: 16,
+  },
+  backButton: {
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+  },
+  backButtonText: {
+    color: '#ffffff',
+    fontSize: 18,
+    fontWeight: '600',
+  },
+  roktScreenTitle: {
+    flex: 1,
+    textAlign: 'center',
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#ffffff',
+    marginRight: 60, // Offset for back button to center the title
   },
 });
 

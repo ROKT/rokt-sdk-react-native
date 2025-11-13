@@ -46,8 +46,15 @@ using namespace facebook::react;
 
 - (void)updateProps:(Props::Shared const &)props oldProps:(Props::Shared const &)oldProps
 {
-  // This is intentionally left blank.
-  // The props are handled by the view manager and direct access to the swift view.
+  const auto &oldViewProps = *std::static_pointer_cast<const RoktNativeWidgetProps>(oldProps);
+  const auto &newViewProps = *std::static_pointer_cast<const RoktNativeWidgetProps>(props);
+
+  // Handle placeholderName prop
+  if (oldViewProps.placeholderName != newViewProps.placeholderName) {
+    _placeholderName = [NSString stringWithUTF8String:newViewProps.placeholderName.c_str()];
+    NSLog(@"[ROKT] iOS Fabric: RoktNativeWidgetComponentView placeholder name set to: %@", _placeholderName);
+  }
+
   [super updateProps:props oldProps:oldProps];
 }
 
