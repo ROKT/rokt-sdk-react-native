@@ -13,7 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changes
 
-- Updated Rokt native SDK versions. Android `4.11.3`, iOS `4.14.3`
+- Updated Rokt native iOS SDK version to `4.14.3`.
 
 ### Fixed
 
