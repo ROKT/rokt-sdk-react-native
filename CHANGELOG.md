@@ -9,6 +9,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.11.1] - 2025-11-14
+
+### Changes
+
+- Updated Rokt native iOS SDK version to `4.14.3`.
+
+### Fixed
+
+- iOS view hierarchy corruption in New Architecture
+
 ## [4.11.0] - 2025-09-03
 
 ### Changes
@@ -36,7 +46,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Support new response action type `ExternalPaymentTrigger`
 - Sessions are now retained between app restarts
 
-[unreleased]: https://github.com/ROKT/rokt-sdk-react-native/compare/4.11.0...HEAD
+[unreleased]: https://github.com/ROKT/rokt-sdk-react-native/compare/4.11.1...HEAD
+[4.11.1]: https://github.com/ROKT/rokt-sdk-react-native/compare/4.11.0...4.11.1
 [4.11.0]: https://github.com/ROKT/rokt-sdk-react-native/compare/4.10.2...4.11.0
 [4.10.2]: https://github.com/ROKT/rokt-sdk-react-native/compare/4.10.1...4.10.2
 [4.10.1]: https://github.com/ROKT/rokt-sdk-react-native/compare/4.10.0...4.10.1
