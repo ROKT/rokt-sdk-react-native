@@ -1683,7 +1683,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - Rokt-Widget (~> 4.14.0)
     - Yoga
-  - Rokt-Widget (4.14.0)
+  - Rokt-Widget (4.14.3)
   - SocketRocket (0.7.1)
   - Yoga (0.0.0)
 
