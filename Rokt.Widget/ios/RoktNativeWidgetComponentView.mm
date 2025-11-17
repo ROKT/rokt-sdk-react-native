@@ -101,6 +101,12 @@ using namespace facebook::react;
 
 - (void)updateProps:(Props::Shared const &)props oldProps:(Props::Shared const &)oldProps
 {
+  // Check if the shared pointers are valid before dereferencing
+  if (!oldProps || !props) {
+    [super updateProps:props oldProps:oldProps];
+    return;
+  }
+  
   const auto &oldViewProps = *std::static_pointer_cast<const RoktNativeWidgetProps>(oldProps);
   const auto &newViewProps = *std::static_pointer_cast<const RoktNativeWidgetProps>(props);
 
