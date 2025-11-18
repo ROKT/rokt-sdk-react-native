@@ -103,6 +103,17 @@ class HomeScreen extends Component<HomeScreenProps, HomeScreenState> {
     });
   };
 
+  onNavigateOnly = () => {
+    // Navigate without executing Rokt (for testing view lifecycle)
+    this.props.navigation.navigate('RoktView', {
+      viewName: this.state.viewName,
+      email: this.state.email,
+      firstname: this.state.firstname,
+      lastname: this.state.lastname,
+      placeholderName: this.state.placeholderName,
+    });
+  };
+
   render() {
     return (
       <SafeAreaView style={styles.container}>
@@ -178,6 +189,14 @@ class HomeScreen extends Component<HomeScreenProps, HomeScreenState> {
                 style={[styles.button, styles.buttonSecondary]}
                 onPress={this.onExecute}>
                 <Text style={styles.buttonText}>Execute</Text>
+              </TouchableOpacity>
+            </View>
+
+            <View style={styles.buttonContainer}>
+              <TouchableOpacity
+                style={[styles.button, styles.buttonTertiary]}
+                onPress={this.onNavigateOnly}>
+                <Text style={styles.buttonText}>Navigate Only</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -360,6 +379,9 @@ const styles = StyleSheet.create({
   },
   buttonSecondary: {
     backgroundColor: '#34c759',
+  },
+  buttonTertiary: {
+    backgroundColor: '#ff9500',
   },
   buttonText: {
     color: '#ffffff',
