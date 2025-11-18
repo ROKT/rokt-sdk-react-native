@@ -24,8 +24,6 @@ import {Rokt, RoktEmbeddedView, RoktEventManager} from '@rokt/react-native-sdk';
 
 const eventManagerEmitter = new NativeEventEmitter(RoktEventManager);
 
-type RoktEmbeddedViewRef = React.ComponentRef<typeof RoktEmbeddedView>;
-
 // Navigation types
 type RootStackParamList = {
   Home: undefined;
@@ -34,12 +32,14 @@ type RootStackParamList = {
     email: string;
     firstname: string;
     lastname: string;
+    phone?: string;
     placeholderName: string;
   };
   DetailView: {
     email: string;
     firstname: string;
     lastname: string;
+    phone?: string;
   };
 };
 
@@ -54,9 +54,6 @@ interface HomeScreenState {
   tagId: string;
   viewName: string;
   placeholderName: string;
-  email: string;
-  firstname: string;
-  lastname: string;
 }
 
 class HomeScreen extends Component<HomeScreenProps, HomeScreenState> {
@@ -69,9 +66,6 @@ class HomeScreen extends Component<HomeScreenProps, HomeScreenState> {
       tagId: '', // Enter your Rokt Tag ID here
       viewName: 'RoktExperience', // Your view name
       placeholderName: 'Location1',
-      email: 'test@example.com',
-      firstname: 'John',
-      lastname: 'Doe',
     };
 
     // Listen for Rokt events
@@ -99,12 +93,13 @@ class HomeScreen extends Component<HomeScreenProps, HomeScreenState> {
       return;
     }
 
-    // Navigate to Rokt view screen with parameters
+    // Navigate to checkout screen
     this.props.navigation.navigate('RoktView', {
       viewName: this.state.viewName,
-      email: this.state.email,
-      firstname: this.state.firstname,
-      lastname: this.state.lastname,
+      email: '',
+      firstname: '',
+      lastname: '',
+      phone: '',
       placeholderName: this.state.placeholderName,
     });
   };
@@ -113,9 +108,10 @@ class HomeScreen extends Component<HomeScreenProps, HomeScreenState> {
     // Navigate without executing Rokt (for testing view lifecycle)
     this.props.navigation.navigate('RoktView', {
       viewName: this.state.viewName,
-      email: this.state.email,
-      firstname: this.state.firstname,
-      lastname: this.state.lastname,
+      email: '',
+      firstname: '',
+      lastname: '',
+      phone: '',
       placeholderName: this.state.placeholderName,
     });
   };
@@ -128,11 +124,13 @@ class HomeScreen extends Component<HomeScreenProps, HomeScreenState> {
           style={styles.scrollView}>
           <View style={styles.header}>
             <Text style={styles.title}>Rokt SDK Demo</Text>
-            <Text style={styles.subtitle}>React Navigation Example</Text>
+            <Text style={styles.subtitle}>Checkout Flow Example</Text>
           </View>
 
           <View style={styles.formContainer}>
-            <Text style={styles.label}>Rokt Tag ID *</Text>
+            <Text style={styles.sectionTitle}>Configuration</Text>
+
+            <Text style={styles.configLabel}>Rokt Tag ID *</Text>
             <TextInput
               style={styles.input}
               value={this.state.tagId}
@@ -140,7 +138,7 @@ class HomeScreen extends Component<HomeScreenProps, HomeScreenState> {
               placeholder="Enter your Tag ID"
             />
 
-            <Text style={styles.label}>View Name</Text>
+            <Text style={styles.configLabel}>View Name</Text>
             <TextInput
               style={styles.input}
               value={this.state.viewName}
@@ -148,40 +146,12 @@ class HomeScreen extends Component<HomeScreenProps, HomeScreenState> {
               placeholder="RoktExperience"
             />
 
-            <Text style={styles.label}>Placeholder Name</Text>
+            <Text style={styles.configLabel}>Placeholder Name</Text>
             <TextInput
               style={styles.input}
               value={this.state.placeholderName}
               onChangeText={placeholderName => this.setState({ placeholderName })}
               placeholder="RoktEmbedded1"
-            />
-
-            <Text style={styles.sectionTitle}>Customer Attributes</Text>
-
-            <Text style={styles.label}>Email</Text>
-            <TextInput
-              style={styles.input}
-              value={this.state.email}
-              onChangeText={email => this.setState({ email })}
-              placeholder="customer@example.com"
-              keyboardType="email-address"
-              autoCapitalize="none"
-            />
-
-            <Text style={styles.label}>First Name</Text>
-            <TextInput
-              style={styles.input}
-              value={this.state.firstname}
-              onChangeText={firstname => this.setState({ firstname })}
-              placeholder="First Name"
-            />
-
-            <Text style={styles.label}>Last Name</Text>
-            <TextInput
-              style={styles.input}
-              value={this.state.lastname}
-              onChangeText={lastname => this.setState({ lastname })}
-              placeholder="Last Name"
             />
 
             <View style={styles.buttonContainer}>
@@ -194,7 +164,7 @@ class HomeScreen extends Component<HomeScreenProps, HomeScreenState> {
               <TouchableOpacity
                 style={[styles.button, styles.buttonSecondary]}
                 onPress={this.onExecute}>
-                <Text style={styles.buttonText}>Execute</Text>
+                <Text style={styles.buttonText}>Go to Checkout</Text>
               </TouchableOpacity>
             </View>
 
@@ -213,75 +183,155 @@ class HomeScreen extends Component<HomeScreenProps, HomeScreenState> {
 }
 
 // Rokt View Screen Component
-class RoktViewScreen extends Component<RoktViewScreenProps> {
-  private placeholder = React.createRef<RoktEmbeddedViewRef>();
+interface RoktViewScreenState {
+  email: string;
+  firstname: string;
+  lastname: string;
+  phone: string;
+  isEmailValid: boolean;
+  hasExecutedRokt: boolean;
+}
 
-  componentDidMount() {
-    // Execute Rokt after the view is mounted
-    setTimeout(() => {
-      const { email, firstname, lastname } = this.props.route.params;
+class RoktViewScreen extends Component<RoktViewScreenProps, RoktViewScreenState> {
+  private placeholder = React.createRef<any>();
 
-      const attributes: { [key: string]: string } = {
-        email,
-        firstname,
-        lastname,
-        sandbox: 'true',
-        country: 'US',
-        customertype: 'guest',
-        deliverytype: 'carryout',
-        mobile: ''
-      };
-
-      const placeholders: { [key: string]: number } = {};
-      const nodeHandle = findNodeHandle(this.placeholder.current);
-      console.log('Node handle:', nodeHandle);
-
-      if (nodeHandle !== null) {
-        placeholders['RoktEmbedded1'] = nodeHandle;
-        console.log('Placeholders registered:', placeholders);
-      } else {
-        console.error('ERROR: Node handle is null! Placeholder not properly registered');
-      }
-
-      console.log('Executing with viewName:', this.props.route.params.viewName);
-      console.log('Attributes:', attributes);
-
-      Rokt.execute("RoktEmbeddedExperience", attributes, placeholders);
-      console.log('Rokt Execute called');
-    }, 100);
+  constructor(props: RoktViewScreenProps) {
+    super(props);
+    const { email, firstname, lastname, phone } = props.route.params;
+    this.state = {
+      email: email || '',
+      firstname: firstname || '',
+      lastname: lastname || '',
+      phone: phone || '',
+      isEmailValid: false,
+      hasExecutedRokt: false,
+    };
   }
 
+  validateEmail = (email: string): boolean => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
+  handleEmailChange = (email: string) => {
+    this.setState({ email });
+  };
+
+  handleEmailBlur = () => {
+    const isValid = this.validateEmail(this.state.email);
+
+    if (isValid && !this.state.isEmailValid) {
+      // Email just became valid, trigger Rokt execution
+      this.setState({ isEmailValid: true }, () => {
+        this.executeRokt();
+      });
+    } else if (!isValid && this.state.isEmailValid) {
+      this.setState({ isEmailValid: false });
+    }
+  };
+
+  executeRokt = () => {
+    const { email, firstname, lastname, phone } = this.state;
+
+    const attributes: { [key: string]: string } = {
+      email,
+      firstname,
+      lastname,
+      mobile: phone || '',
+      sandbox: 'true',
+      country: 'US',
+      customertype: 'guest',
+      deliverytype: 'carryout',
+    };
+
+    const placeholders: { [key: string]: number } = {};
+    const nodeHandle = findNodeHandle(this.placeholder.current);
+    console.log('Node handle:', nodeHandle);
+
+    if (nodeHandle !== null) {
+      placeholders['RoktEmbedded1'] = nodeHandle;
+      console.log('Placeholders registered:', placeholders);
+    } else {
+      console.error('ERROR: Node handle is null! Placeholder not properly registered');
+      return;
+    }
+
+    console.log('Executing Rokt with attributes:', attributes);
+
+    Rokt.execute("RoktEmbeddedExperience", attributes, placeholders);
+    this.setState({ hasExecutedRokt: true });
+    console.log('Rokt Execute called');
+  };
+
   onNavigateToDetail = () => {
-    const { email, firstname, lastname } = this.props.route.params;
+    const { email, firstname, lastname, phone } = this.state;
     this.props.navigation.navigate('DetailView', {
       email,
       firstname,
       lastname,
+      phone,
     });
   };
 
   render() {
-    const { placeholderName } = this.props.route.params;
-
     return (
       <SafeAreaView style={styles.container}>
         <ScrollView
           contentInsetAdjustmentBehavior="automatic"
-          style={styles.scrollView}>
-          <View style={styles.placeholderContainer}>
-            <Text style={styles.placeholderLabel}>
-              Rokt Placement ({placeholderName})
-            </Text>
-            <RoktEmbeddedView
-              ref={this.placeholder}
-              placeholderName="RoktEmbedded1"
-            />
+          style={styles.scrollView}
+          keyboardShouldPersistTaps="handled">
+          <View style={styles.checkoutContainer}>
+            <View style={styles.formSection}>
+              <Text style={styles.label}>First Name</Text>
+              <TextInput
+                style={styles.input}
+                value={this.state.firstname}
+                onChangeText={firstname => this.setState({ firstname })}
+                placeholder="First Name"
+              />
 
-            <TouchableOpacity
-              style={[styles.button, styles.buttonPrimary, styles.detailButton]}
-              onPress={this.onNavigateToDetail}>
-              <Text style={styles.buttonText}>View Details</Text>
-            </TouchableOpacity>
+              <Text style={styles.label}>Last Name</Text>
+              <TextInput
+                style={styles.input}
+                value={this.state.lastname}
+                onChangeText={lastname => this.setState({ lastname })}
+                placeholder="Last Name"
+              />
+
+              <Text style={styles.label}>Email Address</Text>
+              <TextInput
+                style={[
+                  styles.input,
+                  this.state.email && !this.state.isEmailValid && styles.inputError,
+                  this.state.isEmailValid && styles.inputValid
+                ]}
+                value={this.state.email}
+                onChangeText={this.handleEmailChange}
+                onBlur={this.handleEmailBlur}
+                placeholder="customer@example.com"
+                keyboardType="email-address"
+                autoCapitalize="none"
+              />
+              {this.state.email && !this.state.isEmailValid && (
+                <Text style={styles.errorText}>Please enter a valid email address</Text>
+              )}
+
+              <Text style={styles.label}>Phone Number</Text>
+              <TextInput
+                style={styles.input}
+                value={this.state.phone}
+                onChangeText={phone => this.setState({ phone })}
+                placeholder="Phone Number"
+                keyboardType="phone-pad"
+              />
+            </View>
+
+            <View style={styles.roktPlacementSection}>
+              <RoktEmbeddedView
+                ref={this.placeholder}
+                placeholderName="RoktEmbedded1"
+              />
+            </View>
           </View>
         </ScrollView>
       </SafeAreaView>
@@ -292,7 +342,7 @@ class RoktViewScreen extends Component<RoktViewScreenProps> {
 // Detail View Screen Component
 class DetailViewScreen extends Component<DetailViewScreenProps> {
   render() {
-    const { email, firstname, lastname } = this.props.route.params;
+    const { email, firstname, lastname, phone } = this.props.route.params;
 
     return (
       <SafeAreaView style={styles.container}>
@@ -315,6 +365,11 @@ class DetailViewScreen extends Component<DetailViewScreenProps> {
             <View style={styles.infoRow}>
               <Text style={styles.infoLabel}>Email:</Text>
               <Text style={styles.infoValue}>{email}</Text>
+            </View>
+
+            <View style={styles.infoRow}>
+              <Text style={styles.infoLabel}>Phone:</Text>
+              <Text style={styles.infoValue}>{phone || 'Not provided'}</Text>
             </View>
 
             <View style={styles.detailDescription}>
@@ -359,7 +414,7 @@ export default function App() {
           name="RoktView"
           component={RoktViewScreen}
           options={{
-            title: 'Rokt Offers',
+            title: 'Checkout',
           }}
         />
         <Stack.Screen
@@ -409,6 +464,19 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 3,
   },
+  checkoutContainer: {
+    flex: 1,
+  },
+  formSection: {
+    backgroundColor: '#ffffff',
+    padding: 20,
+    paddingBottom: 30,
+  },
+  roktPlacementSection: {
+    backgroundColor: '#f5f5f5',
+    padding: 20,
+    minHeight: 200,
+  },
   sectionTitle: {
     fontSize: 18,
     fontWeight: '600',
@@ -417,6 +485,15 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   label: {
+    fontSize: 13,
+    fontWeight: '400',
+    color: '#999',
+    marginTop: 16,
+    marginBottom: 8,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  configLabel: {
     fontSize: 14,
     fontWeight: '600',
     color: '#666',
@@ -431,6 +508,20 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     fontSize: 16,
     backgroundColor: '#fff',
+  },
+  inputError: {
+    borderColor: '#ff3b30',
+    borderWidth: 2,
+  },
+  inputValid: {
+    borderColor: '#34c759',
+    borderWidth: 2,
+  },
+  errorText: {
+    color: '#ff3b30',
+    fontSize: 12,
+    marginTop: 4,
+    marginLeft: 4,
   },
   buttonContainer: {
     flexDirection: 'row',
@@ -458,24 +549,6 @@ const styles = StyleSheet.create({
     color: '#ffffff',
     fontSize: 16,
     fontWeight: '600',
-  },
-  placeholderContainer: {
-    backgroundColor: '#ffffff',
-    padding: 20,
-    margin: 16,
-    borderRadius: 12,
-    shadowColor: '#000',
-    shadowOffset: {width: 0, height: 2},
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-    minHeight: 300,
-  },
-  placeholderLabel: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#333',
-    marginBottom: 12,
   },
   detailButton: {
     marginTop: 24,
