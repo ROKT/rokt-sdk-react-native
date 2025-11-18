@@ -28,6 +28,9 @@ using namespace facebook::react;
     UIView * _view;
 }
 
+// Static reference to hold the old placement across navigation
+static RoktEmbeddedView *_staticRoktEmbeddedView = nil;
+
 + (ComponentDescriptorProvider)componentDescriptorProvider
 {
     return concreteComponentDescriptorProvider<RoktNativeWidgetComponentDescriptor>();
@@ -36,7 +39,16 @@ using namespace facebook::react;
 - (instancetype)initWithFrame:(CGRect)frame
 {
   if (self = [super initWithFrame:frame]) {
-    _roktEmbeddedView = [[RoktEmbeddedView alloc] initWithFrame:self.bounds];
+    // Reuse the static instance if it exists to simulate customer's issue
+    if (_staticRoktEmbeddedView != nil) {
+      _roktEmbeddedView = _staticRoktEmbeddedView;
+      _roktEmbeddedView.frame = self.bounds;
+      NSLog(@"[ROKT] iOS Fabric: Reusing existing static RoktEmbeddedView reference");
+    } else {
+      _roktEmbeddedView = [[RoktEmbeddedView alloc] initWithFrame:self.bounds];
+      _staticRoktEmbeddedView = _roktEmbeddedView;
+      NSLog(@"[ROKT] iOS Fabric: Created new RoktEmbeddedView and stored in static reference");
+    }
     _roktEmbeddedView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     [self addSubview:_roktEmbeddedView];
     NSLog(@"[ROKT] iOS Fabric: RoktNativeWidgetComponentView initialized with frame: %@", NSStringFromCGRect(frame));
@@ -45,76 +57,16 @@ using namespace facebook::react;
   return self;
 }
 
-- (void)willMoveToWindow:(UIWindow *)newWindow
-{
-  NSLog(@"[ROKT] iOS Fabric: willMoveToWindow called");
-  NSLog(@"[ROKT] iOS Fabric: Current window: %@", self.window);
-  NSLog(@"[ROKT] iOS Fabric: New window: %@", newWindow);
-  NSLog(@"[ROKT] iOS Fabric: RoktEmbeddedView superview before removal: %@", self.roktEmbeddedView.superview);
-  
-  // Remove the embedded view from hierarchy when moving to a new window
-  if (self.roktEmbeddedView && self.roktEmbeddedView.superview) {
-    NSLog(@"[ROKT] iOS Fabric: Removing RoktEmbeddedView from superview");
-    [self.roktEmbeddedView removeFromSuperview];
-    NSLog(@"[ROKT] iOS Fabric: RoktEmbeddedView removed successfully");
-  } else {
-    NSLog(@"[ROKT] iOS Fabric: RoktEmbeddedView not in view hierarchy, skipping removal");
-  }
-  
-  [super willMoveToWindow:newWindow];
-}
-
 - (void)didMoveToWindow
 {
   [super didMoveToWindow];
   
   NSLog(@"[ROKT] iOS Fabric: didMoveToWindow called");
   NSLog(@"[ROKT] iOS Fabric: Current window: %@", self.window);
-  NSLog(@"[ROKT] iOS Fabric: RoktEmbeddedView superview before adding: %@", self.roktEmbeddedView.superview);
-  
-  if (!self.window) {
-    NSLog(@"[ROKT] iOS Fabric: No window available, RoktEmbeddedView not re-added");
-    return;
-  }
-  
-  if (!self.roktEmbeddedView) {
-    NSLog(@"[ROKT] iOS Fabric: RoktEmbeddedView is nil");
-    return;
-  }
-  
-  if (self.roktEmbeddedView.superview) {
-    NSLog(@"[ROKT] iOS Fabric: RoktEmbeddedView already has superview, skipping re-add");
-    return;
-  }
-  
-  // Re-add the embedded view to hierarchy after moving to new window
-  NSLog(@"[ROKT] iOS Fabric: Adding RoktEmbeddedView back to view hierarchy");
-  NSLog(@"[ROKT] iOS Fabric: RoktEmbeddedView frame: %@", NSStringFromCGRect(self.roktEmbeddedView.frame));
-  NSLog(@"[ROKT] iOS Fabric: Self frame: %@", NSStringFromCGRect(self.frame));
-  NSLog(@"[ROKT] iOS Fabric: Self bounds: %@", NSStringFromCGRect(self.bounds));
-  
-  self.roktEmbeddedView.frame = self.bounds;
-  [self addSubview:self.roktEmbeddedView];
-  NSLog(@"[ROKT] iOS Fabric: RoktEmbeddedView added successfully");
-  NSLog(@"[ROKT] iOS Fabric: RoktEmbeddedView superview after adding: %@", self.roktEmbeddedView.superview);
 }
 
 - (void)updateProps:(Props::Shared const &)props oldProps:(Props::Shared const &)oldProps
 {
-  // const auto &oldViewProps = *std::static_pointer_cast<const RoktNativeWidgetProps>(oldProps);
-  // const auto &newViewProps = *std::static_pointer_cast<const RoktNativeWidgetProps>(props);
-
-  // if (!oldViewProps || !newViewProps) {
-  //   NSLog(@"[ROKT] iOS Fabric: updateProps called with null props");
-  //   [super updateProps:props oldProps:oldProps];
-  //   return;
-  // }
-
-  // // Handle placeholderName prop
-  // if (oldViewProps.placeholderName != newViewProps.placeholderName) {
-  //   _placeholderName = [NSString stringWithUTF8String:newViewProps.placeholderName.c_str()];
-  //   NSLog(@"[ROKT] iOS Fabric: RoktNativeWidgetComponentView placeholder name set to: %@", _placeholderName);
-  // }
 
   [super updateProps:props oldProps:oldProps];
 }
