@@ -28,9 +28,6 @@ using namespace facebook::react;
     UIView * _view;
 }
 
-// Static reference to hold the old placement across navigation
-static RoktEmbeddedView *_staticRoktEmbeddedView = nil;
-
 + (ComponentDescriptorProvider)componentDescriptorProvider
 {
     return concreteComponentDescriptorProvider<RoktNativeWidgetComponentDescriptor>();
@@ -39,20 +36,12 @@ static RoktEmbeddedView *_staticRoktEmbeddedView = nil;
 - (instancetype)initWithFrame:(CGRect)frame
 {
   if (self = [super initWithFrame:frame]) {
-    // Reuse the static instance if it exists to simulate customer's issue
-    if (_staticRoktEmbeddedView != nil) {
-      _roktEmbeddedView = _staticRoktEmbeddedView;
-      _roktEmbeddedView.frame = self.bounds;
-      NSLog(@"[ROKT] iOS Fabric: Reusing existing static RoktEmbeddedView reference");
-    } else {
-      _roktEmbeddedView = [[RoktEmbeddedView alloc] initWithFrame:self.bounds];
-      _staticRoktEmbeddedView = _roktEmbeddedView;
-      NSLog(@"[ROKT] iOS Fabric: Created new RoktEmbeddedView and stored in static reference");
-    }
+    // Create a fresh RoktEmbeddedView for each component instance
+    _roktEmbeddedView = [[RoktEmbeddedView alloc] initWithFrame:self.bounds];
     _roktEmbeddedView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     [self addSubview:_roktEmbeddedView];
     NSLog(@"[ROKT] iOS Fabric: RoktNativeWidgetComponentView initialized with frame: %@", NSStringFromCGRect(frame));
-    NSLog(@"[ROKT] iOS Fabric: RoktEmbeddedView created and added to view hierarchy");
+    NSLog(@"[ROKT] iOS Fabric: Created fresh RoktEmbeddedView instance");
   }
   return self;
 }
