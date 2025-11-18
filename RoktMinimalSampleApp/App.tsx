@@ -36,10 +36,16 @@ type RootStackParamList = {
     lastname: string;
     placeholderName: string;
   };
+  DetailView: {
+    email: string;
+    firstname: string;
+    lastname: string;
+  };
 };
 
 type HomeScreenProps = NativeStackScreenProps<RootStackParamList, 'Home'>;
 type RoktViewScreenProps = NativeStackScreenProps<RootStackParamList, 'RoktView'>;
+type DetailViewScreenProps = NativeStackScreenProps<RootStackParamList, 'DetailView'>;
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -245,6 +251,15 @@ class RoktViewScreen extends Component<RoktViewScreenProps> {
     }, 100);
   }
 
+  onNavigateToDetail = () => {
+    const { email, firstname, lastname } = this.props.route.params;
+    this.props.navigation.navigate('DetailView', {
+      email,
+      firstname,
+      lastname,
+    });
+  };
+
   render() {
     const { placeholderName } = this.props.route.params;
 
@@ -261,6 +276,55 @@ class RoktViewScreen extends Component<RoktViewScreenProps> {
               ref={this.placeholder}
               placeholderName="RoktEmbedded1"
             />
+
+            <TouchableOpacity
+              style={[styles.button, styles.buttonPrimary, styles.detailButton]}
+              onPress={this.onNavigateToDetail}>
+              <Text style={styles.buttonText}>View Details</Text>
+            </TouchableOpacity>
+          </View>
+        </ScrollView>
+      </SafeAreaView>
+    );
+  }
+}
+
+// Detail View Screen Component
+class DetailViewScreen extends Component<DetailViewScreenProps> {
+  render() {
+    const { email, firstname, lastname } = this.props.route.params;
+
+    return (
+      <SafeAreaView style={styles.container}>
+        <ScrollView
+          contentInsetAdjustmentBehavior="automatic"
+          style={styles.scrollView}>
+          <View style={styles.formContainer}>
+            <Text style={styles.sectionTitle}>User Information</Text>
+
+            <View style={styles.infoRow}>
+              <Text style={styles.infoLabel}>First Name:</Text>
+              <Text style={styles.infoValue}>{firstname}</Text>
+            </View>
+
+            <View style={styles.infoRow}>
+              <Text style={styles.infoLabel}>Last Name:</Text>
+              <Text style={styles.infoValue}>{lastname}</Text>
+            </View>
+
+            <View style={styles.infoRow}>
+              <Text style={styles.infoLabel}>Email:</Text>
+              <Text style={styles.infoValue}>{email}</Text>
+            </View>
+
+            <View style={styles.detailDescription}>
+              <Text style={styles.label}>Additional Information</Text>
+              <Text style={styles.descriptionText}>
+                This is the detailed view that shows customer information.
+                You can customize this screen to display any additional
+                details or functionality you need.
+              </Text>
+            </View>
           </View>
         </ScrollView>
       </SafeAreaView>
@@ -296,6 +360,13 @@ export default function App() {
           component={RoktViewScreen}
           options={{
             title: 'Rokt Offers',
+          }}
+        />
+        <Stack.Screen
+          name="DetailView"
+          component={DetailViewScreen}
+          options={{
+            title: 'User Details',
           }}
         />
       </Stack.Navigator>
@@ -405,5 +476,37 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#333',
     marginBottom: 12,
+  },
+  detailButton: {
+    marginTop: 24,
+  },
+  infoRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#f0f0f0',
+  },
+  infoLabel: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#666',
+  },
+  infoValue: {
+    fontSize: 16,
+    color: '#333',
+  },
+  detailDescription: {
+    marginTop: 24,
+    padding: 16,
+    backgroundColor: '#f9f9f9',
+    borderRadius: 8,
+  },
+  descriptionText: {
+    fontSize: 14,
+    color: '#666',
+    lineHeight: 20,
+    marginTop: 8,
   },
 });
