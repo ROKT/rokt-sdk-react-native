@@ -101,20 +101,20 @@ using namespace facebook::react;
 
 - (void)updateProps:(Props::Shared const &)props oldProps:(Props::Shared const &)oldProps
 {
-  // Check if the shared pointers are valid before dereferencing
-  if (!oldProps || !props) {
-    [super updateProps:props oldProps:oldProps];
-    return;
-  }
-  
-  const auto &oldViewProps = *std::static_pointer_cast<const RoktNativeWidgetProps>(oldProps);
-  const auto &newViewProps = *std::static_pointer_cast<const RoktNativeWidgetProps>(props);
+  // const auto &oldViewProps = *std::static_pointer_cast<const RoktNativeWidgetProps>(oldProps);
+  // const auto &newViewProps = *std::static_pointer_cast<const RoktNativeWidgetProps>(props);
 
-  // Handle placeholderName prop
-  if (oldViewProps.placeholderName != newViewProps.placeholderName) {
-    _placeholderName = [NSString stringWithUTF8String:newViewProps.placeholderName.c_str()];
-    NSLog(@"[ROKT] iOS Fabric: RoktNativeWidgetComponentView placeholder name set to: %@", _placeholderName);
-  }
+  // if (!oldViewProps || !newViewProps) {
+  //   NSLog(@"[ROKT] iOS Fabric: updateProps called with null props");
+  //   [super updateProps:props oldProps:oldProps];
+  //   return;
+  // }
+
+  // // Handle placeholderName prop
+  // if (oldViewProps.placeholderName != newViewProps.placeholderName) {
+  //   _placeholderName = [NSString stringWithUTF8String:newViewProps.placeholderName.c_str()];
+  //   NSLog(@"[ROKT] iOS Fabric: RoktNativeWidgetComponentView placeholder name set to: %@", _placeholderName);
+  // }
 
   [super updateProps:props oldProps:oldProps];
 }
