@@ -1658,7 +1658,7 @@ PODS:
   - RNCCheckbox (0.5.20):
     - BEMCheckBox (~> 1.4)
     - React-Core
-  - rokt-react-native-sdk (4.11.0):
+  - rokt-react-native-sdk (4.11.1):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -1681,7 +1681,7 @@ PODS:
     - ReactCodegen
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
-    - Rokt-Widget (~> 4.14.0)
+    - Rokt-Widget (~> 4.14.3)
     - Yoga
   - Rokt-Widget (4.14.3)
   - SocketRocket (0.7.1)
@@ -1988,7 +1988,7 @@ SPEC CHECKSUMS:
   ReactCodegen: f891084749d03b8af8a244cefaa492e491b763fd
   ReactCommon: c7d636ec1b9801ff4ee83cce8e0bf74a1610fc3f
   RNCCheckbox: 33b44487ca8008394ce658cc32b26eab04f426ef
-  rokt-react-native-sdk: 9918cb6088edc6564d9b49ec5246d434d1fec852
+  rokt-react-native-sdk: badc9889d9e3af59727350c9e8ad912a427fe16c
   Rokt-Widget: 870c7143d23c7de1ad1bac7e627d1e3b17c6965d
   SocketRocket: d4aabe649be1e368d1318fdf28a022d714d65748
   Yoga: a6cb833e04fb8c59a012b49fb1d040fcb0cbb633
