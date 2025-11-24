@@ -19,7 +19,7 @@ import {
   View,
 } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
-import { createNativeStackNavigator, NativeStackScreenProps } from '@react-navigation/native-stack';
+import { createNativeStackNavigator, NativeStackScreenProps, NativeStackNavigationProp } from '@react-navigation/native-stack';
 import {Rokt, RoktEmbeddedView, RoktEventManager} from '@rokt/react-native-sdk';
 
 const eventManagerEmitter = new NativeEventEmitter(RoktEventManager);
@@ -49,6 +49,21 @@ type DetailViewScreenProps = NativeStackScreenProps<RootStackParamList, 'DetailV
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
+// Custom Back Button Component
+interface CustomBackButtonProps {
+  navigation: NativeStackNavigationProp<RootStackParamList, any>;
+}
+
+const CustomBackButton: React.FC<CustomBackButtonProps> = ({ navigation }) => {
+  return (
+    <TouchableOpacity
+      onPress={() => navigation.goBack()}
+      style={styles.backButton}>
+      <Text style={styles.backButtonText}>← Back</Text>
+    </TouchableOpacity>
+  );
+};
+
 // Home Screen Component
 interface HomeScreenState {
   tagId: string;
@@ -66,6 +81,10 @@ class HomeScreen extends Component<HomeScreenProps, HomeScreenState> {
       tagId: '', // Enter your Rokt Tag ID here
       viewName: 'RoktExperience', // Your view name
       placeholderName: 'Location1',
+    };
+
+    this.componentDidMount = () => {
+      console.log('HomeScreen Component did mount ***************');
     };
 
     // Listen for Rokt events
@@ -206,6 +225,10 @@ class RoktViewScreen extends Component<RoktViewScreenProps, RoktViewScreenState>
       isEmailValid: false,
       hasExecutedRokt: false,
     };
+
+    this.componentDidMount = () => {
+      console.log('RoktViewScreen Component did mount');
+    };
   }
 
   validateEmail = (email: string): boolean => {
@@ -324,6 +347,12 @@ class RoktViewScreen extends Component<RoktViewScreenProps, RoktViewScreenState>
                 placeholder="Phone Number"
                 keyboardType="phone-pad"
               />
+
+              <TouchableOpacity
+                style={[styles.button, styles.buttonTertiary, styles.singleButton]}
+                onPress={this.onNavigateToDetail}>
+                <Text style={styles.buttonText}>Continue to Details</Text>
+              </TouchableOpacity>
             </View>
 
             <View style={styles.roktPlacementSection}>
@@ -413,16 +442,18 @@ export default function App() {
         <Stack.Screen
           name="RoktView"
           component={RoktViewScreen}
-          options={{
+          options={({ navigation }) => ({
             title: 'Checkout',
-          }}
+            headerLeft: () => <CustomBackButton navigation={navigation} />,
+          })}
         />
         <Stack.Screen
           name="DetailView"
           component={DetailViewScreen}
-          options={{
+          options={({ navigation }) => ({
             title: 'User Details',
-          }}
+            headerLeft: () => <CustomBackButton navigation={navigation} />,
+          })}
         />
       </Stack.Navigator>
     </NavigationContainer>
@@ -536,6 +567,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  singleButton: {
+    marginTop: 24,
+  },
   buttonPrimary: {
     backgroundColor: '#4ba9c8',
   },
@@ -581,5 +615,14 @@ const styles = StyleSheet.create({
     color: '#666',
     lineHeight: 20,
     marginTop: 8,
+  },
+  backButton: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+  },
+  backButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
   },
 });
