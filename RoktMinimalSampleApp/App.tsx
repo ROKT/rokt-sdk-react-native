@@ -21,8 +21,13 @@ import {
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator, NativeStackScreenProps, NativeStackNavigationProp } from '@react-navigation/native-stack';
 import {Rokt, RoktEmbeddedView, RoktEventManager} from '@rokt/react-native-sdk';
+import styled from 'styled-components/native';
 
 const eventManagerEmitter = new NativeEventEmitter(RoktEventManager);
+
+const RoktContainer = styled.View`
+  margin-bottom: 20px;
+`;
 
 // Navigation types
 type RootStackParamList = {
@@ -356,10 +361,12 @@ class RoktViewScreen extends Component<RoktViewScreenProps, RoktViewScreenState>
             </View>
 
             <View style={styles.roktPlacementSection}>
-              <RoktEmbeddedView
-                ref={this.placeholder}
-                placeholderName="RoktEmbedded1"
-              />
+              <RoktContainer>
+                <RoktEmbeddedView
+                  ref={this.placeholder}
+                  placeholderName="RoktEmbedded1"
+                />
+              </RoktContainer>
             </View>
           </View>
         </ScrollView>
