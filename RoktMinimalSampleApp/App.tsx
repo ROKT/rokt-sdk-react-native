@@ -19,7 +19,7 @@ import {
   View,
 } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
-import { createNativeStackNavigator, NativeStackScreenProps, NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { createStackNavigator, StackScreenProps, StackNavigationProp } from '@react-navigation/stack';
 import {Rokt, RoktEmbeddedView, RoktEventManager} from '@rokt/react-native-sdk';
 import styled from 'styled-components/native';
 
@@ -48,15 +48,15 @@ type RootStackParamList = {
   };
 };
 
-type HomeScreenProps = NativeStackScreenProps<RootStackParamList, 'Home'>;
-type RoktViewScreenProps = NativeStackScreenProps<RootStackParamList, 'RoktView'>;
-type DetailViewScreenProps = NativeStackScreenProps<RootStackParamList, 'DetailView'>;
+type HomeScreenProps = StackScreenProps<RootStackParamList, 'Home'>;
+type RoktViewScreenProps = StackScreenProps<RootStackParamList, 'RoktView'>;
+type DetailViewScreenProps = StackScreenProps<RootStackParamList, 'DetailView'>;
 
-const Stack = createNativeStackNavigator<RootStackParamList>();
+const Stack = createStackNavigator<RootStackParamList>();
 
 // Custom Back Button Component
 interface CustomBackButtonProps {
-  navigation: NativeStackNavigationProp<RootStackParamList, any>;
+  navigation: StackNavigationProp<RootStackParamList, any>;
 }
 
 const CustomBackButton: React.FC<CustomBackButtonProps> = ({ navigation }) => {
