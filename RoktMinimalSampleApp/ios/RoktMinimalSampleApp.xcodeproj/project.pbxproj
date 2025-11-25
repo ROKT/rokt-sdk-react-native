@@ -11,9 +11,9 @@
 		257742F625EBC3973BA4C35F /* libPods-RoktMinimalSampleAppTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = B7702138BA5E4F0A4EFB52EB /* libPods-RoktMinimalSampleAppTests.a */; };
 		2A3819AAEF22EDF8C350C99D /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */; };
 		45BB7E6EB8CFBBD8C15CB6FE /* libPods-RoktMinimalSampleApp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D2E36FE58308C0CBD831937B /* libPods-RoktMinimalSampleApp.a */; };
+		722093182ED6281000CFFD35 /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 722093172ED6281000CFFD35 /* AppDelegate.mm */; };
+		7220931A2ED6281D00CFFD35 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 722093192ED6281D00CFFD35 /* main.m */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
-		B3685BB22E36F99800F0BC24 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3685BB12E36F99800F0BC24 /* AppDelegate.swift */; };
-		B3685BB32E36F99800F0BC24 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3685BB12E36F99800F0BC24 /* AppDelegate.swift */; };
 		B3685BB62E36FB7700F0BC24 /* RoktMinimalSampleAppUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3685BB42E36FB7700F0BC24 /* RoktMinimalSampleAppUITests.swift */; };
 		B3685BB72E36FB7700F0BC24 /* RoktMinimalSampleAppUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3685BB52E36FB7700F0BC24 /* RoktMinimalSampleAppUITestsLaunchTests.swift */; };
 /* End PBXBuildFile section */
@@ -35,10 +35,12 @@
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = RoktMinimalSampleApp/Info.plist; sourceTree = "<group>"; };
 		13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = PrivacyInfo.xcprivacy; path = RoktMinimalSampleApp/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		720500D32EC62AEC00A5B39F /* RoktMinimalSampleApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RoktMinimalSampleApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		722093162ED627FF00CFFD35 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
+		722093172ED6281000CFFD35 /* AppDelegate.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = AppDelegate.mm; sourceTree = "<group>"; };
+		722093192ED6281D00CFFD35 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		8199587F43DA611FD45D9A1D /* Pods-RoktMinimalSampleAppTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RoktMinimalSampleAppTests.debug.xcconfig"; path = "Target Support Files/Pods-RoktMinimalSampleAppTests/Pods-RoktMinimalSampleAppTests.debug.xcconfig"; sourceTree = "<group>"; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = RoktMinimalSampleApp/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		A6F949A3F03932C00B5BD16F /* Pods-RoktMinimalSampleApp.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RoktMinimalSampleApp.debug.xcconfig"; path = "Target Support Files/Pods-RoktMinimalSampleApp/Pods-RoktMinimalSampleApp.debug.xcconfig"; sourceTree = "<group>"; };
-		B3685BB12E36F99800F0BC24 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		B3685BB42E36FB7700F0BC24 /* RoktMinimalSampleAppUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoktMinimalSampleAppUITests.swift; sourceTree = "<group>"; };
 		B3685BB52E36FB7700F0BC24 /* RoktMinimalSampleAppUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoktMinimalSampleAppUITestsLaunchTests.swift; sourceTree = "<group>"; };
 		B7702138BA5E4F0A4EFB52EB /* libPods-RoktMinimalSampleAppTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-RoktMinimalSampleAppTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -70,8 +72,10 @@
 		13B07FAE1A68108700A75B9A /* RoktMinimalSampleApp */ = {
 			isa = PBXGroup;
 			children = (
-				B3685BB12E36F99800F0BC24 /* AppDelegate.swift */,
 				13B07FB51A68108700A75B9A /* Images.xcassets */,
+				722093172ED6281000CFFD35 /* AppDelegate.mm */,
+				722093192ED6281D00CFFD35 /* main.m */,
+				722093162ED627FF00CFFD35 /* AppDelegate.h */,
 				13B07FB61A68108700A75B9A /* Info.plist */,
 				81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */,
 				13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */,
@@ -189,7 +193,7 @@
 						TestTargetID = 13B07F861A680F5B00A75B9A;
 					};
 					13B07F861A680F5B00A75B9A = {
-						LastSwiftMigration = 1640;
+						LastSwiftMigration = 2600;
 					};
 				};
 			};
@@ -334,7 +338,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				B3685BB22E36F99800F0BC24 /* AppDelegate.swift in Sources */,
 				B3685BB62E36FB7700F0BC24 /* RoktMinimalSampleAppUITests.swift in Sources */,
 				B3685BB72E36FB7700F0BC24 /* RoktMinimalSampleAppUITestsLaunchTests.swift in Sources */,
 			);
@@ -344,7 +347,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				B3685BB32E36F99800F0BC24 /* AppDelegate.swift in Sources */,
+				7220931A2ED6281D00CFFD35 /* main.m in Sources */,
+				722093182ED6281000CFFD35 /* AppDelegate.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
