@@ -93,14 +93,26 @@ For iOS development, ensure you have:
 
 ### Publishing
 
-This SDK is published to a NPM package repository. The publishing step uses the fastlane lanes `publishAlphaSDK` or `publishSDK` for publishing the alpha or production version respectively to NPM. The fastlane file is located inside `RoktSampleApp/android`
-The steps are configured in `publish.gradle`.
-Publishing Alpha and prod are possible through Buildkite based on the Git branch names as explained in above step.
+This SDK is published to a NPM package repository. Publishing is automated through GitHub Actions workflows.
 
 #### Automated Publishing
 
-The SDK can be released via the **Mobile Release Pipeline**. Follow the instructions in the Mobile Release Pipeline repo to release. You can still release the SDK manually by following the steps in the above section.  
+The SDK is automatically published to NPM when the `VERSION` file is updated and pushed to the `main` branch. The GitHub Actions workflow (`release-from-main.yml`) handles:
+
+- Building and testing the package
+- Running iOS and Android tests
+- Publishing to NPM with the appropriate dist tag
+- Creating a GitHub release
+
+To create a new release:
+
+1. Use the "Create draft release" workflow to bump the version (major, minor, or patch)
+2. Review and merge the generated pull request
+3. Once merged to `main`, the release workflow will automatically publish to NPM
+
 The appropriate dist tag will be applied automatically when publishing if one is set (e.g. `1.2.3-alpha.1` will set the dist tag as `alpha`). If not, the default `latest` tag will be used.
+
+You can also release the SDK manually by following the steps in the above section.
 
 ## Integration Guide
 
