@@ -25,7 +25,7 @@ import {
 } from "@rokt/react-native-sdk";
 
 const DEFAULT_TAG_ID = "2754655826098840951";
-const DEFAULT_VIEW_NAME = "RoktExperience";
+const DEFAULT_VIEW_NAME = "MSDKEmbeddedLayout";
 const DEFAULT_PLACEHOLDER = "Location1";
 
 const eventManagerEmitter = new NativeEventEmitter(RoktEventManager);
