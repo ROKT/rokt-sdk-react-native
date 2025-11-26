@@ -11,13 +11,14 @@ The RoktSampleApp includes bare-minimum UI to demonstrate the usage of React Nat
 The application includes the common functionality in the `*.js files` whereas the platform specific code is written in the respective platform package example `android or ios`.
 We use `npm` package manager to manage the dependencies for the project.
 
-| Environment | Build                                                                                                                                              |
-| ----------- | :------------------------------------------------------------------------------------------------------------------------------------------------- |
-| release     | [![Build status](https://badge.buildkite.com/e75677bd3c8e83f1da750aa9124df1f418f211c9c630765ffd.svg)](https://buildkite.com/rokt/react-native-sdk) |
-
 ## CI/CD System
 
-The CI system used is **Buildkite** [https://buildkite.com/rokt/react-native-sdk/](https://buildkite.com/rokt/react-native-sdk/) Buildkite workflows are defined in the `.buildkite` directory. In the iOS step, we build the app and run UI tests in the Buildkite environment. For Android, we create the APK within Buildkite, and then perform UI tests on a device farm. This is done by using the deviceFarmUITest Fastlane lane located in the directory `RoktSampleApp/android`.
+The CI system used is **GitHub Actions**. Workflows are defined in the `.github/workflows` directory. The CI pipeline includes:
+
+- Code quality checks (Trunk)
+- Building and packaging the SDK
+- iOS build and test execution
+- Android build and test execution
 
 ## Local Setup
 
