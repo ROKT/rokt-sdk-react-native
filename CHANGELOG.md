@@ -13,6 +13,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Simplified Expo config plugin - autolinking now handles all native setup automatically
 - Updated Rokt native Android SDK version to `4.12.1`
+- Updated Rokt native iOS SDK to [4.14.5](https://github.com/ROKT/rokt-sdk-ios/blob/main/CHANGELOG.md#4145---2025-12-10).
+- Reverted iOS view hierarchy changes
 
 ## [4.11.2] - 2025-11-20
 
