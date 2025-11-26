@@ -13,15 +13,15 @@ This is an Expo managed workflow test application for validating the Rokt React 
 
 1. Install dependencies:
 
-```bash
-npm install
-```
+   ```bash
+   npm install
+   ```
 
 2. Generate native projects with expo prebuild:
 
-```bash
-npm run prebuild
-```
+   ```bash
+   npm run prebuild
+   ```
 
 This will generate the `ios` and `android` directories with native code.
 
@@ -52,12 +52,12 @@ Or open the `android` directory in Android Studio and run from there.
 
 The Rokt SDK integrates seamlessly with Expo through standard React Native autolinking:
 
-### Android
+### Android Integration
 
 - **Autolinking**: `RNRoktWidgetPackage` is automatically registered via React Native autolinking
 - **Dependencies**: The Rokt native SDK is available from Maven Central (no custom repository needed)
 
-### iOS
+### iOS Integration
 
 - **Autolinking**: The SDK's podspec is automatically discovered
 - **Dependencies**: `Rokt-Widget` pod is resolved via CocoaPods
@@ -66,11 +66,11 @@ The Rokt SDK integrates seamlessly with Expo through standard React Native autol
 
 After running `npm run prebuild`, you can verify the SDK is properly linked:
 
-### Android
+### Android Verification
 
 - The autolinking configuration should include `@rokt/react-native-sdk` in the generated build files
 
-### iOS
+### iOS Verification
 
 - Check `ios/Podfile.lock` should include:
   - `rokt-react-native-sdk`

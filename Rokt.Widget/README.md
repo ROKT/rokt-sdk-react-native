@@ -24,71 +24,17 @@ You would also need to
 
 ### Android Configuration
 
-1.  Add the Rokt Widget plugin repository URL in the `build.gradle` file of the project.
+The Rokt SDK is available from Maven Central and will be resolved automatically via React Native autolinking. No manual repository or package configuration is required.
 
-```groovy
-allprojects {
-    repositories {
-        ...
-        maven {
-            url  "https://apps.rokt.com/msdk"
-        }
-    }
-}
-```
-
-Or if you are using [Gradle](https://gradle.org/) 7.0.0 and above, where the repository settings that were previously in the top-level build.gradle file are now in the settings.gradle file, add the following in settings.gradle file.
-
-```groovy
-dependencyResolutionManagement {
-	repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
-	repositories {
-		google()
-		mavenCentral()
-		// Rokt SDK artifacts
-		maven {
-			url "https://apps.rokt.com/msdk"
-		}
-	}
-}
-```
-
-#### File: MainApplication.java (Module: app)
-
-2. In your ReactApplication class, make sure you add the RoktEmbeddedViewPackage to the getPackages method:
-
-```java
-
-// import the class
-import com.rokt.reactnativesdk.RoktEmbeddedViewPackage;
-
-@Override
-protected List<ReactPackage> getPackages() {
-	@SuppressWarnings("UnnecessaryLocalVariable")
-    List<ReactPackage> packages = new PackageList(this).getPackages();
-    //Add the RoktEmbeddedViewPackage
-    packages.add(new RoktEmbeddedViewPackage());
-    return packages;
-}
-```
-
-##### File: .gradle (Module: app)
-
-3. It's likely that you will need multiDexEnabled as well
-4. Make sure you are targeting mindSdk version 18 or higher.
+Ensure your app meets the minimum requirements:
 
 ```groovy
 android {
-    ...
     defaultConfig {
-        ...
-        multiDexEnabled true,
-        minSdkVersion 18
+        minSdkVersion 21
     }
 }
 ```
-
-...
 
 ### iOS Configuration
 
@@ -105,64 +51,80 @@ Below Configurations are required only if you are using Mac M1 machines:
 1. Make sure cocoa pods are installed using gem not brew(sudo gem install [cocoapods](https://cocoapods.org/).  
    If it is already installed using brew, use below commands to uninstall them
 
-```shell
-brew uninstall cocoapods
-brew uninstall --ignore-dependencies ruby
-```
+   ```shell
+   brew uninstall cocoapods
+   brew uninstall --ignore-dependencies ruby
+   ```
 
 2. Install cocoapods with gem
 
-```shell
-Sudo gem install cocoapods
-```
+   ```shell
+   Sudo gem install cocoapods
+   ```
 
-4. Replace the post_install in ios/podfile with below code
+3. Replace the post_install in ios/podfile with below code
 
-```ruby
-post_install do |installer|
-  react_native_post_install(installer)
+   ```ruby
+   post_install do |installer|
+     react_native_post_install(installer)
 
-  installer.pods_project.targets.each do |target|
-    target.build_configurations.each do |config|
-      # Disable arm64 builds for the simulator
-      config.build_settings['EXCLUDED_ARCHS[sdk=iphonesimulator*]'] = 'arm64'
-    end
-  end
-end
-```
+     installer.pods_project.targets.each do |target|
+       target.build_configurations.each do |config|
+         # Disable arm64 builds for the simulator
+         config.build_settings['EXCLUDED_ARCHS[sdk=iphonesimulator*]'] = 'arm64'
+       end
+     end
+   end
+   ```
 
 4. Reinstall the pods:
 
-```shell
-cd ios
-pod deintegrate
-sudo arch -x86_64 gem install ffi
-arch -x86_64 pod install
-```
+   ```shell
+   cd ios
+   pod deintegrate
+   sudo arch -x86_64 gem install ffi
+   arch -x86_64 pod install
+   ```
 
 ### Expo
 
-This package cannot be used with "Expo Go" app, because it requires custom native code.
-Integration with Expo is possible in both bare workflow and custom managed workflow via config plugis.
+This package cannot be used with the "Expo Go" app because it requires custom native code.
+Integration with Expo is supported in both bare workflow and managed workflow.
 
-### Bare Workflow
+#### Bare Workflow
 
-If using Bare Workflow, follow the above Android and iOS setup steps.
+No additional configuration is required. React Native autolinking will automatically set up the SDK.
 
-### Managed Workflow
+#### Managed Workflow
 
-Since Expo Go will not work with react-native-sdk, the suggested workflow is to use a custom development client. If starting a new app, you can run `npx create-react-native-app -t with-dev-client` to have this set up automatically. It will also allow you to use the Expo Application Service (EAS Build) do the Android and iOS builds.
-After installing the @rokt/react-native-sdk NPM package, add the config plugin to the plugins array of your app.json or app.config.js.
+Since Expo Go does not support custom native code, you need to use a custom development client.
 
-```json
-{
-  "expo": {
-    "plugins": ["@rokt/react-native-sdk"]
-  }
-}
-```
+1. Install the required packages:
 
-If you are not using EAS Build then you must use the `expo prebuild --clean` command as described in the [Adding custom native code](https://docs.expo.dev/workflow/customizing/) guide to rebuild your app with the plugin changes.
+   ```shell
+   npm install @rokt/react-native-sdk expo-dev-client
+   ```
+
+2. (Optional) Add the config plugin to your `app.json` or `app.config.js`:
+
+   ```json
+   {
+     "expo": {
+       "plugins": ["@rokt/react-native-sdk"]
+     }
+   }
+   ```
+
+   > Note: The config plugin is optional as React Native autolinking handles the native setup automatically.
+
+3. Generate the native projects and build:
+
+   ```shell
+   npx expo prebuild --clean
+   npx expo run:ios   # or npx expo run:android
+   ```
+
+For production builds, you can use [EAS Build](https://docs.expo.dev/build/introduction/) which will handle the native compilation automatically.
 
 ### Usage
 
@@ -252,4 +214,4 @@ Copyright 2020 Rokt Pte Ltd
 
 Licensed under the Rokt Software Development Kit (SDK) Terms of Use Version 2.0 (the "License");
 You may not use this file except in compliance with the License.
-You may obtain a copy of the License at https://rokt.com/sdk-license-2-0/
+You may obtain a copy of the License at <https://rokt.com/sdk-license-2-0/>

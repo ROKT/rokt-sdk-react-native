@@ -24,7 +24,6 @@ import {
   RoktEventManager,
 } from "@rokt/react-native-sdk";
 
-// Default test values - replace with your actual Rokt Tag ID for testing
 const DEFAULT_TAG_ID = "2754655826098840951";
 const DEFAULT_VIEW_NAME = "RoktExperience";
 const DEFAULT_PLACEHOLDER = "Location1";

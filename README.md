@@ -2,8 +2,8 @@
 
 ## Resident Experts
 
-- James Newman - james.newman@rokt.com
-- Thomson Thomas - thomson.thomas@rokt.com
+- James Newman - <james.newman@rokt.com>
+- Thomson Thomas - <thomson.thomas@rokt.com>
 
 ## Overview
 
@@ -119,6 +119,7 @@ You can also release the SDK manually by following the steps in the above sectio
 To add this SDK to your application:
 
 1. Go to the root of your project in your terminal and run:
+
    ```shell
    npm install @rokt/react-native-sdk --save
    npm install
@@ -126,61 +127,14 @@ To add this SDK to your application:
 
 ### Android Configuration
 
-1. Add the Rokt Widget plugin repository URL in the `build.gradle` file of the project:
+The Rokt SDK is available from Maven Central and will be resolved automatically via React Native autolinking. No manual repository or package configuration is required.
 
-```gradle
-allprojects {
-    repositories {
-        ...
-        maven {
-            url  "https://apps.rokt.com/msdk"
-        }
-    }
-}
-```
-
-Or if you are using Gradle 7.0.0 and above, where the repository settings are in the settings.gradle file, add the following:
-
-```gradle
-dependencyResolutionManagement {
-	repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
-	repositories {
-		google()
-		mavenCentral()
-		// Rokt SDK artifacts
-		maven {
-			url "https://apps.rokt.com/msdk"
-		}
-	}
-}
-```
-
-##### File: MainApplication.java (Module: app)
-
-2. In your ReactApplication class, add the RoktEmbeddedViewPackage to the getPackages method:
-
-```java
-@Override
-protected List<ReactPackage> getPackages() {
-	@SuppressWarnings("UnnecessaryLocalVariable")
-    List<ReactPackage> packages = new PackageList(this).getPackages();
-    //Add the RoktEmbeddedViewPackage
-    packages.add(new RoktEmbeddedViewPackage());
-    return packages;
-}
-```
-
-##### File: .gradle (Module: app)
-
-3. Enable multiDex and set minimum SDK version:
+Ensure your app meets the minimum requirements:
 
 ```gradle
 android {
-    ...
     defaultConfig {
-        ...
-        multiDexEnabled true,
-        minSdkVersion 18
+        minSdkVersion 21
     }
 }
 ```
@@ -197,32 +151,43 @@ pod install
 
 ### Expo
 
-This package cannot be used with "Expo Go" app, because it requires custom native code.
-Integration with Expo is possible in both bare workflow and custom managed workflow via config plugins.
+This package cannot be used with the "Expo Go" app because it requires custom native code.
+Integration with Expo is supported in both bare workflow and managed workflow.
 
 #### Bare Workflow
 
-If using Bare Workflow, follow the above Android and iOS setup steps.
+No additional configuration is required. React Native autolinking will automatically set up the SDK.
 
 #### Managed Workflow
 
-Since Expo Go will not work with react-native-sdk, use a custom development client. If starting a new app, run:
+Since Expo Go does not support custom native code, you need to use a custom development client.
 
-```shell
-npx create-react-native-app -t with-dev-client
-```
+1. Install the required packages:
 
-After installing the @rokt/react-native-sdk NPM package, add the config plugin to the plugins array of your app.json or app.config.js:
+   ```shell
+   npm install @rokt/react-native-sdk expo-dev-client
+   ```
 
-```js
-{
-  "expo": {
-    "plugins": ["@rokt/react-native-sdk"]
-  }
-}
-```
+2. (Optional) Add the config plugin to your `app.json` or `app.config.js`:
 
-If not using EAS Build, use the `expo prebuild --clean` command to rebuild your app with the plugin changes. Follow the [Expo customizing workflow documentation](https://docs.expo.dev/workflow/customizing/) for more info.
+   ```json
+   {
+     "expo": {
+       "plugins": ["@rokt/react-native-sdk"]
+     }
+   }
+   ```
+
+   > Note: The config plugin is optional as React Native autolinking handles the native setup automatically.
+
+3. Generate the native projects and build:
+
+   ```shell
+   npx expo prebuild --clean
+   npx expo run:ios   # or npx expo run:android
+   ```
+
+For production builds, you can use [EAS Build](https://docs.expo.dev/build/introduction/) which will handle the native compilation automatically.
 
 ## Usage
 
@@ -311,7 +276,8 @@ Rokt.execute("RoktEmbeddedExperience", attributes, placeholders, () =>
 
 - React Native (core dependency)
 - Native modules for both Android and iOS platforms
-- For Android: Rokt Widget maven repository
+- For Android: Rokt SDK from Maven Central (resolved automatically)
+- For iOS: Rokt-Widget pod (resolved automatically via CocoaPods)
 
 ### Mac M1 Machine Configuration
 
@@ -338,4 +304,4 @@ Copyright 2020 Rokt Pte Ltd
 
 Licensed under the Rokt Software Development Kit (SDK) Terms of Use Version 2.0 (the "License");
 You may not use this file except in compliance with the License.
-You may obtain a copy of the License at https://rokt.com/sdk-license-2-0/
+You may obtain a copy of the License at <https://rokt.com/sdk-license-2-0/>
