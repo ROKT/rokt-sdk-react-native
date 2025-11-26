@@ -24,7 +24,7 @@ lint:
         - .buildkite/**
         - "**/gradlew"
         - "**/gradlew.bat"
-    - linters: [osv-scanner, markdownlint]
+    - linters: [osv-scanner]
       paths:
         - "**/package-lock.json"
         - "**/Podfile.lock"

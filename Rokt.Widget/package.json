@@ -31,9 +31,16 @@
   "author": "",
   "license": "Copyright 2020 Rokt Pte Ltd",
   "peerDependencies": {
-    "react-native": ">= 0.55.4"
+    "react-native": ">= 0.55.4",
+    "@expo/config-plugins": ">=7.0.0"
+  },
+  "peerDependenciesMeta": {
+    "@expo/config-plugins": {
+      "optional": true
+    }
   },
   "devDependencies": {
+    "@expo/config-plugins": "^7.2.5",
     "@types/jest": "^27.5.1",
     "@types/react": "^19.0.0",
     "@types/react-native": "^0.68.0",
@@ -42,9 +49,6 @@
     "eslint": "^8.41.0",
     "typescript": "^5.0.4",
     "expo-module-scripts": "^2.0.0"
-  },
-  "dependencies": {
-    "@expo/config-plugins": "^7.2.5"
   },
   "codegenConfig": {
     "name": "RNRoktWidgetSpec",
