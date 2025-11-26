@@ -1,76 +1,20 @@
-import {
-  ConfigPlugin,
-  withProjectBuildGradle,
-  withMainApplication,
-} from "@expo/config-plugins";
-import { addImports } from "@expo/config-plugins/build/android/codeMod";
+import { ConfigPlugin } from "@expo/config-plugins";
 
-const IMPORT_STATEMENT = "com.rokt.reactnativesdk.RoktEmbeddedViewPackage";
-const ADD_PACKAGE = "packages.add(new RoktEmbeddedViewPackage());";
-const GRADLE_MAVEN =
-  'allprojects { repositories { maven { url "https://apps.rokt.com/msdk" } } }';
-
-function addRoktJavaPackage(javaSource: string, javaInsert: string): string {
-  const lines = javaSource.split("\n");
-  const getPackageIndex = lines.findIndex((line) =>
-    line.match(/return packages;/),
-  );
-  lines.splice(getPackageIndex, 0, javaInsert);
-  return lines.join("\n");
-}
-
-function addRoktKotlinPackage(kotlinSource: string): string {
-  return kotlinSource.replace(
-    "return PackageList(this).packages",
-    "return PackageList(this).packages.apply { add(RoktEmbeddedViewPackage()) }",
-  );
-}
-
-const withRoktMainApplication: ConfigPlugin = (configuration) => {
-  return withMainApplication(configuration, (config) => {
-    if (["java", "kt"].includes(config.modResults.language)) {
-      const isJava = config.modResults.language === "java";
-      try {
-        config.modResults.contents = addImports(
-          config.modResults.contents,
-          [IMPORT_STATEMENT],
-          isJava,
-        );
-        if (isJava) {
-          config.modResults.contents = addRoktJavaPackage(
-            config.modResults.contents,
-            ADD_PACKAGE,
-          );
-        } else {
-          config.modResults.contents = addRoktKotlinPackage(
-            config.modResults.contents,
-          );
-        }
-      } catch (e) {
-        throw new Error("Cannot add RoktSDK to the project's MainApplication.");
-      }
-    }
-    return config;
-  });
-};
-
-const withRoktProjectBuildGradle: ConfigPlugin = (config) => {
-  return withProjectBuildGradle(config, (config) => {
-    let content = config.modResults.contents;
-    if (
-      !content.includes("rokt-eng-us") &&
-      !content.includes("apps.rokt.com")
-    ) {
-      content = `${content} \n ${GRADLE_MAVEN}`;
-    }
-    config.modResults.contents = content;
-    return config;
-  });
-};
-
+/**
+ * Expo Config Plugin for Rokt React Native SDK
+ *
+ * This plugin configures your Expo project to use the Rokt SDK.
+ *
+ * Current behavior:
+ * - Android: No modifications needed - autolinking handles package registration
+ *   and the Rokt native SDK is available via Maven Central
+ * - iOS: No modifications needed - the podspec declares the Rokt-Widget dependency
+ *   which is resolved automatically via CocoaPods
+ *
+ * This plugin is kept as a placeholder for potential future configuration needs
+ * and to provide a consistent integration experience for Expo users.
+ */
 const withRoktSDK: ConfigPlugin = (config) => {
-  withRoktMainApplication(config);
-  withRoktProjectBuildGradle(config);
   return config;
 };
 
