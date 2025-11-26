@@ -39,64 +39,9 @@ using namespace facebook::react;
     _roktEmbeddedView = [[RoktEmbeddedView alloc] initWithFrame:self.bounds];
     _roktEmbeddedView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     [self addSubview:_roktEmbeddedView];
-    NSLog(@"[ROKT] iOS Fabric: RoktNativeWidgetComponentView initialized with frame: %@", NSStringFromCGRect(frame));
-    NSLog(@"[ROKT] iOS Fabric: RoktEmbeddedView created and added to view hierarchy");
+    NSLog(@"[ROKT] iOS Fabric: RoktFabricWrapperView initialized");
   }
   return self;
-}
-
-- (void)willMoveToWindow:(UIWindow *)newWindow
-{
-  NSLog(@"[ROKT] iOS Fabric: willMoveToWindow called");
-  NSLog(@"[ROKT] iOS Fabric: Current window: %@", self.window);
-  NSLog(@"[ROKT] iOS Fabric: New window: %@", newWindow);
-  NSLog(@"[ROKT] iOS Fabric: RoktEmbeddedView superview before removal: %@", self.roktEmbeddedView.superview);
-  
-  // Remove the embedded view from hierarchy when moving to a new window
-  if (self.roktEmbeddedView && self.roktEmbeddedView.superview) {
-    NSLog(@"[ROKT] iOS Fabric: Removing RoktEmbeddedView from superview");
-    [self.roktEmbeddedView removeFromSuperview];
-    NSLog(@"[ROKT] iOS Fabric: RoktEmbeddedView removed successfully");
-  } else {
-    NSLog(@"[ROKT] iOS Fabric: RoktEmbeddedView not in view hierarchy, skipping removal");
-  }
-  
-  [super willMoveToWindow:newWindow];
-}
-
-- (void)didMoveToWindow
-{
-  [super didMoveToWindow];
-  
-  NSLog(@"[ROKT] iOS Fabric: didMoveToWindow called");
-  NSLog(@"[ROKT] iOS Fabric: Current window: %@", self.window);
-  NSLog(@"[ROKT] iOS Fabric: RoktEmbeddedView superview before adding: %@", self.roktEmbeddedView.superview);
-  
-  if (!self.window) {
-    NSLog(@"[ROKT] iOS Fabric: No window available, RoktEmbeddedView not re-added");
-    return;
-  }
-  
-  if (!self.roktEmbeddedView) {
-    NSLog(@"[ROKT] iOS Fabric: RoktEmbeddedView is nil");
-    return;
-  }
-  
-  if (self.roktEmbeddedView.superview) {
-    NSLog(@"[ROKT] iOS Fabric: RoktEmbeddedView already has superview, skipping re-add");
-    return;
-  }
-  
-  // Re-add the embedded view to hierarchy after moving to new window
-  NSLog(@"[ROKT] iOS Fabric: Adding RoktEmbeddedView back to view hierarchy");
-  NSLog(@"[ROKT] iOS Fabric: RoktEmbeddedView frame: %@", NSStringFromCGRect(self.roktEmbeddedView.frame));
-  NSLog(@"[ROKT] iOS Fabric: Self frame: %@", NSStringFromCGRect(self.frame));
-  NSLog(@"[ROKT] iOS Fabric: Self bounds: %@", NSStringFromCGRect(self.bounds));
-  
-  self.roktEmbeddedView.frame = self.bounds;
-  [self addSubview:self.roktEmbeddedView];
-  NSLog(@"[ROKT] iOS Fabric: RoktEmbeddedView added successfully");
-  NSLog(@"[ROKT] iOS Fabric: RoktEmbeddedView superview after adding: %@", self.roktEmbeddedView.superview);
 }
 
 - (void)updateProps:(Props::Shared const &)props oldProps:(Props::Shared const &)oldProps
