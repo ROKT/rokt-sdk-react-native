@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Simplified Expo config plugin - autolinking now handles all native setup automatically
+
 ## [4.11.2] - 2025-11-20
 
 ### Changes
