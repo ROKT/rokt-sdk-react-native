@@ -38,7 +38,13 @@ To clear the cache, delete `node_modules` and `package-lock.json` and re-run `np
 ### Start with npx
 
 Make sure you have your Android device or Emulator turned on.
-go to _RoktSampleApp_ directory and run `npx react-native start --reset-cache`
+Go to _RoktSampleApp_ directory and run:
+
+```bash
+npx react-native start --reset-cache
+```
+
+**Note:** The `--reset-cache` flag clears the Metro bundler cache. Use this especially when adjusting the React Native version or experiencing build issues.
 
 ## iOS
 
