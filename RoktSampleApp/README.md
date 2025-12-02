@@ -31,7 +31,7 @@ The CI system used is **GitHub Actions**. Workflows are defined in the `.github/
 cd Rokt.Widget
 npm install
 npm run build
-npm pack 
+npm pack
 ```
 
 > [!NOTE]
@@ -55,16 +55,19 @@ cd ios
 Choose one of the following commands:
 
 **Option A:** Direct pod install (use if you encounter Ruby 3.4+ issues)
+
 ```bash
 pod install --repo-update
 ```
 
 **Option B:** Using bundler for version management
+
 ```bash
 bundle exec pod install --repo-update
 ```
 
 Then return to the RoktSampleApp directory:
+
 ```bash
 cd ..
 ```
@@ -100,6 +103,7 @@ cd ..
 If you encounter build issues, try clearing caches:
 
 **npm cache:**
+
 ```bash
 # From RoktSampleApp directory
 rm -rf node_modules package-lock.json
@@ -107,11 +111,13 @@ npm install
 ```
 
 **Metro bundler cache:**
+
 ```bash
 npx react-native start --reset-cache
 ```
 
 **iOS cache:**
+
 ```bash
 # From RoktSampleApp/ios directory
 rm -rf Pods Podfile.lock
