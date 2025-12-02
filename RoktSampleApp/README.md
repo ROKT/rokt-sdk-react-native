@@ -1,10 +1,5 @@
 # React Native
 
-## Resident Experts
-
-- Thomson Thomas - thomson.thomas@rokt.com
-- James Newman - james.newman@rokt.com
-
 ## Overview
 
 The RoktSampleApp includes bare-minimum UI to demonstrate the usage of React Native SDK for our partners and testing
