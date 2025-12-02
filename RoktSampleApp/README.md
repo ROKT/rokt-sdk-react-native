@@ -34,7 +34,8 @@ npm run build
 npm pack 
 ```
 
-This creates `rokt-react-native-sdk-X.X.X.tgz` file that the sample app will use.
+> [!NOTE]
+> This creates `rokt-react-native-sdk-X.X.X.tgz` file that the sample app will use.
 
 #### 2. Install Sample App Dependencies
 
@@ -68,7 +69,8 @@ Then return to the RoktSampleApp directory:
 cd ..
 ```
 
-**Note:** Ruby 3.4+ with `bundle exec` may fail due to missing `kconv`. Use Option B, downgrade to Ruby 3.3.x, or add `gem 'nkf'` to Gemfile with `export LANG=en_US.UTF-8`.
+> [!WARNING]
+> Ruby 3.4+ with `bundle exec` may fail due to missing `kconv`. Use Option A, downgrade to Ruby 3.3.x, or add `gem 'nkf'` to Gemfile with `export LANG=en_US.UTF-8`.
 
 ### Running the Sample App
 
@@ -81,7 +83,8 @@ cd ..
    ```
    Replace `"iPhone 14"` with your simulator name. To see available simulators: `xcrun simctl list devices`
 
-**Note for M1 Macs:** If you encounter architecture issues, start Metro bundler first in a separate terminal: `npx react-native start --reset-cache`
+> [!TIP]
+> **M1 Macs:** If you encounter architecture issues, start Metro bundler first in a separate terminal: `npx react-native start --reset-cache`
 
 #### Android
 
@@ -115,7 +118,8 @@ rm -rf Pods Podfile.lock
 pod install --repo-update
 ```
 
-**Note:** The `--reset-cache` flag is especially useful when adjusting the React Native version or experiencing build issues.
+> [!TIP]
+> The `--reset-cache` flag is especially useful when adjusting the React Native version or experiencing build issues.
 
 ## Testing SDK Changes Locally
 
