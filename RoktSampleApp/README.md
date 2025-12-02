@@ -17,6 +17,17 @@ The CI system used is **GitHub Actions**. Workflows are defined in the `.github/
 
 ## Local Setup
 
+### First Time Setup (Required)
+
+**If this is your first time running the sample app, you must build the Rokt Widget package first:**
+
+1. Navigate to the _Rokt.Widget_ directory
+2. Run `npm install`
+3. Run `npm run build`
+4. Run `npm pack`
+
+This creates the local SDK package (`rokt-react-native-sdk-X.X.X.tgz`) that the sample app depends on.
+
 ### NPM install on Sample app
 
 1. Go to _RoktSampleApp_ directory
@@ -50,18 +61,19 @@ Make sure you have your iOS device or Simulator turned on.
 
 go to _RoktSampleApp_ directory and run `npx react-native run-android`
 
-## Note
+## Testing SDK Changes Locally
 
-To test the SDK changes locally
+If you've made changes to the SDK and want to test them in the sample app:
 
 ### Update version of Rokt Widget
 
 1. Go to _Rokt.Widget_ directory
-2. change the version `X.X.X` in `package.json` to a new version.
-3. `npm install`
-4. `npm run build` to build the `dist` folder
-5. `npm pack` to build the new `rokt-react-native-sdk-X.X.X.tgz`
-6. go to `RoktSampleApp` project `package.json` to point to `rokt-react-native-sdk-X.X.X.tgz` file
+2. Change the version `X.X.X` in `package.json` to a new version
+3. Run `npm install`
+4. Run `npm run build` to build the `dist` folder
+5. Run `npm pack` to create the new `rokt-react-native-sdk-X.X.X.tgz`
+6. Go to `RoktSampleApp` project `package.json` and update the dependency to point to the new `rokt-react-native-sdk-X.X.X.tgz` file
+7. Run `npm install` in the _RoktSampleApp_ directory to update the dependency
 
 # Copyright
 
