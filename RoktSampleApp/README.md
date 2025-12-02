@@ -44,8 +44,21 @@ go to _RoktSampleApp_ directory and run `npx react-native start --reset-cache`
 
 ### Install the pod
 
-go to _RoktSampleApp/ios_ directory and run `bundle exec pod install --repo-update`
-if pod install failed from rokt-react-native-sdk podfile, run `bundle exec pod update Rokt-Widget`
+Go to _RoktSampleApp/ios_ directory and run either:
+
+```bash
+bundle exec pod install --repo-update
+```
+
+or
+
+```bash
+pod install --repo-update
+```
+
+**Note:** If using `bundle exec` with Ruby 3.4+, the command may fail due to a missing `kconv` library. You can either use the direct `pod install` command above, downgrade to Ruby 3.3.x, or manually add `gem 'nkf'` to the Gemfile and ensure UTF-8 encoding with `export LANG=en_US.UTF-8`.
+
+If pod install failed from rokt-react-native-sdk podfile, run `bundle exec pod update Rokt-Widget`
 
 ## Run iOS
 
