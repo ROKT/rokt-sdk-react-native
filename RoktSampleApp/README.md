@@ -17,70 +17,160 @@ The CI system used is **GitHub Actions**. Workflows are defined in the `.github/
 
 ## Local Setup
 
-### First Time Setup (Required)
+### Prerequisites
 
-**If this is your first time running the sample app, you must build the Rokt Widget package first:**
+Before setting up the sample app, ensure you have the following installed:
 
-1. Navigate to the _Rokt.Widget_ directory
-2. Run `npm install`
-3. Run `npm run build`
-4. Run `npm pack`
+- **Node.js** (v14 or higher) and **npm**
+- **React Native CLI** (`npm install -g react-native-cli`)
+- **For iOS development:**
+  - macOS with Xcode installed
+  - CocoaPods (`gem install cocoapods` or use bundler)
+  - iOS Simulator or physical device
+- **For Android development:**
+  - Android Studio with SDK installed
+  - Android Emulator or physical device with USB debugging enabled
 
-This creates the local SDK package (`rokt-react-native-sdk-X.X.X.tgz`) that the sample app depends on.
+### First-Time Setup
 
-### NPM install on Sample app
+Follow these steps in order if this is your first time setting up the sample app:
 
-1. Go to _RoktSampleApp_ directory
-2. `npm install`
+#### Step 1: Build the Rokt Widget Package
 
-To clear the cache, delete `node_modules` and `package-lock.json` and re-run `npm install`
+The sample app depends on a locally built version of the Rokt Widget SDK.
 
-### Start with npx
+1. Navigate to the `Rokt.Widget` directory from the project root:
+   ```bash
+   cd Rokt.Widget
+   ```
 
-Make sure you have your Android device or Emulator turned on.
-Go to _RoktSampleApp_ directory and run:
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
 
+3. Build the package:
+   ```bash
+   npm run build
+   ```
+
+4. Create the distributable package:
+   ```bash
+   npm pack
+   ```
+   
+   This creates `rokt-react-native-sdk-X.X.X.tgz` file that the sample app will use.
+
+#### Step 2: Install Sample App Dependencies
+
+1. Navigate to the `RoktSampleApp` directory from the project root:
+   ```bash
+   cd ../RoktSampleApp
+   ```
+
+2. Install npm dependencies:
+   ```bash
+   npm install
+   ```
+
+#### Step 3: Platform-Specific Setup
+
+Choose the platform(s) you want to run:
+
+##### iOS Setup
+
+1. Navigate to the iOS directory:
+   ```bash
+   cd ios
+   ```
+
+2. Install CocoaPods dependencies using one of the following commands:
+   
+   **Option A (Recommended):** Using bundler:
+   ```bash
+   bundle exec pod install --repo-update
+   ```
+   
+   **Option B:** Direct pod install:
+   ```bash
+   pod install --repo-update
+   ```
+
+3. Return to the `RoktSampleApp` directory:
+   ```bash
+   cd ..
+   ```
+
+**Note:** If using `bundle exec` with Ruby 3.4+, the command may fail due to a missing `kconv` library. You can either use Option B above, downgrade to Ruby 3.3.x, or manually add `gem 'nkf'` to the Gemfile and ensure UTF-8 encoding with `export LANG=en_US.UTF-8`.
+
+##### Android Setup
+
+No additional setup is required for Android beyond the standard Android development environment.
+
+### Running the Sample App
+
+#### Running on iOS
+
+1. **Start the iOS Simulator** (or connect a physical device)
+   - Open Xcode → Xcode menu → Open Developer Tool → Simulator
+   - Or boot your preferred simulator from the command line
+
+2. **From the `RoktSampleApp` directory**, start the Metro bundler (in a separate terminal):
+   ```bash
+   npx react-native start --reset-cache
+   ```
+
+3. **In another terminal**, run the app:
+   ```bash
+   npx react-native run-ios --simulator="iPhone 14"
+   ```
+   
+   Replace `"iPhone 14"` with your preferred simulator name. To see available simulators:
+   ```bash
+   xcrun simctl list devices
+   ```
+
+**Note for M1 Macs:** If you encounter architecture issues, ensure the Metro bundler is running before executing the `run-ios` command.
+
+#### Running on Android
+
+1. **Start your Android Emulator** (or connect a physical device with USB debugging enabled)
+   - Open Android Studio → AVD Manager → Start emulator
+   - Or use `adb devices` to verify your device is connected
+
+2. **From the `RoktSampleApp` directory**, run:
+   ```bash
+   npx react-native run-android
+   ```
+   
+   This will automatically start the Metro bundler if it's not already running.
+
+### Troubleshooting
+
+#### Clearing Caches
+
+If you encounter build issues, try clearing caches:
+
+**npm cache:**
+```bash
+# From RoktSampleApp directory
+rm -rf node_modules package-lock.json
+npm install
+```
+
+**Metro bundler cache:**
 ```bash
 npx react-native start --reset-cache
 ```
 
-**Note:** The `--reset-cache` flag clears the Metro bundler cache. Use this especially when adjusting the React Native version or experiencing build issues.
-
-## iOS
-
-### Install the pod
-
-Go to _RoktSampleApp/ios_ directory and run either:
-
+**iOS cache:**
 ```bash
-bundle exec pod install --repo-update
-```
-
-or
-
-```bash
+# From RoktSampleApp/ios directory
+rm -rf Pods Podfile.lock
 pod install --repo-update
 ```
 
-To clear the cache, delete `Podfile.lock` and `Pods` directory, then re-run either `pod install` command.
-
-**Note:** If using `bundle exec` with Ruby 3.4+, the command may fail due to a missing `kconv` library. You can either use the direct `pod install` command above, downgrade to Ruby 3.3.x, or manually add `gem 'nkf'` to the Gemfile and ensure UTF-8 encoding with `export LANG=en_US.UTF-8`.
-
-If pod install failed from rokt-react-native-sdk podfile, run `bundle exec pod update Rokt-Widget`
-
-## Run iOS
-
-**Important:** Make sure you have your iOS device or Simulator booted before running the commands below. The build will fail if no device is booted.
-
-1. go to _RoktSampleApp_ directory
-2. if you are on an M1 Mac, run `npx react-native start`
-3. run `npx react-native run-ios --simulator="[simulator/device name]"` e.g. `npx react-native run-ios --simulator="iPhone 14"`
-
-## Android
-
-### run Android
-
-go to _RoktSampleApp_ directory and run `npx react-native run-android`
+**Note:** The `--reset-cache` flag is especially useful when adjusting the React Native version or experiencing build issues.
 
 ## Testing SDK Changes Locally
 
