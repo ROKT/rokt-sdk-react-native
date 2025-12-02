@@ -19,131 +19,76 @@ The CI system used is **GitHub Actions**. Workflows are defined in the `.github/
 
 ### Prerequisites
 
-Before setting up the sample app, ensure you have the following installed:
-
-- **Node.js** (v14 or higher) and **npm**
-- **React Native CLI** (`npm install -g react-native-cli`)
-- **For iOS development:**
-  - macOS with Xcode installed
-  - CocoaPods (`gem install cocoapods` or use bundler)
-  - iOS Simulator or physical device
-- **For Android development:**
-  - Android Studio with SDK installed
-  - Android Emulator or physical device with USB debugging enabled
+- **Node.js** (v14+), **npm**, and **React Native CLI** (`npm install -g react-native-cli`)
+- **iOS:** macOS, Xcode, CocoaPods, and iOS Simulator/device
+- **Android:** Android Studio with SDK, and Emulator/device with USB debugging
 
 ### First-Time Setup
 
-Follow these steps in order if this is your first time setting up the sample app:
+#### 1. Build the Rokt Widget Package
 
-#### Step 1: Build the Rokt Widget Package
+```bash
+cd Rokt.Widget
+npm install
+npm run build
+npm pack 
+```
 
-The sample app depends on a locally built version of the Rokt Widget SDK.
+This creates `rokt-react-native-sdk-X.X.X.tgz` file that the sample app will use.
 
-1. Navigate to the `Rokt.Widget` directory from the project root:
-   ```bash
-   cd Rokt.Widget
-   ```
+#### 2. Install Sample App Dependencies
 
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
+```bash
+cd ../RoktSampleApp
+npm install
+```
 
-3. Build the package:
-   ```bash
-   npm run build
-   ```
+#### 3. iOS Setup
 
-4. Create the distributable package:
-   ```bash
-   npm pack
-   ```
-   
-   This creates `rokt-react-native-sdk-X.X.X.tgz` file that the sample app will use.
+Navigate to the iOS directory and install CocoaPods dependencies:
 
-#### Step 2: Install Sample App Dependencies
+```bash
+cd ios
+```
 
-1. Navigate to the `RoktSampleApp` directory from the project root:
-   ```bash
-   cd ../RoktSampleApp
-   ```
+Choose one of the following commands:
 
-2. Install npm dependencies:
-   ```bash
-   npm install
-   ```
+**Option A:** Direct pod install (use if you encounter Ruby 3.4+ issues)
+```bash
+pod install --repo-update
+```
 
-#### Step 3: Platform-Specific Setup
+**Option B:** Using bundler for version management
+```bash
+bundle exec pod install --repo-update
+```
 
-Choose the platform(s) you want to run:
+Then return to the RoktSampleApp directory:
+```bash
+cd ..
+```
 
-##### iOS Setup
-
-1. Navigate to the iOS directory:
-   ```bash
-   cd ios
-   ```
-
-2. Install CocoaPods dependencies using one of the following commands:
-   
-   **Option A (Recommended):** Using bundler:
-   ```bash
-   bundle exec pod install --repo-update
-   ```
-   
-   **Option B:** Direct pod install:
-   ```bash
-   pod install --repo-update
-   ```
-
-3. Return to the `RoktSampleApp` directory:
-   ```bash
-   cd ..
-   ```
-
-**Note:** If using `bundle exec` with Ruby 3.4+, the command may fail due to a missing `kconv` library. You can either use Option B above, downgrade to Ruby 3.3.x, or manually add `gem 'nkf'` to the Gemfile and ensure UTF-8 encoding with `export LANG=en_US.UTF-8`.
-
-##### Android Setup
-
-No additional setup is required for Android beyond the standard Android development environment.
+**Note:** Ruby 3.4+ with `bundle exec` may fail due to missing `kconv`. Use Option B, downgrade to Ruby 3.3.x, or add `gem 'nkf'` to Gemfile with `export LANG=en_US.UTF-8`.
 
 ### Running the Sample App
 
-#### Running on iOS
+#### iOS
 
-1. **Start the iOS Simulator** (or connect a physical device)
-   - Open Xcode → Xcode menu → Open Developer Tool → Simulator
-   - Or boot your preferred simulator from the command line
-
-2. **From the `RoktSampleApp` directory**, start the Metro bundler (in a separate terminal):
-   ```bash
-   npx react-native start --reset-cache
-   ```
-
-3. **In another terminal**, run the app:
+1. Start iOS Simulator (Xcode → Open Developer Tool → Simulator) or connect device
+2. From `RoktSampleApp`, run:
    ```bash
    npx react-native run-ios --simulator="iPhone 14"
    ```
-   
-   Replace `"iPhone 14"` with your preferred simulator name. To see available simulators:
+   Replace `"iPhone 14"` with your simulator name. To see available simulators: `xcrun simctl list devices`
+
+**Note for M1 Macs:** If you encounter architecture issues, start Metro bundler first in a separate terminal: `npx react-native start --reset-cache`
+
+#### Android
+
+1. From `RoktSampleApp`:
    ```bash
-   xcrun simctl list devices
+   npx react-native run-android  # Starts Metro bundler automatically
    ```
-
-**Note for M1 Macs:** If you encounter architecture issues, ensure the Metro bundler is running before executing the `run-ios` command.
-
-#### Running on Android
-
-1. **Start your Android Emulator** (or connect a physical device with USB debugging enabled)
-   - Open Android Studio → AVD Manager → Start emulator
-   - Or use `adb devices` to verify your device is connected
-
-2. **From the `RoktSampleApp` directory**, run:
-   ```bash
-   npx react-native run-android
-   ```
-   
-   This will automatically start the Metro bundler if it's not already running.
 
 ### Troubleshooting
 
