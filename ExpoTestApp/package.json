@@ -1,0 +1,26 @@
+{
+  "name": "expotestapp",
+  "version": "4.11.2",
+  "main": "index.ts",
+  "scripts": {
+    "start": "expo start --dev-client",
+    "android": "expo run:android",
+    "ios": "expo run:ios",
+    "web": "expo start --web",
+    "prebuild": "expo prebuild --clean"
+  },
+  "dependencies": {
+    "@rokt/react-native-sdk": "file:../Rokt.Widget/rokt-react-native-sdk-4.11.2.tgz",
+    "expo": "~54.0.25",
+    "expo-dev-client": "~6.0.16",
+    "expo-status-bar": "~3.0.8",
+    "react": "19.1.0",
+    "react-native": "0.81.5"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.25.2",
+    "@types/react": "~19.1.0",
+    "typescript": "~5.9.2"
+  },
+  "private": true
+}
