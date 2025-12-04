@@ -1,10 +1,5 @@
 # React Native
 
-## Resident Experts
-
-- Thomson Thomas - thomson.thomas@rokt.com
-- James Newman - james.newman@rokt.com
-
 ## Overview
 
 The RoktSampleApp includes bare-minimum UI to demonstrate the usage of React Native SDK for our partners and testing
@@ -22,51 +17,129 @@ The CI system used is **GitHub Actions**. Workflows are defined in the `.github/
 
 ## Local Setup
 
-### NPM install on Sample app
+### Prerequisites
 
-1. Go to _RoktSampleApp_ directory
-2. `npm install`
+- **Node.js** (v14+), **npm**, and **React Native CLI** (`npm install -g react-native-cli`)
+- **iOS:** macOS, Xcode, CocoaPods, and iOS Simulator/device
+- **Android:** Android Studio with SDK, and Emulator/device with USB debugging
 
-To clear the cache, delete `node_modules` and `package-lock.json` and re-run `npm install`
+### First-Time Setup
 
-### Start with npx
+#### 1. Build the Rokt Widget Package
 
-Make sure you have your Android device or Emulator turned on.
-go to _RoktSampleApp_ directory and run `npx react-native start --reset-cache`
+```bash
+cd Rokt.Widget
+npm install
+npm run build
+npm pack
+```
 
-## iOS
+> [!NOTE]
+> This creates `rokt-react-native-sdk-X.X.X.tgz` file that the sample app will use.
 
-### Install the pod
+#### 2. Install Sample App Dependencies
 
-go to _RoktSampleApp/ios_ directory and run `bundle exec pod install --repo-update`
-if pod install failed from rokt-react-native-sdk podfile, run `bundle exec pod update Rokt-Widget`
+```bash
+cd ../RoktSampleApp
+npm install
+```
 
-## Run iOS
+#### 3. iOS Setup
 
-Make sure you have your iOS device or Simulator turned on.
+Navigate to the iOS directory and install CocoaPods dependencies:
 
-1. go to _RoktSampleApp_ directory
-2. if you are on an M1 Mac, run `npx react-native start`
-3. run `npx react-native run-ios --simulator="[simulator/device name]"` e.g. `npx react-native run-ios --simulator="iPhone 14"`
+```bash
+cd ios
+```
 
-## Android
+Choose one of the following commands:
 
-### run Android
+**Option A:** Direct pod install (use if you encounter Ruby 3.4+ issues)
 
-go to _RoktSampleApp_ directory and run `npx react-native run-android`
+```bash
+pod install --repo-update
+```
 
-## Note
+**Option B:** Using bundler for version management
 
-To test the SDK changes locally
+```bash
+bundle exec pod install --repo-update
+```
+
+Then return to the RoktSampleApp directory:
+
+```bash
+cd ..
+```
+
+> [!WARNING]
+> Ruby 3.4+ with `bundle exec` may fail due to missing `kconv`. Use Option A, downgrade to Ruby 3.3.x, or add `gem 'nkf'` to Gemfile with `export LANG=en_US.UTF-8`.
+
+### Running the Sample App
+
+#### iOS
+
+1. Start iOS Simulator (Xcode → Open Developer Tool → Simulator) or connect device
+2. From `RoktSampleApp`, run:
+   ```bash
+   npx react-native run-ios --simulator="iPhone 14"
+   ```
+   Replace `"iPhone 14"` with your simulator name. To see available simulators: `xcrun simctl list devices`
+
+> [!TIP]
+> **M1 Macs:** If you encounter architecture issues, start Metro bundler first in a separate terminal: `npx react-native start --reset-cache`
+
+#### Android
+
+1. From `RoktSampleApp`:
+   ```bash
+   npx react-native run-android  # Starts Metro bundler automatically
+   ```
+
+### Troubleshooting
+
+#### Clearing Caches
+
+If you encounter build issues, try clearing caches:
+
+**npm cache:**
+
+```bash
+# From RoktSampleApp directory
+rm -rf node_modules package-lock.json
+npm install
+```
+
+**Metro bundler cache:**
+
+```bash
+npx react-native start --reset-cache
+```
+
+**iOS cache:**
+
+```bash
+# From RoktSampleApp/ios directory
+rm -rf Pods Podfile.lock
+pod install --repo-update
+```
+
+> [!TIP]
+> The `--reset-cache` flag is especially useful when adjusting the React Native version or experiencing build issues.
+
+## Testing SDK Changes Locally
+
+If you've made changes to the SDK and want to test them in the sample app:
 
 ### Update version of Rokt Widget
 
 1. Go to _Rokt.Widget_ directory
-2. change the version `X.X.X` in `package.json` to a new version.
-3. `npm install`
-4. `npm run build` to build the `dist` folder
-5. `npm pack` to build the new `rokt-react-native-sdk-X.X.X.tgz`
-6. go to `RoktSampleApp` project `package.json` to point to `rokt-react-native-sdk-X.X.X.tgz` file
+2. Change the version `X.X.X` in `package.json` to a new version
+3. Run `npm install`
+4. Run `npm run build` to build the `dist` folder
+5. Run `npm pack` to create the new `rokt-react-native-sdk-X.X.X.tgz`
+6. Go to `RoktSampleApp` project `package.json` and update the dependency to point to the new `rokt-react-native-sdk-X.X.X.tgz` file
+7. Run `npm install` in the _RoktSampleApp_ directory to update the dependency
 
 # Copyright
 

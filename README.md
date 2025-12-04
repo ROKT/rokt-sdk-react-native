@@ -1,10 +1,5 @@
 # @rokt/react-native-sdk
 
-## Resident Experts
-
-- James Newman - <james.newman@rokt.com>
-- Thomson Thomas - <thomson.thomas@rokt.com>
-
 ## Overview
 
 This repository contains the React Native SDK [Rokt.Widget](Rokt.Widget) and a Sample Application [RoktSampleApp](RoktSampleApp).
