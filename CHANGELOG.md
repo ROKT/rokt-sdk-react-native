@@ -9,8 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Changed
+### Changes
 
+- Updated Rokt native iOS SDK to [4.14.5](https://github.com/ROKT/rokt-sdk-ios/blob/main/CHANGELOG.md).
+- Reverted iOS view hierarchy changes
 - Simplified Expo config plugin - autolinking now handles all native setup automatically
 
 ## [4.11.2] - 2025-11-20
