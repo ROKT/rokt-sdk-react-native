@@ -1,0 +1,25 @@
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 2
+    labels:
+      - dependabot
+    commit-message:
+      prefix: chore
+
+  - package-ecosystem: gradle
+    directory: /Rokt.Widget/android
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 2
+    labels:
+      - dependabot
+    commit-message:
+      prefix: chore
+    ignore:
+      - dependency-name: com.android.tools.build:gradle
+      - dependency-name: org.jetbrains.kotlin:kotlin-gradle-plugin
+      - dependency-name: androidx.lifecycle:lifecycle-runtime-ktx
