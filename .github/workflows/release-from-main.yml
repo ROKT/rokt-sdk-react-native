@@ -13,6 +13,7 @@ concurrency:
 
 permissions:
   contents: write
+  id-token: write  # Required for npm OIDC trusted publishing
 
 jobs:
   build-package:
@@ -144,14 +145,16 @@ jobs:
           node-version: 18
           cache: npm
           cache-dependency-path: Rokt.Widget/package-lock.json
+          registry-url: 'https://registry.npmjs.org'
 
-      - name: Publish to npm
+      # Trusted publishing requires npm 11.5.1+
+      - name: Update npm
+        run: npm install -g npm@latest
+
+      - name: Publish to npm with OIDC
         shell: bash
-        env:
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
           cd Rokt.Widget
-          echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > .npmrc
           TARBALL="rokt-react-native-sdk-${{ needs.setup-and-version.outputs.final_version }}.tgz"
           if [ ! -f "$TARBALL" ]; then
             echo "Error: Expected tarball $TARBALL not found in Rokt.Widget directory"
