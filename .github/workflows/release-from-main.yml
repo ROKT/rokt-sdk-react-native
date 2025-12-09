@@ -160,7 +160,7 @@ jobs:
           echo "Publishing tarball: $TARBALL"
           npm publish "$TARBALL" --access=public --tag=latest
 
-      - uses: ffurrer2/extract-release-notes@cae32133495112d23e3569ad04fef240ba4e7bc8 # v2.3.0
+      - uses: ffurrer2/extract-release-notes@202313ec7461b6b9e401996714484690ab1ae105 # v3.0.0
         id: extract-release-notes
         with:
           changelog_file: CHANGELOG.md
