@@ -152,6 +152,7 @@ class RNRoktWidgetModule internal constructor(private val reactContext: ReactApp
                                 when {
                                     placeholders.getType(key) == ReadableType.Number ->
                                         placeholders.getDouble(key).toInt()
+
                                     else -> {
                                         impl.logDebug("Invalid view tag for key: $key")
                                         continue
