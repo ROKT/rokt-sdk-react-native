@@ -1,6 +1,6 @@
 {
   "name": "@rokt/react-native-sdk",
-  "version": "4.11.3",
+  "version": "4.11.2",
   "description": "Rokt Mobile SDK to integrate ROKT Api into ReactNative application",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -30,6 +30,15 @@
   ],
   "author": "",
   "license": "Copyright 2020 Rokt Pte Ltd",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ROKT/rokt-sdk-react-native"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true,
+    "registry": "https://registry.npmjs.org"
+  },
   "peerDependencies": {
     "react-native": ">= 0.55.4",
     "@expo/config-plugins": ">=7.0.0"

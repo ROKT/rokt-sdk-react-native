@@ -1,6 +1,6 @@
 {
   "name": "expotestapp",
-  "version": "4.11.3",
+  "version": "4.11.2",
   "main": "index.ts",
   "scripts": {
     "start": "expo start --dev-client",
@@ -10,7 +10,7 @@
     "prebuild": "expo prebuild --clean"
   },
   "dependencies": {
-    "@rokt/react-native-sdk": "file:../Rokt.Widget/rokt-react-native-sdk-4.11.3.tgz",
+    "@rokt/react-native-sdk": "file:../Rokt.Widget/rokt-react-native-sdk-4.11.2.tgz",
     "expo": "~54.0.25",
     "expo-dev-client": "~6.0.16",
     "expo-status-bar": "~3.0.8",
