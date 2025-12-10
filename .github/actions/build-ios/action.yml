@@ -27,24 +27,34 @@ runs:
         pod install
         echo "iOS dependencies installed successfully"
 
+    - name: Find available iPhone simulator
+      id: find-simulator
+      shell: bash
+      run: |
+        # Find an available iPhone simulator
+        DEVICE_ID=$(xcrun simctl list devices available --json | jq -r '.devices | to_entries[] | .value[] | select(.name | startswith("iPhone")) | .udid' | head -1)
+        DEVICE_NAME=$(xcrun simctl list devices available --json | jq -r '.devices | to_entries[] | .value[] | select(.name | startswith("iPhone")) | .name' | head -1)
+
+        if [ -z "$DEVICE_ID" ]; then
+          echo "Error: No iPhone simulator found"
+          exit 1
+        fi
+
+        echo "Using simulator: $DEVICE_NAME (UDID: $DEVICE_ID)"
+        echo "device-id=$DEVICE_ID" >> $GITHUB_OUTPUT
+        echo "device-name=$DEVICE_NAME" >> $GITHUB_OUTPUT
+
     - name: Build iOS for Simulator
       id: build-ios
       shell: bash
       run: |
         cd RoktSampleApp
 
-        # Find an available iPhone simulator
-        DEVICE_ID=$(xcrun simctl list devices available --json | jq -r '.devices | to_entries[] | .value[] | select(.name | startswith("iPhone")) | .udid' | head -1)
-        DEVICE_NAME=$(xcrun simctl list devices available --json | jq -r '.devices | to_entries[] | .value[] | select(.name | startswith("iPhone")) | .name' | head -1)
-
-        echo "Using simulator: $DEVICE_NAME (UDID: $DEVICE_ID)"
-        echo "device-name=$DEVICE_NAME" >> $GITHUB_OUTPUT
-
         # Build for iOS Simulator
         xcodebuild -workspace ios/RoktSampleApp.xcworkspace \
           -scheme RoktSampleApp \
           -configuration Debug \
-          -destination "platform=iOS Simulator,id=$DEVICE_ID" \
+          -destination "platform=iOS Simulator,id=${{ steps.find-simulator.outputs.device-id }}" \
           -derivedDataPath ios/build \
           -UseModernBuildSystem=YES \
           build
@@ -72,14 +82,11 @@ runs:
       run: |
         cd RoktSampleApp
 
-        # Find an available iPhone simulator
-        DEVICE_ID=$(xcrun simctl list devices available --json | jq -r '.devices | to_entries[] | .value[] | select(.name | startswith("iPhone")) | .udid' | head -1)
-
         # Run tests and generate test results
         xcodebuild -workspace ios/RoktSampleApp.xcworkspace \
           -scheme RoktSampleApp \
           -configuration Debug \
-          -destination "platform=iOS Simulator,id=$DEVICE_ID" \
+          -destination "platform=iOS Simulator,id=${{ steps.find-simulator.outputs.device-id }}" \
           -derivedDataPath ios/build \
           -UseModernBuildSystem=YES \
           test | xcpretty -r junit -o ios/build/test-results.xml || true
@@ -98,7 +105,7 @@ runs:
         Build Date: $(date -u +"%Y-%m-%d %H:%M:%S UTC")
         Platform: iOS Simulator
         Build Type: Debug
-        Device: ${{ steps.build-ios.outputs.device-name }}
+        Device: ${{ steps.find-simulator.outputs.device-name }}
         EOF
 
     - name: Upload iOS artifacts
@@ -123,7 +130,7 @@ runs:
         echo "**Branch:** ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
         echo "**Platform:** iOS Simulator" >> $GITHUB_STEP_SUMMARY
         echo "**Build Type:** Debug" >> $GITHUB_STEP_SUMMARY
-        echo "**Device:** ${{ steps.build-ios.outputs.device-name }}" >> $GITHUB_STEP_SUMMARY
+        echo "**Device:** ${{ steps.find-simulator.outputs.device-name }}" >> $GITHUB_STEP_SUMMARY
         echo "" >> $GITHUB_STEP_SUMMARY
         echo "The iOS app artifact has been uploaded and is available for download in the Actions tab." >> $GITHUB_STEP_SUMMARY
         echo "This includes the app bundle, test results, and build metadata." >> $GITHUB_STEP_SUMMARY
