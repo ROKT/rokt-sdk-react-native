@@ -13,7 +13,7 @@ concurrency:
 
 permissions:
   contents: write
-  id-token: write  # Required for npm OIDC trusted publishing
+  id-token: write # Required for npm OIDC trusted publishing
 
 jobs:
   build-package:
@@ -28,7 +28,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
-          node-version: 18
+          node-version: 20
           cache: npm
           cache-dependency-path: Rokt.Widget/package-lock.json
 
@@ -145,7 +145,7 @@ jobs:
           node-version: 18
           cache: npm
           cache-dependency-path: Rokt.Widget/package-lock.json
-          registry-url: 'https://registry.npmjs.org'
+          registry-url: "https://registry.npmjs.org"
 
       # Trusted publishing requires npm 11.5.1+
       - name: Update npm
