@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.11.3] - 2025-12-10
+
 ### Changed
 
 - Updated Rokt native iOS SDK to [4.14.5](https://github.com/ROKT/rokt-sdk-ios/blob/main/CHANGELOG.md#4145---2025-12-10).
@@ -59,7 +61,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Support new response action type `ExternalPaymentTrigger`
 - Sessions are now retained between app restarts
 
-[unreleased]: https://github.com/ROKT/rokt-sdk-react-native/compare/4.11.2...HEAD
+[unreleased]: https://github.com/ROKT/rokt-sdk-react-native/compare/4.11.3...HEAD
+[4.11.3]: https://github.com/ROKT/rokt-sdk-react-native/compare/4.11.2...4.11.3
 [4.11.2]: https://github.com/ROKT/rokt-sdk-react-native/compare/4.11.1...4.11.2
 [4.11.1]: https://github.com/ROKT/rokt-sdk-react-native/compare/4.11.0...4.11.1
 [4.11.0]: https://github.com/ROKT/rokt-sdk-react-native/compare/4.10.2...4.11.0
