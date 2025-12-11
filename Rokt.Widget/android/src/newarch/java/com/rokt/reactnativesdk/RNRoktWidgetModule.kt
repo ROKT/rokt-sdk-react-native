@@ -27,12 +27,12 @@ class RNRoktWidgetModule internal constructor(private val reactContext: ReactApp
 
     @ReactMethod
     override fun initialize(roktTagId: String?, appVersion: String?) {
-        impl.initialize(roktTagId, appVersion, currentActivity)
+        impl.initialize(roktTagId, appVersion, reactContext.currentActivity)
     }
 
     @ReactMethod
     override fun initializeWithFontFiles(roktTagId: String?, appVersion: String?, fontsMap: ReadableMap?) {
-        impl.initializeWithFontFiles(roktTagId, appVersion, fontsMap, currentActivity)
+        impl.initializeWithFontFiles(roktTagId, appVersion, fontsMap, reactContext.currentActivity)
     }
 
     @ReactMethod
@@ -61,7 +61,7 @@ class RNRoktWidgetModule internal constructor(private val reactContext: ReactApp
             return
         }
 
-        impl.startRoktEventListener(Rokt.events(viewName), currentActivity, viewName)
+        impl.startRoktEventListener(Rokt.events(viewName), reactContext.currentActivity, viewName)
         val config = roktConfig?.let { impl.buildRoktConfig(it) }
 
         // Process placeholders for Fabric
@@ -103,7 +103,7 @@ class RNRoktWidgetModule internal constructor(private val reactContext: ReactApp
             return
         }
 
-        impl.startRoktEventListener(Rokt.events(viewName), currentActivity, viewName)
+        impl.startRoktEventListener(Rokt.events(viewName), reactContext.currentActivity, viewName)
         val config = roktConfig?.let { impl.buildRoktConfig(it) }
 
         // Process placeholders for Fabric
@@ -152,6 +152,7 @@ class RNRoktWidgetModule internal constructor(private val reactContext: ReactApp
                                 when {
                                     placeholders.getType(key) == ReadableType.Number ->
                                         placeholders.getDouble(key).toInt()
+
                                     else -> {
                                         impl.logDebug("Invalid view tag for key: $key")
                                         continue

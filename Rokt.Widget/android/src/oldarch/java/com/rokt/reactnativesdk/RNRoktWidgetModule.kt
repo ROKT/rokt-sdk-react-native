@@ -27,12 +27,12 @@ class RNRoktWidgetModule internal constructor(private val reactContext: ReactApp
 
     @ReactMethod
     fun initialize(roktTagId: String?, appVersion: String?) {
-        impl.initialize(roktTagId, appVersion, currentActivity)
+        impl.initialize(roktTagId, appVersion, reactContext.currentActivity)
     }
 
     @ReactMethod
     fun initializeWithFontFiles(roktTagId: String?, appVersion: String?, fontsMap: ReadableMap?) {
-        impl.initializeWithFontFiles(roktTagId, appVersion, fontsMap, currentActivity)
+        impl.initializeWithFontFiles(roktTagId, appVersion, fontsMap, reactContext.currentActivity)
     }
 
     @ReactMethod
@@ -62,7 +62,7 @@ class RNRoktWidgetModule internal constructor(private val reactContext: ReactApp
         }
 
         val uiManager = reactContext.getNativeModule(UIManagerModule::class.java)
-        impl.startRoktEventListener(Rokt.events(viewName), currentActivity, viewName)
+        impl.startRoktEventListener(Rokt.events(viewName), reactContext.currentActivity, viewName)
 
         val config = roktConfig?.let { impl.buildRoktConfig(it) }
         uiManager?.addUIBlock { nativeViewHierarchyManager ->
@@ -103,7 +103,7 @@ class RNRoktWidgetModule internal constructor(private val reactContext: ReactApp
         }
 
         val uiManager = reactContext.getNativeModule(UIManagerModule::class.java)
-        impl.startRoktEventListener(Rokt.events(viewName), currentActivity, viewName)
+        impl.startRoktEventListener(Rokt.events(viewName), reactContext.currentActivity, viewName)
         val config = roktConfig?.let { impl.buildRoktConfig(it) }
         uiManager?.addUIBlock { nativeViewHierarchyManager ->
             Rokt.execute2Step(
