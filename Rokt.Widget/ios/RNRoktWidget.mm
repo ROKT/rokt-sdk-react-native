@@ -322,14 +322,28 @@ RCT_EXPORT_METHOD(purchaseFinalized:(NSString *)placementId
 {
     NSMutableDictionary *nativePlaceholders = [[NSMutableDictionary alloc]initWithCapacity:placeholders.count];
 
+#ifdef RCT_NEW_ARCH_ENABLED
+    Class componentViewClass = NSClassFromString(@"RoktNativeWidgetComponentView");
+#endif
+
     for(id key in placeholders){
 #ifdef RCT_NEW_ARCH_ENABLED
-        RoktNativeWidgetComponentView *wrapperView = (RoktNativeWidgetComponentView *)viewRegistry[[placeholders objectForKey:key]];
-        if (!wrapperView || ![wrapperView isKindOfClass:[RoktNativeWidgetComponentView class]]) {
-            RCTLogError(@"Cannot find RoktNativeWidgetComponentView with tag #%@", key);
+        // In New Arch, we may get either:
+        // 1. RoktNativeWidgetComponentView (full Fabric mode - RN 0.81+)
+        // 2. RoktEmbeddedView (interop mode - RN 0.77 and similar)
+        UIView *view = viewRegistry[[placeholders objectForKey:key]];
+
+        if (componentViewClass && [view isKindOfClass:componentViewClass]) {
+            // Full Fabric mode - extract the embedded view from the wrapper
+            RoktNativeWidgetComponentView *wrapperView = (RoktNativeWidgetComponentView *)view;
+            nativePlaceholders[key] = wrapperView.roktEmbeddedView;
+        } else if ([view isKindOfClass:[RoktEmbeddedView class]]) {
+            // Interop mode - use the view directly
+            nativePlaceholders[key] = (RoktEmbeddedView *)view;
+        } else {
+            RCTLogError(@"Cannot find RoktNativeWidget view with tag #%@. Found: %@", key, view ? NSStringFromClass([view class]) : @"nil");
             continue;
         }
-        nativePlaceholders[key] = wrapperView.roktEmbeddedView;
 #else
         RoktEmbeddedView *view = viewRegistry[[placeholders objectForKey:key]];
         if (!view || ![view isKindOfClass:[RoktEmbeddedView class]]) {
