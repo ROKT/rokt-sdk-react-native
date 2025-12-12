@@ -40,12 +40,20 @@ import {
   PUBLIC_KEY_PROD,
   PUBLIC_KEY_STAGE,
 } from './utils/rokt-constants';
-import {Colors} from 'react-native/Libraries/NewAppScreen';
 import {Rokt, RoktEmbeddedView, RoktEventManager} from '@rokt/react-native-sdk';
 import sha256 from 'crypto-js/sha256';
 import {Buffer} from 'buffer';
 
 var forge = require('node-forge');
+
+const Colors = {
+  white: '#ffffff',
+  lighter: '#f3f3f3',
+  light: '#dae1e7',
+  dark: '#444444',
+  darker: '#222222',
+  black: '#000000',
+};
 
 const eventManagerEmitter = new NativeEventEmitter(RoktEventManager);
 
