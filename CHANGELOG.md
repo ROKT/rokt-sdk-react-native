@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [4.11.4] - 2025-12-15
 
+### Changed
+
+- iOS embedded view resolving in old and new architectures
+
 ### Fixed
 
 - Fix Android build error with ReactNative SDK version 0.81.5
