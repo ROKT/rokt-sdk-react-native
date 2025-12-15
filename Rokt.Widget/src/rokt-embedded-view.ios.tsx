@@ -10,7 +10,6 @@
  */
 
 import {
-  requireNativeComponent,
   StyleSheet,
   NativeEventEmitter,
   NativeModules,
@@ -59,19 +58,11 @@ interface RoktNativeWidgetProps extends ViewProps {
   onWidgetMarginChanged?: (event: MarginChangedEvent) => void;
 }
 
-declare const global: {
-  __turboModuleProxy: unknown;
-  nativeFabricUIManager: unknown;
-};
-
-const isFabricEnabled = global.nativeFabricUIManager != null;
-
-// Conditional component loading based on architecture
-const WidgetNativeComponent = (
-  isFabricEnabled
-    ? RoktNativeWidgetNativeComponent
-    : requireNativeComponent<RoktNativeWidgetProps>("RoktLegacyNativeWidget")
-) as HostComponent<RoktNativeWidgetProps>;
+// Always use the codegen component - it handles both Fabric and interop automatically
+// In New Arch: Uses RoktNativeWidgetComponentView (Fabric)
+// In Old Arch: Uses interop with RoktNativeWidget ViewManager
+const WidgetNativeComponent =
+  RoktNativeWidgetNativeComponent as HostComponent<RoktNativeWidgetProps>;
 
 const eventManagerEmitter = new NativeEventEmitter(RoktEventManager);
 
