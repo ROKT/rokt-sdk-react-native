@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.11.4] - 2025-12-15
+
+### Changed
+
+- iOS embedded view resolving in old and new architectures
+
 ### Fixed
 
 - Fix Android build error with ReactNative SDK version 0.81.5
@@ -65,7 +71,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Support new response action type `ExternalPaymentTrigger`
 - Sessions are now retained between app restarts
 
-[unreleased]: https://github.com/ROKT/rokt-sdk-react-native/compare/4.11.3...HEAD
+[unreleased]: https://github.com/ROKT/rokt-sdk-react-native/compare/4.11.4...HEAD
+[4.11.4]: https://github.com/ROKT/rokt-sdk-react-native/compare/4.11.3...4.11.4
 [4.11.3]: https://github.com/ROKT/rokt-sdk-react-native/compare/4.11.2...4.11.3
 [4.11.2]: https://github.com/ROKT/rokt-sdk-react-native/compare/4.11.1...4.11.2
 [4.11.1]: https://github.com/ROKT/rokt-sdk-react-native/compare/4.11.0...4.11.1
