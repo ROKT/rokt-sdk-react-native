@@ -8,14 +8,14 @@
 
 /* Begin PBXBuildFile section */
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
-		257742F625EBC3973BA4C35F /* libPods-RoktSampleAppTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = B7702138BA5E4F0A4EFB52EB /* libPods-RoktSampleAppTests.a */; };
 		2A3819AAEF22EDF8C350C99D /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */; };
-		45BB7E6EB8CFBBD8C15CB6FE /* libPods-RoktSampleApp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D2E36FE58308C0CBD831937B /* libPods-RoktSampleApp.a */; };
+		58FC02406997452D48C3BE42 /* libPods-RoktSampleAppTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 94C0FA75D58A9742F647DA47 /* libPods-RoktSampleAppTests.a */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
 		B3685BB22E36F99800F0BC24 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3685BB12E36F99800F0BC24 /* AppDelegate.swift */; };
 		B3685BB32E36F99800F0BC24 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3685BB12E36F99800F0BC24 /* AppDelegate.swift */; };
 		B3685BB62E36FB7700F0BC24 /* RoktSampleAppUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3685BB42E36FB7700F0BC24 /* RoktSampleAppUITests.swift */; };
 		B3685BB72E36FB7700F0BC24 /* RoktSampleAppUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3685BB52E36FB7700F0BC24 /* RoktSampleAppUITestsLaunchTests.swift */; };
+		D402CE01B4A4B7B7316205FB /* libPods-RoktSampleApp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 22037B9A9C21071596B4409D /* libPods-RoktSampleApp.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -30,20 +30,20 @@
 
 /* Begin PBXFileReference section */
 		00E356EE1AD99517003FC87E /* RoktSampleAppTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RoktSampleAppTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		11B9631249363DACFD96114B /* Pods-RoktSampleApp.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RoktSampleApp.release.xcconfig"; path = "Target Support Files/Pods-RoktSampleApp/Pods-RoktSampleApp.release.xcconfig"; sourceTree = "<group>"; };
 		13B07F961A680F5B00A75B9A /* RoktSampleApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; name = RoktSampleApp.app; path = "/Users/thomson/projects/rokt-sdk-react-native/RoktSampleApp/ios/build/Debug-iphoneos/RoktSampleApp.app"; sourceTree = "<absolute>"; };
 		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = RoktSampleApp/Images.xcassets; sourceTree = "<group>"; };
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = RoktSampleApp/Info.plist; sourceTree = "<group>"; };
 		13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = PrivacyInfo.xcprivacy; path = RoktSampleApp/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
-		8199587F43DA611FD45D9A1D /* Pods-RoktSampleAppTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RoktSampleAppTests.debug.xcconfig"; path = "Target Support Files/Pods-RoktSampleAppTests/Pods-RoktSampleAppTests.debug.xcconfig"; sourceTree = "<group>"; };
+		22037B9A9C21071596B4409D /* libPods-RoktSampleApp.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-RoktSampleApp.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		42749B2AA0CEA80E943E5CFE /* Pods-RoktSampleApp.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RoktSampleApp.release.xcconfig"; path = "Target Support Files/Pods-RoktSampleApp/Pods-RoktSampleApp.release.xcconfig"; sourceTree = "<group>"; };
+		526F35C54AA89CF4D655BB49 /* Pods-RoktSampleApp.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RoktSampleApp.debug.xcconfig"; path = "Target Support Files/Pods-RoktSampleApp/Pods-RoktSampleApp.debug.xcconfig"; sourceTree = "<group>"; };
+		736355E015D96154C5CE6594 /* Pods-RoktSampleAppTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RoktSampleAppTests.release.xcconfig"; path = "Target Support Files/Pods-RoktSampleAppTests/Pods-RoktSampleAppTests.release.xcconfig"; sourceTree = "<group>"; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = RoktSampleApp/LaunchScreen.storyboard; sourceTree = "<group>"; };
-		A6F949A3F03932C00B5BD16F /* Pods-RoktSampleApp.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RoktSampleApp.debug.xcconfig"; path = "Target Support Files/Pods-RoktSampleApp/Pods-RoktSampleApp.debug.xcconfig"; sourceTree = "<group>"; };
+		94C0FA75D58A9742F647DA47 /* libPods-RoktSampleAppTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-RoktSampleAppTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		B3685BB12E36F99800F0BC24 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		B3685BB42E36FB7700F0BC24 /* RoktSampleAppUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoktSampleAppUITests.swift; sourceTree = "<group>"; };
 		B3685BB52E36FB7700F0BC24 /* RoktSampleAppUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoktSampleAppUITestsLaunchTests.swift; sourceTree = "<group>"; };
-		B7702138BA5E4F0A4EFB52EB /* libPods-RoktSampleAppTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-RoktSampleAppTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		D2E36FE58308C0CBD831937B /* libPods-RoktSampleApp.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-RoktSampleApp.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		D6EF2E19964A769AA6849FC8 /* Pods-RoktSampleAppTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RoktSampleAppTests.release.xcconfig"; path = "Target Support Files/Pods-RoktSampleAppTests/Pods-RoktSampleAppTests.release.xcconfig"; sourceTree = "<group>"; };
+		E4CD481AED4FAB77C758B87E /* Pods-RoktSampleAppTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RoktSampleAppTests.debug.xcconfig"; path = "Target Support Files/Pods-RoktSampleAppTests/Pods-RoktSampleAppTests.debug.xcconfig"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
@@ -52,7 +52,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				257742F625EBC3973BA4C35F /* libPods-RoktSampleAppTests.a in Frameworks */,
+				58FC02406997452D48C3BE42 /* libPods-RoktSampleAppTests.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -60,7 +60,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				45BB7E6EB8CFBBD8C15CB6FE /* libPods-RoktSampleApp.a in Frameworks */,
+				D402CE01B4A4B7B7316205FB /* libPods-RoktSampleApp.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -83,8 +83,8 @@
 			isa = PBXGroup;
 			children = (
 				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
-				D2E36FE58308C0CBD831937B /* libPods-RoktSampleApp.a */,
-				B7702138BA5E4F0A4EFB52EB /* libPods-RoktSampleAppTests.a */,
+				22037B9A9C21071596B4409D /* libPods-RoktSampleApp.a */,
+				94C0FA75D58A9742F647DA47 /* libPods-RoktSampleAppTests.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -123,10 +123,10 @@
 		BBD78D7AC51CEA395F1C20DB /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				A6F949A3F03932C00B5BD16F /* Pods-RoktSampleApp.debug.xcconfig */,
-				11B9631249363DACFD96114B /* Pods-RoktSampleApp.release.xcconfig */,
-				8199587F43DA611FD45D9A1D /* Pods-RoktSampleAppTests.debug.xcconfig */,
-				D6EF2E19964A769AA6849FC8 /* Pods-RoktSampleAppTests.release.xcconfig */,
+				526F35C54AA89CF4D655BB49 /* Pods-RoktSampleApp.debug.xcconfig */,
+				42749B2AA0CEA80E943E5CFE /* Pods-RoktSampleApp.release.xcconfig */,
+				E4CD481AED4FAB77C758B87E /* Pods-RoktSampleAppTests.debug.xcconfig */,
+				736355E015D96154C5CE6594 /* Pods-RoktSampleAppTests.release.xcconfig */,
 			);
 			path = Pods;
 			sourceTree = "<group>";
@@ -138,7 +138,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 00E357021AD99517003FC87E /* Build configuration list for PBXNativeTarget "RoktSampleAppTests" */;
 			buildPhases = (
-				E9F3AA364626C5B134538FB8 /* [CP] Check Pods Manifest.lock */,
+				18A49797CD024CF17E55DE8C /* [CP] Check Pods Manifest.lock */,
 				00E356EA1AD99517003FC87E /* Sources */,
 				00E356EB1AD99517003FC87E /* Frameworks */,
 				00E356EC1AD99517003FC87E /* Resources */,
@@ -157,13 +157,13 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "RoktSampleApp" */;
 			buildPhases = (
-				11AD6E83742BB6D41307617E /* [CP] Check Pods Manifest.lock */,
+				8A353EA5582048948331E72A /* [CP] Check Pods Manifest.lock */,
 				13B07F871A680F5B00A75B9A /* Sources */,
 				13B07F8C1A680F5B00A75B9A /* Frameworks */,
 				13B07F8E1A680F5B00A75B9A /* Resources */,
 				00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */,
-				188402350172EF0691E67F90 /* [CP] Embed Pods Frameworks */,
-				63C323BDB62FFE7B3CA3171C /* [CP] Copy Pods Resources */,
+				633792C6A4D2433A2C33EE87 /* [CP] Embed Pods Frameworks */,
+				1C03B5A0D77369760A6D8691 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -248,7 +248,7 @@
 			shellPath = /bin/sh;
 			shellScript = "set -e\n\nWITH_ENVIRONMENT=\"$REACT_NATIVE_PATH/scripts/xcode/with-environment.sh\"\nREACT_NATIVE_XCODE=\"$REACT_NATIVE_PATH/scripts/react-native-xcode.sh\"\n\n/bin/sh -c \"$WITH_ENVIRONMENT $REACT_NATIVE_XCODE\"\n";
 		};
-		11AD6E83742BB6D41307617E /* [CP] Check Pods Manifest.lock */ = {
+		18A49797CD024CF17E55DE8C /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -263,31 +263,14 @@
 			outputFileListPaths = (
 			);
 			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-RoktSampleApp-checkManifestLockResult.txt",
+				"$(DERIVED_FILE_DIR)/Pods-RoktSampleAppTests-checkManifestLockResult.txt",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		188402350172EF0691E67F90 /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-RoktSampleApp/Pods-RoktSampleApp-frameworks-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-RoktSampleApp/Pods-RoktSampleApp-frameworks-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-RoktSampleApp/Pods-RoktSampleApp-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		63C323BDB62FFE7B3CA3171C /* [CP] Copy Pods Resources */ = {
+		1C03B5A0D77369760A6D8691 /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -304,7 +287,24 @@
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-RoktSampleApp/Pods-RoktSampleApp-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		E9F3AA364626C5B134538FB8 /* [CP] Check Pods Manifest.lock */ = {
+		633792C6A4D2433A2C33EE87 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-RoktSampleApp/Pods-RoktSampleApp-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-RoktSampleApp/Pods-RoktSampleApp-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-RoktSampleApp/Pods-RoktSampleApp-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		8A353EA5582048948331E72A /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -319,7 +319,7 @@
 			outputFileListPaths = (
 			);
 			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-RoktSampleAppTests-checkManifestLockResult.txt",
+				"$(DERIVED_FILE_DIR)/Pods-RoktSampleApp-checkManifestLockResult.txt",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -360,7 +360,7 @@
 /* Begin XCBuildConfiguration section */
 		00E356F61AD99517003FC87E /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 8199587F43DA611FD45D9A1D /* Pods-RoktSampleAppTests.debug.xcconfig */;
+			baseConfigurationReference = E4CD481AED4FAB77C758B87E /* Pods-RoktSampleAppTests.debug.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CLANG_ENABLE_MODULES = YES;
@@ -390,7 +390,7 @@
 		};
 		00E356F71AD99517003FC87E /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = D6EF2E19964A769AA6849FC8 /* Pods-RoktSampleAppTests.release.xcconfig */;
+			baseConfigurationReference = 736355E015D96154C5CE6594 /* Pods-RoktSampleAppTests.release.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CLANG_ENABLE_MODULES = YES;
@@ -416,7 +416,7 @@
 		};
 		13B07F941A680F5B00A75B9A /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = A6F949A3F03932C00B5BD16F /* Pods-RoktSampleApp.debug.xcconfig */;
+			baseConfigurationReference = 526F35C54AA89CF4D655BB49 /* Pods-RoktSampleApp.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
@@ -444,7 +444,7 @@
 		};
 		13B07F951A680F5B00A75B9A /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 11B9631249363DACFD96114B /* Pods-RoktSampleApp.release.xcconfig */;
+			baseConfigurationReference = 42749B2AA0CEA80E943E5CFE /* Pods-RoktSampleApp.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;

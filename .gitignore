@@ -4,3 +4,6 @@
 **/.settings/**
 Pods/
 .vscode/
+
+# Build artifacts
+rokt-react-native-sdk-*.tgz

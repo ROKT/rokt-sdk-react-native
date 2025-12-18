@@ -40,7 +40,7 @@ RCT_EXPORT_MODULE(RoktEventManager);
 
 - (NSArray<NSString *> *)supportedEvents
 {
-  return @[@"WidgetHeightChanges", @"FirstPositiveResponse", @"RoktCallback", @"RoktEvents"];
+  return @[@"WidgetHeightChanges", @"RoktEvents"];
 }
 
 - (void)onWidgetHeightChanges:(CGFloat)widgetHeight placement:(NSString*) selectedPlacement
@@ -49,20 +49,6 @@ RCT_EXPORT_MODULE(RoktEventManager);
         [self sendEventWithName:@"WidgetHeightChanges" body:@{@"height": [NSNumber numberWithDouble: widgetHeight],
                                                               @"selectedPlacement": selectedPlacement
         }];
-    }
-}
-
-- (void)onFirstPositiveResponse
-{
-    if (hasListeners) {
-        [self sendEventWithName:@"FirstPositiveResponse" body:@{@"":@""}];
-    }
-}
-
-- (void)onRoktCallbackReceived:(NSString*)eventValue
-{
-    if (hasListeners) {
-        [self sendEventWithName:@"RoktCallback" body:@{@"callbackValue": eventValue}];
     }
 }
 
@@ -83,7 +69,12 @@ RCT_EXPORT_MODULE(RoktEventManager);
          NSDecimalNumber *totalPrice;
          NSDecimalNumber *unitPrice;
          
-         if ([event isKindOfClass:[ShowLoadingIndicator class]]) {
+         if ([event isKindOfClass:[EmbeddedSizeChanged class]]) {
+            eventName = @"EmbeddedSizeChanged";
+            placementId = ((EmbeddedSizeChanged *)event).placementId;
+            CGFloat widgetHeight = ((EmbeddedSizeChanged *)event).updatedHeight;
+            [self onWidgetHeightChanges:widgetHeight placement:placementId];
+         } else if ([event isKindOfClass:[ShowLoadingIndicator class]]) {
              eventName = @"ShowLoadingIndicator";
          } else if ([event isKindOfClass:[HideLoadingIndicator class]]) {
              eventName = @"HideLoadingIndicator";
@@ -108,10 +99,6 @@ RCT_EXPORT_MODULE(RoktEventManager);
          } else if ([event isKindOfClass:[PlacementFailure class]]) {
              placementId = ((PlacementFailure *)event).placementId;
              eventName = @"PlacementFailure";
-         } else if ([event isKindOfClass:[FirstPositiveEngagement class]]) {
-             placementId = ((FirstPositiveEngagement *)event).placementId;
-             eventName = @"FirstPositiveEngagement";
-             self.firstPositiveEngagement = (FirstPositiveEngagement *)event;
          } else if ([event isKindOfClass:[InitComplete class]]) {
              eventName = @"InitComplete";
              status = ((InitComplete *)event).success ? @"true" : @"false";

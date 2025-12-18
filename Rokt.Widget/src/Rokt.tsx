@@ -69,30 +69,6 @@ export abstract class Rokt {
     }
   }
 
-  public static execute2Step(
-    viewName: string,
-    attributes: Record<string, string>,
-    placeholders: Record<string, number | null>,
-    roktConfig?: IRoktConfig,
-  ): void {
-    if (roktConfig) {
-      RNRoktWidget.execute2StepWithConfig(
-        viewName,
-        attributes,
-        placeholders,
-        roktConfig,
-      );
-    } else {
-      RNRoktWidget.execute2Step(viewName, attributes, placeholders);
-    }
-  }
-
-  public static setFulfillmentAttributes(
-    attributes: Record<string, string>,
-  ): void {
-    RNRoktWidget.setFulfillmentAttributes(attributes);
-  }
-
   public static purchaseFinalized(
     placementId: string,
     catalogItemId: string,
@@ -107,10 +83,6 @@ export abstract class Rokt {
 
   public static setEnvironmentToProd(): void {
     RNRoktWidget.setEnvironmentToProd();
-  }
-
-  public static setLoggingEnabled(enabled: boolean): void {
-    RNRoktWidget.setLoggingEnabled(enabled);
   }
 }
 

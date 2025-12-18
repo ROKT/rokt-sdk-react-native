@@ -77,8 +77,6 @@ export default class App extends Component<Props, State> {
   private placeholder1 = React.createRef<RoktEmbeddedViewRef>();
   private placeholder2 = React.createRef<RoktEmbeddedViewRef>();
 
-  private subscription: EmitterSubscription;
-  private callBackSubscription: EmitterSubscription;
   private eventSubscription: EmitterSubscription;
 
   constructor(props: Props) {
@@ -97,22 +95,6 @@ export default class App extends Component<Props, State> {
       twoStepEnabled: false,
       encryptEnabled: false,
     };
-
-    this.subscription = eventManagerEmitter.addListener(
-      'FirstPositiveResponse',
-      _ => {
-        console.log('Widget OnFirstPositiveEvent Callback');
-        // Send unhashed email on first positive response
-        Rokt.setFulfillmentAttributes(FULLFILLMENT_ATTRIBUTES);
-      },
-    );
-
-    this.callBackSubscription = eventManagerEmitter.addListener(
-      'RoktCallback',
-      data => {
-        console.log('roktCallback received: ' + data.callbackValue);
-      },
-    );
 
     this.eventSubscription = eventManagerEmitter.addListener(
       'RoktEvents',
@@ -143,13 +125,10 @@ export default class App extends Component<Props, State> {
   }
 
   componentWillUnmount() {
-    this.subscription.remove();
-    this.callBackSubscription.remove();
     this.eventSubscription.remove();
   }
 
   onInitHandler = () => {
-    Rokt.setLoggingEnabled(true);
     if (isNotEmpty(this.state.tagId)) {
       if (this.state.stageEnabled) {
         console.log('Executing on Stage');

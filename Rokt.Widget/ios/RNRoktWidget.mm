@@ -24,11 +24,9 @@
 
 @interface RNRoktWidget ()
 
-@property (nonatomic, nullable) RoktEventHandler *roktEventHandler;
 @property (nonatomic, nullable) RoktEventManager *eventManager;
 
 - (void)executeRoktWithViewName:(NSString *)viewName attributes:(NSDictionary *)attributes placeholders:(NSDictionary *)placeholders config:(RoktConfig *)config;
-- (void)executeRokt2StepWithViewName:(NSString *)viewName attributes:(NSDictionary *)attributes placeholders:(NSDictionary *)placeholders config:(RoktConfig *)config;
 
 @end
 
@@ -96,21 +94,11 @@ RCT_EXPORT_METHOD(execute:(NSString *)viewName
 
         [self subscribeViewEvents:viewName];
 
-        [Rokt executeWithViewName:viewName attributes:finalAttributes
-                       placements:nativePlaceholders
-                           onLoad:^{ [self.eventManager onRoktCallbackReceived:@"onLoad"];}
-                         onUnLoad:^{
-	    [self.eventManager onRoktCallbackReceived:@"onUnLoad"];
-            RCTLogInfo(@"unloaded");
-        }
-     onShouldShowLoadingIndicator:^{ [self.eventManager onRoktCallbackReceived:@"onShouldShowLoadingIndicator"];}
-     onShouldHideLoadingIndicator:^{ [self.eventManager onRoktCallbackReceived:@"onShouldHideLoadingIndicator"];}
-             onEmbeddedSizeChange:^(NSString *selectedPlacement, CGFloat widgetHeight){
-            
-            [self.eventManager onWidgetHeightChanges:widgetHeight placement:selectedPlacement];
-            
-        }];
-        
+        [Rokt executeWithEventsWithViewName:viewName
+            attributes:finalAttributes
+            placements:nativePlaceholders
+            onEvent:nil
+        ];
     }];
 }
 
@@ -147,97 +135,6 @@ RCT_EXPORT_METHOD(executeWithConfig:(NSString *)viewName
     [self executeRoktWithViewName:viewName attributes:finalAttributes placeholders:placeholders config:config];
 }
 #endif
-
-RCT_EXPORT_METHOD(execute2Step:(NSString *)viewName
-                  attributes:(NSDictionary *)attributes
-                  placeholders:(NSDictionary *)placeholders
-                  )
-{
-    if (viewName == nil) {
-        RCTLog(@"Execute failed. ViewName cannot be null");
-        return;
-    }
-    NSMutableDictionary *finalAttributes = [self convertToMutableDictionaryOfStrings:attributes];
-    
-    [self.bridge.uiManager addUIBlock:^(RCTUIManager *uiManager, NSDictionary<NSNumber *,UIView *> *viewRegistry) {
-        NSMutableDictionary *nativePlaceholders = [self getNativePlaceholders:placeholders viewRegistry:viewRegistry];
-        
-        [self subscribeViewEvents:viewName];
-        
-        [Rokt execute2stepWithViewName:viewName attributes:finalAttributes
-                            placements:nativePlaceholders
-                                onLoad:^{ [self.eventManager onRoktCallbackReceived:@"onLoad"];}
-                              onUnLoad:^{
-	    [self.eventManager onRoktCallbackReceived:@"onUnLoad"];
-            RCTLogInfo(@"unloaded");
-        }
-          onShouldShowLoadingIndicator:^{ [self.eventManager onRoktCallbackReceived:@"onShouldShowLoadingIndicator"];}
-          onShouldHideLoadingIndicator:^{ [self.eventManager onRoktCallbackReceived:@"onShouldHideLoadingIndicator"];}
-                  onEmbeddedSizeChange:^(NSString *selectedPlacement, CGFloat widgetHeight){
-            
-            [self.eventManager onWidgetHeightChanges:widgetHeight placement:selectedPlacement];
-            
-        }
-                               onEvent:^(RoktEventType roktEventType, RoktEventHandler* roktEventHandler){
-            self.roktEventHandler = roktEventHandler;
-            if (roktEventType == RoktEventTypeFirstPositiveEngagement) {
-                RCTLogInfo(@"firstPositiveEvent was fired");
-                [self.eventManager onFirstPositiveResponse];
-            }
-        }];
-        
-    }];
-    
-}
-
-#ifdef RCT_NEW_ARCH_ENABLED
-RCT_EXPORT_METHOD(execute2StepWithConfig:(NSString *)viewName
-                  attributes:(NSDictionary *)attributes
-                  placeholders:(NSDictionary *)placeholders
-                  roktConfig:(JS::NativeRoktWidget::RoktConfigType &)roktConfig
-                  )
-{
-    if (viewName == nil) {
-        RCTLog(@"Execute failed. ViewName cannot be null");
-        return;
-    }
-    NSMutableDictionary *finalAttributes = [self convertToMutableDictionaryOfStrings:attributes];
-
-    RoktConfig *config = [self buildRoktConfigFromSpec:roktConfig];
-    [self executeRokt2StepWithViewName:viewName attributes:finalAttributes placeholders:placeholders config:config];
-    
-}
-#else
-RCT_EXPORT_METHOD(execute2StepWithConfig:(NSString *)viewName
-                  attributes:(NSDictionary *)attributes
-                  placeholders:(NSDictionary *)placeholders
-                  roktConfig:(NSDictionary *)roktConfig
-                  )
-{
-    if (viewName == nil) {
-        RCTLog(@"Execute failed. ViewName cannot be null");
-        return;
-    }
-    NSMutableDictionary *finalAttributes = [self convertToMutableDictionaryOfStrings:attributes];
-
-    RoktConfig *config = [self buildRoktConfigFromDict:roktConfig];
-    [self executeRokt2StepWithViewName:viewName attributes:finalAttributes placeholders:placeholders config:config];
-}
-#endif
-
-RCT_EXPORT_METHOD(setFulfillmentAttributes:(NSDictionary *)attributes) {
-    if (self.roktEventHandler != nil) {
-        RCTLogInfo(@"calling setFulfillmentAttributesWithAttributes");
-        [self.bridge.uiManager addUIBlock:^(RCTUIManager *uiManager, NSDictionary<NSNumber *,UIView *> *viewRegistry) {
-            [self.roktEventHandler setFulfillmentAttributesWithAttributes:attributes];
-        }];
-    }
-    if (self.eventManager != nil && self.eventManager.firstPositiveEngagement != nil) {
-        [self.bridge.uiManager addUIBlock:^(RCTUIManager *uiManager, NSDictionary<NSNumber *,UIView *> *viewRegistry) {
-            [self.eventManager.firstPositiveEngagement setFulfillmentAttributesWithAttributes:attributes];
-        }];
-    }
-}
 
 - (NSMutableDictionary*)convertToMutableDictionaryOfStrings:(NSDictionary*)attributes
 {
@@ -290,11 +187,6 @@ RCT_EXPORT_METHOD(setEnvironmentToStage) {
 }
 RCT_EXPORT_METHOD(setEnvironmentToProd){
     [Rokt setEnvironmentWithEnvironment: RoktEnvironmentProd];
-}
-
-RCT_EXPORT_METHOD(setLoggingEnabled: (BOOL)enabled)
-{
-    [Rokt setLoggingEnabledWithEnable:enabled];
 }
 
 RCT_EXPORT_METHOD(purchaseFinalized:(NSString *)placementId
@@ -365,53 +257,12 @@ RCT_EXPORT_METHOD(purchaseFinalized:(NSString *)placementId
 
         [self subscribeViewEvents:viewName];
 
-        [Rokt executeWithViewName:viewName attributes:attributes
-                       placements:nativePlaceholders
-                           config:config
-                           onLoad:^{ [self.eventManager onRoktCallbackReceived:@"onLoad"];}
-                         onUnLoad:^{
-        [self.eventManager onRoktCallbackReceived:@"onUnLoad"];
-            RCTLogInfo(@"unloaded");
-        }
-     onShouldShowLoadingIndicator:^{ [self.eventManager onRoktCallbackReceived:@"onShouldShowLoadingIndicator"];}
-     onShouldHideLoadingIndicator:^{ [self.eventManager onRoktCallbackReceived:@"onShouldHideLoadingIndicator"];}
-             onEmbeddedSizeChange:^(NSString *selectedPlacement, CGFloat widgetHeight){
-                [self.eventManager onWidgetHeightChanges:widgetHeight placement:selectedPlacement];
-            }];
-    }];
-}
-
-- (void)executeRokt2StepWithViewName:(NSString *)viewName attributes:(NSDictionary *)attributes placeholders:(NSDictionary *)placeholders config:(RoktConfig *)config
-{
-    [self.bridge.uiManager addUIBlock:^(RCTUIManager *uiManager, NSDictionary<NSNumber *,UIView *> *viewRegistry) {
-        NSMutableDictionary *nativePlaceholders = [self getNativePlaceholders:placeholders viewRegistry:viewRegistry];
-
-        self.eventManager = [RoktEventManager allocWithZone: nil];
-
-        [Rokt eventsWithViewName:viewName onEvent:^(RoktEvent * roktEvent) {
-            [self.eventManager onRoktEvents:roktEvent viewName:viewName];
-        }];
-
-        [Rokt execute2stepWithViewName:viewName attributes:attributes
-                            placements:nativePlaceholders
-                                config:config
-                                onLoad:^{ [self.eventManager onRoktCallbackReceived:@"onLoad"];}
-                              onUnLoad:^{
-        [self.eventManager onRoktCallbackReceived:@"onUnLoad"];
-            RCTLogInfo(@"unloaded");
-        }
-          onShouldShowLoadingIndicator:^{ [self.eventManager onRoktCallbackReceived:@"onShouldShowLoadingIndicator"];}
-          onShouldHideLoadingIndicator:^{ [self.eventManager onRoktCallbackReceived:@"onShouldHideLoadingIndicator"];}
-                  onEmbeddedSizeChange:^(NSString *selectedPlacement, CGFloat widgetHeight){
-            [self.eventManager onWidgetHeightChanges:widgetHeight placement:selectedPlacement];
-        }
-                               onEvent:^(RoktEventType roktEventType, RoktEventHandler* roktEventHandler){
-            self.roktEventHandler = roktEventHandler;
-            if (roktEventType == RoktEventTypeFirstPositiveEngagement) {
-                RCTLogInfo(@"firstPositiveEvent was fired");
-                [self.eventManager onFirstPositiveResponse];
-            }
-        }];
+        [Rokt executeWithEventsWithViewName:viewName
+            attributes:attributes
+            placements:nativePlaceholders
+            config:config
+            onEvent:nil
+        ];
     }];
 }
 

@@ -43,28 +43,14 @@ export interface Spec extends TurboModule {
     placeholders: { [key: string]: number | null },
     roktConfig: RoktConfigType,
   ): void;
-  execute2Step(
-    viewName: string,
-    attributes: { [key: string]: string },
-    placeholders: { [key: string]: number | null },
-  ): void;
-  execute2StepWithConfig(
-    viewName: string,
-    attributes: { [key: string]: string },
-    placeholders: { [key: string]: number | null },
-    roktConfig: RoktConfigType,
-  ): void;
   purchaseFinalized(
     placementId: string,
     catalogItemId: string,
     success: boolean,
   ): void;
 
-  // Additional methods
-  setFulfillmentAttributes(attributes: { [key: string]: string }): void;
   setEnvironmentToStage(): void;
   setEnvironmentToProd(): void;
-  setLoggingEnabled(enabled: boolean): void;
 }
 
 export default TurboModuleRegistry.getEnforcing<Spec>("RNRoktWidget");
