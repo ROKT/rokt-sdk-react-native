@@ -94,7 +94,7 @@ RCT_EXPORT_METHOD(execute:(NSString *)viewName
 
         [self subscribeViewEvents:viewName];
 
-        [Rokt executeWithEventsWithViewName:viewName
+        [Rokt selectPlacementsWithIdentifier:viewName
             attributes:finalAttributes
             placements:nativePlaceholders
             onEvent:nil
@@ -177,7 +177,7 @@ RCT_EXPORT_METHOD(executeWithConfig:(NSString *)viewName
     if (self.eventManager == nil) {
         self.eventManager = [RoktEventManager allocWithZone: nil];
     }
-    [Rokt eventsWithViewName:viewName onEvent:^(RoktEvent * _Nonnull roktEvent) {
+    [Rokt eventsWithIdentifier:viewName onEvent:^(RoktEvent * _Nonnull roktEvent) {
         [self.eventManager onRoktEvents:roktEvent viewName:viewName];
     }];
 }
@@ -198,7 +198,7 @@ RCT_EXPORT_METHOD(purchaseFinalized:(NSString *)placementId
         return;
     }
     // Call the native iOS implementation
-    [Rokt purchaseFinalizedWithPlacementId:placementId
+    [Rokt purchaseFinalizedWithIdentifier:placementId
                             catalogItemId:catalogItemId
                                 success:success];
 }
@@ -257,7 +257,7 @@ RCT_EXPORT_METHOD(purchaseFinalized:(NSString *)placementId
 
         [self subscribeViewEvents:viewName];
 
-        [Rokt executeWithEventsWithViewName:viewName
+        [Rokt selectPlacementsWithIdentifier:viewName
             attributes:attributes
             placements:nativePlaceholders
             config:config
