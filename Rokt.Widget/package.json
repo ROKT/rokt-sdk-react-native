@@ -50,6 +50,7 @@
   },
   "devDependencies": {
     "@expo/config-plugins": "^7.2.5",
+    "@react-native-community/cli": "latest",
     "@types/jest": "^27.5.1",
     "@types/react": "^19.0.0",
     "@types/react-native": "^0.68.0",

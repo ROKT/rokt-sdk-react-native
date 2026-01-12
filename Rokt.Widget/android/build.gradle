@@ -2,6 +2,7 @@ buildscript {
     ext.kotlin_version = '1.8.21'
 
     repositories {
+         mavenLocal()
          google()
          mavenCentral()
     }
@@ -73,9 +74,7 @@ android {
 }
 
 repositories {
-
         mavenLocal()
-
         maven {
             // All of React Native (JS, Obj-C sources, Android binaries) is installed from npm
             url "$rootDir/../node_modules/react-native/android"
@@ -101,5 +100,5 @@ dependencies {
     implementation "com.facebook.react:react-native:+"  // From node_modules
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation "androidx.lifecycle:lifecycle-runtime-ktx:2.6.1"
-    implementation ('com.rokt:roktsdk:4.12.1')
+    implementation ('com.rokt:roktsdk:5.0.0')
 }

@@ -11,7 +11,7 @@ export const FULLFILLMENT_ATTRIBUTES = {
 };
 
 export const DEFAULT_TAG_ID = '2754655826098840951';
-export const DEFAULT_VIEW_NAME = 'testTwoEmbedded';
+export const DEFAULT_VIEW_NAME = 'MSDKEmbeddedLayout';
 export const DEFAULT_COUNTRY = 'US';
 
 export const PUBLIC_KEY_PROD =

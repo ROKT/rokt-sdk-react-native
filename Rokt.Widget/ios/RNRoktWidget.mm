@@ -26,7 +26,7 @@
 
 @property (nonatomic, nullable) RoktEventManager *eventManager;
 
-- (void)executeRoktWithViewName:(NSString *)viewName attributes:(NSDictionary *)attributes placeholders:(NSDictionary *)placeholders config:(RoktConfig *)config;
+- (void)selectPlacementsWithIdentifier:(NSString *)identifier attributes:(NSDictionary *)attributes placeholders:(NSDictionary *)placeholders config:(RoktConfig *)config;
 
 @end
 
@@ -77,13 +77,13 @@ RCT_EXPORT_METHOD(initializeWithFonts:(NSString *)roktTagId appVersion: (NSStrin
     [Rokt initWithRoktTagId:roktTagId ];
 }
 
-RCT_EXPORT_METHOD(execute:(NSString *)viewName
+RCT_EXPORT_METHOD(selectPlacements:(NSString *)identifier
                   attributes:(NSDictionary *)attributes
                   placeholders:(NSDictionary *)placeholders
                   )
 {
-    if (viewName == nil) {
-        RCTLog(@"Execute failed. ViewName cannot be null");
+    if (identifier == nil) {
+        RCTLog(@"selectPlacements failed. identifier cannot be null");
         return;
     }
     NSMutableDictionary *finalAttributes = [self convertToMutableDictionaryOfStrings:attributes];
@@ -92,9 +92,9 @@ RCT_EXPORT_METHOD(execute:(NSString *)viewName
 
         NSMutableDictionary *nativePlaceholders = [self getNativePlaceholders:placeholders viewRegistry:viewRegistry];
 
-        [self subscribeViewEvents:viewName];
+        [self subscribeViewEvents:identifier];
 
-        [Rokt selectPlacementsWithIdentifier:viewName
+        [Rokt selectPlacementsWithIdentifier:identifier
             attributes:finalAttributes
             placements:nativePlaceholders
             onEvent:nil
@@ -103,36 +103,36 @@ RCT_EXPORT_METHOD(execute:(NSString *)viewName
 }
 
 #ifdef RCT_NEW_ARCH_ENABLED
-RCT_EXPORT_METHOD(executeWithConfig:(NSString *)viewName
+RCT_EXPORT_METHOD(selectPlacementsWithConfig:(NSString *)identifier
                   attributes:(NSDictionary *)attributes
                   placeholders:(NSDictionary *)placeholders
                   roktConfig:(JS::NativeRoktWidget::RoktConfigType &)roktConfig
                   )
 {
-    if (viewName == nil) {
-        RCTLog(@"Execute failed. ViewName cannot be null");
+    if (identifier == nil) {
+        RCTLog(@"selectPlacementsWithConfig failed. identifier cannot be null");
         return;
     }
     NSMutableDictionary *finalAttributes = [self convertToMutableDictionaryOfStrings:attributes];
 
     RoktConfig *config = [self buildRoktConfigFromSpec:roktConfig];
-    [self executeRoktWithViewName:viewName attributes:finalAttributes placeholders:placeholders config:config];
+    [self selectPlacementsWithIdentifier:identifier attributes:finalAttributes placeholders:placeholders config:config];
 }
 #else
-RCT_EXPORT_METHOD(executeWithConfig:(NSString *)viewName
+RCT_EXPORT_METHOD(selectPlacementsWithConfig:(NSString *)identifier
                   attributes:(NSDictionary *)attributes
                   placeholders:(NSDictionary *)placeholders
                   roktConfig:(NSDictionary *)roktConfig
                   )
 {
-    if (viewName == nil) {
-        RCTLog(@"Execute failed. ViewName cannot be null");
+    if (identifier == nil) {
+        RCTLog(@"selectPlacementsWithConfig failed. identifier cannot be null");
         return;
     }
     NSMutableDictionary *finalAttributes = [self convertToMutableDictionaryOfStrings:attributes];
 
     RoktConfig *config = [self buildRoktConfigFromDict:roktConfig];
-    [self executeRoktWithViewName:viewName attributes:finalAttributes placeholders:placeholders config:config];
+    [self selectPlacementsWithIdentifier:identifier attributes:finalAttributes placeholders:placeholders config:config];
 }
 #endif
 
@@ -168,17 +168,17 @@ RCT_EXPORT_METHOD(executeWithConfig:(NSString *)viewName
 {
     self.eventManager = [RoktEventManager allocWithZone: nil];
     [Rokt globalEventsOnEvent:^(RoktEvent * _Nonnull roktEvent) {
-        [self.eventManager onRoktEvents:roktEvent viewName:nil];
+        [self.eventManager onRoktEvents:roktEvent identifier:nil];
     }];
 }
 
-- (void)subscribeViewEvents:(NSString* _Nonnull) viewName
+- (void)subscribeViewEvents:(NSString* _Nonnull) identifier
 {
     if (self.eventManager == nil) {
         self.eventManager = [RoktEventManager allocWithZone: nil];
     }
-    [Rokt eventsWithIdentifier:viewName onEvent:^(RoktEvent * _Nonnull roktEvent) {
-        [self.eventManager onRoktEvents:roktEvent viewName:viewName];
+    [Rokt eventsWithIdentifier:identifier onEvent:^(RoktEvent * _Nonnull roktEvent) {
+        [self.eventManager onRoktEvents:roktEvent identifier:identifier];
     }];
 }
 
@@ -250,14 +250,14 @@ RCT_EXPORT_METHOD(purchaseFinalized:(NSString *)placementId
     return nativePlaceholders;
 }
 
-- (void)executeRoktWithViewName:(NSString *)viewName attributes:(NSDictionary *)attributes placeholders:(NSDictionary *)placeholders config:(RoktConfig *)config
+- (void)selectPlacementsWithIdentifier:(NSString *)identifier attributes:(NSDictionary *)attributes placeholders:(NSDictionary *)placeholders config:(RoktConfig *)config
 {
     [self.bridge.uiManager addUIBlock:^(RCTUIManager *uiManager, NSDictionary<NSNumber *,UIView *> *viewRegistry) {
         NSMutableDictionary *nativePlaceholders = [self getNativePlaceholders:placeholders viewRegistry:viewRegistry];
 
-        [self subscribeViewEvents:viewName];
+        [self subscribeViewEvents:identifier];
 
-        [Rokt selectPlacementsWithIdentifier:viewName
+        [Rokt selectPlacementsWithIdentifier:identifier
             attributes:attributes
             placements:nativePlaceholders
             config:config

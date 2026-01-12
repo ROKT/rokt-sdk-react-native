@@ -3,8 +3,6 @@ package com.rokt.reactnativesdk
 import com.facebook.react.bridge.*
 import com.facebook.react.uimanager.UIManagerHelper
 import com.rokt.roktsdk.Rokt
-import com.rokt.roktsdk.Rokt.RoktEventHandler
-import com.rokt.roktsdk.Rokt.RoktEventType
 import com.rokt.roktsdk.Widget
 import java.lang.ref.WeakReference
 import java.util.concurrent.CountDownLatch
@@ -36,95 +34,42 @@ class RNRoktWidgetModule internal constructor(private val reactContext: ReactApp
     }
 
     @ReactMethod
-    override fun execute(viewName: String?, attributes: ReadableMap?, placeholders: ReadableMap?) {
-        executeInternal(viewName, attributes, placeholders)
+    override fun selectPlacements(identifier: String?, attributes: ReadableMap?, placeholders: ReadableMap?) {
+        executeInternal(identifier, attributes, placeholders)
     }
 
     @ReactMethod
-    override fun executeWithConfig(
-        viewName: String?,
+    override fun selectPlacementsWithConfig(
+        identifier: String?,
         attributes: ReadableMap?,
         placeholders: ReadableMap?,
         roktConfig: ReadableMap?,
     ) {
-        executeInternal(viewName, attributes, placeholders, roktConfig)
+        executeInternal(identifier, attributes, placeholders, roktConfig)
     }
 
     private fun executeInternal(
-        viewName: String?,
+        identifier: String?,
         attributes: ReadableMap?,
         placeholders: ReadableMap?,
         roktConfig: ReadableMap? = null,
     ) {
-        if (viewName == null) {
-            impl.logDebug("Execute failed. ViewName cannot be null")
+        if (identifier == null) {
+            impl.logDebug("Execute failed. Identifier cannot be null")
             return
         }
 
-        impl.startRoktEventListener(Rokt.events(viewName), reactContext.currentActivity, viewName)
+        impl.startRoktEventListener(Rokt.events(identifier), reactContext.currentActivity, identifier)
         val config = roktConfig?.let { impl.buildRoktConfig(it) }
 
         // Process placeholders for Fabric
         val placeholdersMap = processPlaceholders(placeholders)
 
-        // Execute Rokt with the placeholders we gathered
-        Rokt.execute(
-            viewName = viewName,
+        // Select placements with the placeholders we gathered
+        Rokt.selectPlacements(
+            identifier = identifier,
             attributes = impl.readableMapToMapOfStrings(attributes),
-            callback = impl.createRoktCallback(),
             placeholders = placeholdersMap,
-            config = config,
-        )
-    }
-
-    @ReactMethod
-    override fun execute2Step(viewName: String?, attributes: ReadableMap?, placeholders: ReadableMap?) {
-        execute2StepInternal(viewName, attributes, placeholders)
-    }
-
-    @ReactMethod
-    override fun execute2StepWithConfig(
-        viewName: String?,
-        attributes: ReadableMap?,
-        placeholders: ReadableMap?,
-        roktConfig: ReadableMap?,
-    ) {
-        execute2StepInternal(viewName, attributes, placeholders, roktConfig)
-    }
-
-    private fun execute2StepInternal(
-        viewName: String?,
-        attributes: ReadableMap?,
-        placeholders: ReadableMap?,
-        roktConfig: ReadableMap? = null,
-    ) {
-        if (viewName == null) {
-            impl.logDebug("Execute failed. ViewName cannot be null")
-            return
-        }
-
-        impl.startRoktEventListener(Rokt.events(viewName), reactContext.currentActivity, viewName)
-        val config = roktConfig?.let { impl.buildRoktConfig(it) }
-
-        // Process placeholders for Fabric
-        val placeholdersMap = processPlaceholders(placeholders)
-
-        // Execute Rokt with the placeholders we gathered
-        Rokt.execute2Step(
-            viewName = viewName,
-            attributes = impl.readableMapToMapOfStrings(attributes),
-            callback = impl.createRoktCallback(),
-            placeholders = placeholdersMap,
-            roktEventCallback =
-            object : Rokt.RoktEventCallback {
-                override fun onEvent(eventType: RoktEventType, roktEventHandler: RoktEventHandler) {
-                    impl.setRoktEventHandler(roktEventHandler)
-                    if (eventType == RoktEventType.FirstPositiveEngagement) {
-                        impl.logDebug("onFirstPositiveEvent was fired")
-                        impl.sendEvent(reactContext, "FirstPositiveResponse", null)
-                    }
-                }
-            },
             config = config,
         )
     }
@@ -195,11 +140,6 @@ class RNRoktWidgetModule internal constructor(private val reactContext: ReactApp
         return placeholdersMap
     }
 
-    @ReactMethod
-    override fun setFulfillmentAttributes(attributes: ReadableMap?) {
-        impl.setFulfillmentAttributes(attributes)
-    }
-
     override fun getName(): String = impl.getName()
 
     @ReactMethod
@@ -213,12 +153,7 @@ class RNRoktWidgetModule internal constructor(private val reactContext: ReactApp
     }
 
     @ReactMethod
-    override fun setLoggingEnabled(enabled: Boolean) {
-        impl.setLoggingEnabled(enabled)
-    }
-
-    @ReactMethod
-    override fun purchaseFinalized(placementId: String, catalogItemId: String, success: Boolean) {
-        impl.purchaseFinalized(placementId, catalogItemId, success)
+    override fun purchaseFinalized(identifier: String, catalogItemId: String, success: Boolean) {
+        impl.purchaseFinalized(identifier, catalogItemId, success)
     }
 }

@@ -36,13 +36,13 @@ class RNRoktWidgetModule internal constructor(private val reactContext: ReactApp
     }
 
     @ReactMethod
-    fun execute(viewName: String?, attributes: ReadableMap?, placeholders: ReadableMap?) {
-        executeInternal(viewName, attributes, placeholders)
+    fun selectPlacements(identifier: String?, attributes: ReadableMap?, placeholders: ReadableMap?) {
+        executeInternal(identifier, attributes, placeholders)
     }
 
     @ReactMethod
-    fun executeWithConfig(
-        viewName: String?,
+    fun selectPlacementsWithConfig(
+        identifier: String?,
         attributes: ReadableMap?,
         placeholders: ReadableMap?,
         roktConfig: ReadableMap?,
@@ -51,76 +51,25 @@ class RNRoktWidgetModule internal constructor(private val reactContext: ReactApp
     }
 
     private fun executeInternal(
-        viewName: String?,
+        identifier: String?,
         attributes: ReadableMap?,
         placeholders: ReadableMap?,
         roktConfig: ReadableMap? = null,
     ) {
-        if (viewName == null) {
-            impl.logDebug("Execute failed. ViewName cannot be null")
+        if (identifier == null) {
+            impl.logDebug("Execute failed. Identifier cannot be null")
             return
         }
 
         val uiManager = reactContext.getNativeModule(UIManagerModule::class.java)
-        impl.startRoktEventListener(Rokt.events(viewName), reactContext.currentActivity, viewName)
+        impl.startRoktEventListener(Rokt.events(identifier), reactContext.currentActivity, identifier)
 
         val config = roktConfig?.let { impl.buildRoktConfig(it) }
         uiManager?.addUIBlock { nativeViewHierarchyManager ->
-            Rokt.execute(
-                viewName = viewName,
+            Rokt.selectPlacements(
+                identifier = identifier,
                 attributes = impl.readableMapToMapOfStrings(attributes),
-                callback = impl.createRoktCallback(),
                 placeholders = safeUnwrapPlaceholders(placeholders, nativeViewHierarchyManager),
-                config = config,
-            )
-        }
-    }
-
-    @ReactMethod
-    fun execute2Step(viewName: String?, attributes: ReadableMap?, placeholders: ReadableMap?) {
-        execute2StepInternal(viewName, attributes, placeholders)
-    }
-
-    @ReactMethod
-    fun execute2StepWithConfig(
-        viewName: String?,
-        attributes: ReadableMap?,
-        placeholders: ReadableMap?,
-        roktConfig: ReadableMap?,
-    ) {
-        execute2StepInternal(viewName, attributes, placeholders, roktConfig)
-    }
-
-    private fun execute2StepInternal(
-        viewName: String?,
-        attributes: ReadableMap?,
-        placeholders: ReadableMap?,
-        roktConfig: ReadableMap? = null,
-    ) {
-        if (viewName == null) {
-            impl.logDebug("Execute failed. ViewName cannot be null")
-            return
-        }
-
-        val uiManager = reactContext.getNativeModule(UIManagerModule::class.java)
-        impl.startRoktEventListener(Rokt.events(viewName), reactContext.currentActivity, viewName)
-        val config = roktConfig?.let { impl.buildRoktConfig(it) }
-        uiManager?.addUIBlock { nativeViewHierarchyManager ->
-            Rokt.execute2Step(
-                viewName = viewName,
-                attributes = impl.readableMapToMapOfStrings(attributes),
-                callback = impl.createRoktCallback(),
-                placeholders = safeUnwrapPlaceholders(placeholders, nativeViewHierarchyManager),
-                roktEventCallback =
-                object : Rokt.RoktEventCallback {
-                    override fun onEvent(eventType: RoktEventType, roktEventHandler: RoktEventHandler) {
-                        impl.setRoktEventHandler(roktEventHandler)
-                        if (eventType == RoktEventType.FirstPositiveEngagement) {
-                            impl.logDebug("onFirstPositiveEvent was fired")
-                            impl.sendEvent(reactContext, "FirstPositiveResponse", null)
-                        }
-                    }
-                },
                 config = config,
             )
         }

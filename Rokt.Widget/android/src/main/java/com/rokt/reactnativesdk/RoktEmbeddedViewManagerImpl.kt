@@ -42,10 +42,6 @@ class RoktEmbeddedViewManagerImpl {
                 override fun onHeightChanged(height: Int) {
                     changeHeight(widget.context as ReactContext, height, widget.id)
                 }
-
-                override fun onMarginChanged(start: Int, top: Int, end: Int, bottom: Int) {
-                    changeMargin(widget.context as ReactContext, widget.id, start, top, end, bottom)
-                }
             },
         )
     }

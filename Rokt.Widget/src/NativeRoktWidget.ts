@@ -32,13 +32,13 @@ export interface Spec extends TurboModule {
     appVersion: string,
     fontsMap: { [key: string]: string },
   ): void;
-  execute(
-    viewName: string,
+  selectPlacements(
+    identifier: string,
     attributes: { [key: string]: string },
     placeholders: { [key: string]: number | null },
   ): void;
-  executeWithConfig(
-    viewName: string,
+  selectPlacementsWithConfig(
+    identifier: string,
     attributes: { [key: string]: string },
     placeholders: { [key: string]: number | null },
     roktConfig: RoktConfigType,

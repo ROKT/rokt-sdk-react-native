@@ -234,8 +234,8 @@ export default class App extends Component<Props, State> {
     } else if (this.state.encryptEnabled) {
       this.executeEncrypted(attributes, placeholders);
     } else {
-      Rokt.execute(this.state.viewName, attributes, placeholders);
-      console.log('Execute');
+      Rokt.selectPlacements(this.state.viewName, attributes, placeholders);
+      console.log('Select Placements');
     }
   };
 

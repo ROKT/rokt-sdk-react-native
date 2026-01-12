@@ -51,21 +51,21 @@ export abstract class Rokt {
     }
   }
 
-  public static execute(
-    viewName: string,
+  public static selectPlacements(
+    identifier: string,
     attributes: Record<string, string>,
     placeholders: Record<string, number | null>,
     roktConfig?: IRoktConfig,
   ): void {
     if (roktConfig) {
-      RNRoktWidget.executeWithConfig(
-        viewName,
+      RNRoktWidget.selectPlacementsWithConfig(
+        identifier,
         attributes,
         placeholders,
         roktConfig,
       );
     } else {
-      RNRoktWidget.execute(viewName, attributes, placeholders);
+      RNRoktWidget.selectPlacements(identifier, attributes, placeholders);
     }
   }
 

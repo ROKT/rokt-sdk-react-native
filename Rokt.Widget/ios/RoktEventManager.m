@@ -52,7 +52,7 @@ RCT_EXPORT_MODULE(RoktEventManager);
     }
 }
 
-- (void)onRoktEvents:(RoktEvent * _Nonnull)event viewName:(NSString * _Nullable)viewName
+- (void)onRoktEvents:(RoktEvent * _Nonnull)event identifier:(NSString * _Nullable)identifier
 {
      if (hasListeners) {
          NSString *placementId;
@@ -125,8 +125,8 @@ RCT_EXPORT_MODULE(RoktEventManager);
              unitPrice = cartEvent.unitPrice;
          }
          NSMutableDictionary *payload = [@{@"event": eventName} mutableCopy];
-         if (viewName != nil) {
-             [payload setObject:viewName forKey:@"viewName"];
+         if (identifier != nil) {
+             [payload setObject:identifier forKey:@"viewName"];
          }
          if (placementId != nil) {
              [payload setObject:placementId forKey:@"placementId"];
