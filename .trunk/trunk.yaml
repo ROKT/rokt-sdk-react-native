@@ -31,17 +31,17 @@ lint:
   enabled:
     - swiftlint@0.58.2
     - buildifier@8.2.1
-    - checkov@3.2.495
+    - checkov@3.2.497
     - dotenv-linter@4.0.0
     - git-diff-check
     - ktlint@1.8.0
-    - markdownlint@0.46.0
-    - osv-scanner@2.3.0
-    - oxipng@9.1.5
-    - prettier@3.7.3
+    - markdownlint@0.47.0
+    - osv-scanner@2.3.1
+    - oxipng@10.0.0
+    - prettier@3.7.4
     - shellcheck@0.11.0
     - shfmt@3.6.0
-    - trufflehog@3.91.1
+    - trufflehog@3.92.4
     - yamllint@1.37.1
 actions:
   disabled:
