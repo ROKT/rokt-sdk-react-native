@@ -141,6 +141,6 @@ If you've made changes to the SDK and want to test them in the sample app:
 6. Go to `RoktSampleApp` project `package.json` and update the dependency to point to the new `rokt-react-native-sdk-X.X.X.tgz` file
 7. Run `npm install` in the _RoktSampleApp_ directory to update the dependency
 
-# Copyright
+## Copyright
 
 Copyright 2020 Rokt Pte Ltd Licensed under the Rokt Software Development Kit (SDK) Terms of Use Version 2.0 (the "License"); You may not use this file except in compliance with the License. You may obtain a copy of the License at <https://rokt.com/sdk-license-2-0/>
