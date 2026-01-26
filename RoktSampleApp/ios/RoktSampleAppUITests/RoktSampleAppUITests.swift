@@ -18,28 +18,28 @@ class RoktSampleAppUITests: XCTestCase {
         // In UI tests it is usually best to stop immediately when a failure occurs.
         continueAfterFailure = false
         XCUIDevice.shared.orientation = .portrait
-        // In UI tests it’s important to set the initial state - such as interface orientation - required for your tests before they run. The setUp method is a good place to do this.
+        // In UI tests it’s important to set the initial state - such as interface orientation -
+        // required for your tests before they run. The setUp method is a good place to do this.
     }
 
     override func tearDownWithError() throws {
         // Put teardown code here. This method is called after the invocation of each test method in the class.
     }
-  
+
   func testEmbedded() throws {
     // UI tests must launch the application that they test.
     let app = XCUIApplication()
     app.launch()
-    
+
     XCTAssertTrue(app.otherElements["Initialize"].waitForExistence(timeout: 60))
     app.otherElements["Initialize"].tap()
-    
+
     waiting(5.0)
     app.otherElements["Execute"].tap()
-    
+
     waiting(5.0)
     XCTAssert(app.buttons["Rokt Privacy Policy"].exists, "Rokt Privacy Policy exists" )
   }
-
 
   func testOverlay() throws {
     // UI tests must launch the application that they test.
@@ -48,11 +48,11 @@ class RoktSampleAppUITests: XCTestCase {
 
     XCTAssertTrue(app.otherElements["Initialize"].waitForExistence(timeout: 60))
     app.otherElements["Initialize"].tap()
-    
+
     waiting(5.0)
     app.textFields["input_view_name"].doubleTap()
 
-    for c in "iOSOverlay" {app.textFields["input_view_name"].typeText(String(c))}
+    for character in "iOSOverlay" {app.textFields["input_view_name"].typeText(String(character))}
     app.staticTexts["Welcome"].tap()
 
     app.otherElements["Execute"].tap()
@@ -60,7 +60,6 @@ class RoktSampleAppUITests: XCTestCase {
     XCTAssert(app.buttons["Example Privacy Policy"].exists, "Example Privacy Policy exists" )
     XCTAssert(app.staticTexts["Test Title"].exists, "test title exist" )
   }
-
 
   func waiting(_ secounds: TimeInterval) {
     _ = XCTWaiter.wait(for: [expectation(description: "Wait for n seconds")], timeout: secounds)
