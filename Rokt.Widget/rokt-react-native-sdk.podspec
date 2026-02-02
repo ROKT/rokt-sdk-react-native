@@ -46,5 +46,5 @@ Pod::Spec.new do |s|
     end
   end
 
-  s.dependency "Rokt-Widget", "~> 4.14.5"
+  s.dependency "Rokt-Widget", "~> 4.15.0"
 end

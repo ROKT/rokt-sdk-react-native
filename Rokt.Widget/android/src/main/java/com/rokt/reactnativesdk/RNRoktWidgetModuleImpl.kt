@@ -105,6 +105,12 @@ class RNRoktWidgetModuleImpl(private val reactContext: ReactApplicationContext) 
         Rokt.setLoggingEnabled(enabled)
     }
 
+    fun setSessionId(sessionId: String) {
+        Rokt.setSessionId(sessionId)
+    }
+
+    fun getSessionId(): String? = Rokt.getSessionId()
+
     fun setRoktEventHandler(roktEventHandler: RoktEventHandler) {
         this.roktEventHandler = roktEventHandler
     }

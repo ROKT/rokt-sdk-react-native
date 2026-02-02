@@ -4,3 +4,7 @@
 **/.settings/**
 Pods/
 .vscode/
+
+Rokt.Widget/rokt-react-native-sdk-*.tgz
+RoktSampleApp/package-lock.json
+RoktSampleApp/android/app/src/main/assets/*.bundle

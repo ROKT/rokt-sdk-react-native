@@ -65,6 +65,10 @@ export interface Spec extends TurboModule {
   setEnvironmentToStage(): void;
   setEnvironmentToProd(): void;
   setLoggingEnabled(enabled: boolean): void;
+
+  // Session ID methods
+  setSessionId(sessionId: string): void;
+  getSessionId(): string | null;
 }
 
 export default TurboModuleRegistry.getEnforcing<Spec>("RNRoktWidget");
