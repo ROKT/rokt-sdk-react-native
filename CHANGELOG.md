@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [4.12.0] - 2026-02-04
 
+### Added
+
+- Added support for getting and setting session ID. If you use multiple integrations, such as webview and native within your app you can now set session ID so it is maintained across integration types.
+
 ## [4.11.4] - 2025-12-15
 
 ### Changed
