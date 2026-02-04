@@ -311,6 +311,16 @@ RCT_EXPORT_METHOD(purchaseFinalized:(NSString *)placementId
                                 success:success];
 }
 
+RCT_EXPORT_METHOD(setSessionId:(NSString *)sessionId)
+{
+    [Rokt setSessionIdWithSessionId:sessionId];
+}
+
+RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(getSessionId)
+{
+    return [Rokt getSessionId];
+}
+
 #ifdef RCT_NEW_ARCH_ENABLED
 - (std::shared_ptr<facebook::react::TurboModule>)getTurboModule:(const facebook::react::ObjCTurboModule::InitParams &)params {
     self.bridge = params.instance.bridge;

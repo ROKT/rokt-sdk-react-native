@@ -2257,7 +2257,7 @@ PODS:
   - RNCCheckbox (0.5.20):
     - BEMCheckBox (~> 1.4)
     - React-Core
-  - rokt-react-native-sdk (4.11.3):
+  - rokt-react-native-sdk (4.11.4):
     - boost
     - DoubleConversion
     - fast_float
@@ -2283,10 +2283,10 @@ PODS:
     - ReactCodegen
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
-    - Rokt-Widget (~> 4.14.5)
+    - Rokt-Widget (~> 4.15.0)
     - SocketRocket
     - Yoga
-  - Rokt-Widget (4.14.5)
+  - Rokt-Widget (4.15.0)
   - SocketRocket (0.7.1)
   - Yoga (0.0.0)
 
@@ -2595,8 +2595,8 @@ SPEC CHECKSUMS:
   ReactCodegen: 6c26f8c25d0b5ae66f86a1cce1777076ac8bcbd8
   ReactCommon: 5f0e5c09a64a2717215dd84380e1a747810406f2
   RNCCheckbox: 33b44487ca8008394ce658cc32b26eab04f426ef
-  rokt-react-native-sdk: 0ac09e70c81c127bfc01ca2fa61a397bcc2fe48c
-  Rokt-Widget: c77b91164019f797425e2f77ea68e0d091774abe
+  rokt-react-native-sdk: aa8a56953c0f07dc1a492667737950e1279884c1
+  Rokt-Widget: d08a819afaa8b3588c14dc44d4ebb08bc2150fe2
   SocketRocket: d4aabe649be1e368d1318fdf28a022d714d65748
   Yoga: 728df40394d49f3f471688747cf558158b3a3bd1
 

@@ -221,4 +221,12 @@ class RNRoktWidgetModule internal constructor(private val reactContext: ReactApp
     override fun purchaseFinalized(placementId: String, catalogItemId: String, success: Boolean) {
         impl.purchaseFinalized(placementId, catalogItemId, success)
     }
+
+    @ReactMethod
+    override fun setSessionId(sessionId: String) {
+        impl.setSessionId(sessionId)
+    }
+
+    @ReactMethod(isBlockingSynchronousMethod = true)
+    override fun getSessionId(): String? = impl.getSessionId()
 }
