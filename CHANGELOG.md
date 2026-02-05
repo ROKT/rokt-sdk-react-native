@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.12.0] - 2026-02-04
+
+### Added
+
+- Added support for getting and setting session ID. If you use multiple integrations, such as webview and native within your app you can now set session ID so it is maintained across integration types.
+
 ## [4.11.4] - 2025-12-15
 
 ### Changed
@@ -71,7 +77,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Support new response action type `ExternalPaymentTrigger`
 - Sessions are now retained between app restarts
 
-[unreleased]: https://github.com/ROKT/rokt-sdk-react-native/compare/4.11.4...HEAD
+[unreleased]: https://github.com/ROKT/rokt-sdk-react-native/compare/4.12.0...HEAD
+[4.12.0]: https://github.com/ROKT/rokt-sdk-react-native/compare/4.11.4...4.12.0
 [4.11.4]: https://github.com/ROKT/rokt-sdk-react-native/compare/4.11.3...4.11.4
 [4.11.3]: https://github.com/ROKT/rokt-sdk-react-native/compare/4.11.2...4.11.3
 [4.11.2]: https://github.com/ROKT/rokt-sdk-react-native/compare/4.11.1...4.11.2
