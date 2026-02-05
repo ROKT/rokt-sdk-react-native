@@ -18,6 +18,7 @@ info:
     - lang-javascript
     - lang-kotlin
     - lang-objectivec
+    - serviceTier-3
 
   x-cortex-oncall:
     opsgenie:
