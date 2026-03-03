@@ -11,6 +11,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [4.12.1] - 2026-03-03
 
+### Changed
+
+- Updated Rokt Android SDK to `4.14.0`.
+- SPM fallback option iOS native
+
 ## [4.12.0] - 2026-02-04
 
 ### Added
