@@ -9,6 +9,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.12.1] - 2026-03-03
+
+### Changed
+
+- Updated Rokt Android SDK to `4.14.0`.
+- SPM fallback option iOS native
+
 ## [4.12.0] - 2026-02-04
 
 ### Added
@@ -77,7 +84,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Support new response action type `ExternalPaymentTrigger`
 - Sessions are now retained between app restarts
 
-[unreleased]: https://github.com/ROKT/rokt-sdk-react-native/compare/4.12.0...HEAD
+[unreleased]: https://github.com/ROKT/rokt-sdk-react-native/compare/4.12.1...HEAD
+[4.12.1]: https://github.com/ROKT/rokt-sdk-react-native/compare/4.12.0...4.12.1
 [4.12.0]: https://github.com/ROKT/rokt-sdk-react-native/compare/4.11.4...4.12.0
 [4.11.4]: https://github.com/ROKT/rokt-sdk-react-native/compare/4.11.3...4.11.4
 [4.11.3]: https://github.com/ROKT/rokt-sdk-react-native/compare/4.11.2...4.11.3
