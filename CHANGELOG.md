@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [4.12.2] - 2026-03-05
 
+### Updated
+
+- Updated Cocoapods dependency to loosely version the Rokt Widget from version 4.15.0 to less than 5.0.0
+
 ## [4.12.1] - 2026-03-03
 
 ### Changed
