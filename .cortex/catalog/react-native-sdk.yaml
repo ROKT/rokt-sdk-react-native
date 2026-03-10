@@ -20,11 +20,6 @@ info:
     - lang-objectivec
     - serviceTier-3
 
-  x-cortex-oncall:
-    opsgenie:
-      type: SCHEDULE
-      id: Mobile Integrations_schedule
-
   x-cortex-link:
     - name: Mobile SDK Detailed Error View
       type: dashboard
