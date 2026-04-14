@@ -25,9 +25,9 @@
 
 Plans:
 
-- [ ] 01-01-PLAN.md — Apply teammate baseline + clean TypeScript and Android layers
-- [ ] 01-02-PLAN.md — Apply teammate baseline + clean iOS bridge and event manager
-- [ ] 01-03-PLAN.md — Android event additions, barrel exports, cross-platform verification
+- [ ] 01-01-PLAN.md — Rewrite TypeScript layer (TurboModule spec + Rokt.tsx) and Android shared impl for v5.0.0
+- [ ] 01-02-PLAN.md — Rewrite iOS bridge (RNRoktWidget.mm) and event manager for v5.0.0 with shoppable ads events
+- [ ] 01-03-PLAN.md — Rewrite Android arch wrappers, add selectShoppableAds, full cross-platform build verification
 
 **Success Criteria:**
 
@@ -74,4 +74,4 @@ Plans:
 ---
 
 _Roadmap created: 2026-04-14_
-_Last updated: 2026-04-14 after phase 1 planning_
+_Last updated: 2026-04-14 after phase 1 replanning_
