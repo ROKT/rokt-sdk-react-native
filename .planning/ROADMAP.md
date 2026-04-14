@@ -25,8 +25,8 @@
 
 Plans:
 
-- [ ] 01-01-PLAN.md — Rewrite TypeScript layer (TurboModule spec + Rokt.tsx) and Android shared impl for v5.0.0
-- [ ] 01-02-PLAN.md — Rewrite iOS bridge (RNRoktWidget.mm) and event manager for v5.0.0 with shoppable ads events
+- [x] 01-01-PLAN.md — Rewrite TypeScript layer (TurboModule spec + Rokt.tsx) and Android shared impl for v5.0.0
+- [x] 01-02-PLAN.md — Rewrite iOS bridge (RNRoktWidget.mm) and event manager for v5.0.0 with shoppable ads events
 - [ ] 01-03-PLAN.md — Rewrite Android arch wrappers, add selectShoppableAds, full cross-platform build verification
 
 **Success Criteria:**
@@ -47,6 +47,13 @@ Plans:
 **Goal:** Update RoktSampleApp and ExpoTestApp for v5.0.0 API changes and add shoppable ads demonstration with native payment extension registration.
 
 **Requirements:** APP-01, APP-02, APP-03
+
+**Plans:** 2 plans
+
+Plans:
+
+- [ ] 02-01-PLAN.md — Update both sample apps for v5.0.0 API, add shoppable ads demo, register payment extension in iOS AppDelegate
+- [ ] 02-02-PLAN.md — Build verification: Rokt.Widget + RoktSampleApp + ExpoTestApp on iOS and Android
 
 **Success Criteria:**
 
@@ -74,4 +81,4 @@ Plans:
 ---
 
 _Roadmap created: 2026-04-14_
-_Last updated: 2026-04-14 after phase 1 replanning_
+_Last updated: 2026-04-14 after phase 2 planning_
