@@ -67,6 +67,33 @@ class RNRoktWidgetModuleImpl(private val reactContext: ReactApplicationContext) 
         Rokt.purchaseFinalized(placementId, catalogItemId, success)
     }
 
+    fun selectShoppableAds(
+        identifier: String,
+        attributes: ReadableMap?,
+        currentActivity: Activity?,
+    ) {
+        startRoktEventListener(Rokt.events(identifier), currentActivity, identifier)
+        Rokt.selectShoppableAds(
+            identifier = identifier,
+            attributes = readableMapToMapOfStrings(attributes),
+        )
+    }
+
+    fun selectShoppableAdsWithConfig(
+        identifier: String,
+        attributes: ReadableMap?,
+        roktConfig: ReadableMap?,
+        currentActivity: Activity?,
+    ) {
+        startRoktEventListener(Rokt.events(identifier), currentActivity, identifier)
+        val config = roktConfig?.let { buildRoktConfig(it) }
+        Rokt.selectShoppableAds(
+            identifier = identifier,
+            attributes = readableMapToMapOfStrings(attributes),
+            config = config,
+        )
+    }
+
     fun setEnvironmentToStage() {
         Rokt.setEnvironment(Rokt.Environment.Stage)
     }
