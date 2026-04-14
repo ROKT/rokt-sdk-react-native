@@ -13,7 +13,7 @@ Pod::Spec.new do |s|
   s.homepage     = "https://github.com/ROKT/rokt-sdk-react-native"
   s.summary      = "Rokt Mobile SDK to integrate ROKT Api into React Native iOS application"
 
-  s.platforms = { :ios => "10.0" }
+  s.platforms = { :ios => "15.0" }
   s.source       = { :git => "https://github.com/ROKT/rokt-sdk-react-native", :tag => "#{s.version}" }
 
   s.source_files = "ios/**/*.{h,m,swift,mm}"
@@ -47,14 +47,14 @@ Pod::Spec.new do |s|
   end
 
   # Primary: CocoaPods dependency (still works when SPM is not used)
-  s.dependency "Rokt-Widget", ">= 4.15", "< 5"
+  s.dependency "Rokt-Widget", ">= 5.0.0"
 
   # SPM bridge: registers Rokt-Widget as an SPM dependency alongside CocoaPods (RN 0.75+).
   # See: https://github.com/facebook/react-native/pull/44627
   if respond_to?(:spm_dependency, true)
     spm_dependency(s,
       url: 'https://github.com/ROKT/rokt-sdk-ios.git',
-      requirement: { kind: 'upToNextMajorVersion', minimumVersion: '4.15.0' },
+      requirement: { kind: 'upToNextMajorVersion', minimumVersion: '5.0.0' },
       products: ['Rokt-Widget']
     )
   end
