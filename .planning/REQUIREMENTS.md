@@ -1,53 +1,68 @@
-# Requirements: Rokt RN SDK Shoppable Ads
+# Requirements: Rokt RN SDK v5.0.0 Migration & Shoppable Ads
 
 **Defined:** 2026-04-14
-**Core Value:** Partners using React Native can trigger Shoppable Ads placements and handle purchase events
+**Core Value:** React Native SDK achieves API parity with native iOS/Android SDK 5.0.0
 
 ## v1 Requirements
 
 ### SDK Dependencies
 
-- [ ] **SDK-01**: iOS SDK dependency updated to Rokt-Widget >= 5.0.0
-- [ ] **SDK-02**: Android SDK dependency unchanged (4.14.1)
-- [ ] **SDK-03**: Package version bumped appropriately
+- [ ] **SDK-01**: iOS SDK dependency updated to Rokt-Widget >= 5.0.0 (podspec + SPM)
+- [ ] **SDK-02**: Android SDK dependency updated to roktsdk 5.0.0
+- [ ] **SDK-03**: Package version bumped to 5.0.0
+- [ ] **SDK-04**: iOS platform minimum raised to 15.0
 
-### Bridge API
+### API Renames
 
-- [ ] **API-01**: `registerPaymentExtension` method exposed in TurboModule spec (NativeRoktWidget.ts)
-- [ ] **API-02**: `registerPaymentExtension` implemented in iOS native bridge (RNRoktWidget.mm)
-- [ ] **API-03**: `registerPaymentExtension` added as no-op in Android native bridge (RNRoktWidgetModuleImpl.kt)
-- [ ] **API-04**: `registerPaymentExtension` exposed in public Rokt.tsx API
-- [ ] **API-05**: Both old and new RN architecture paths work for new API
+- [ ] **REN-01**: execute/executeWithConfig renamed to selectPlacements/selectPlacementsWithConfig in TurboModule spec
+- [ ] **REN-02**: execute/executeWithConfig renamed to selectPlacements/selectPlacementsWithConfig in iOS bridge
+- [ ] **REN-03**: execute/executeWithConfig renamed to selectPlacements/selectPlacementsWithConfig in Android bridge
+- [ ] **REN-04**: execute/executeWithConfig renamed to selectPlacements/selectPlacementsWithConfig in public Rokt.tsx
+- [ ] **REN-05**: viewName parameter renamed to identifier across all APIs
+- [ ] **REN-06**: purchaseFinalized parameter placementId renamed to identifier
 
-### Events
+### API Removals
 
-- [ ] **EVT-01**: CartItemInstantPurchaseInitiated event type handled and emitted
-- [ ] **EVT-02**: CartItemInstantPurchase event type handled and emitted
-- [ ] **EVT-03**: CartItemInstantPurchaseFailure event type handled and emitted
-- [ ] **EVT-04**: InstantPurchaseDismissal event type handled and emitted
-- [ ] **EVT-05**: CartItemDevicePay event type with paymentProvider context handled
+- [ ] **REM-01**: setLoggingEnabled removed from all layers (TurboModule, iOS, Android, Rokt.tsx)
+- [ ] **REM-02**: execute2Step/execute2StepWithConfig removed from all layers
+- [ ] **REM-03**: setFulfillmentAttributes removed from all layers
+- [ ] **REM-04**: setSessionId/getSessionId removed from all layers
+
+### Event System
+
+- [ ] **EVT-01**: iOS bridge updated to unified onEvent callback pattern (replacing individual callbacks)
+- [ ] **EVT-02**: Android bridge updated to unified onEvent callback pattern
+- [ ] **EVT-03**: New shoppable ads events handled (CartItemInstantPurchaseInitiated, CartItemInstantPurchase, CartItemInstantPurchaseFailure, InstantPurchaseDismissal, CartItemDevicePay)
+
+### Shoppable Ads
+
+- [ ] **SHP-01**: selectShoppableAds method added to TurboModule spec
+- [ ] **SHP-02**: selectShoppableAds implemented in iOS bridge
+- [ ] **SHP-03**: selectShoppableAds implemented in Android bridge
+- [ ] **SHP-04**: selectShoppableAds exposed in public Rokt.tsx API
 
 ### Example Apps
 
-- [ ] **APP-01**: RoktSampleApp demonstrates shoppable ads flow with payment extension registration
-- [ ] **APP-02**: ExpoTestApp demonstrates shoppable ads flow with payment extension registration
-- [ ] **APP-03**: Extension library (RoktPaymentExtension) added to iOS sample app targets
-- [ ] **APP-04**: registerPaymentExtension called in native AppDelegate code
+- [ ] **APP-01**: RoktSampleApp updated for v5.0.0 API changes + shoppable ads
+- [ ] **APP-02**: ExpoTestApp updated for v5.0.0 API changes + shoppable ads
+- [ ] **APP-03**: Payment extension registration in native iOS AppDelegate
+
+### Documentation
+
+- [ ] **DOC-01**: README.md updated with v5.0.0 API surface
+- [ ] **DOC-02**: MIGRATING.md created with migration guide from v4.x to v5.0.0
 
 ## v2 Requirements
 
-### Android
-
-- **AND-01**: Full Android Shoppable Ads implementation (separate bet)
+(None — this covers the full v5.0.0 migration)
 
 ## Out of Scope
 
-| Feature                    | Reason                                       |
-| -------------------------- | -------------------------------------------- |
-| Android Shoppable Ads      | Separate bet — no-op stubs only              |
-| Google Pay                 | Apple Pay only for this cycle                |
-| Web SDK support            | Different platform                           |
-| New Shoppable Ads features | Only exposing what iOS SDK 5.0.0 already has |
+| Feature                       | Reason                                      |
+| ----------------------------- | ------------------------------------------- |
+| Google Pay                    | Apple Pay only for this cycle               |
+| Web SDK support               | Different platform                          |
+| New features beyond SDK 5.0.0 | Only exposing what native SDKs already have |
 
 ## Traceability
 
@@ -56,28 +71,37 @@
 | SDK-01      | Phase 1 | Pending |
 | SDK-02      | Phase 1 | Pending |
 | SDK-03      | Phase 1 | Pending |
-| API-01      | Phase 1 | Pending |
-| API-02      | Phase 1 | Pending |
-| API-03      | Phase 1 | Pending |
-| API-04      | Phase 1 | Pending |
-| API-05      | Phase 1 | Pending |
+| SDK-04      | Phase 1 | Pending |
+| REN-01      | Phase 1 | Pending |
+| REN-02      | Phase 1 | Pending |
+| REN-03      | Phase 1 | Pending |
+| REN-04      | Phase 1 | Pending |
+| REN-05      | Phase 1 | Pending |
+| REN-06      | Phase 1 | Pending |
+| REM-01      | Phase 1 | Pending |
+| REM-02      | Phase 1 | Pending |
+| REM-03      | Phase 1 | Pending |
+| REM-04      | Phase 1 | Pending |
 | EVT-01      | Phase 1 | Pending |
 | EVT-02      | Phase 1 | Pending |
 | EVT-03      | Phase 1 | Pending |
-| EVT-04      | Phase 1 | Pending |
-| EVT-05      | Phase 1 | Pending |
+| SHP-01      | Phase 1 | Pending |
+| SHP-02      | Phase 1 | Pending |
+| SHP-03      | Phase 1 | Pending |
+| SHP-04      | Phase 1 | Pending |
 | APP-01      | Phase 2 | Pending |
 | APP-02      | Phase 2 | Pending |
 | APP-03      | Phase 2 | Pending |
-| APP-04      | Phase 2 | Pending |
+| DOC-01      | Phase 3 | Pending |
+| DOC-02      | Phase 3 | Pending |
 
 **Coverage:**
 
-- v1 requirements: 17 total
-- Mapped to phases: 17
+- v1 requirements: 26 total
+- Mapped to phases: 26
 - Unmapped: 0 ✓
 
 ---
 
 _Requirements defined: 2026-04-14_
-_Last updated: 2026-04-14 after initial definition_
+_Last updated: 2026-04-14 after scope expansion_

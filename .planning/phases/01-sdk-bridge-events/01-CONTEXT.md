@@ -2,96 +2,156 @@
 
 **Gathered:** 2026-04-14
 **Status:** Ready for planning
-**Source:** User requirements + mParticle reference implementation + Rokt integration guide
+**Source:** iOS/Android migration guides + teammate branch + mParticle reference
 
 <domain>
 ## Phase Boundary
 
-This phase updates the Rokt React Native SDK to support Shoppable Ads by:
+Full v5.0.0 migration of the React Native SDK bridge layer:
 
-1. Bumping the iOS SDK dependency from 4.x to 5.0.0
-2. Adding `selectShoppableAds` API method to the RN bridge
-3. Updating event handling for new shoppable ads event types
-4. Android side is no-op stubs only
-5. Updating the RoktConfig building to use the new SDK 5.0 builder pattern
+1. Bump iOS SDK to Rokt-Widget 5.0.0 and Android SDK to roktsdk 5.0.0
+2. Rename execute → selectPlacements across all layers (TS, iOS, Android)
+3. Remove deprecated APIs (setLoggingEnabled, execute2Step, setFulfillmentAttributes, setSessionId/getSessionId)
+4. Update event system to unified onEvent callback pattern
+5. Add selectShoppableAds API on all layers
+6. Leverage teammate's `feat/remove-deprecated-functions` branch
 
-This does NOT include example app changes (Phase 2).
+Does NOT include example app changes (Phase 2) or documentation (Phase 3).
 
 </domain>
 
 <decisions>
 ## Implementation Decisions
 
-### SDK Version Update
+### Teammate's Branch (feat/remove-deprecated-functions)
 
-- iOS podspec: Change `s.dependency "Rokt-Widget", ">= 4.15", "< 5"` to `s.dependency "Rokt-Widget", ">= 5.0.0"`
-- iOS SPM: Change `minimumVersion: '4.15.0'` to `minimumVersion: '5.0.0'`
-- Android SDK version stays at 4.14.1 — no change
-- iOS platform minimum likely needs to be raised (check SDK 5.0.0 requirements)
+- This branch already has significant foundation work: new arch support, Kotlin bridge, TypeScript types
+- The TurboModule spec (NativeRoktWidget.ts) on that branch already uses `selectPlacements` (not execute)
+- The Rokt.tsx already uses `selectPlacements` with the new signature
+- The iOS bridge (RNRoktWidget.mm) is already rewritten for new arch
+- The Android bridge is already rewritten in Kotlin with new/old arch split
+- The podspec on that branch still points to `~> 4.14.5` — needs bumping to `>= 5.0.0`
+- The build.gradle on that branch points to `roktsdk:5.0.0` already
+- **Strategy**: Cherry-pick or diff-apply the teammate's source files as foundation, then layer our additions on top (shoppable ads, event updates, final version bumps)
 
-### New API: selectShoppableAds
+### iOS SDK 5.0.0 Migration (from ROKT/rokt-sdk-ios MIGRATING.md)
 
-- The direct Rokt SDK (not mParticle) uses `Rokt.selectShoppableAds(identifier:attributes:config:onEvent:)`
-- In the RN bridge, this needs to be exposed similarly to `execute` but WITHOUT placeholders (shoppable ads don't use embedded views — they use a full-screen overlay)
-- Method signature in TurboModule spec: `selectShoppableAds(identifier: string, attributes: { [key: string]: string }, roktConfig?: RoktConfigType): void`
-- Public API in Rokt.tsx: `static selectShoppableAds(identifier: string, attributes: Record<string, string>, roktConfig?: IRoktConfig): void`
+- `execute()` / `execute2step()` / `executeWithEvents()` → `selectPlacements()`
+- `viewName` → `identifier` parameter rename
+- `locationName` → `location` parameter rename
+- `PlacementOptions` → `RoktPlacementOptions`
+- `setLoggingEnabled(enable:)` removed → `setLogLevel(_:)` (.debug, .error, .none)
+- `onInitComplete` callback removed from `initWith()` → use `globalEvents()` for `RoktEvent.InitComplete`
+- Individual callbacks (onLoad, onUnLoad, etc.) → single `onEvent: { event in }` with RoktEvent pattern matching
+- iOS minimum bumped from 12 to iOS 15
+- SPM and CocoaPods moved to source distribution
 
-### registerPaymentExtension is NOT exposed through the RN bridge
+### Android SDK 5.0.0 Migration (from ROKT/sdk-android-source MIGRATING.md)
 
-- IMPORTANT: registerPaymentExtension requires native Swift/ObjC code to create the RoktStripePaymentExtension object
-- This CANNOT be done from JavaScript — it requires importing the RoktStripePaymentExtension Swift package and instantiating with Apple Pay merchant ID
-- registerPaymentExtension is called in the native AppDelegate, NOT through the RN bridge
-- The RN bridge only needs `selectShoppableAds` — payment extension registration is a native-only concern
-- This is a key difference from mParticle where `registerPaymentExtension` IS on the bridge because mParticle Core SDK wraps it
+- `execute()` / `execute2Step()` / `executeWithEvents()` → `selectPlacements()`
+- `viewName` → `identifier` parameter rename
+- `purchaseFinalized()`: `placementId` → `identifier`, `status` → `success`
+- `events()`: `viewName` → `identifier`
+- `RoktEvent.id` property → `identifier` on all event classes
+- `RoktCallback`, `RoktInitCallback`, `RoktEventCallback`, `RoktEventHandler`, `RoktEventType`, `UnloadReasons` all REMOVED
+- `setLoggingEnabled()` removed → use `Rokt.setLogLevel()`
+- `execute2Step()` removed → use `selectPlacements()`
+- `RoktInitCallback` removed from `init()` → use `globalEvents()` Flow for `RoktEvent.InitComplete`
+- Individual callbacks → `RoktEventCollector` or `Flow<RoktEvent>` overload
 
-### iOS Native Bridge Implementation (RNRoktWidget.mm)
+### TurboModule Spec Changes (NativeRoktWidget.ts)
 
-- Add `selectShoppableAds` method to both old arch (RCT_EXPORT_METHOD) and new arch (NativeRoktWidgetSpec)
-- The implementation calls `[Rokt selectShoppableAds:identifier attributes:attributes config:roktConfig onEvent:^(RoktEvent *event) { ... }]`
-- Event callback feeds into existing RoktEventManager
-- RoktConfig building may need updating from direct property assignment to builder pattern (like mParticle did: MPRoktConfig → RoktConfigBuilder → build)
+From teammate's branch, the spec already has:
 
-### SDK 5.0 API Changes (from mParticle reference)
+```typescript
+interface Spec extends TurboModule {
+  initialize(roktTagId: string, appVersion: string): void;
+  initializeWithFontFiles(
+    roktTagId: string,
+    appVersion: string,
+    fontsMap: { [key: string]: string },
+  ): void;
+  selectPlacements(
+    identifier: string,
+    attributes: { [key: string]: string },
+    placeholders: { [key: string]: number | null },
+  ): void;
+  selectPlacementsWithConfig(
+    identifier: string,
+    attributes: { [key: string]: string },
+    placeholders: { [key: string]: number | null },
+    roktConfig: RoktConfigType,
+  ): void;
+  purchaseFinalized(
+    placementId: string,
+    catalogItemId: string,
+    success: boolean,
+  ): void;
+  setEnvironmentToStage(): void;
+  setEnvironmentToProd(): void;
+}
+```
 
-- `MPRoktConfig` → `RoktConfig` (new namespace)
-- Config built via `RoktConfigBuilder` → `colorMode:` → `cacheConfig:` → `build`
-- `MPColorMode` → `RoktColorMode` (RoktColorModeDark, RoktColorModeLight, RoktColorModeSystem)
-- `MPRoktEmbeddedView` → `RoktEmbeddedView`
-- `MPRoktEvent` → `RoktEvent`
-- `callbacks:` parameter replaced with `onEvent:^(RoktEvent *event)` block
-- Event handling moves from individual callback properties to unified onEvent handler
-- Need `#import <RoktContracts/RoktContracts-Swift.h>` or equivalent header
+We need to ADD:
 
-### Android No-Op
+```typescript
+  selectShoppableAds(identifier: string, attributes: { [key: string]: string }): void;
+  selectShoppableAdsWithConfig(identifier: string, attributes: { [key: string]: string }, roktConfig: RoktConfigType): void;
+```
 
-- Add `selectShoppableAds` method to `RNRoktWidgetModuleImpl.kt` that logs a warning and does nothing
-- Add to both old arch and new arch module files
-- Add to TurboModule spec (NativeRoktWidget.ts)
+And VERIFY removed methods are NOT present: no setLoggingEnabled, no execute, no execute2Step, no setFulfillmentAttributes, no setSessionId/getSessionId.
 
-### Event System Updates
+### Public API Changes (Rokt.tsx)
 
-- The onEvent callback receives `RoktEvent` objects with various types
-- New shoppable ads event types that must be forwarded:
-  - CartItemInstantPurchaseInitiated
-  - CartItemInstantPurchase (already partially handled — exists in current iOS event manager)
-  - CartItemInstantPurchaseFailure
-  - CartItemDevicePay (with paymentProvider)
-  - InstantPurchaseDismissal
-- The existing selectPlacements method should also be updated to use onEvent callback pattern instead of individual callback properties (if SDK 5.0 removes the old callback pattern)
+From teammate's branch, already has: `selectPlacements()`, `purchaseFinalized()`, `setEnvironmentToStage/Prod()`
+Need to ADD: `selectShoppableAds()`
+Need to VERIFY removed: no `execute()`, no `execute2Step()`, no `setLoggingEnabled()`, no `setFulfillmentAttributes()`, no `setSessionId/getSessionId()`
 
-### RoktEventManager Updates
+### iOS Native Bridge (RNRoktWidget.mm)
 
-- Current iOS RoktEventManager handles events via individual methods
-- SDK 5.0 unifies to `onRoktEvents:(RoktEvent *)event viewName:(NSString *)viewName`
-- The mParticle reference shows how this works — the event manager takes a RoktEvent and emits the appropriate JS event
-- Need to handle the new event types and extract their properties
+Teammate's branch already has the full rewrite with new arch support.
+Need to:
+
+- Update Rokt SDK import if needed for 5.0.0
+- Verify selectPlacements uses onEvent callback (not individual callbacks)
+- Add selectShoppableAds method (calls `[Rokt selectShoppableAds:identifier attributes:attributes config:config onEvent:^(RoktEvent *event) { ... }]`)
+- Verify all deprecated methods removed
+
+### Android Native Bridge (RNRoktWidgetModuleImpl.kt)
+
+Teammate's branch already has Kotlin rewrite.
+Need to:
+
+- Verify selectPlacements uses onEvent/RoktEventCollector pattern
+- Add selectShoppableAds method
+- Verify all deprecated methods removed
+- Verify parameter names match SDK 5.0 (identifier, not viewName)
+
+### Event System
+
+Both iOS and Android event managers need to handle new event types:
+
+- CartItemInstantPurchaseInitiated (identifier, catalogItemId, cartItemId)
+- CartItemInstantPurchase (catalogItemId, totalPrice, currency, quantity)
+- CartItemInstantPurchaseFailure (error, catalogItemId)
+- CartItemDevicePay (paymentProvider)
+- InstantPurchaseDismissal (identifier)
+
+The mParticle reference shows the unified onEvent pattern — event manager receives RoktEvent and emits appropriate JS events.
+
+### SDK Dependency Versions
+
+- iOS podspec: `s.dependency "Rokt-Widget", ">= 5.0.0"` (teammate has `~> 4.14.5`)
+- iOS SPM: `minimumVersion: '5.0.0'`
+- iOS platform: `>= 15.0` (teammate has `>= 10.0` — needs update)
+- Android: `implementation ('com.rokt:roktsdk:5.0.0')` (teammate already has this)
+- Package version: `5.0.0` (teammate has `4.11.4`)
 
 ### Claude's Discretion
 
-- Exact import paths for SDK 5.0 headers (may need to check actual SDK package)
-- Whether `selectPlacements` existing callback pattern needs updating for SDK 5.0 compat
-- TypeScript type definitions for new event payloads
-- Error handling for selectShoppableAds failures
+- Exact merge strategy for teammate's branch (cherry-pick vs diff-apply vs manual)
+- Whether to use setLogLevel as replacement for setLoggingEnabled or just remove
+- RoktConfig builder pattern details for the RN bridge layer
 
 </decisions>
 
@@ -101,92 +161,72 @@ This does NOT include example app changes (Phase 2).
 
 **Downstream agents MUST read these before planning or implementing.**
 
-### Current Bridge Implementation
+### Teammate's Branch (baseline to build upon)
 
-- `Rokt.Widget/src/NativeRoktWidget.ts` — TurboModule spec (add selectShoppableAds here)
-- `Rokt.Widget/src/Rokt.tsx` — Public API class (add selectShoppableAds here)
-- `Rokt.Widget/ios/RNRoktWidget.mm` — iOS native bridge (add selectShoppableAds here, update RoktConfig)
-- `Rokt.Widget/ios/RoktEventManager.m` — iOS event handling (update for new event types + unified onEvent)
+- GitHub: https://github.com/ROKT/rokt-sdk-react-native/tree/feat/remove-deprecated-functions
+- Key files to diff: NativeRoktWidget.ts, Rokt.tsx, RNRoktWidget.mm, RNRoktWidgetModuleImpl.kt, podspec, build.gradle, package.json
+
+### Current Source (on our branch)
+
+- `Rokt.Widget/src/NativeRoktWidget.ts` — TurboModule spec
+- `Rokt.Widget/src/Rokt.tsx` — Public API (NOTE: already has selectShoppableAds from Wave 1 work)
+- `Rokt.Widget/ios/RNRoktWidget.mm` — iOS bridge
+- `Rokt.Widget/ios/RoktEventManager.m` — iOS event handling
 - `Rokt.Widget/ios/RoktEventManager.h` — Event manager header
-
-### Android Bridge
-
-- `Rokt.Widget/android/src/main/java/com/rokt/reactnativesdk/RNRoktWidgetModuleImpl.kt` — Core impl (add no-op)
-- `Rokt.Widget/android/src/newarch/java/com/rokt/reactnativesdk/RNRoktWidgetModule.kt` — New arch wrapper
-- `Rokt.Widget/android/src/oldarch/java/com/rokt/reactnativesdk/RNRoktWidgetModule.kt` — Old arch wrapper
-
-### SDK Dependency
-
-- `Rokt.Widget/rokt-react-native-sdk.podspec` — iOS SDK version (change here)
-- `Rokt.Widget/android/build.gradle` — Android SDK version (no change)
+- `Rokt.Widget/android/src/main/java/com/rokt/reactnativesdk/RNRoktWidgetModuleImpl.kt` — Android impl
+- `Rokt.Widget/android/src/newarch/java/com/rokt/reactnativesdk/RNRoktWidgetModule.kt` — New arch
+- `Rokt.Widget/android/src/oldarch/java/com/rokt/reactnativesdk/RNRoktWidgetModule.kt` — Old arch
+- `Rokt.Widget/rokt-react-native-sdk.podspec` — iOS dependency
+- `Rokt.Widget/android/build.gradle` — Android dependency
 - `Rokt.Widget/package.json` — Package version
 
-### mParticle Reference (similar changes already done)
+### Migration Guides
+
+- iOS: https://github.com/ROKT/rokt-sdk-ios/blob/main/MIGRATING.md
+- Android: https://github.com/ROKT/sdk-android-source/blob/main/MIGRATING.md
+
+### mParticle Reference (similar migration done)
 
 - GitHub compare: mParticle/react-native-mparticle main...thomson-t/shoppable-ads-sdk9
-- Key patterns: selectShoppableAds bridge method, RoktConfigBuilder usage, onEvent callback, RoktContracts import
 
 </canonical_refs>
 
 <specifics>
 ## Specific Ideas
 
-### selectShoppableAds API signature (from Rokt integration guide)
+### Wave 1 Work Already Done (on our branch)
 
-```swift
-// Direct Rokt SDK (what we call from the RN bridge)
-Rokt.selectShoppableAds(
-    identifier: String,
-    attributes: [String: String],
-    config: [String: String]?,
-    onEvent: (RoktEvent) -> Void
-)
-```
+Plan 01-01 already executed and committed:
 
-### mParticle TurboModule spec addition (reference)
+- podspec bumped to `>= 5.0.0` with SPM `minimumVersion: '5.0.0'`, iOS platform `15.0`
+- package.json version `5.0.0`
+- NativeRoktWidget.ts has `selectShoppableAds` and `selectShoppableAdsWithConfig` added
+- Rokt.tsx has `static selectShoppableAds()` method added
+- BUT: This was additive only — the old execute/execute2Step methods were NOT removed
+- AND: Android SDK version was NOT bumped (was intentionally left as no-op)
 
-```typescript
-selectShoppableAds(
-    identifier: string,
-    attributes: { [key: string]: string },
-    roktConfig?: RoktConfigType
-): void;
-```
+### What Still Needs to Happen
 
-### mParticle Android no-op (reference)
-
-```kotlin
-fun selectShoppableAds(
-    identifier: String,
-    attributes: ReadableMap?,
-    roktConfig: ReadableMap?,
-) {
-    Logger.warning("selectShoppableAds is not yet supported on Android")
-}
-```
-
-### Event types from integration guide
-
-| Event                            | Properties                                    |
-| -------------------------------- | --------------------------------------------- |
-| CartItemInstantPurchaseInitiated | identifier, catalogItemId, cartItemId         |
-| CartItemInstantPurchase          | catalogItemId, totalPrice, currency, quantity |
-| CartItemInstantPurchaseFailure   | error, catalogItemId                          |
-| CartItemDevicePay                | paymentProvider                               |
-| InstantPurchaseDismissal         | identifier                                    |
+1. Remove old execute/execute2Step/executeWithConfig from TurboModule spec
+2. Remove setLoggingEnabled, setFulfillmentAttributes, setSessionId/getSessionId from TurboModule spec
+3. Rename any remaining viewName → identifier
+4. Update iOS bridge to use onEvent callback pattern
+5. Add selectShoppableAds to iOS bridge
+6. Update Android bridge: bump SDK, use selectPlacements, add selectShoppableAds
+7. Update both event managers for new event types
+8. Ensure both old/new arch wrappers are consistent
 
 </specifics>
 
 <deferred>
 ## Deferred Ideas
 
-- Example app integration (Phase 2)
-- Android real implementation (v2/separate bet)
-- registerPaymentExtension RN bridge method (not needed — native only for direct SDK)
+- Example app updates (Phase 2)
+- README + migration guide (Phase 3)
 
 </deferred>
 
 ---
 
 _Phase: 01-sdk-bridge-events_
-_Context gathered: 2026-04-14 from user requirements + mParticle reference + Rokt docs_
+_Context gathered: 2026-04-14 after scope expansion_
