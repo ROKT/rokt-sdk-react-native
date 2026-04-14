@@ -51,39 +51,21 @@ export abstract class Rokt {
     }
   }
 
-  public static execute(
-    viewName: string,
+  public static selectPlacements(
+    identifier: string,
     attributes: Record<string, string>,
     placeholders: Record<string, number | null>,
     roktConfig?: IRoktConfig,
   ): void {
     if (roktConfig) {
-      RNRoktWidget.executeWithConfig(
-        viewName,
+      RNRoktWidget.selectPlacementsWithConfig(
+        identifier,
         attributes,
         placeholders,
         roktConfig,
       );
     } else {
-      RNRoktWidget.execute(viewName, attributes, placeholders);
-    }
-  }
-
-  public static execute2Step(
-    viewName: string,
-    attributes: Record<string, string>,
-    placeholders: Record<string, number | null>,
-    roktConfig?: IRoktConfig,
-  ): void {
-    if (roktConfig) {
-      RNRoktWidget.execute2StepWithConfig(
-        viewName,
-        attributes,
-        placeholders,
-        roktConfig,
-      );
-    } else {
-      RNRoktWidget.execute2Step(viewName, attributes, placeholders);
+      RNRoktWidget.selectPlacements(identifier, attributes, placeholders);
     }
   }
 
@@ -113,12 +95,6 @@ export abstract class Rokt {
     }
   }
 
-  public static setFulfillmentAttributes(
-    attributes: Record<string, string>,
-  ): void {
-    RNRoktWidget.setFulfillmentAttributes(attributes);
-  }
-
   public static purchaseFinalized(
     placementId: string,
     catalogItemId: string,
@@ -133,33 +109,6 @@ export abstract class Rokt {
 
   public static setEnvironmentToProd(): void {
     RNRoktWidget.setEnvironmentToProd();
-  }
-
-  public static setLoggingEnabled(enabled: boolean): void {
-    RNRoktWidget.setLoggingEnabled(enabled);
-  }
-
-  /**
-   * Set the session id to use for the next execute call.
-   *
-   * This is useful for cases where you have a session id from a non-native integration,
-   * e.g. WebView, and you want the session to be consistent across integrations.
-   *
-   * @remarks Empty strings are ignored and will not update the session.
-   *
-   * @param sessionId - The session id to be set. Must be a non-empty string.
-   */
-  public static setSessionId(sessionId: string): void {
-    RNRoktWidget.setSessionId(sessionId);
-  }
-
-  /**
-   * Get the session id to use within a non-native integration e.g. WebView
-   *
-   * @returns The session id or null if no session is present.
-   */
-  public static getSessionId(): string | null {
-    return RNRoktWidget.getSessionId();
   }
 }
 

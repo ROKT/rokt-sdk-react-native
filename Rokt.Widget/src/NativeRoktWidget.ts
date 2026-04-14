@@ -32,24 +32,13 @@ export interface Spec extends TurboModule {
     appVersion: string,
     fontsMap: { [key: string]: string },
   ): void;
-  execute(
-    viewName: string,
+  selectPlacements(
+    identifier: string,
     attributes: { [key: string]: string },
     placeholders: { [key: string]: number | null },
   ): void;
-  executeWithConfig(
-    viewName: string,
-    attributes: { [key: string]: string },
-    placeholders: { [key: string]: number | null },
-    roktConfig: RoktConfigType,
-  ): void;
-  execute2Step(
-    viewName: string,
-    attributes: { [key: string]: string },
-    placeholders: { [key: string]: number | null },
-  ): void;
-  execute2StepWithConfig(
-    viewName: string,
+  selectPlacementsWithConfig(
+    identifier: string,
     attributes: { [key: string]: string },
     placeholders: { [key: string]: number | null },
     roktConfig: RoktConfigType,
@@ -72,15 +61,8 @@ export interface Spec extends TurboModule {
     success: boolean,
   ): void;
 
-  // Additional methods
-  setFulfillmentAttributes(attributes: { [key: string]: string }): void;
   setEnvironmentToStage(): void;
   setEnvironmentToProd(): void;
-  setLoggingEnabled(enabled: boolean): void;
-
-  // Session ID methods
-  setSessionId(sessionId: string): void;
-  getSessionId(): string | null;
 }
 
 export default TurboModuleRegistry.getEnforcing<Spec>("RNRoktWidget");
