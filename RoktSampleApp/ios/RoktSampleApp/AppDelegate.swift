@@ -3,7 +3,8 @@ import React
 import React_RCTAppDelegate
 import ReactAppDependencyProvider
 import Rokt_Widget
-import RoktPaymentExtension
+// TODO: Uncomment when RoktPaymentExtension is published
+// import RoktPaymentExtension
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -31,9 +32,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
       launchOptions: launchOptions
     )
 
-    // Register payment extension for shoppable ads
-    let stripeExtension = RoktStripePaymentExtension(applePayMerchantId: "merchant.com.rokt.sample")
-    Rokt.registerPaymentExtension(stripeExtension, config: ["stripeKey": "pk_test_placeholder"])
+    // TODO: Register payment extension for shoppable ads when RoktPaymentExtension is published
+    // let stripeExtension = RoktStripePaymentExtension(applePayMerchantId: "merchant.com.rokt.sample")
+    // Rokt.registerPaymentExtension(stripeExtension, config: ["stripeKey": "pk_test_placeholder"])
 
     return true
   }

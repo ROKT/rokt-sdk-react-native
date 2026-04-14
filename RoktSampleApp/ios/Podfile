@@ -15,6 +15,18 @@ if linkage != nil
   use_frameworks! :linkage => linkage.to_sym
 end
 
+# Rokt SDK 5.0 source-based pods need dynamic framework linking
+# to avoid module map redefinition errors with React Native's module system
+pre_install do |installer|
+  installer.pod_targets.each do |pod|
+    if ['Rokt-Widget', 'RoktContracts', 'RoktUXHelper', 'DcuiSchema'].include?(pod.name)
+      def pod.build_type;
+        Pod::BuildType.new(:linkage => :dynamic, :packaging => :framework)
+      end
+    end
+  end
+end
+
 target 'RoktSampleApp' do
   config = use_native_modules!
 
@@ -24,7 +36,8 @@ target 'RoktSampleApp' do
     :app_path => "#{Pod::Config.instance.installation_root}/.."
   )
 
-  pod 'RoktPaymentExtension'
+  # TODO: Add RoktPaymentExtension pod when published to CocoaPods
+  # pod 'RoktPaymentExtension'
 
   target 'RoktSampleAppTests' do
     inherit! :search_paths

@@ -9,6 +9,7 @@
 //  You may obtain a copy of the License at https://rokt.com/sdk-license-2-0/
 
 #import "RoktEventManager.h"
+@import RoktContracts;
 #import <Rokt_Widget/Rokt_Widget-Swift.h>
 
 @implementation RoktEventManager
@@ -71,48 +72,48 @@ RCT_EXPORT_MODULE(RoktEventManager);
          NSDecimalNumber *totalPrice;
          NSDecimalNumber *unitPrice;
 
-         if ([event isKindOfClass:[EmbeddedSizeChanged class]]) {
+         if ([event isKindOfClass:[RoktEmbeddedSizeChanged class]]) {
             eventName = @"EmbeddedSizeChanged";
-            placementId = ((EmbeddedSizeChanged *)event).placementId;
-            CGFloat widgetHeight = ((EmbeddedSizeChanged *)event).updatedHeight;
+            placementId = ((RoktEmbeddedSizeChanged *)event).identifier;
+            CGFloat widgetHeight = ((RoktEmbeddedSizeChanged *)event).updatedHeight;
             [self onWidgetHeightChanges:widgetHeight placement:placementId];
-         } else if ([event isKindOfClass:[ShowLoadingIndicator class]]) {
+         } else if ([event isKindOfClass:[RoktShowLoadingIndicator class]]) {
              eventName = @"ShowLoadingIndicator";
-         } else if ([event isKindOfClass:[HideLoadingIndicator class]]) {
+         } else if ([event isKindOfClass:[RoktHideLoadingIndicator class]]) {
              eventName = @"HideLoadingIndicator";
-         } else if ([event isKindOfClass:[PlacementInteractive class]]) {
-             placementId = ((PlacementInteractive *)event).placementId;
+         } else if ([event isKindOfClass:[RoktPlacementInteractive class]]) {
+             placementId = ((RoktPlacementInteractive *)event).identifier;
              eventName = @"PlacementInteractive";
-         } else if ([event isKindOfClass:[PlacementReady class]]) {
-             placementId = ((PlacementReady *)event).placementId;
+         } else if ([event isKindOfClass:[RoktPlacementReady class]]) {
+             placementId = ((RoktPlacementReady *)event).identifier;
              eventName = @"PlacementReady";
-         } else if ([event isKindOfClass:[OfferEngagement class]]) {
-             placementId = ((OfferEngagement *)event).placementId;
+         } else if ([event isKindOfClass:[RoktOfferEngagement class]]) {
+             placementId = ((RoktOfferEngagement *)event).identifier;
              eventName = @"OfferEngagement";
-         } else if ([event isKindOfClass:[PositiveEngagement class]]) {
-             placementId = ((PositiveEngagement *)event).placementId;
+         } else if ([event isKindOfClass:[RoktPositiveEngagement class]]) {
+             placementId = ((RoktPositiveEngagement *)event).identifier;
              eventName = @"PositiveEngagement";
-         } else if ([event isKindOfClass:[PlacementClosed class]]) {
-             placementId = ((PlacementClosed *)event).placementId;
+         } else if ([event isKindOfClass:[RoktPlacementClosed class]]) {
+             placementId = ((RoktPlacementClosed *)event).identifier;
              eventName = @"PlacementClosed";
-         } else if ([event isKindOfClass:[PlacementCompleted class]]) {
-             placementId = ((PlacementCompleted *)event).placementId;
+         } else if ([event isKindOfClass:[RoktPlacementCompleted class]]) {
+             placementId = ((RoktPlacementCompleted *)event).identifier;
              eventName = @"PlacementCompleted";
-         } else if ([event isKindOfClass:[PlacementFailure class]]) {
-             placementId = ((PlacementFailure *)event).placementId;
+         } else if ([event isKindOfClass:[RoktPlacementFailure class]]) {
+             placementId = ((RoktPlacementFailure *)event).identifier;
              eventName = @"PlacementFailure";
-         } else if ([event isKindOfClass:[InitComplete class]]) {
+         } else if ([event isKindOfClass:[RoktInitComplete class]]) {
              eventName = @"InitComplete";
-             status = ((InitComplete *)event).success ? @"true" : @"false";
-         } else if ([event isKindOfClass:[OpenUrl class]]) {
+             status = ((RoktInitComplete *)event).success ? @"true" : @"false";
+         } else if ([event isKindOfClass:[RoktOpenUrl class]]) {
              eventName = @"OpenUrl";
-             placementId = ((OpenUrl *)event).placementId;
-             url = ((OpenUrl *)event).url;
-         } else if ([event isKindOfClass:[CartItemInstantPurchase class]]) {
-             CartItemInstantPurchase *cartEvent = (CartItemInstantPurchase *)event;
+             placementId = ((RoktOpenUrl *)event).identifier;
+             url = ((RoktOpenUrl *)event).url;
+         } else if ([event isKindOfClass:[RoktCartItemInstantPurchase class]]) {
+             RoktCartItemInstantPurchase *cartEvent = (RoktCartItemInstantPurchase *)event;
              eventName = @"CartItemInstantPurchase";
              // Required properties
-             placementId = cartEvent.placementId;
+             placementId = cartEvent.identifier;
              cartItemId = cartEvent.cartItemId;
              catalogItemId = cartEvent.catalogItemId;
              currency = cartEvent.currency;
@@ -125,27 +126,27 @@ RCT_EXPORT_MODULE(RoktEventManager);
              quantity = cartEvent.quantity;
              totalPrice = cartEvent.totalPrice;
              unitPrice = cartEvent.unitPrice;
-         } else if ([event isKindOfClass:[CartItemInstantPurchaseInitiated class]]) {
-             CartItemInstantPurchaseInitiated *cartEvent = (CartItemInstantPurchaseInitiated *)event;
+         } else if ([event isKindOfClass:[RoktCartItemInstantPurchaseInitiated class]]) {
+             RoktCartItemInstantPurchaseInitiated *cartEvent = (RoktCartItemInstantPurchaseInitiated *)event;
              eventName = @"CartItemInstantPurchaseInitiated";
-             placementId = cartEvent.placementId;
+             placementId = cartEvent.identifier;
              catalogItemId = cartEvent.catalogItemId;
              cartItemId = cartEvent.cartItemId;
-         } else if ([event isKindOfClass:[CartItemInstantPurchaseFailure class]]) {
-             CartItemInstantPurchaseFailure *cartEvent = (CartItemInstantPurchaseFailure *)event;
+         } else if ([event isKindOfClass:[RoktCartItemInstantPurchaseFailure class]]) {
+             RoktCartItemInstantPurchaseFailure *cartEvent = (RoktCartItemInstantPurchaseFailure *)event;
              eventName = @"CartItemInstantPurchaseFailure";
-             placementId = cartEvent.placementId;
+             placementId = cartEvent.identifier;
              catalogItemId = cartEvent.catalogItemId;
              error = cartEvent.error;
-         } else if ([event isKindOfClass:[CartItemDevicePay class]]) {
-             CartItemDevicePay *cartEvent = (CartItemDevicePay *)event;
+         } else if ([event isKindOfClass:[RoktCartItemDevicePay class]]) {
+             RoktCartItemDevicePay *cartEvent = (RoktCartItemDevicePay *)event;
              eventName = @"CartItemDevicePay";
-             placementId = cartEvent.placementId;
+             placementId = cartEvent.identifier;
              paymentProvider = cartEvent.paymentProvider;
-         } else if ([event isKindOfClass:[InstantPurchaseDismissal class]]) {
-             InstantPurchaseDismissal *dismissEvent = (InstantPurchaseDismissal *)event;
+         } else if ([event isKindOfClass:[RoktInstantPurchaseDismissal class]]) {
+             RoktInstantPurchaseDismissal *dismissEvent = (RoktInstantPurchaseDismissal *)event;
              eventName = @"InstantPurchaseDismissal";
-             placementId = dismissEvent.placementId;
+             placementId = dismissEvent.identifier;
          }
          NSMutableDictionary *payload = [@{@"event": eventName} mutableCopy];
          if (identifier != nil) {

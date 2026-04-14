@@ -46,8 +46,9 @@ Pod::Spec.new do |s|
     end
   end
 
-  # Primary: CocoaPods dependency (still works when SPM is not used)
+  # Primary: CocoaPods dependencies
   s.dependency "Rokt-Widget", ">= 5.0.0"
+  s.dependency "RoktContracts", "~> 0.1"
 
   # SPM bridge: registers Rokt-Widget as an SPM dependency alongside CocoaPods (RN 0.75+).
   # See: https://github.com/facebook/react-native/pull/44627
