@@ -216,12 +216,26 @@ Plan 01-01 already executed and committed:
 7. Update both event managers for new event types
 8. Ensure both old/new arch wrappers are consistent
 
+### Build Verification (MANDATORY for every phase)
+
+Every phase MUST end with a build verification task that:
+
+1. Builds the Rokt.Widget package (`cd Rokt.Widget && npm run build`)
+2. Installs the built package in RoktSampleApp (`cd RoktSampleApp && npm install`)
+3. Installs the built package in ExpoTestApp (`cd ExpoTestApp && npm install`)
+4. Builds RoktSampleApp iOS (`cd RoktSampleApp/ios && pod install && xcodebuild build ...`)
+5. Builds RoktSampleApp Android (`cd RoktSampleApp/android && ./gradlew assembleDebug`)
+6. Builds ExpoTestApp iOS (`cd ExpoTestApp && npx expo prebuild --platform ios && cd ios && pod install && xcodebuild build ...`)
+7. Builds ExpoTestApp Android (`cd ExpoTestApp && npx expo prebuild --platform android && cd android && ./gradlew assembleDebug`)
+
+This ensures the SDK changes don't break consumers. Build failures block the phase.
+
 </specifics>
 
 <deferred>
 ## Deferred Ideas
 
-- Example app updates (Phase 2)
+- Example app API updates and shoppable ads demo (Phase 2)
 - README + migration guide (Phase 3)
 
 </deferred>
