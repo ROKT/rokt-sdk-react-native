@@ -2,6 +2,8 @@ import UIKit
 import React
 import React_RCTAppDelegate
 import ReactAppDependencyProvider
+import Rokt_Widget
+import RoktPaymentExtension
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -28,6 +30,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
       in: window,
       launchOptions: launchOptions
     )
+
+    // Register payment extension for shoppable ads
+    let stripeExtension = RoktStripePaymentExtension(applePayMerchantId: "merchant.com.rokt.sample")
+    Rokt.registerPaymentExtension(stripeExtension, config: ["stripeKey": "pk_test_placeholder"])
 
     return true
   }

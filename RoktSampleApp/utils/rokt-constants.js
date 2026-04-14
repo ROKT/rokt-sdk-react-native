@@ -6,12 +6,8 @@ export const DEFAULT_ATTRIBUTES = {
   postcode: '90210',
 };
 
-export const FULLFILLMENT_ATTRIBUTES = {
-  email: 'j.smith@example.com',
-};
-
 export const DEFAULT_TAG_ID = '2754655826098840951';
-export const DEFAULT_VIEW_NAME = 'testTwoEmbedded';
+export const DEFAULT_VIEW_NAME = 'MSDKEmbeddedLayout';
 export const DEFAULT_COUNTRY = 'US';
 
 export const PUBLIC_KEY_PROD =

@@ -24,6 +24,8 @@ target 'RoktSampleApp' do
     :app_path => "#{Pod::Config.instance.installation_root}/.."
   )
 
+  pod 'RoktPaymentExtension'
+
   target 'RoktSampleAppTests' do
     inherit! :search_paths
     # Pods for testing
