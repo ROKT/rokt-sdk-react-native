@@ -17,9 +17,17 @@
 
 ## Phase 1: SDK Bridge & Events
 
-**Goal:** Update iOS SDK to 5.0.0 and Android SDK to 5.0.0. Rename execute→selectPlacements, remove deprecated APIs, update to unified onEvent callback pattern, and add selectShoppableAds. Leverage teammate's `feat/remove-deprecated-functions` branch.
+**Goal:** Update iOS SDK to 5.0.0 and Android SDK to 5.0.0. Rename execute->selectPlacements, remove deprecated APIs, update to unified onEvent callback pattern, and add selectShoppableAds. Leverage teammate's `feat/remove-deprecated-functions` branch.
 
 **Requirements:** SDK-01, SDK-02, SDK-03, SDK-04, REN-01, REN-02, REN-03, REN-04, REN-05, REN-06, REM-01, REM-02, REM-03, REM-04, EVT-01, EVT-02, EVT-03, SHP-01, SHP-02, SHP-03, SHP-04
+
+**Plans:** 3 plans
+
+Plans:
+
+- [ ] 01-01-PLAN.md — Apply teammate baseline + clean TypeScript and Android layers
+- [ ] 01-02-PLAN.md — Apply teammate baseline + clean iOS bridge and event manager
+- [ ] 01-03-PLAN.md — Android event additions, barrel exports, cross-platform verification
 
 **Success Criteria:**
 
@@ -66,4 +74,4 @@
 ---
 
 _Roadmap created: 2026-04-14_
-_Last updated: 2026-04-14 after scope expansion_
+_Last updated: 2026-04-14 after phase 1 planning_
