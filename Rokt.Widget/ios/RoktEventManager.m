@@ -40,7 +40,7 @@ RCT_EXPORT_MODULE(RoktEventManager);
 
 - (NSArray<NSString *> *)supportedEvents
 {
-  return @[@"WidgetHeightChanges", @"FirstPositiveResponse", @"RoktCallback", @"RoktEvents"];
+  return @[@"WidgetHeightChanges", @"RoktEvents"];
 }
 
 - (void)onWidgetHeightChanges:(CGFloat)widgetHeight placement:(NSString*) selectedPlacement
@@ -52,21 +52,7 @@ RCT_EXPORT_MODULE(RoktEventManager);
     }
 }
 
-- (void)onFirstPositiveResponse
-{
-    if (hasListeners) {
-        [self sendEventWithName:@"FirstPositiveResponse" body:@{@"":@""}];
-    }
-}
-
-- (void)onRoktCallbackReceived:(NSString*)eventValue
-{
-    if (hasListeners) {
-        [self sendEventWithName:@"RoktCallback" body:@{@"callbackValue": eventValue}];
-    }
-}
-
-- (void)onRoktEvents:(RoktEvent * _Nonnull)event viewName:(NSString * _Nullable)viewName
+- (void)onRoktEvents:(RoktEvent * _Nonnull)event identifier:(NSString * _Nullable)identifier
 {
      if (hasListeners) {
          NSString *placementId;
@@ -79,11 +65,18 @@ RCT_EXPORT_MODULE(RoktEventManager);
          NSString *itemDescription;
          NSString *linkedProductId;
          NSString *providerData;
+         NSString *error;
+         NSString *paymentProvider;
          NSDecimalNumber *quantity;
          NSDecimalNumber *totalPrice;
          NSDecimalNumber *unitPrice;
-         
-         if ([event isKindOfClass:[ShowLoadingIndicator class]]) {
+
+         if ([event isKindOfClass:[EmbeddedSizeChanged class]]) {
+            eventName = @"EmbeddedSizeChanged";
+            placementId = ((EmbeddedSizeChanged *)event).placementId;
+            CGFloat widgetHeight = ((EmbeddedSizeChanged *)event).updatedHeight;
+            [self onWidgetHeightChanges:widgetHeight placement:placementId];
+         } else if ([event isKindOfClass:[ShowLoadingIndicator class]]) {
              eventName = @"ShowLoadingIndicator";
          } else if ([event isKindOfClass:[HideLoadingIndicator class]]) {
              eventName = @"HideLoadingIndicator";
@@ -108,10 +101,6 @@ RCT_EXPORT_MODULE(RoktEventManager);
          } else if ([event isKindOfClass:[PlacementFailure class]]) {
              placementId = ((PlacementFailure *)event).placementId;
              eventName = @"PlacementFailure";
-         } else if ([event isKindOfClass:[FirstPositiveEngagement class]]) {
-             placementId = ((FirstPositiveEngagement *)event).placementId;
-             eventName = @"FirstPositiveEngagement";
-             self.firstPositiveEngagement = (FirstPositiveEngagement *)event;
          } else if ([event isKindOfClass:[InitComplete class]]) {
              eventName = @"InitComplete";
              status = ((InitComplete *)event).success ? @"true" : @"false";
@@ -136,10 +125,31 @@ RCT_EXPORT_MODULE(RoktEventManager);
              quantity = cartEvent.quantity;
              totalPrice = cartEvent.totalPrice;
              unitPrice = cartEvent.unitPrice;
+         } else if ([event isKindOfClass:[CartItemInstantPurchaseInitiated class]]) {
+             CartItemInstantPurchaseInitiated *cartEvent = (CartItemInstantPurchaseInitiated *)event;
+             eventName = @"CartItemInstantPurchaseInitiated";
+             placementId = cartEvent.placementId;
+             catalogItemId = cartEvent.catalogItemId;
+             cartItemId = cartEvent.cartItemId;
+         } else if ([event isKindOfClass:[CartItemInstantPurchaseFailure class]]) {
+             CartItemInstantPurchaseFailure *cartEvent = (CartItemInstantPurchaseFailure *)event;
+             eventName = @"CartItemInstantPurchaseFailure";
+             placementId = cartEvent.placementId;
+             catalogItemId = cartEvent.catalogItemId;
+             error = cartEvent.error;
+         } else if ([event isKindOfClass:[CartItemDevicePay class]]) {
+             CartItemDevicePay *cartEvent = (CartItemDevicePay *)event;
+             eventName = @"CartItemDevicePay";
+             placementId = cartEvent.placementId;
+             paymentProvider = cartEvent.paymentProvider;
+         } else if ([event isKindOfClass:[InstantPurchaseDismissal class]]) {
+             InstantPurchaseDismissal *dismissEvent = (InstantPurchaseDismissal *)event;
+             eventName = @"InstantPurchaseDismissal";
+             placementId = dismissEvent.placementId;
          }
          NSMutableDictionary *payload = [@{@"event": eventName} mutableCopy];
-         if (viewName != nil) {
-             [payload setObject:viewName forKey:@"viewName"];
+         if (identifier != nil) {
+             [payload setObject:identifier forKey:@"viewName"];
          }
          if (placementId != nil) {
              [payload setObject:placementId forKey:@"placementId"];
@@ -167,6 +177,12 @@ RCT_EXPORT_MODULE(RoktEventManager);
          }
          if (providerData != nil) {
              [payload setObject:providerData forKey:@"providerData"];
+         }
+         if (error != nil) {
+             [payload setObject:error forKey:@"error"];
+         }
+         if (paymentProvider != nil) {
+             [payload setObject:paymentProvider forKey:@"paymentProvider"];
          }
          if (quantity != nil) {
              [payload setObject:quantity forKey:@"quantity"];

@@ -15,12 +15,9 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @interface RoktEventManager : RCTEventEmitter <RCTBridgeModule>
-@property (nonatomic) FirstPositiveEngagement * _Nullable firstPositiveEngagement;
 + (instancetype _Nonnull)allocWithZone:(NSZone * _Nullable)zone;
 - (void)onWidgetHeightChanges:(CGFloat)widgetHeight placement:(NSString * _Nonnull)selectedPlacement;
-- (void)onFirstPositiveResponse;
-- (void)onRoktCallbackReceived:(NSString * _Nonnull)eventValue;
-- (void)onRoktEvents:(RoktEvent * _Nonnull)event viewName:(NSString * _Nullable)viewName;
+- (void)onRoktEvents:(RoktEvent * _Nonnull)event identifier:(NSString * _Nullable)identifier;
 
 @end
 
