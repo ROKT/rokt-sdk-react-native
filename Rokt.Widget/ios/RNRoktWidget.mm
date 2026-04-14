@@ -24,11 +24,9 @@
 
 @interface RNRoktWidget ()
 
-@property (nonatomic, nullable) RoktEventHandler *roktEventHandler;
 @property (nonatomic, nullable) RoktEventManager *eventManager;
 
-- (void)executeRoktWithViewName:(NSString *)viewName attributes:(NSDictionary *)attributes placeholders:(NSDictionary *)placeholders config:(RoktConfig *)config;
-- (void)executeRokt2StepWithViewName:(NSString *)viewName attributes:(NSDictionary *)attributes placeholders:(NSDictionary *)placeholders config:(RoktConfig *)config;
+- (void)selectPlacementsWithIdentifier:(NSString *)identifier attributes:(NSDictionary *)attributes placeholders:(NSDictionary *)placeholders config:(RoktConfig *)config;
 
 @end
 
@@ -79,179 +77,132 @@ RCT_EXPORT_METHOD(initializeWithFonts:(NSString *)roktTagId appVersion: (NSStrin
     [Rokt initWithRoktTagId:roktTagId ];
 }
 
-RCT_EXPORT_METHOD(execute:(NSString *)viewName
+RCT_EXPORT_METHOD(selectPlacements:(NSString *)identifier
                   attributes:(NSDictionary *)attributes
                   placeholders:(NSDictionary *)placeholders
                   )
 {
-    if (viewName == nil) {
-        RCTLog(@"Execute failed. ViewName cannot be null");
+    if (identifier == nil) {
+        RCTLog(@"selectPlacements failed. identifier cannot be null");
         return;
     }
     NSMutableDictionary *finalAttributes = [self convertToMutableDictionaryOfStrings:attributes];
-    
+
     [self.bridge.uiManager addUIBlock:^(RCTUIManager *uiManager, NSDictionary<NSNumber *,UIView *> *viewRegistry) {
 
         NSMutableDictionary *nativePlaceholders = [self getNativePlaceholders:placeholders viewRegistry:viewRegistry];
 
-        [self subscribeViewEvents:viewName];
+        [self subscribeViewEvents:identifier];
 
-        [Rokt executeWithViewName:viewName attributes:finalAttributes
-                       placements:nativePlaceholders
-                           onLoad:^{ [self.eventManager onRoktCallbackReceived:@"onLoad"];}
-                         onUnLoad:^{
-	    [self.eventManager onRoktCallbackReceived:@"onUnLoad"];
-            RCTLogInfo(@"unloaded");
-        }
-     onShouldShowLoadingIndicator:^{ [self.eventManager onRoktCallbackReceived:@"onShouldShowLoadingIndicator"];}
-     onShouldHideLoadingIndicator:^{ [self.eventManager onRoktCallbackReceived:@"onShouldHideLoadingIndicator"];}
-             onEmbeddedSizeChange:^(NSString *selectedPlacement, CGFloat widgetHeight){
-            
-            [self.eventManager onWidgetHeightChanges:widgetHeight placement:selectedPlacement];
-            
-        }];
-        
+        [Rokt selectPlacementsWithIdentifier:identifier
+            attributes:finalAttributes
+            placements:nativePlaceholders
+            onEvent:nil
+        ];
     }];
 }
 
 #ifdef RCT_NEW_ARCH_ENABLED
-RCT_EXPORT_METHOD(executeWithConfig:(NSString *)viewName
+RCT_EXPORT_METHOD(selectPlacementsWithConfig:(NSString *)identifier
                   attributes:(NSDictionary *)attributes
                   placeholders:(NSDictionary *)placeholders
                   roktConfig:(JS::NativeRoktWidget::RoktConfigType &)roktConfig
                   )
 {
-    if (viewName == nil) {
-        RCTLog(@"Execute failed. ViewName cannot be null");
+    if (identifier == nil) {
+        RCTLog(@"selectPlacementsWithConfig failed. identifier cannot be null");
         return;
     }
     NSMutableDictionary *finalAttributes = [self convertToMutableDictionaryOfStrings:attributes];
 
     RoktConfig *config = [self buildRoktConfigFromSpec:roktConfig];
-    [self executeRoktWithViewName:viewName attributes:finalAttributes placeholders:placeholders config:config];
+    [self selectPlacementsWithIdentifier:identifier attributes:finalAttributes placeholders:placeholders config:config];
 }
 #else
-RCT_EXPORT_METHOD(executeWithConfig:(NSString *)viewName
+RCT_EXPORT_METHOD(selectPlacementsWithConfig:(NSString *)identifier
                   attributes:(NSDictionary *)attributes
                   placeholders:(NSDictionary *)placeholders
                   roktConfig:(NSDictionary *)roktConfig
                   )
 {
-    if (viewName == nil) {
-        RCTLog(@"Execute failed. ViewName cannot be null");
+    if (identifier == nil) {
+        RCTLog(@"selectPlacementsWithConfig failed. identifier cannot be null");
         return;
     }
     NSMutableDictionary *finalAttributes = [self convertToMutableDictionaryOfStrings:attributes];
 
     RoktConfig *config = [self buildRoktConfigFromDict:roktConfig];
-    [self executeRoktWithViewName:viewName attributes:finalAttributes placeholders:placeholders config:config];
+    [self selectPlacementsWithIdentifier:identifier attributes:finalAttributes placeholders:placeholders config:config];
 }
 #endif
 
-RCT_EXPORT_METHOD(execute2Step:(NSString *)viewName
-                  attributes:(NSDictionary *)attributes
-                  placeholders:(NSDictionary *)placeholders
-                  )
+RCT_EXPORT_METHOD(selectShoppableAds:(NSString *)identifier
+                  attributes:(NSDictionary *)attributes)
 {
-    if (viewName == nil) {
-        RCTLog(@"Execute failed. ViewName cannot be null");
+    if (identifier == nil) {
+        RCTLog(@"selectShoppableAds failed. identifier cannot be null");
         return;
     }
     NSMutableDictionary *finalAttributes = [self convertToMutableDictionaryOfStrings:attributes];
-    
-    [self.bridge.uiManager addUIBlock:^(RCTUIManager *uiManager, NSDictionary<NSNumber *,UIView *> *viewRegistry) {
-        NSMutableDictionary *nativePlaceholders = [self getNativePlaceholders:placeholders viewRegistry:viewRegistry];
-        
-        [self subscribeViewEvents:viewName];
-        
-        [Rokt execute2stepWithViewName:viewName attributes:finalAttributes
-                            placements:nativePlaceholders
-                                onLoad:^{ [self.eventManager onRoktCallbackReceived:@"onLoad"];}
-                              onUnLoad:^{
-	    [self.eventManager onRoktCallbackReceived:@"onUnLoad"];
-            RCTLogInfo(@"unloaded");
-        }
-          onShouldShowLoadingIndicator:^{ [self.eventManager onRoktCallbackReceived:@"onShouldShowLoadingIndicator"];}
-          onShouldHideLoadingIndicator:^{ [self.eventManager onRoktCallbackReceived:@"onShouldHideLoadingIndicator"];}
-                  onEmbeddedSizeChange:^(NSString *selectedPlacement, CGFloat widgetHeight){
-            
-            [self.eventManager onWidgetHeightChanges:widgetHeight placement:selectedPlacement];
-            
-        }
-                               onEvent:^(RoktEventType roktEventType, RoktEventHandler* roktEventHandler){
-            self.roktEventHandler = roktEventHandler;
-            if (roktEventType == RoktEventTypeFirstPositiveEngagement) {
-                RCTLogInfo(@"firstPositiveEvent was fired");
-                [self.eventManager onFirstPositiveResponse];
-            }
-        }];
-        
-    }];
-    
+    [self subscribeViewEvents:identifier];
+    [Rokt selectShoppableAdsWithIdentifier:identifier
+        attributes:finalAttributes
+        config:nil
+        onEvent:nil
+    ];
 }
 
 #ifdef RCT_NEW_ARCH_ENABLED
-RCT_EXPORT_METHOD(execute2StepWithConfig:(NSString *)viewName
+RCT_EXPORT_METHOD(selectShoppableAdsWithConfig:(NSString *)identifier
                   attributes:(NSDictionary *)attributes
-                  placeholders:(NSDictionary *)placeholders
-                  roktConfig:(JS::NativeRoktWidget::RoktConfigType &)roktConfig
-                  )
+                  roktConfig:(JS::NativeRoktWidget::RoktConfigType &)roktConfig)
 {
-    if (viewName == nil) {
-        RCTLog(@"Execute failed. ViewName cannot be null");
+    if (identifier == nil) {
+        RCTLog(@"selectShoppableAdsWithConfig failed. identifier cannot be null");
         return;
     }
     NSMutableDictionary *finalAttributes = [self convertToMutableDictionaryOfStrings:attributes];
-
     RoktConfig *config = [self buildRoktConfigFromSpec:roktConfig];
-    [self executeRokt2StepWithViewName:viewName attributes:finalAttributes placeholders:placeholders config:config];
-    
+    [self subscribeViewEvents:identifier];
+    [Rokt selectShoppableAdsWithIdentifier:identifier
+        attributes:finalAttributes
+        config:config
+        onEvent:nil
+    ];
 }
 #else
-RCT_EXPORT_METHOD(execute2StepWithConfig:(NSString *)viewName
+RCT_EXPORT_METHOD(selectShoppableAdsWithConfig:(NSString *)identifier
                   attributes:(NSDictionary *)attributes
-                  placeholders:(NSDictionary *)placeholders
-                  roktConfig:(NSDictionary *)roktConfig
-                  )
+                  roktConfig:(NSDictionary *)roktConfig)
 {
-    if (viewName == nil) {
-        RCTLog(@"Execute failed. ViewName cannot be null");
+    if (identifier == nil) {
+        RCTLog(@"selectShoppableAdsWithConfig failed. identifier cannot be null");
         return;
     }
     NSMutableDictionary *finalAttributes = [self convertToMutableDictionaryOfStrings:attributes];
-
     RoktConfig *config = [self buildRoktConfigFromDict:roktConfig];
-    [self executeRokt2StepWithViewName:viewName attributes:finalAttributes placeholders:placeholders config:config];
+    [self subscribeViewEvents:identifier];
+    [Rokt selectShoppableAdsWithIdentifier:identifier
+        attributes:finalAttributes
+        config:config
+        onEvent:nil
+    ];
 }
 #endif
-
-RCT_EXPORT_METHOD(setFulfillmentAttributes:(NSDictionary *)attributes) {
-    if (self.roktEventHandler != nil) {
-        RCTLogInfo(@"calling setFulfillmentAttributesWithAttributes");
-        [self.bridge.uiManager addUIBlock:^(RCTUIManager *uiManager, NSDictionary<NSNumber *,UIView *> *viewRegistry) {
-            [self.roktEventHandler setFulfillmentAttributesWithAttributes:attributes];
-        }];
-    }
-    if (self.eventManager != nil && self.eventManager.firstPositiveEngagement != nil) {
-        [self.bridge.uiManager addUIBlock:^(RCTUIManager *uiManager, NSDictionary<NSNumber *,UIView *> *viewRegistry) {
-            [self.eventManager.firstPositiveEngagement setFulfillmentAttributesWithAttributes:attributes];
-        }];
-    }
-}
 
 - (NSMutableDictionary*)convertToMutableDictionaryOfStrings:(NSDictionary*)attributes
 {
     NSMutableDictionary *finalAttributes = [attributes mutableCopy];
     NSArray *keysForNullValues = [finalAttributes allKeysForObject:[NSNull null]];
     [finalAttributes removeObjectsForKeys:keysForNullValues];
-    
+
     NSSet *keys = [finalAttributes keysOfEntriesPassingTest:^BOOL(id key, id obj, BOOL *stop) {
         return ![obj isKindOfClass:[NSString class]];
     }];
-    
+
     [finalAttributes removeObjectsForKeys:[keys allObjects]];
     return finalAttributes;
-    
+
 }
 
 - (ColorMode)stringToColorMode:(NSString*)colorString
@@ -271,17 +222,17 @@ RCT_EXPORT_METHOD(setFulfillmentAttributes:(NSDictionary *)attributes) {
 {
     self.eventManager = [RoktEventManager allocWithZone: nil];
     [Rokt globalEventsOnEvent:^(RoktEvent * _Nonnull roktEvent) {
-        [self.eventManager onRoktEvents:roktEvent viewName:nil];
+        [self.eventManager onRoktEvents:roktEvent identifier:nil];
     }];
 }
 
-- (void)subscribeViewEvents:(NSString* _Nonnull) viewName
+- (void)subscribeViewEvents:(NSString* _Nonnull) identifier
 {
     if (self.eventManager == nil) {
         self.eventManager = [RoktEventManager allocWithZone: nil];
     }
-    [Rokt eventsWithViewName:viewName onEvent:^(RoktEvent * _Nonnull roktEvent) {
-        [self.eventManager onRoktEvents:roktEvent viewName:viewName];
+    [Rokt eventsWithIdentifier:identifier onEvent:^(RoktEvent * _Nonnull roktEvent) {
+        [self.eventManager onRoktEvents:roktEvent identifier:identifier];
     }];
 }
 
@@ -290,11 +241,6 @@ RCT_EXPORT_METHOD(setEnvironmentToStage) {
 }
 RCT_EXPORT_METHOD(setEnvironmentToProd){
     [Rokt setEnvironmentWithEnvironment: RoktEnvironmentProd];
-}
-
-RCT_EXPORT_METHOD(setLoggingEnabled: (BOOL)enabled)
-{
-    [Rokt setLoggingEnabledWithEnable:enabled];
 }
 
 RCT_EXPORT_METHOD(purchaseFinalized:(NSString *)placementId
@@ -306,19 +252,9 @@ RCT_EXPORT_METHOD(purchaseFinalized:(NSString *)placementId
         return;
     }
     // Call the native iOS implementation
-    [Rokt purchaseFinalizedWithPlacementId:placementId
+    [Rokt purchaseFinalizedWithIdentifier:placementId
                             catalogItemId:catalogItemId
                                 success:success];
-}
-
-RCT_EXPORT_METHOD(setSessionId:(NSString *)sessionId)
-{
-    [Rokt setSessionIdWithSessionId:sessionId];
-}
-
-RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(getSessionId)
-{
-    return [Rokt getSessionId];
 }
 
 #ifdef RCT_NEW_ARCH_ENABLED
@@ -368,60 +304,19 @@ RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(getSessionId)
     return nativePlaceholders;
 }
 
-- (void)executeRoktWithViewName:(NSString *)viewName attributes:(NSDictionary *)attributes placeholders:(NSDictionary *)placeholders config:(RoktConfig *)config
+- (void)selectPlacementsWithIdentifier:(NSString *)identifier attributes:(NSDictionary *)attributes placeholders:(NSDictionary *)placeholders config:(RoktConfig *)config
 {
     [self.bridge.uiManager addUIBlock:^(RCTUIManager *uiManager, NSDictionary<NSNumber *,UIView *> *viewRegistry) {
         NSMutableDictionary *nativePlaceholders = [self getNativePlaceholders:placeholders viewRegistry:viewRegistry];
 
-        [self subscribeViewEvents:viewName];
+        [self subscribeViewEvents:identifier];
 
-        [Rokt executeWithViewName:viewName attributes:attributes
-                       placements:nativePlaceholders
-                           config:config
-                           onLoad:^{ [self.eventManager onRoktCallbackReceived:@"onLoad"];}
-                         onUnLoad:^{
-        [self.eventManager onRoktCallbackReceived:@"onUnLoad"];
-            RCTLogInfo(@"unloaded");
-        }
-     onShouldShowLoadingIndicator:^{ [self.eventManager onRoktCallbackReceived:@"onShouldShowLoadingIndicator"];}
-     onShouldHideLoadingIndicator:^{ [self.eventManager onRoktCallbackReceived:@"onShouldHideLoadingIndicator"];}
-             onEmbeddedSizeChange:^(NSString *selectedPlacement, CGFloat widgetHeight){
-                [self.eventManager onWidgetHeightChanges:widgetHeight placement:selectedPlacement];
-            }];
-    }];
-}
-
-- (void)executeRokt2StepWithViewName:(NSString *)viewName attributes:(NSDictionary *)attributes placeholders:(NSDictionary *)placeholders config:(RoktConfig *)config
-{
-    [self.bridge.uiManager addUIBlock:^(RCTUIManager *uiManager, NSDictionary<NSNumber *,UIView *> *viewRegistry) {
-        NSMutableDictionary *nativePlaceholders = [self getNativePlaceholders:placeholders viewRegistry:viewRegistry];
-
-        self.eventManager = [RoktEventManager allocWithZone: nil];
-
-        [Rokt eventsWithViewName:viewName onEvent:^(RoktEvent * roktEvent) {
-            [self.eventManager onRoktEvents:roktEvent viewName:viewName];
-        }];
-
-        [Rokt execute2stepWithViewName:viewName attributes:attributes
-                            placements:nativePlaceholders
-                                config:config
-                                onLoad:^{ [self.eventManager onRoktCallbackReceived:@"onLoad"];}
-                              onUnLoad:^{
-        [self.eventManager onRoktCallbackReceived:@"onUnLoad"];
-            RCTLogInfo(@"unloaded");
-        }
-          onShouldShowLoadingIndicator:^{ [self.eventManager onRoktCallbackReceived:@"onShouldShowLoadingIndicator"];}
-          onShouldHideLoadingIndicator:^{ [self.eventManager onRoktCallbackReceived:@"onShouldHideLoadingIndicator"];}
-                  onEmbeddedSizeChange:^(NSString *selectedPlacement, CGFloat widgetHeight){
-            [self.eventManager onWidgetHeightChanges:widgetHeight placement:selectedPlacement];
-        }
-                               onEvent:^(RoktEventType roktEventType, RoktEventHandler* roktEventHandler){
-            self.roktEventHandler = roktEventHandler;
-            if (roktEventType == RoktEventTypeFirstPositiveEngagement) {
-                RCTLogInfo(@"firstPositiveEvent was fired");
-                [self.eventManager onFirstPositiveResponse];
-            }
-        }];
+        [Rokt selectPlacementsWithIdentifier:identifier
+            attributes:attributes
+            placements:nativePlaceholders
+            config:config
+            onEvent:nil
+        ];
     }];
 }
 
