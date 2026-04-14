@@ -10,10 +10,8 @@ import androidx.lifecycle.repeatOnLifecycle
 import com.facebook.react.bridge.*
 import com.facebook.react.modules.core.DeviceEventManagerModule.RCTDeviceEventEmitter
 import com.rokt.roktsdk.CacheConfig
-import com.rokt.roktsdk.FulfillmentAttributes
 import com.rokt.roktsdk.Rokt
 import com.rokt.roktsdk.Rokt.Environment.Prod
-import com.rokt.roktsdk.Rokt.RoktEventHandler
 import com.rokt.roktsdk.Rokt.SdkFrameworkType.ReactNative
 import com.rokt.roktsdk.RoktConfig
 import com.rokt.roktsdk.RoktEvent
@@ -32,16 +30,9 @@ import kotlinx.coroutines.launch
  * You may obtain a copy of the License at https://rokt.com/sdk-license-2-0/
  */
 class RNRoktWidgetModuleImpl(private val reactContext: ReactApplicationContext) {
-    private var roktEventHandler: RoktEventHandler? = null
-    private var fulfillmentAttributesCallback: FulfillmentAttributes? = null
     private var debug = false
 
     private val eventSubscriptions = mutableMapOf<String, Job?>()
-    private val listeners: MutableMap<Long, Rokt.RoktCallback> =
-        object : LinkedHashMap<Long, Rokt.RoktCallback>() {
-            override fun removeEldestEntry(eldest: Map.Entry<Long, Rokt.RoktCallback>): Boolean =
-                this.size > MAX_LISTENERS
-        }
 
     fun getName(): String = REACT_CLASS
 
@@ -72,22 +63,6 @@ class RNRoktWidgetModuleImpl(private val reactContext: ReactApplicationContext) 
         }
     }
 
-    fun setFulfillmentAttributes(attributes: ReadableMap?) {
-        if (roktEventHandler != null) {
-            val fulfillmentAttributes = readableMapToMapOfStrings(attributes)
-            roktEventHandler?.setFulfillmentAttributes(fulfillmentAttributes)
-            logDebug("Calling setFulfillmentAttributes")
-        } else {
-            logDebug("RoktEventHandler is null, make sure you run execute2Step before calling setFulfillmentAttributes")
-        }
-
-        if (fulfillmentAttributesCallback != null) {
-            val fulfillmentAttributes = readableMapToMapOfStrings(attributes)
-            fulfillmentAttributesCallback?.sendAttributes(fulfillmentAttributes)
-            logDebug("Calling setFulfillmentAttributes")
-        }
-    }
-
     fun purchaseFinalized(placementId: String, catalogItemId: String, success: Boolean) {
         Rokt.purchaseFinalized(placementId, catalogItemId, success)
     }
@@ -98,53 +73,6 @@ class RNRoktWidgetModuleImpl(private val reactContext: ReactApplicationContext) 
 
     fun setEnvironmentToProd() {
         Rokt.setEnvironment(Prod)
-    }
-
-    fun setLoggingEnabled(enabled: Boolean) {
-        this.debug = enabled
-        Rokt.setLoggingEnabled(enabled)
-    }
-
-    fun setSessionId(sessionId: String) {
-        Rokt.setSessionId(sessionId)
-    }
-
-    fun getSessionId(): String? = Rokt.getSessionId()
-
-    fun setRoktEventHandler(roktEventHandler: RoktEventHandler) {
-        this.roktEventHandler = roktEventHandler
-    }
-
-    fun createRoktCallback(): Rokt.RoktCallback {
-        val callback: Rokt.RoktCallback =
-            object : Rokt.RoktCallback {
-                override fun onLoad() {
-                    sendCallback("onLoad", null)
-                }
-
-                override fun onUnload(reason: Rokt.UnloadReasons) {
-                    sendCallback("onUnLoad", reason.toString())
-                }
-
-                override fun onShouldShowLoadingIndicator() {
-                    sendCallback("onShouldShowLoadingIndicator", null)
-                }
-
-                override fun onShouldHideLoadingIndicator() {
-                    sendCallback("onShouldHideLoadingIndicator", null)
-                }
-            }
-        listeners[System.currentTimeMillis()] = callback
-        return callback
-    }
-
-    fun sendCallback(eventValue: String, reason: String?) {
-        val params = Arguments.createMap()
-        params.putString("callbackValue", eventValue)
-        if (reason != null) {
-            params.putString("reason", reason)
-        }
-        sendEvent(reactContext, "RoktCallback", params)
     }
 
     fun sendEvent(reactContext: ReactContext?, eventName: String, params: WritableMap?) {
@@ -211,12 +139,6 @@ class RNRoktWidgetModuleImpl(private val reactContext: ReactApplicationContext) 
                         var eventName: String
                         val placementId: String? =
                             when (event) {
-                                is RoktEvent.FirstPositiveEngagement -> {
-                                    eventName = "FirstPositiveEngagement"
-                                    fulfillmentAttributesCallback = event.fulfillmentAttributes
-                                    event.id
-                                }
-
                                 RoktEvent.HideLoadingIndicator -> {
                                     eventName = "HideLoadingIndicator"
                                     null
@@ -285,6 +207,31 @@ class RNRoktWidgetModuleImpl(private val reactContext: ReactApplicationContext) 
                                     params.putInt("quantity", event.quantity)
                                     params.putDouble("unitPrice", event.unitPrice)
                                     event.placementId
+                                }
+
+                                is RoktEvent.CartItemInstantPurchaseInitiated -> {
+                                    eventName = "CartItemInstantPurchaseInitiated"
+                                    params.putString("catalogItemId", event.catalogItemId)
+                                    params.putString("cartItemId", event.cartItemId)
+                                    event.identifier
+                                }
+
+                                is RoktEvent.CartItemInstantPurchaseFailure -> {
+                                    eventName = "CartItemInstantPurchaseFailure"
+                                    params.putString("error", event.error)
+                                    params.putString("catalogItemId", event.catalogItemId)
+                                    event.identifier
+                                }
+
+                                is RoktEvent.CartItemDevicePay -> {
+                                    eventName = "CartItemDevicePay"
+                                    params.putString("paymentProvider", event.paymentProvider)
+                                    event.identifier
+                                }
+
+                                is RoktEvent.InstantPurchaseDismissal -> {
+                                    eventName = "InstantPurchaseDismissal"
+                                    event.identifier
                                 }
 
                                 else -> {
