@@ -87,6 +87,32 @@ export abstract class Rokt {
     }
   }
 
+  /**
+   * Select shoppable ads for a given identifier.
+   *
+   * Shoppable ads use a full-screen overlay (no embedded placeholders).
+   * Payment extension registration must be done in native AppDelegate code.
+   *
+   * @param identifier - The identifier for the shoppable ads placement
+   * @param attributes - Key-value attributes for the placement
+   * @param roktConfig - Optional configuration for the placement
+   */
+  public static selectShoppableAds(
+    identifier: string,
+    attributes: Record<string, string>,
+    roktConfig?: IRoktConfig,
+  ): void {
+    if (roktConfig) {
+      RNRoktWidget.selectShoppableAdsWithConfig(
+        identifier,
+        attributes,
+        roktConfig,
+      );
+    } else {
+      RNRoktWidget.selectShoppableAds(identifier, attributes);
+    }
+  }
+
   public static setFulfillmentAttributes(
     attributes: Record<string, string>,
   ): void {

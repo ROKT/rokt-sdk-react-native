@@ -54,6 +54,18 @@ export interface Spec extends TurboModule {
     placeholders: { [key: string]: number | null },
     roktConfig: RoktConfigType,
   ): void;
+
+  // Shoppable Ads methods
+  selectShoppableAds(
+    identifier: string,
+    attributes: { [key: string]: string },
+  ): void;
+  selectShoppableAdsWithConfig(
+    identifier: string,
+    attributes: { [key: string]: string },
+    roktConfig: RoktConfigType,
+  ): void;
+
   purchaseFinalized(
     placementId: string,
     catalogItemId: string,
