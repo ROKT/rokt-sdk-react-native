@@ -4,8 +4,6 @@ import com.facebook.react.bridge.*
 import com.facebook.react.uimanager.NativeViewHierarchyManager
 import com.facebook.react.uimanager.UIManagerModule
 import com.rokt.roktsdk.Rokt
-import com.rokt.roktsdk.Rokt.RoktEventHandler
-import com.rokt.roktsdk.Rokt.RoktEventType
 import com.rokt.roktsdk.Widget
 import java.lang.ref.WeakReference
 
@@ -36,40 +34,39 @@ class RNRoktWidgetModule internal constructor(private val reactContext: ReactApp
     }
 
     @ReactMethod
-    fun execute(viewName: String?, attributes: ReadableMap?, placeholders: ReadableMap?) {
-        executeInternal(viewName, attributes, placeholders)
+    fun selectPlacements(identifier: String?, attributes: ReadableMap?, placeholders: ReadableMap?) {
+        executeInternal(identifier, attributes, placeholders)
     }
 
     @ReactMethod
-    fun executeWithConfig(
-        viewName: String?,
+    fun selectPlacementsWithConfig(
+        identifier: String?,
         attributes: ReadableMap?,
         placeholders: ReadableMap?,
         roktConfig: ReadableMap?,
     ) {
-        executeInternal(viewName, attributes, placeholders, roktConfig)
+        executeInternal(identifier, attributes, placeholders, roktConfig)
     }
 
     private fun executeInternal(
-        viewName: String?,
+        identifier: String?,
         attributes: ReadableMap?,
         placeholders: ReadableMap?,
         roktConfig: ReadableMap? = null,
     ) {
-        if (viewName == null) {
-            impl.logDebug("Execute failed. ViewName cannot be null")
+        if (identifier == null) {
+            impl.logDebug("Execute failed. Identifier cannot be null")
             return
         }
 
         val uiManager = reactContext.getNativeModule(UIManagerModule::class.java)
-        impl.startRoktEventListener(Rokt.events(viewName), reactContext.currentActivity, viewName)
+        impl.startRoktEventListener(Rokt.events(identifier), reactContext.currentActivity, identifier)
 
         val config = roktConfig?.let { impl.buildRoktConfig(it) }
         uiManager?.addUIBlock { nativeViewHierarchyManager ->
-            Rokt.execute(
-                viewName = viewName,
+            Rokt.selectPlacements(
+                identifier = identifier,
                 attributes = impl.readableMapToMapOfStrings(attributes),
-                callback = impl.createRoktCallback(),
                 placeholders = safeUnwrapPlaceholders(placeholders, nativeViewHierarchyManager),
                 config = config,
             )
@@ -77,63 +74,30 @@ class RNRoktWidgetModule internal constructor(private val reactContext: ReactApp
     }
 
     @ReactMethod
-    fun execute2Step(viewName: String?, attributes: ReadableMap?, placeholders: ReadableMap?) {
-        execute2StepInternal(viewName, attributes, placeholders)
+    fun selectShoppableAds(identifier: String?, attributes: ReadableMap?) {
+        selectShoppableAdsInternal(identifier, attributes)
     }
 
     @ReactMethod
-    fun execute2StepWithConfig(
-        viewName: String?,
-        attributes: ReadableMap?,
-        placeholders: ReadableMap?,
-        roktConfig: ReadableMap?,
-    ) {
-        execute2StepInternal(viewName, attributes, placeholders, roktConfig)
+    fun selectShoppableAdsWithConfig(identifier: String?, attributes: ReadableMap?, roktConfig: ReadableMap?) {
+        selectShoppableAdsInternal(identifier, attributes, roktConfig)
     }
 
-    private fun execute2StepInternal(
-        viewName: String?,
+    private fun selectShoppableAdsInternal(
+        identifier: String?,
         attributes: ReadableMap?,
-        placeholders: ReadableMap?,
         roktConfig: ReadableMap? = null,
     ) {
-        if (viewName == null) {
-            impl.logDebug("Execute failed. ViewName cannot be null")
+        if (identifier == null) {
+            impl.logDebug("selectShoppableAds failed. Identifier cannot be null")
             return
         }
-
-        val uiManager = reactContext.getNativeModule(UIManagerModule::class.java)
-        impl.startRoktEventListener(Rokt.events(viewName), reactContext.currentActivity, viewName)
-        val config = roktConfig?.let { impl.buildRoktConfig(it) }
-        uiManager?.addUIBlock { nativeViewHierarchyManager ->
-            Rokt.execute2Step(
-                viewName = viewName,
-                attributes = impl.readableMapToMapOfStrings(attributes),
-                callback = impl.createRoktCallback(),
-                placeholders = safeUnwrapPlaceholders(placeholders, nativeViewHierarchyManager),
-                roktEventCallback =
-                object : Rokt.RoktEventCallback {
-                    override fun onEvent(eventType: RoktEventType, roktEventHandler: RoktEventHandler) {
-                        impl.setRoktEventHandler(roktEventHandler)
-                        if (eventType == RoktEventType.FirstPositiveEngagement) {
-                            impl.logDebug("onFirstPositiveEvent was fired")
-                            impl.sendEvent(reactContext, "FirstPositiveResponse", null)
-                        }
-                    }
-                },
-                config = config,
-            )
-        }
+        impl.selectShoppableAds(identifier, attributes, reactContext.currentActivity)
     }
 
     @ReactMethod
-    fun setFulfillmentAttributes(attributes: ReadableMap?) {
-        impl.setFulfillmentAttributes(attributes)
-    }
-
-    @ReactMethod
-    fun purchaseFinalized(placementId: String, catalogItemId: String, success: Boolean) {
-        impl.purchaseFinalized(placementId, catalogItemId, success)
+    fun purchaseFinalized(identifier: String, catalogItemId: String, success: Boolean) {
+        impl.purchaseFinalized(identifier, catalogItemId, success)
     }
 
     override fun getName(): String = impl.getName()
@@ -146,11 +110,6 @@ class RNRoktWidgetModule internal constructor(private val reactContext: ReactApp
     @ReactMethod
     fun setEnvironmentToProd() {
         impl.setEnvironmentToProd()
-    }
-
-    @ReactMethod
-    fun setLoggingEnabled(enabled: Boolean) {
-        impl.setLoggingEnabled(enabled)
     }
 
     @ReactMethod

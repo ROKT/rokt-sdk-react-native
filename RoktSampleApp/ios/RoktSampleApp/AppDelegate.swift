@@ -2,6 +2,9 @@ import UIKit
 import React
 import React_RCTAppDelegate
 import ReactAppDependencyProvider
+import Rokt_Widget
+// Uncomment to enable Shoppable Ads payment extension:
+// import RoktStripePaymentExtension
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -28,6 +31,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
       in: window,
       launchOptions: launchOptions
     )
+
+    // Register payment extension for shoppable ads (uncomment when RoktPaymentExtension is published):
+    // let stripeExtension = RoktStripePaymentExtension(applePayMerchantId: "merchant.com.rokt.sample")
+    // Rokt.registerPaymentExtension(stripeExtension, config: ["stripeKey": "pk_test_placeholder"])
 
     return true
   }

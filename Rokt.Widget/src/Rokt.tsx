@@ -51,46 +51,48 @@ export abstract class Rokt {
     }
   }
 
-  public static execute(
-    viewName: string,
+  public static selectPlacements(
+    identifier: string,
     attributes: Record<string, string>,
     placeholders: Record<string, number | null>,
     roktConfig?: IRoktConfig,
   ): void {
     if (roktConfig) {
-      RNRoktWidget.executeWithConfig(
-        viewName,
+      RNRoktWidget.selectPlacementsWithConfig(
+        identifier,
         attributes,
         placeholders,
         roktConfig,
       );
     } else {
-      RNRoktWidget.execute(viewName, attributes, placeholders);
+      RNRoktWidget.selectPlacements(identifier, attributes, placeholders);
     }
   }
 
-  public static execute2Step(
-    viewName: string,
+  /**
+   * Select shoppable ads for a given identifier.
+   *
+   * Shoppable ads use a full-screen overlay (no embedded placeholders).
+   * Payment extension registration must be done in native AppDelegate code.
+   *
+   * @param identifier - The identifier for the shoppable ads placement
+   * @param attributes - Key-value attributes for the placement
+   * @param roktConfig - Optional configuration for the placement
+   */
+  public static selectShoppableAds(
+    identifier: string,
     attributes: Record<string, string>,
-    placeholders: Record<string, number | null>,
     roktConfig?: IRoktConfig,
   ): void {
     if (roktConfig) {
-      RNRoktWidget.execute2StepWithConfig(
-        viewName,
+      RNRoktWidget.selectShoppableAdsWithConfig(
+        identifier,
         attributes,
-        placeholders,
         roktConfig,
       );
     } else {
-      RNRoktWidget.execute2Step(viewName, attributes, placeholders);
+      RNRoktWidget.selectShoppableAds(identifier, attributes);
     }
-  }
-
-  public static setFulfillmentAttributes(
-    attributes: Record<string, string>,
-  ): void {
-    RNRoktWidget.setFulfillmentAttributes(attributes);
   }
 
   public static purchaseFinalized(
@@ -109,28 +111,19 @@ export abstract class Rokt {
     RNRoktWidget.setEnvironmentToProd();
   }
 
-  public static setLoggingEnabled(enabled: boolean): void {
-    RNRoktWidget.setLoggingEnabled(enabled);
-  }
-
   /**
-   * Set the session id to use for the next execute call.
+   * Set a custom session ID for the Rokt SDK.
    *
-   * This is useful for cases where you have a session id from a non-native integration,
-   * e.g. WebView, and you want the session to be consistent across integrations.
-   *
-   * @remarks Empty strings are ignored and will not update the session.
-   *
-   * @param sessionId - The session id to be set. Must be a non-empty string.
+   * @param sessionId - The session ID to set. Must be a non-empty string.
    */
   public static setSessionId(sessionId: string): void {
     RNRoktWidget.setSessionId(sessionId);
   }
 
   /**
-   * Get the session id to use within a non-native integration e.g. WebView
+   * Get the current session ID from the Rokt SDK.
    *
-   * @returns The session id or null if no session is present.
+   * @returns The current session ID, or null if not set.
    */
   public static getSessionId(): string | null {
     return RNRoktWidget.getSessionId();

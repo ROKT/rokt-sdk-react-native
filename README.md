@@ -2,160 +2,55 @@
 
 ## Overview
 
-This repository contains the React Native SDK [Rokt.Widget](Rokt.Widget) and a Sample Application [RoktSampleApp](RoktSampleApp).
+This repository contains the React Native SDK [Rokt.Widget](Rokt.Widget), a Sample Application [RoktSampleApp](RoktSampleApp), and an Expo Test Application [ExpoTestApp](ExpoTestApp).
 
-The React Native SDK enables you to integrate Rokt into your React Native mobile apps to drive more value from—and for—your customers. The SDK is built to be lightweight, secure, and simple to integrate and maintain, resulting in minimal lift for your engineering team. The RoktSampleApp includes bare-minimum UI to demonstrate the usage of React Native SDK for partners.
+The React Native SDK enables you to integrate Rokt into your React Native mobile apps to drive more value from—and for—your customers. The SDK is built to be lightweight, secure, and simple to integrate and maintain, resulting in minimal lift for your engineering team.
 
 For detailed information about each component, please refer to:
 
 - [Rokt.Widget README](Rokt.Widget/README.md) - Documentation for the SDK implementation
 - [RoktSampleApp README](RoktSampleApp/README.md) - Guide for the sample application
-
-## Service Architecture
-
-The React Native SDK uses a bridge architecture to connect your JavaScript/TypeScript application code to the native Rokt Widget SDK implementations:
-
-### Bridge Architecture
-
-#### TypeScript Layer
-
-- **API Interface**: The SDK provides a TypeScript interface in `Rokt.tsx` that exports methods like `initialize()`, `execute()`, and `execute2Step()`
-- **Module Definition**: The TypeScript layer defines a `RNRoktWidget` interface that maps to the native modules
-
-#### Native Bridge Implementation
-
-##### iOS Implementation
-
-- **Swift Bridge Classes**:
-  - `RNRoktWidget`: Main bridge class implementing `RCTBridgeModule` that exports methods to React Native
-  - `RoktEventManager`: Handles events and callbacks between the Swift implementation and JavaScript
-  - The bridge translates React Native method calls to the corresponding native Rokt iOS SDK methods
-
-##### Android Implementation
-
-- **Kotlin Bridge Classes**:
-  - `RNRoktWidgetModule`: Main Kotlin class that extends `ReactContextBaseJavaModule` to implement the bridge
-  - `RoktEmbeddedViewManager`: Manages embedded view components and UI rendering
-  - The module takes React Native parameters and converts them to the format needed by the native Rokt Android SDK
-
-When you call methods from the TypeScript layer, the following happens:
-
-1. Your JavaScript/TypeScript code invokes methods on the `Rokt` object
-2. The React Native bridge serializes parameters and routes the call to the appropriate native module (`RNRoktWidget` on iOS or `RNRoktWidgetModule` on Android)
-3. The native module translates the call to the corresponding native Rokt Widget SDK method (e.g., `Rokt.initialize()`, `Rokt.execute()`)
-4. Results and callbacks are serialized and passed back through the bridge to your JavaScript code
-
-### Workflow
-
-1. **Initialization**: Call `Rokt.initialize()` with your ROKT_TAG_ID to prepare the SDK
-2. **Placement Execution**: Call `Rokt.execute()` with template and user attributes to fetch and display Rokt content
-3. **Callback Handling**: Process the onLoad callback once content is loaded
-
-Behind the scenes, the SDK handles:
-
-- API communication with Rokt's backend services
-- Content rendering in the appropriate placement locations
-- Event tracking and user interaction
-
-The sample application demonstrates both placement types with a minimal implementation that you can use as a reference.
-
-## Development Environment Setup
-
-1. Install ReactNative development environment by following the [React Native environment setup instructions](https://reactnative.dev/docs/environment-setup).
-2. This project requires a minimum `Ruby` version `2.7.6`. Check by running `ruby -v` in your terminal.
-3. Clone this repository to your local machine.
-4. Run `npm install` to install all dependencies.
-
-### Android Setup
-
-Make sure you have Android Studio installed and properly configured with the required SDK versions.
-
-### iOS Setup
-
-For iOS development, ensure you have:
-
-- Xcode installed
-- CocoaPods installed (`sudo gem install cocoapods`)
-
-## Making Changes and Deployment
-
-### Local Development
-
-1. Make your code changes in the appropriate files
-2. Test changes using the RoktSampleApp:
-   - Android: `npx react-native run-android`
-   - iOS: `npx react-native run-ios`
-
-### Publishing
-
-This SDK is published to a NPM package repository. Publishing is automated through GitHub Actions workflows.
-
-#### Automated Publishing
-
-The SDK is automatically published to NPM when the `VERSION` file is updated and pushed to the `main` branch. The GitHub Actions workflow (`release-from-main.yml`) handles:
-
-- Building and testing the package
-- Running iOS and Android tests
-- Publishing to NPM with the appropriate dist tag
-- Creating a GitHub release
-
-To create a new release:
-
-1. Use the "Create draft release" workflow to bump the version (major, minor, or patch)
-2. Review and merge the generated pull request
-3. Once merged to `main`, the release workflow will automatically publish to NPM
-
-The appropriate dist tag will be applied automatically when publishing if one is set (e.g. `1.2.3-alpha.1` will set the dist tag as `alpha`). If not, the default `latest` tag will be used.
-
-You can also release the SDK manually by following the steps in the above section.
+- [Migration Guide](MIGRATING.md) - Guide for migrating from v4.x to v5.0.0
 
 ## Integration Guide
 
-To add this SDK to your application:
+### Installation
 
-1. Go to the root of your project in your terminal and run:
-
-   ```shell
-   npm install @rokt/react-native-sdk --save
-   npm install
-   ```
+```shell
+npm install @rokt/react-native-sdk --save
+```
 
 ### Android Configuration
 
 The Rokt SDK is available from Maven Central and will be resolved automatically via React Native autolinking. No manual repository or package configuration is required.
 
-Ensure your app meets the minimum requirements:
-
-```gradle
-android {
-    defaultConfig {
-        minSdkVersion 21
-    }
-}
-```
-
 ### iOS Configuration
 
-#### Install the pods
+#### Bare React Native
 
-Navigate to the iOS folder and run:
+Add the following `pre_install` block to your `ios/Podfile` before the `target` block. This is required because Rokt SDK 5.0 ships as source-based Swift pods that need dynamic framework linking:
 
-```shell
-pod install
+```ruby
+pre_install do |installer|
+  installer.pod_targets.each do |pod|
+    if ['Rokt-Widget', 'RoktContracts', 'RoktUXHelper', 'DcuiSchema'].include?(pod.name)
+      def pod.build_type;
+        Pod::BuildType.new(:linkage => :dynamic, :packaging => :framework)
+      end
+    end
+  end
+end
 ```
 
-### Expo
+Then install pods:
 
-This package cannot be used with the "Expo Go" app because it requires custom native code.
-Integration with Expo is supported in both bare workflow and managed workflow.
+```shell
+cd ios && pod install
+```
 
-#### Bare Workflow
+#### Expo
 
-No additional configuration is required. React Native autolinking will automatically set up the SDK.
-
-#### Managed Workflow
-
-Since Expo Go does not support custom native code, you need to use a custom development client.
+This package cannot be used with "Expo Go" because it requires custom native code. Use a custom development client instead.
 
 1. Install the required packages:
 
@@ -163,7 +58,7 @@ Since Expo Go does not support custom native code, you need to use a custom deve
    npm install @rokt/react-native-sdk expo-dev-client
    ```
 
-2. (Optional) Add the config plugin to your `app.json` or `app.config.js`:
+2. Add the config plugin to your `app.json` or `app.config.js`:
 
    ```json
    {
@@ -173,7 +68,7 @@ Since Expo Go does not support custom native code, you need to use a custom deve
    }
    ```
 
-   > Note: The config plugin is optional as React Native autolinking handles the native setup automatically.
+   > The config plugin automatically configures the iOS Podfile for Rokt SDK compatibility. This is required for Expo projects.
 
 3. Generate the native projects and build:
 
@@ -182,37 +77,24 @@ Since Expo Go does not support custom native code, you need to use a custom deve
    npx expo run:ios   # or npx expo run:android
    ```
 
-For production builds, you can use [EAS Build](https://docs.expo.dev/build/introduction/) which will handle the native compilation automatically.
-
 ## Usage
 
-### Initialising the SDK
-
-The Rokt Module provides two methods:
-
-1. `initialize(string ROKT_TAG_ID, string AppVersion)`
-2. `execute(string TemplateVersion, object UserAttributes, object placements, function onLoad)`
-
-The Initialize Method will fetch API results that Execute Method would need, so best not to place both calls next to each other.
-
-#### Import
+### Import
 
 ```js
 import { Rokt, RoktEmbeddedView } from "@rokt/react-native-sdk";
 ```
 
-#### Initialize
+### Initialize
 
 ```js
-Rokt.initialize("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx", "1.0");
+Rokt.initialize("YOUR_ROKT_TAG_ID", "1.0");
 ```
 
-### To launch Overlay placement
-
-#### Execute Overlay
+### Select Placements (Overlay)
 
 ```js
-attributes = {
+const attributes = {
   email: "j.smith@example.com",
   firstname: "Jenny",
   lastname: "Smith",
@@ -220,78 +102,153 @@ attributes = {
   postcode: "90210",
   country: "US",
 };
-Rokt.execute("RoktExperience", attributes, null, () =>
-  console.log("Placement Loaded"),
-);
+
+Rokt.selectPlacements("RoktExperience", attributes, {});
 ```
 
-### To launch Embedded placement
-
-#### Create placeholder
+### Select Placements (Embedded)
 
 ```js
-constructor(props) {
-  super(props);
-  this.placeholder1 = React.createRef();
+// Create a ref for the embedded view
+const placeholderRef = React.createRef();
+
+// In your JSX:
+<RoktEmbeddedView ref={placeholderRef} placeholderName="RoktEmbedded1" />;
+
+// Execute with placeholders:
+const placeholders = {
+  RoktEmbedded1: findNodeHandle(placeholderRef.current),
+};
+
+Rokt.selectPlacements("RoktEmbeddedExperience", attributes, placeholders);
+```
+
+### Select Placements with Config
+
+```js
+import { RoktConfigBuilder, CacheConfig } from "@rokt/react-native-sdk";
+
+const config = new RoktConfigBuilder()
+  .withColorMode("dark")
+  .withCacheConfig(new CacheConfig(5400)) // 90 minutes
+  .build();
+
+Rokt.selectPlacements("RoktExperience", attributes, placeholders, config);
+```
+
+### Shoppable Ads
+
+Shoppable Ads enables partners to present contextual upsell offers to customers after a purchase. Shoppable Ads use a full-screen overlay — no embedded placeholders are needed.
+
+```js
+Rokt.selectShoppableAds("ConfirmationPage", {
+  email: "j.smith@example.com",
+  confirmationref: "ORD-123",
+  amount: "52.25",
+  currency: "USD",
+});
+```
+
+> **Note:** Shoppable Ads is currently supported on iOS only. On Android, `selectShoppableAds` is a no-op.
+
+#### Payment Extension (iOS)
+
+Shoppable Ads requires a payment extension registered in your native iOS AppDelegate:
+
+```swift
+// AppDelegate.swift
+import Rokt_Widget
+import RoktStripePaymentExtension
+
+// After SDK initialization:
+if let stripeExt = RoktStripePaymentExtension(
+    applePayMerchantId: "merchant.com.yourapp"
+) {
+    Rokt.registerPaymentExtension(stripeExt, config: [
+        "stripeKey": "pk_live_your_stripe_key"
+    ])
 }
 ```
 
-In render():
+### Purchase Finalized
+
+After a shoppable ads purchase completes:
 
 ```js
-<RoktEmbeddedView
-  ref={this.placeholder1}
-  placeholderName={"RoktEmbedded1"}
-></RoktEmbeddedView>
+Rokt.purchaseFinalized("placementId", "catalogItemId", true);
 ```
 
-#### Execute Embedded
+### Event Handling
+
+Listen for SDK events via `NativeEventEmitter`:
 
 ```js
-placeholders = {
-  RoktEmbedded1: findNodeHandle(this.placeholder1.current),
-};
+import { NativeEventEmitter, NativeModules } from "react-native";
 
-attributes = {
-  email: "j.smith@example.com",
-  firstname: "Jenny",
-  lastname: "Smith",
-  mobile: "(323) 867-5309",
-  postcode: "90210",
-  country: "US",
-};
-Rokt.execute("RoktEmbeddedExperience", attributes, placeholders, () =>
-  console.log("Placement Loaded"),
-);
+const eventEmitter = new NativeEventEmitter(NativeModules.RoktEventManager);
+
+const subscription = eventEmitter.addListener("RoktEvents", (event) => {
+  switch (event.event) {
+    case "InitComplete":
+      console.log("SDK initialized:", event.status);
+      break;
+    case "PlacementReady":
+      console.log("Placement ready:", event.placementId);
+      break;
+    case "PlacementClosed":
+      console.log("Placement closed");
+      break;
+    case "CartItemInstantPurchase":
+      console.log("Purchase:", event.catalogItemId, event.totalPrice);
+      break;
+  }
+});
+
+// Clean up
+subscription.remove();
 ```
 
-## Key Dependencies & Gotchas
+### Environment Configuration
 
-### Dependencies
-
-- React Native (core dependency)
-- Native modules for both Android and iOS platforms
-- For Android: Rokt SDK from Maven Central (resolved automatically)
-- For iOS: Rokt-Widget pod (resolved automatically via CocoaPods)
-
-### Mac M1 Machine Configuration
-
-When developing on Mac M1 machines, follow these additional steps:
-
-1. Make sure cocoa pods are installed using gem not brew:
-
-```shell
-brew uninstall cocoapods
-brew uninstall --ignore-dependencies ruby
-sudo gem install cocoapods
+```js
+Rokt.setEnvironmentToStage(); // For testing
+Rokt.setEnvironmentToProd(); // For production (default)
 ```
 
-### Common Issues
+## API Reference
 
-1. When integrating with an existing app, ensure the React Native version is compatible with the SDK.
-2. For Android, MultiDex is required as the SDK increases method count.
-3. For iOS, ensure CocoaPods is properly installed and initialized.
-4. Always call `initialize()` before `execute()` and allow sufficient time between the calls.
+| Method                                                                 | Description                            |
+| ---------------------------------------------------------------------- | -------------------------------------- |
+| `Rokt.initialize(tagId, appVersion, fontFilesMap?)`                    | Initialize the SDK                     |
+| `Rokt.selectPlacements(identifier, attributes, placeholders, config?)` | Display overlay or embedded placements |
+| `Rokt.selectShoppableAds(identifier, attributes, config?)`             | Display shoppable ads (iOS only)       |
+| `Rokt.purchaseFinalized(placementId, catalogItemId, success)`          | Report purchase completion             |
+| `Rokt.setEnvironmentToStage()`                                         | Set staging environment                |
+| `Rokt.setEnvironmentToProd()`                                          | Set production environment             |
+| `Rokt.setSessionId(sessionId)`                                         | Set a custom session ID                |
+| `Rokt.getSessionId()`                                                  | Get the current session ID             |
+
+## Minimum Requirements
+
+| Platform     | Version |
+| ------------ | ------- |
+| iOS          | 15.0    |
+| Android      | API 21  |
+| React Native | 0.71.0+ |
+
+## Development
+
+### Local Development
+
+1. Make code changes in `Rokt.Widget/`
+2. Build the package: `cd Rokt.Widget && npm run build`
+3. Test using the sample apps:
+   - `cd RoktSampleApp && npm install && npm run ios`
+   - `cd RoktSampleApp && npm install && npm run android`
+
+### Publishing
+
+The SDK is published to NPM automatically via GitHub Actions when the `VERSION` file is updated on `main`.
 
 ## License
 

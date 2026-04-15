@@ -34,17 +34,8 @@ import {
   DEFAULT_COUNTRY,
   DEFAULT_TAG_ID,
   DEFAULT_VIEW_NAME,
-  ENCRYPTION_KEY_ID_PROD,
-  ENCRYPTION_KEY_ID_STAGE,
-  FULLFILLMENT_ATTRIBUTES,
-  PUBLIC_KEY_PROD,
-  PUBLIC_KEY_STAGE,
 } from './utils/rokt-constants';
 import {Rokt, RoktEmbeddedView, RoktEventManager} from '@rokt/react-native-sdk';
-import sha256 from 'crypto-js/sha256';
-import {Buffer} from 'buffer';
-
-var forge = require('node-forge');
 
 const Colors = {
   white: '#ffffff',
@@ -69,16 +60,12 @@ interface State {
   targetElement2: string;
   attributes: string;
   stageEnabled: boolean;
-  twoStepEnabled: boolean;
-  encryptEnabled: boolean;
 }
 
 export default class App extends Component<Props, State> {
   private placeholder1 = React.createRef<RoktEmbeddedViewRef>();
   private placeholder2 = React.createRef<RoktEmbeddedViewRef>();
 
-  private subscription: EmitterSubscription;
-  private callBackSubscription: EmitterSubscription;
   private eventSubscription: EmitterSubscription;
 
   constructor(props: Props) {
@@ -94,25 +81,7 @@ export default class App extends Component<Props, State> {
       targetElement2: 'Location2',
       attributes: attributes,
       stageEnabled: false,
-      twoStepEnabled: false,
-      encryptEnabled: false,
     };
-
-    this.subscription = eventManagerEmitter.addListener(
-      'FirstPositiveResponse',
-      _ => {
-        console.log('Widget OnFirstPositiveEvent Callback');
-        // Send unhashed email on first positive response
-        Rokt.setFulfillmentAttributes(FULLFILLMENT_ATTRIBUTES);
-      },
-    );
-
-    this.callBackSubscription = eventManagerEmitter.addListener(
-      'RoktCallback',
-      data => {
-        console.log('roktCallback received: ' + data.callbackValue);
-      },
-    );
 
     this.eventSubscription = eventManagerEmitter.addListener(
       'RoktEvents',
@@ -126,30 +95,24 @@ export default class App extends Component<Props, State> {
           // Call purchaseFinalized with the required parameters
           // placementId, catalogItemId, and status (true for successful purchase)
           Rokt.purchaseFinalized(data.placementId, data.catalogItemId, true);
+        } else if (data.event === 'CartItemInstantPurchaseInitiated') {
+          console.log('Shoppable: Purchase initiated', data.catalogItemId);
+        } else if (data.event === 'CartItemInstantPurchaseFailure') {
+          console.log('Shoppable: Purchase failed', data.error);
+        } else if (data.event === 'CartItemDevicePay') {
+          console.log('Shoppable: Device pay', data.paymentProvider);
+        } else if (data.event === 'InstantPurchaseDismissal') {
+          console.log('Shoppable: Dismissal');
         }
       },
     );
   }
 
-  encrypt(text: string, publicKey: string) {
-    const publicBytes = forge.util.decode64(publicKey);
-    const pkeyAsn1 = forge.asn1.fromDer(publicBytes);
-    const publicKeyFromAsn1 = forge.pki.publicKeyFromAsn1(pkeyAsn1);
-    let toEncrypt = Buffer.from(text);
-    let encrypted = publicKeyFromAsn1.encrypt(toEncrypt, 'RSA-OAEP', {
-      md: forge.md.sha256.create(),
-    });
-    return forge.util.encode64(encrypted);
-  }
-
   componentWillUnmount() {
-    this.subscription.remove();
-    this.callBackSubscription.remove();
     this.eventSubscription.remove();
   }
 
   onInitHandler = () => {
-    Rokt.setLoggingEnabled(true);
     if (isNotEmpty(this.state.tagId)) {
       if (this.state.stageEnabled) {
         console.log('Executing on Stage');
@@ -173,51 +136,6 @@ export default class App extends Component<Props, State> {
       position: 'bottom',
       autoHide: true,
     });
-  };
-
-  execute2Step = async (attributes: any, placeholders: any) => {
-    try {
-      // first we send hashed email
-      attributes.emailsha256 = sha256(attributes.email).toString();
-      attributes.email = null;
-      Rokt.execute2Step(this.state.viewName, attributes, placeholders);
-
-      console.log('Execute 2 Step');
-    } catch (e) {
-      console.error(e);
-    }
-  };
-
-  executeEncrypted = async (attributes: any, placeholders: any) => {
-    try {
-      let publicKey;
-
-      if (this.state.stageEnabled) {
-        publicKey = PUBLIC_KEY_STAGE;
-        attributes.piiencryptionkeyid = ENCRYPTION_KEY_ID_STAGE;
-      } else {
-        publicKey = PUBLIC_KEY_PROD;
-        attributes.piiencryptionkeyid = ENCRYPTION_KEY_ID_PROD;
-      }
-
-      // first we send hashed email
-      attributes.emailEnc = this.encrypt(
-        attributes.email,
-        publicKey,
-      ).toString();
-      attributes.firstnameEnc = this.encrypt(
-        attributes.firstname,
-        publicKey,
-      ).toString();
-      attributes.email = null;
-      attributes.firstname = null;
-
-      Rokt.execute(this.state.viewName, attributes, placeholders);
-
-      console.log('Execute Encrypted');
-    } catch (e) {
-      console.error(e);
-    }
   };
 
   onExecuteHandler = () => {
@@ -248,16 +166,29 @@ export default class App extends Component<Props, State> {
 
     if (isEmpty(this.state.viewName)) {
       this.showToast('View Name cannot be empty');
+      return;
     }
 
-    if (this.state.twoStepEnabled) {
-      this.execute2Step(attributes, placeholders);
-    } else if (this.state.encryptEnabled) {
-      this.executeEncrypted(attributes, placeholders);
-    } else {
-      Rokt.execute(this.state.viewName, attributes, placeholders);
-      console.log('Execute');
+    Rokt.selectPlacements(this.state.viewName, attributes, placeholders);
+    console.log('Select Placements');
+  };
+
+  onShoppableAdsHandler = () => {
+    var stateCopy = JSON.parse(JSON.stringify(this.state));
+    if (!isValidJson(stateCopy.attributes)) {
+      this.showToast('Attributes must be valid JSON');
+      return;
     }
+    var attributes = JSON.parse(stateCopy.attributes);
+    attributes.country = this.state.country;
+
+    if (isEmpty(this.state.viewName)) {
+      this.showToast('View Name cannot be empty');
+      return;
+    }
+
+    Rokt.selectShoppableAds(this.state.viewName, attributes);
+    console.log('Select Shoppable Ads');
   };
 
   render() {
@@ -363,33 +294,6 @@ export default class App extends Component<Props, State> {
                     Stage Environment
                   </Text>
                 </View>
-                <View style={{flexDirection: 'row'}}>
-                  <CheckBox
-                    accessibilityLabel="input_2step"
-                    value={this.state.twoStepEnabled}
-                    onValueChange={() =>
-                      this.setState({
-                        twoStepEnabled: !this.state.twoStepEnabled,
-                      })
-                    }
-                  />
-                  <Text style={{marginTop: 5, marginLeft: 5}}>
-                    2Step Data Pass
-                  </Text>
-                </View>
-
-                <View style={{flexDirection: 'row'}}>
-                  <CheckBox
-                    accessibilityLabel="input_encrypt"
-                    value={this.state.encryptEnabled}
-                    onValueChange={() =>
-                      this.setState({
-                        encryptEnabled: !this.state.encryptEnabled,
-                      })
-                    }
-                  />
-                  <Text style={{marginTop: 5, marginLeft: 5}}>Encrypt RSA</Text>
-                </View>
                 <View style={styles.buttonContainer}>
                   <TouchableOpacity
                     onPress={this.onInitHandler}
@@ -400,6 +304,11 @@ export default class App extends Component<Props, State> {
                     onPress={this.onExecuteHandler}
                     style={[{height: 50, flex: 1}]}>
                     <Text style={styles.button}>Execute</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={this.onShoppableAdsHandler}
+                    style={[{height: 50, flex: 1}]}>
+                    <Text style={styles.button}>Shoppable Ads</Text>
                   </TouchableOpacity>
                 </View>
               </View>

@@ -25,7 +25,7 @@ import {
 } from "@rokt/react-native-sdk";
 
 const DEFAULT_TAG_ID = "2754655826098840951";
-const DEFAULT_VIEW_NAME = "MSDKEmbeddedLayout";
+const DEFAULT_IDENTIFIER = "MSDKEmbeddedLayout";
 const DEFAULT_PLACEHOLDER = "Location1";
 
 const eventManagerEmitter = new NativeEventEmitter(RoktEventManager);
@@ -35,7 +35,7 @@ export default function App() {
     useRef<React.ComponentRef<typeof RoktEmbeddedView>>(null);
 
   const [tagId, setTagId] = useState(DEFAULT_TAG_ID);
-  const [viewName, setViewName] = useState(DEFAULT_VIEW_NAME);
+  const [identifier, setIdentifier] = useState(DEFAULT_IDENTIFIER);
   const [placeholderName, setPlaceholderName] = useState(DEFAULT_PLACEHOLDER);
   const [isInitialized, setIsInitialized] = useState(false);
   const [status, setStatus] = useState("Not initialized");
@@ -48,6 +48,17 @@ export default function App() {
         console.log("Rokt Event:", JSON.stringify(data));
         if (data.event === "InitComplete") {
           setStatus(`Initialized: ${data.status}`);
+        } else if (data.event === "CartItemInstantPurchase") {
+          console.log("CartItemInstantPurchase — calling purchaseFinalized");
+          Rokt.purchaseFinalized(data.placementId, data.catalogItemId, true);
+        } else if (data.event === "CartItemInstantPurchaseInitiated") {
+          console.log("Shoppable: Purchase initiated", data.catalogItemId);
+        } else if (data.event === "CartItemInstantPurchaseFailure") {
+          console.log("Shoppable: Purchase failed", data.error);
+        } else if (data.event === "CartItemDevicePay") {
+          console.log("Shoppable: Device pay", data.paymentProvider);
+        } else if (data.event === "InstantPurchaseDismissal") {
+          console.log("Shoppable: Dismissal");
         }
       },
     );
@@ -61,7 +72,6 @@ export default function App() {
       return;
     }
 
-    Rokt.setLoggingEnabled(true);
     Rokt.initialize(tagId, "1.0");
     setIsInitialized(true);
     setStatus("Initializing...");
@@ -87,9 +97,27 @@ export default function App() {
       placeholders[placeholderName] = nodeHandle;
     }
 
-    Rokt.execute(viewName, attributes, placeholders);
-    setStatus("Executing placement...");
-    console.log("Rokt execute called");
+    Rokt.selectPlacements(identifier, attributes, placeholders);
+    setStatus("Selecting placements...");
+    console.log("Rokt selectPlacements called");
+  };
+
+  const handleShoppableAds = () => {
+    if (!isInitialized) {
+      setStatus("Error: Initialize SDK first");
+      return;
+    }
+
+    const attributes = {
+      email: "test@example.com",
+      firstname: "Test",
+      lastname: "User",
+      country: "US",
+    };
+
+    Rokt.selectShoppableAds(identifier, attributes);
+    setStatus("Selecting shoppable ads...");
+    console.log("Rokt selectShoppableAds called");
   };
 
   return (
@@ -97,9 +125,7 @@ export default function App() {
       <StatusBar barStyle="dark-content" />
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <Text style={styles.title}>Expo Rokt SDK Test</Text>
-        <Text style={styles.subtitle}>
-          Testing Expo Config Plugin Integration
-        </Text>
+        <Text style={styles.subtitle}>Testing v5.0.0 SDK Integration</Text>
 
         <View style={styles.statusContainer}>
           <Text style={styles.statusLabel}>Status:</Text>
@@ -118,12 +144,12 @@ export default function App() {
         </View>
 
         <View style={styles.inputContainer}>
-          <Text style={styles.label}>View Name:</Text>
+          <Text style={styles.label}>Identifier:</Text>
           <TextInput
             style={styles.input}
-            value={viewName}
-            onChangeText={setViewName}
-            placeholder="Enter view name"
+            value={identifier}
+            onChangeText={setIdentifier}
+            placeholder="Enter identifier"
             autoCapitalize="none"
           />
         </View>
@@ -157,6 +183,18 @@ export default function App() {
             disabled={!isInitialized}
           >
             <Text style={styles.buttonText}>Execute Placement</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[
+              styles.button,
+              styles.shoppableButton,
+              !isInitialized && styles.buttonDisabled,
+            ]}
+            onPress={handleShoppableAds}
+            disabled={!isInitialized}
+          >
+            <Text style={styles.buttonText}>Shoppable Ads</Text>
           </TouchableOpacity>
         </View>
 
@@ -228,24 +266,24 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   buttonContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
+    flexDirection: "column",
     marginBottom: 24,
     marginTop: 8,
   },
   button: {
-    flex: 1,
     padding: 14,
     borderRadius: 8,
     alignItems: "center",
+    marginBottom: 8,
   },
   initButton: {
     backgroundColor: "#4ba9c8",
-    marginRight: 8,
   },
   executeButton: {
     backgroundColor: "#28a745",
-    marginLeft: 8,
+  },
+  shoppableButton: {
+    backgroundColor: "#ff6b35",
   },
   buttonDisabled: {
     backgroundColor: "#ccc",
