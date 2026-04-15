@@ -10,7 +10,7 @@
     "prebuild": "expo prebuild --clean"
   },
   "dependencies": {
-    "@rokt/react-native-sdk": "file:../Rokt.Widget/rokt-react-native-sdk-4.12.2.tgz",
+    "@rokt/react-native-sdk": "file:../Rokt.Widget/rokt-react-native-sdk-5.0.0.tgz",
     "expo": "~54.0.25",
     "expo-dev-client": "~6.0.16",
     "expo-status-bar": "~3.0.8",
