@@ -11,7 +11,9 @@
 #import <SafariServices/SafariServices.h>
 #import "RNRoktWidget.h"
 #import <UIKit/UIKit.h>
-@import RoktContracts;
+#if __has_include(<RoktContracts/RoktContracts-Swift.h>)
+    #import <RoktContracts/RoktContracts-Swift.h>
+#endif
 #import <Rokt_Widget/Rokt_Widget-Swift.h>
 #import <React/RCTViewManager.h>
 #import <React/RCTUIManager.h>
@@ -206,16 +208,16 @@ RCT_EXPORT_METHOD(selectShoppableAdsWithConfig:(NSString *)identifier
 
 }
 
-- (ColorMode)stringToColorMode:(NSString*)colorString
+- (RoktColorMode)stringToColorMode:(NSString*)colorString
 {
     if ([colorString isEqualToString:@"light"]) {
-        return ColorModeLight;
+        return RoktColorModeLight;
     }
     else if ([colorString isEqualToString:@"dark"]) {
-        return ColorModeDark;
+        return RoktColorModeDark;
     }
     else {
-        return ColorModeSystem;
+        return RoktColorModeSystem;
     }
 }
 
@@ -316,7 +318,10 @@ RCT_EXPORT_METHOD(purchaseFinalized:(NSString *)placementId
             attributes:attributes
             placements:nativePlaceholders
             config:config
-            onEvent:nil
+            placementOptions:nil
+            onEvent:^(RoktEvent * _Nonnull event) {
+                [self.eventManager onRoktEvents:event identifier:identifier];
+            }
         ];
     }];
 }
@@ -324,10 +329,10 @@ RCT_EXPORT_METHOD(purchaseFinalized:(NSString *)placementId
 #ifdef RCT_NEW_ARCH_ENABLED
 - (RoktConfig*)buildRoktConfigFromSpec:(JS::NativeRoktWidget::RoktConfigType &)roktConfigSpec
 {
-    Builder *builder = [[Builder alloc] init];
+    RoktConfigBuilder *builder = [[RoktConfigBuilder alloc] init];
     NSString *colorMode = roktConfigSpec.colorMode();
     if (colorMode != nil) {
-        ColorMode value = [self stringToColorMode:colorMode];
+        RoktColorMode value = [self stringToColorMode:colorMode];
         [builder colorMode:value];
     }
 
@@ -337,9 +342,9 @@ RCT_EXPORT_METHOD(purchaseFinalized:(NSString *)placementId
         NSDictionary *cacheAttributes = (NSDictionary *)cacheConfigValue.cacheAttributes();
         std::optional<double> duration = cacheConfigValue.cacheDurationInSeconds();
 
-        NSTimeInterval cacheDurationInSeconds = duration.has_value() ? duration.value() : CacheConfig.maxCacheDuration;
+        NSTimeInterval cacheDurationInSeconds = duration.has_value() ? duration.value() : RoktCacheConfig.maxCacheDuration;
 
-        CacheConfig *cacheConfig = [[CacheConfig alloc] initWithCacheDuration:cacheDurationInSeconds cacheAttributes:cacheAttributes];
+        RoktCacheConfig *cacheConfig = [[RoktCacheConfig alloc] initWithCacheDuration:cacheDurationInSeconds cacheAttributes:cacheAttributes];
         [builder cacheConfig:(cacheConfig)];
     }
 
@@ -348,10 +353,10 @@ RCT_EXPORT_METHOD(purchaseFinalized:(NSString *)placementId
 #else
 - (RoktConfig*)buildRoktConfigFromDict:(NSDictionary *)roktConfigDict
 {
-    Builder *builder = [[Builder alloc] init];
+    RoktConfigBuilder *builder = [[RoktConfigBuilder alloc] init];
     NSString *colorMode = roktConfigDict[@"colorMode"];
     if (colorMode != nil) {
-        ColorMode value = [self stringToColorMode:colorMode];
+        RoktColorMode value = [self stringToColorMode:colorMode];
         [builder colorMode:value];
     }
 
@@ -360,9 +365,9 @@ RCT_EXPORT_METHOD(purchaseFinalized:(NSString *)placementId
         NSDictionary *cacheAttributes = cacheConfigDict[@"cacheAttributes"];
         NSNumber *duration = cacheConfigDict[@"cacheDurationInSeconds"];
 
-        NSTimeInterval cacheDurationInSeconds = duration != nil ? [duration doubleValue] : CacheConfig.maxCacheDuration;
+        NSTimeInterval cacheDurationInSeconds = duration != nil ? [duration doubleValue] : RoktCacheConfig.maxCacheDuration;
 
-        CacheConfig *cacheConfig = [[CacheConfig alloc] initWithCacheDuration:cacheDurationInSeconds cacheAttributes:cacheAttributes];
+        RoktCacheConfig *cacheConfig = [[RoktCacheConfig alloc] initWithCacheDuration:cacheDurationInSeconds cacheAttributes:cacheAttributes];
         [builder cacheConfig:(cacheConfig)];
     }
 
