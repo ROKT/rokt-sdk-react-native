@@ -28,8 +28,6 @@ The following methods have been removed in v5.0.0:
 | `Rokt.execute2Step()`             | `Rokt.selectPlacements()`                               |
 | `Rokt.setLoggingEnabled()`        | No replacement — use native SDK log level configuration |
 | `Rokt.setFulfillmentAttributes()` | Removed                                                 |
-| `Rokt.setSessionId()`             | Removed                                                 |
-| `Rokt.getSessionId()`             | Removed                                                 |
 
 #### Event System Changes
 

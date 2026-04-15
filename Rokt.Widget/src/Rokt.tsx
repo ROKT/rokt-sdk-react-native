@@ -111,10 +111,20 @@ export abstract class Rokt {
     RNRoktWidget.setEnvironmentToProd();
   }
 
+  /**
+   * Set a custom session ID for the Rokt SDK.
+   *
+   * @param sessionId - The session ID to set. Must be a non-empty string.
+   */
   public static setSessionId(sessionId: string): void {
     RNRoktWidget.setSessionId(sessionId);
   }
 
+  /**
+   * Get the current session ID from the Rokt SDK.
+   *
+   * @returns The current session ID, or null if not set.
+   */
   public static getSessionId(): string | null {
     return RNRoktWidget.getSessionId();
   }

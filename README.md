@@ -224,6 +224,8 @@ Rokt.setEnvironmentToProd(); // For production (default)
 | `Rokt.purchaseFinalized(placementId, catalogItemId, success)`          | Report purchase completion             |
 | `Rokt.setEnvironmentToStage()`                                         | Set staging environment                |
 | `Rokt.setEnvironmentToProd()`                                          | Set production environment             |
+| `Rokt.setSessionId(sessionId)`                                         | Set a custom session ID                |
+| `Rokt.getSessionId()`                                                  | Get the current session ID             |
 
 ## Minimum Requirements
 
