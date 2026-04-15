@@ -112,6 +112,14 @@ class RNRoktWidgetModule internal constructor(private val reactContext: ReactApp
         impl.setEnvironmentToProd()
     }
 
+    @ReactMethod
+    fun setSessionId(sessionId: String) {
+        impl.setSessionId(sessionId)
+    }
+
+    @ReactMethod(isBlockingSynchronousMethod = true)
+    fun getSessionId(): String? = impl.getSessionId()
+
     private fun safeUnwrapPlaceholders(
         placeholders: ReadableMap?,
         nativeViewHierarchyManager: NativeViewHierarchyManager,

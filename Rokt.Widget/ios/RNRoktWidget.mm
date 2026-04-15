@@ -246,6 +246,14 @@ RCT_EXPORT_METHOD(setEnvironmentToProd){
     [Rokt setEnvironmentWithEnvironment: RoktEnvironmentProd];
 }
 
+RCT_EXPORT_METHOD(setSessionId:(NSString *)sessionId) {
+    [Rokt setSessionIdWithSessionId:sessionId];
+}
+
+RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(getSessionId) {
+    return [Rokt getSessionId];
+}
+
 RCT_EXPORT_METHOD(purchaseFinalized:(NSString *)placementId
                   catalogItemId:(NSString *)catalogItemId
                   success:(BOOL)success)

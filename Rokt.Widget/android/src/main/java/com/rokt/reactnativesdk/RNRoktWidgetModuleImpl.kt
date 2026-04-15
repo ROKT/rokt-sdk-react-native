@@ -88,6 +88,12 @@ class RNRoktWidgetModuleImpl(private val reactContext: ReactApplicationContext) 
         Rokt.setEnvironment(Prod)
     }
 
+    fun setSessionId(sessionId: String) {
+        Rokt.setSessionId(sessionId)
+    }
+
+    fun getSessionId(): String? = Rokt.getSessionId()
+
     fun sendEvent(reactContext: ReactContext?, eventName: String, params: WritableMap?) {
         reactContext?.getJSModule(RCTDeviceEventEmitter::class.java)?.emit(eventName, params)
     }

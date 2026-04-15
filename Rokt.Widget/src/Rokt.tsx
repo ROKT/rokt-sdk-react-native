@@ -110,6 +110,14 @@ export abstract class Rokt {
   public static setEnvironmentToProd(): void {
     RNRoktWidget.setEnvironmentToProd();
   }
+
+  public static setSessionId(sessionId: string): void {
+    RNRoktWidget.setSessionId(sessionId);
+  }
+
+  public static getSessionId(): string | null {
+    return RNRoktWidget.getSessionId();
+  }
 }
 
 declare module "react-native" {
