@@ -132,6 +132,10 @@ jobs:
       github.event.pull_request.draft == false
     needs: [build-test-ios, build-test-android]
     name: Notify GChat
+    permissions:
+      contents: read
+      pull-requests: read
+      id-token: write
     uses: ROKT/rokt-workflows/.github/workflows/oss_pr_opened_notification.yml@1859338d7c2c2b873233505c751acbf09fb218d5 # main
     secrets:
       gchat_webhook: ${{ secrets.GCHAT_PRS_WEBHOOK }}
