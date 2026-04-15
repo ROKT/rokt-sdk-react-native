@@ -3,8 +3,8 @@ import React
 import React_RCTAppDelegate
 import ReactAppDependencyProvider
 import Rokt_Widget
-// Uncomment when RoktPaymentExtension is published:
-// import RoktPaymentExtension
+// Uncomment to enable Shoppable Ads payment extension:
+// import RoktStripePaymentExtension
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {

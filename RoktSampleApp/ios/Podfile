@@ -36,8 +36,8 @@ target 'RoktSampleApp' do
     :app_path => "#{Pod::Config.instance.installation_root}/.."
   )
 
-  # TODO: Add RoktPaymentExtension pod when published to CocoaPods
-  # pod 'RoktPaymentExtension'
+  # Uncomment to enable Shoppable Ads payment extension:
+  # pod 'RoktStripePaymentExtension'
 
   target 'RoktSampleAppTests' do
     inherit! :search_paths

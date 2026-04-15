@@ -158,15 +158,16 @@ Shoppable Ads requires a payment extension registered in your native iOS AppDele
 ```swift
 // AppDelegate.swift
 import Rokt_Widget
-import RoktPaymentExtension
+import RoktStripePaymentExtension
 
 // After SDK initialization:
-let stripeExt = RoktStripePaymentExtension(
+if let stripeExt = RoktStripePaymentExtension(
     applePayMerchantId: "merchant.com.yourapp"
-)
-Rokt.registerPaymentExtension(stripeExt, config: [
-    "stripeKey": "pk_live_your_stripe_key"
-])
+) {
+    Rokt.registerPaymentExtension(stripeExt, config: [
+        "stripeKey": "pk_live_your_stripe_key"
+    ])
+}
 ```
 
 ### Purchase Finalized
