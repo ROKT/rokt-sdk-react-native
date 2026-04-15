@@ -97,13 +97,7 @@ class RNRoktWidgetModule internal constructor(private val reactContext: ReactApp
             impl.logDebug("selectShoppableAds failed. Identifier cannot be null")
             return
         }
-        impl.startRoktEventListener(Rokt.events(identifier), reactContext.currentActivity, identifier)
-        val config = roktConfig?.let { impl.buildRoktConfig(it) }
-        Rokt.selectShoppableAds(
-            identifier = identifier,
-            attributes = impl.readableMapToMapOfStrings(attributes),
-            config = config,
-        )
+        impl.selectShoppableAds(identifier, attributes, reactContext.currentActivity)
     }
 
     /**

@@ -67,16 +67,8 @@ class RNRoktWidgetModuleImpl(private val reactContext: ReactApplicationContext) 
         Rokt.purchaseFinalized(placementId, catalogItemId, success)
     }
 
-    fun selectShoppableAds(
-        identifier: String,
-        attributes: ReadableMap?,
-        currentActivity: Activity?,
-    ) {
-        startRoktEventListener(Rokt.events(identifier), currentActivity, identifier)
-        Rokt.selectShoppableAds(
-            identifier = identifier,
-            attributes = readableMapToMapOfStrings(attributes),
-        )
+    fun selectShoppableAds(identifier: String, attributes: ReadableMap?, currentActivity: Activity?) {
+        Log.w("Rokt", "selectShoppableAds is not yet supported on Android")
     }
 
     fun selectShoppableAdsWithConfig(
@@ -85,13 +77,7 @@ class RNRoktWidgetModuleImpl(private val reactContext: ReactApplicationContext) 
         roktConfig: ReadableMap?,
         currentActivity: Activity?,
     ) {
-        startRoktEventListener(Rokt.events(identifier), currentActivity, identifier)
-        val config = roktConfig?.let { buildRoktConfig(it) }
-        Rokt.selectShoppableAds(
-            identifier = identifier,
-            attributes = readableMapToMapOfStrings(attributes),
-            config = config,
-        )
+        Log.w("Rokt", "selectShoppableAds is not yet supported on Android")
     }
 
     fun setEnvironmentToStage() {
@@ -173,37 +159,37 @@ class RNRoktWidgetModuleImpl(private val reactContext: ReactApplicationContext) 
 
                                 is RoktEvent.OfferEngagement -> {
                                     eventName = "OfferEngagement"
-                                    event.id
+                                    event.identifier
                                 }
 
                                 is RoktEvent.PlacementClosed -> {
                                     eventName = "PlacementClosed"
-                                    event.id
+                                    event.identifier
                                 }
 
                                 is RoktEvent.PlacementCompleted -> {
                                     eventName = "PlacementCompleted"
-                                    event.id
+                                    event.identifier
                                 }
 
                                 is RoktEvent.PlacementFailure -> {
                                     eventName = "PlacementFailure"
-                                    event.id
+                                    event.identifier
                                 }
 
                                 is RoktEvent.PlacementInteractive -> {
                                     eventName = "PlacementInteractive"
-                                    event.id
+                                    event.identifier
                                 }
 
                                 is RoktEvent.PlacementReady -> {
                                     eventName = "PlacementReady"
-                                    event.id
+                                    event.identifier
                                 }
 
                                 is RoktEvent.PositiveEngagement -> {
                                     eventName = "PositiveEngagement"
-                                    event.id
+                                    event.identifier
                                 }
 
                                 RoktEvent.ShowLoadingIndicator -> {
@@ -220,7 +206,7 @@ class RNRoktWidgetModuleImpl(private val reactContext: ReactApplicationContext) 
                                 is RoktEvent.OpenUrl -> {
                                     eventName = "OpenUrl"
                                     params.putString("url", event.url)
-                                    event.id
+                                    event.identifier
                                 }
 
                                 is RoktEvent.CartItemInstantPurchase -> {
@@ -233,31 +219,6 @@ class RNRoktWidgetModuleImpl(private val reactContext: ReactApplicationContext) 
                                     params.putDouble("totalPrice", event.totalPrice)
                                     params.putInt("quantity", event.quantity)
                                     params.putDouble("unitPrice", event.unitPrice)
-                                    event.placementId
-                                }
-
-                                is RoktEvent.CartItemInstantPurchaseInitiated -> {
-                                    eventName = "CartItemInstantPurchaseInitiated"
-                                    params.putString("catalogItemId", event.catalogItemId)
-                                    params.putString("cartItemId", event.cartItemId)
-                                    event.identifier
-                                }
-
-                                is RoktEvent.CartItemInstantPurchaseFailure -> {
-                                    eventName = "CartItemInstantPurchaseFailure"
-                                    params.putString("error", event.error)
-                                    params.putString("catalogItemId", event.catalogItemId)
-                                    event.identifier
-                                }
-
-                                is RoktEvent.CartItemDevicePay -> {
-                                    eventName = "CartItemDevicePay"
-                                    params.putString("paymentProvider", event.paymentProvider)
-                                    event.identifier
-                                }
-
-                                is RoktEvent.InstantPurchaseDismissal -> {
-                                    eventName = "InstantPurchaseDismissal"
                                     event.identifier
                                 }
 

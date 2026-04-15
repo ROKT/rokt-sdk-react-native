@@ -79,11 +79,7 @@ class RNRoktWidgetModule internal constructor(private val reactContext: ReactApp
     }
 
     @ReactMethod
-    fun selectShoppableAdsWithConfig(
-        identifier: String?,
-        attributes: ReadableMap?,
-        roktConfig: ReadableMap?,
-    ) {
+    fun selectShoppableAdsWithConfig(identifier: String?, attributes: ReadableMap?, roktConfig: ReadableMap?) {
         selectShoppableAdsInternal(identifier, attributes, roktConfig)
     }
 
@@ -96,14 +92,7 @@ class RNRoktWidgetModule internal constructor(private val reactContext: ReactApp
             impl.logDebug("selectShoppableAds failed. Identifier cannot be null")
             return
         }
-        impl.startRoktEventListener(Rokt.events(identifier), reactContext.currentActivity, identifier)
-        val config = roktConfig?.let { impl.buildRoktConfig(it) }
-        // No placeholders needed for shoppable ads (full-screen overlay)
-        Rokt.selectShoppableAds(
-            identifier = identifier,
-            attributes = impl.readableMapToMapOfStrings(attributes),
-            config = config,
-        )
+        impl.selectShoppableAds(identifier, attributes, reactContext.currentActivity)
     }
 
     @ReactMethod
