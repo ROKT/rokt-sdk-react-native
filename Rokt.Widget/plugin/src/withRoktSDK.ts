@@ -26,7 +26,7 @@ const DYNAMIC_FRAMEWORK_PODS = [
 const withRoktPodfile: ConfigPlugin = (config) => {
   return withDangerousMod(config, [
     "ios",
-    async (config) => {
+    (config) => {
       const podfilePath = path.join(
         config.modRequest.platformProjectRoot,
         "Podfile",
