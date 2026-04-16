@@ -11,6 +11,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [5.0.0] - 2026-04-16
 
+### Changed
+
+- **BREAKING**: Renamed `execute()` to `selectPlacements()` with `identifier` parameter replacing `viewName`.
+- **BREAKING**: Removed `execute2Step()`, `setLoggingEnabled()`, and `setFulfillmentAttributes()`.
+- **BREAKING**: Unified callback architecture into a single `RoktEvents` event stream via `NativeEventEmitter`.
+- Updated native SDK dependencies to iOS SDK 5.0 and Android SDK 5.0.
+
+### Added
+
+- Shoppable Ads support.
+- New `RoktConfig` parameter for `selectPlacements()`.
+
+For a full migration guide, see [MIGRATING.md](./MIGRATING.md#migrating-from-v4x-to-v500).
+
 ## [4.12.2] - 2026-03-05
 
 ### Updated
