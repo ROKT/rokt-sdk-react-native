@@ -9,6 +9,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.0.0] - 2026-04-16
+
+### Changed
+
+- **BREAKING**: Renamed `execute()` to `selectPlacements()` with `identifier` parameter replacing `viewName`.
+- **BREAKING**: Removed `execute2Step()`, `setLoggingEnabled()`, and `setFulfillmentAttributes()`.
+- **BREAKING**: Unified callback architecture into a single `RoktEvents` event stream via `NativeEventEmitter`.
+- Updated native SDK dependencies to iOS SDK 5.0 and Android SDK 5.0.
+
+### Added
+
+- Shoppable Ads support.
+- New `RoktConfig` parameter for `selectPlacements()`.
+
+For a full migration guide, see [MIGRATING.md](./MIGRATING.md#migrating-from-v4x-to-v500).
+
 ## [4.12.2] - 2026-03-05
 
 ### Updated
@@ -90,7 +106,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Support new response action type `ExternalPaymentTrigger`
 - Sessions are now retained between app restarts
 
-[unreleased]: https://github.com/ROKT/rokt-sdk-react-native/compare/4.12.2...HEAD
+[unreleased]: https://github.com/ROKT/rokt-sdk-react-native/compare/5.0.0...HEAD
+[5.0.0]: https://github.com/ROKT/rokt-sdk-react-native/compare/4.12.2...5.0.0
 [4.12.2]: https://github.com/ROKT/rokt-sdk-react-native/compare/4.12.1...4.12.2
 [4.12.1]: https://github.com/ROKT/rokt-sdk-react-native/compare/4.12.0...4.12.1
 [4.12.0]: https://github.com/ROKT/rokt-sdk-react-native/compare/4.11.4...4.12.0
