@@ -1,6 +1,6 @@
 {
   "name": "expotestapp",
-  "version": "4.12.2",
+  "version": "5.0.0",
   "main": "index.ts",
   "scripts": {
     "start": "expo start --dev-client",
