@@ -16,7 +16,9 @@ import React, {Component} from 'react';
 import {
   EmitterSubscription,
   findNodeHandle,
+  Linking,
   NativeEventEmitter,
+  Platform,
   SafeAreaView,
   ScrollView,
   StatusBar,
@@ -60,6 +62,8 @@ interface State {
   targetElement2: string;
   attributes: string;
   stageEnabled: boolean;
+  customBaseURL: string;
+  paymentCallbackURLScheme: string;
 }
 
 export default class App extends Component<Props, State> {
@@ -67,6 +71,7 @@ export default class App extends Component<Props, State> {
   private placeholder2 = React.createRef<RoktEmbeddedViewRef>();
 
   private eventSubscription: EmitterSubscription;
+  private linkingSubscription?: {remove: () => void};
 
   constructor(props: Props) {
     super(props);
@@ -81,6 +86,8 @@ export default class App extends Component<Props, State> {
       targetElement2: 'Location2',
       attributes: attributes,
       stageEnabled: false,
+      customBaseURL: '',
+      paymentCallbackURLScheme: 'roktsampleapp',
     };
 
     this.eventSubscription = eventManagerEmitter.addListener(
@@ -108,8 +115,19 @@ export default class App extends Component<Props, State> {
     );
   }
 
+  componentDidMount() {
+    // Forward incoming deep-link URLs to the Rokt SDK so redirect-based payment
+    // authentication can resume. iOS only.
+    if (Platform.OS === 'ios') {
+      this.linkingSubscription = Linking.addEventListener('url', ({url}) => {
+        Rokt.handleURLCallback(url);
+      });
+    }
+  }
+
   componentWillUnmount() {
     this.eventSubscription.remove();
+    this.linkingSubscription?.remove();
   }
 
   onInitHandler = () => {
@@ -121,11 +139,27 @@ export default class App extends Component<Props, State> {
         console.log('Executing on Prod');
         Rokt.setEnvironmentToProd();
       }
+      // setCustomBaseURL must be called before initialize. iOS only.
+      if (isNotEmpty(this.state.customBaseURL)) {
+        Rokt.setCustomBaseURL(this.state.customBaseURL);
+        console.log(`Custom base URL set: ${this.state.customBaseURL}`);
+      }
       Rokt.initialize(this.state.tagId, '1.1');
       console.log('Initialize');
     } else {
       this.showToast('Tag ID must be a valid string');
     }
+  };
+
+  onSetPaymentCallbackURLSchemeHandler = () => {
+    if (isEmpty(this.state.paymentCallbackURLScheme)) {
+      this.showToast('Payment callback URL scheme cannot be empty');
+      return;
+    }
+    Rokt.setPaymentCallbackURLScheme(this.state.paymentCallbackURLScheme);
+    console.log(
+      `Payment callback URL scheme set: ${this.state.paymentCallbackURLScheme}`,
+    );
   };
 
   showToast = (message: string) => {
@@ -309,6 +343,44 @@ export default class App extends Component<Props, State> {
                     onPress={this.onShoppableAdsHandler}
                     style={[{height: 50, flex: 1}]}>
                     <Text style={styles.button}>Shoppable Ads</Text>
+                  </TouchableOpacity>
+                </View>
+
+                <Text
+                  style={[styles.sectionTitle, {marginTop: 24, fontSize: 18}]}>
+                  Advanced (iOS)
+                </Text>
+                <Text style={[styles.label, {color: Colors.black}]}>
+                  Custom Base URL (CNAME)
+                </Text>
+                <TextInput
+                  accessibilityLabel="input_custom_base_url"
+                  testID="input_custom_base_url"
+                  style={styles.textInput}
+                  placeholder="https://rokt.example.com"
+                  autoCapitalize="none"
+                  value={this.state.customBaseURL}
+                  onChangeText={customBaseURL => this.setState({customBaseURL})}
+                />
+                <Text style={[styles.label, {color: Colors.black}]}>
+                  Payment callback URL scheme
+                </Text>
+                <TextInput
+                  accessibilityLabel="input_payment_callback_url_scheme"
+                  testID="input_payment_callback_url_scheme"
+                  style={styles.textInput}
+                  placeholder="roktsampleapp"
+                  autoCapitalize="none"
+                  value={this.state.paymentCallbackURLScheme}
+                  onChangeText={paymentCallbackURLScheme =>
+                    this.setState({paymentCallbackURLScheme})
+                  }
+                />
+                <View style={styles.buttonContainer}>
+                  <TouchableOpacity
+                    onPress={this.onSetPaymentCallbackURLSchemeHandler}
+                    style={[{height: 50, flex: 1}]}>
+                    <Text style={styles.button}>Set Callback Scheme</Text>
                   </TouchableOpacity>
                 </View>
               </View>

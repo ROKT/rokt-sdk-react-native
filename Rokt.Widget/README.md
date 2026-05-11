@@ -208,6 +208,31 @@ Rokt.execute("RoktEmbeddedExperience", attributes, placeholders, () =>
 );
 ```
 
+#### Custom Base URL (CNAME)
+
+Route SDK requests through a partner-owned CNAME. Must be called **before** `Rokt.initialize(...)`. iOS only.
+
+```javascript
+Rokt.setCustomBaseURL("https://rokt.example.com");
+Rokt.initialize("xxxxxxxx", "1.0");
+```
+
+#### Payment callback URL scheme (iOS)
+
+Register the host app's URL scheme and forward incoming deep-link URLs to the SDK so redirect-based payment authentication can resume.
+
+```javascript
+import { Linking } from "react-native";
+
+Rokt.setPaymentCallbackURLScheme("myapp");
+
+Linking.addEventListener("url", ({ url }) => {
+  Rokt.handleURLCallback(url);
+});
+```
+
+The scheme must also be declared under `CFBundleURLTypes`/`CFBundleURLSchemes` in `Info.plist` (or `expo.scheme` in `app.json` for Expo).
+
 ## License
 
 Copyright 2020 Rokt Pte Ltd

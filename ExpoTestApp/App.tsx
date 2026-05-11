@@ -5,9 +5,11 @@
  * It demonstrates SDK initialization and embedded view placement.
  */
 
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   findNodeHandle,
+  Linking,
+  Platform,
   SafeAreaView,
   ScrollView,
   StatusBar,
@@ -39,6 +41,21 @@ export default function App() {
   const [placeholderName, setPlaceholderName] = useState(DEFAULT_PLACEHOLDER);
   const [isInitialized, setIsInitialized] = useState(false);
   const [status, setStatus] = useState("Not initialized");
+  const [customBaseURL, setCustomBaseURL] = useState("");
+  const [paymentCallbackURLScheme, setPaymentCallbackURLScheme] =
+    useState("expotestapp");
+
+  // Forward incoming deep-link URLs to the Rokt SDK so redirect-based payment
+  // authentication can resume. iOS only.
+  useEffect(() => {
+    if (Platform.OS !== "ios") {
+      return;
+    }
+    const subscription = Linking.addEventListener("url", ({ url }) => {
+      Rokt.handleURLCallback(url);
+    });
+    return () => subscription.remove();
+  }, []);
 
   // Listen for Rokt events
   React.useEffect(() => {
@@ -72,10 +89,26 @@ export default function App() {
       return;
     }
 
+    // setCustomBaseURL must be called before initialize. iOS only.
+    if (customBaseURL) {
+      Rokt.setCustomBaseURL(customBaseURL);
+      console.log("Custom base URL set:", customBaseURL);
+    }
+
     Rokt.initialize(tagId, "1.0");
     setIsInitialized(true);
     setStatus("Initializing...");
     console.log("Rokt SDK initialized with Tag ID:", tagId);
+  };
+
+  const handleSetPaymentCallbackURLScheme = () => {
+    if (!paymentCallbackURLScheme) {
+      setStatus("Error: Payment callback URL scheme is required");
+      return;
+    }
+    Rokt.setPaymentCallbackURLScheme(paymentCallbackURLScheme);
+    setStatus(`Payment callback URL scheme set: ${paymentCallbackURLScheme}`);
+    console.log("Payment callback URL scheme set:", paymentCallbackURLScheme);
   };
 
   const handleExecute = () => {
@@ -195,6 +228,36 @@ export default function App() {
             disabled={!isInitialized}
           >
             <Text style={styles.buttonText}>Shoppable Ads</Text>
+          </TouchableOpacity>
+        </View>
+
+        <Text style={[styles.label, { marginTop: 16 }]}>Advanced (iOS)</Text>
+
+        <View style={styles.inputContainer}>
+          <Text style={styles.label}>Custom Base URL (CNAME):</Text>
+          <TextInput
+            style={styles.input}
+            value={customBaseURL}
+            onChangeText={setCustomBaseURL}
+            placeholder="https://rokt.example.com"
+            autoCapitalize="none"
+          />
+        </View>
+
+        <View style={styles.inputContainer}>
+          <Text style={styles.label}>Payment callback URL scheme:</Text>
+          <TextInput
+            style={styles.input}
+            value={paymentCallbackURLScheme}
+            onChangeText={setPaymentCallbackURLScheme}
+            placeholder="expotestapp"
+            autoCapitalize="none"
+          />
+          <TouchableOpacity
+            style={[styles.button, styles.initButton, { marginTop: 8 }]}
+            onPress={handleSetPaymentCallbackURLScheme}
+          >
+            <Text style={styles.buttonText}>Set Callback Scheme</Text>
           </TouchableOpacity>
         </View>
 

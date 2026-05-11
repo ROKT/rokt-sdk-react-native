@@ -128,6 +128,48 @@ export abstract class Rokt {
   public static getSessionId(): string | null {
     return RNRoktWidget.getSessionId();
   }
+
+  /**
+   * Route all Rokt SDK requests through a custom CNAME / first-party domain.
+   *
+   * Must be called **before** {@link Rokt.initialize}. The SDK uses only the
+   * scheme, host, and port — any path, query, or fragment is ignored.
+   * Non-HTTPS URLs or URLs with a missing/empty host are rejected.
+   *
+   * iOS only — no-op on Android.
+   *
+   * @param url - HTTPS URL whose host is the partner's CNAME domain.
+   */
+  public static setCustomBaseURL(url: string): void {
+    RNRoktWidget.setCustomBaseURL(url);
+  }
+
+  /**
+   * Register the host app's bare custom URL scheme used for redirect-based
+   * payment callbacks from web views.
+   *
+   * The scheme must also be declared in the iOS `Info.plist` under
+   * `CFBundleURLTypes`/`CFBundleURLSchemes`. Pass `null` to clear the scheme.
+   *
+   * iOS only — no-op on Android.
+   *
+   * @param scheme - Bare scheme string (e.g. `"myapp"`, no `://`), or `null` to clear.
+   */
+  public static setPaymentCallbackURLScheme(scheme: string | null): void {
+    RNRoktWidget.setPaymentCallbackURLScheme(scheme);
+  }
+
+  /**
+   * Forward an incoming deep-link URL to the Rokt SDK so redirect-based payment
+   * authentication can resume. Wire this from React Native's `Linking` listener.
+   *
+   * iOS only — no-op on Android.
+   *
+   * @param url - The URL received by the host app from `Linking`.
+   */
+  public static handleURLCallback(url: string): void {
+    RNRoktWidget.handleURLCallback(url);
+  }
 }
 
 declare module "react-native" {

@@ -94,6 +94,18 @@ class RNRoktWidgetModuleImpl(private val reactContext: ReactApplicationContext) 
 
     fun getSessionId(): String? = Rokt.getSessionId()
 
+    fun setCustomBaseURL(url: String) {
+        Log.w("Rokt", "setCustomBaseURL is iOS only and is a no-op on Android")
+    }
+
+    fun setPaymentCallbackURLScheme(scheme: String?) {
+        Log.w("Rokt", "setPaymentCallbackURLScheme is iOS only and is a no-op on Android")
+    }
+
+    fun handleURLCallback(url: String) {
+        Log.w("Rokt", "handleURLCallback is iOS only and is a no-op on Android")
+    }
+
     fun sendEvent(reactContext: ReactContext?, eventName: String, params: WritableMap?) {
         reactContext?.getJSModule(RCTDeviceEventEmitter::class.java)?.emit(eventName, params)
     }

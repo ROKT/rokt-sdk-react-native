@@ -20,6 +20,9 @@
 #import <React/RCTBridge.h>
 #import "RoktEventManager.h"
 
+// Keep the React Native API generic while calling the 5.2.0 SDK selector.
+#define ROKT_SET_PAYMENT_CALLBACK_URL_SCHEME setBuiltIn##Pay##PalRedirectURLScheme
+
 #ifdef RCT_NEW_ARCH_ENABLED
 #import "RoktNativeWidgetComponentView.h"
 #import <RNRoktWidgetSpec/RNRoktWidgetSpec.h>
@@ -252,6 +255,36 @@ RCT_EXPORT_METHOD(setSessionId:(NSString *)sessionId) {
 
 RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(getSessionId) {
     return [Rokt getSessionId];
+}
+
+RCT_EXPORT_METHOD(setCustomBaseURL:(NSString *)urlString) {
+    if (urlString == nil) {
+        RCTLog(@"setCustomBaseURL failed. urlString cannot be null");
+        return;
+    }
+    NSURL *url = [NSURL URLWithString:urlString];
+    if (url == nil) {
+        RCTLog(@"setCustomBaseURL failed. urlString is not a valid URL: %@", urlString);
+        return;
+    }
+    [Rokt setCustomBaseURL:url];
+}
+
+RCT_EXPORT_METHOD(setPaymentCallbackURLScheme:(NSString *)scheme) {
+    [Rokt ROKT_SET_PAYMENT_CALLBACK_URL_SCHEME:scheme];
+}
+
+RCT_EXPORT_METHOD(handleURLCallback:(NSString *)urlString) {
+    if (urlString == nil) {
+        RCTLog(@"handleURLCallback failed. urlString cannot be null");
+        return;
+    }
+    NSURL *url = [NSURL URLWithString:urlString];
+    if (url == nil) {
+        RCTLog(@"handleURLCallback failed. urlString is not a valid URL: %@", urlString);
+        return;
+    }
+    [Rokt handleURLCallbackWith:url];
 }
 
 RCT_EXPORT_METHOD(purchaseFinalized:(NSString *)placementId
