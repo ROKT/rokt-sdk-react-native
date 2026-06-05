@@ -82,11 +82,8 @@ class RoktEmbeddedViewManagerImpl {
  * Direct event carrying the measured widget height (in dp) back to the JS `onWidgetHeightChanged`
  * handler. Compatible with both the old and new React Native architectures.
  */
-internal class WidgetHeightChangedEvent(
-    surfaceId: Int,
-    viewId: Int,
-    private val height: Int,
-) : Event<WidgetHeightChangedEvent>(surfaceId, viewId) {
+internal class WidgetHeightChangedEvent(surfaceId: Int, viewId: Int, private val height: Int) :
+    Event<WidgetHeightChangedEvent>(surfaceId, viewId) {
     override fun getEventName(): String = RoktEmbeddedViewManagerImpl.EVENT_HEIGHT_CHANGED_NATIVE
 
     override fun getEventData(): WritableMap = Arguments.createMap().apply {
