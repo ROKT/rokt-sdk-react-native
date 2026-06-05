@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.0.1] - 2026-06-05
+
+### Fixed
+
+- fix(android): render embedded placements on New Architecture via EventDispatcher
+
 ## [5.0.0] - 2026-04-16
 
 ### Changed
@@ -106,7 +112,8 @@ For a full migration guide, see [MIGRATING.md](./MIGRATING.md#migrating-from-v4x
 - Support new response action type `ExternalPaymentTrigger`
 - Sessions are now retained between app restarts
 
-[unreleased]: https://github.com/ROKT/rokt-sdk-react-native/compare/5.0.0...HEAD
+[unreleased]: https://github.com/ROKT/rokt-sdk-react-native/compare/5.0.1...HEAD
+[5.0.1]: https://github.com/ROKT/rokt-sdk-react-native/compare/5.0.0...5.0.1
 [5.0.0]: https://github.com/ROKT/rokt-sdk-react-native/compare/4.12.2...5.0.0
 [4.12.2]: https://github.com/ROKT/rokt-sdk-react-native/compare/4.12.1...4.12.2
 [4.12.1]: https://github.com/ROKT/rokt-sdk-react-native/compare/4.12.0...4.12.1
