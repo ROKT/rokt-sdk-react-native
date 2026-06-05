@@ -1,31 +1,23 @@
-name: React Native Pull Request
+name: Release – Publish
 
 on:
-  workflow_dispatch:
-  pull_request:
+  push:
+    branches:
+      - main
+    paths:
+      - VERSION
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 permissions:
-  contents: read
-  pull-requests: read
+  contents: write
+  id-token: write # Required for npm OIDC trusted publishing
 
 jobs:
-  trunk-check:
-    name: Trunk code check
-    runs-on: ubuntu-latest
-    permissions:
-      checks: write
-    steps:
-      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
-        with:
-          persist-credentials: false
-      - name: Trunk Check
-        uses: trunk-io/trunk-action@04ba50e7658c81db7356da96657e6e77f220bfa3 # v1.3.1
-        with:
-          check-mode: pull_request
-
   build-package:
     name: Build and Package Rokt.Widget
-    needs: trunk-check
     runs-on: ubuntu-latest
     outputs:
       package-filename: ${{ steps.build-and-package.outputs.package-filename }}
@@ -59,7 +51,7 @@ jobs:
 
   build-test-ios:
     name: Build & Test iOS
-    needs: [trunk-check, build-package]
+    needs: build-package
     runs-on: macos-latest
     steps:
       - name: Checkout code
@@ -94,7 +86,7 @@ jobs:
 
   build-test-android:
     name: Build & Test Android
-    needs: [trunk-check, build-package]
+    needs: build-package
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -126,16 +118,80 @@ jobs:
             Android APK with version and commit hash
             Build metadata file
 
-  pr-notify:
-    if: >
-      github.event_name == 'pull_request' &&
-      github.event.pull_request.draft == false
+  setup-and-version:
     needs: [build-test-ios, build-test-android]
-    name: Notify GChat
-    permissions:
-      contents: read
-      pull-requests: read
-      id-token: write
-    uses: ROKT/rokt-workflows/.github/workflows/oss_pr_opened_notification.yml@1859338d7c2c2b873233505c751acbf09fb218d5 # main
-    secrets:
-      gchat_webhook: ${{ secrets.GCHAT_PRS_WEBHOOK }}
+    runs-on: ubuntu-latest
+    outputs:
+      final_version: ${{ steps.version-file.outputs.release-version }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        with:
+          persist-credentials: false
+      - name: Get current version
+        id: version-file
+        run: |
+          version_from_file=$(head -n 1 VERSION)
+          echo "release-version=$version_from_file" >> $GITHUB_OUTPUT
+
+  release-and-tag:
+    needs: [setup-and-version, build-package]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        with:
+          persist-credentials: false
+
+      - name: Download and flatten package artifacts
+        uses: ./.github/actions/download-and-flatten
+        with:
+          pattern: rokt-widget-v*-*
+          path: Rokt.Widget/
+
+      - name: Setup Node.js
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: Rokt.Widget/package-lock.json
+          registry-url: https://registry.npmjs.org
+
+      # Trusted publishing requires npm 11.5.1+
+      - name: Update npm
+        run: npm install -g npm@latest
+
+      - name: Publish to npm with OIDC
+        shell: bash
+        run: |
+          cd Rokt.Widget
+          TARBALL="rokt-react-native-sdk-${{ needs.setup-and-version.outputs.final_version }}.tgz"
+          if [ ! -f "$TARBALL" ]; then
+            echo "Error: Expected tarball $TARBALL not found in Rokt.Widget directory"
+            exit 1
+          fi
+          echo "Publishing tarball: $TARBALL"
+          npm publish "$TARBALL" --access=public --tag=latest
+
+      - uses: ffurrer2/extract-release-notes@273da39a24fb7db106a35526c8162815faffd31d # v3.1.0
+        id: extract-release-notes
+        with:
+          changelog_file: CHANGELOG.md
+          release_notes_file: ${{ needs.setup-and-version.outputs.final_version }}.md
+      - name: Changelog
+        run: echo "${{ steps.extract-release-notes.outputs.release_notes }}"
+      - name: Upload release notes
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a #v7.0.1
+        with:
+          name: release-notes
+          path: ${{ needs.setup-and-version.outputs.final_version }}.md
+
+      - name: Create Github release
+        uses: ncipollo/release-action@339a81892b84b4eeb0f6e744e4574d79d0d9b8dd # v1.21.0
+        with:
+          makeLatest: true
+          tag: ${{ needs.setup-and-version.outputs.final_version }}
+          artifacts: Rokt.Widget/*.tgz
+          body: |
+            ## Release notes:
+            ${{ steps.extract-release-notes.outputs.release_notes }}
