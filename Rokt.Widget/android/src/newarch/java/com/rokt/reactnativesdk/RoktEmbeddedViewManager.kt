@@ -15,6 +15,13 @@ class RoktEmbeddedViewManager :
 
     override fun createViewInstance(reactContext: ThemedReactContext): Widget = impl.createViewInstance(reactContext)
 
+    override fun getExportedCustomDirectEventTypeConstants(): MutableMap<String, Any> = mutableMapOf(
+        RoktEmbeddedViewManagerImpl.EVENT_HEIGHT_CHANGED_NATIVE to
+            mapOf("registrationName" to RoktEmbeddedViewManagerImpl.EVENT_HEIGHT_CHANGED),
+        RoktEmbeddedViewManagerImpl.EVENT_MARGIN_CHANGED_NATIVE to
+            mapOf("registrationName" to RoktEmbeddedViewManagerImpl.EVENT_MARGIN_CHANGED),
+    )
+
     @ReactProp(name = "placeholderName")
     override fun setPlaceholderName(view: Widget?, value: String?) {
         impl.setPlaceholderName(view, value)
