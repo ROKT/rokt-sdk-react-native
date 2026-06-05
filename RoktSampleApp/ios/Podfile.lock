@@ -1,7 +1,7 @@
 PODS:
   - BEMCheckBox (1.4.1)
   - boost (1.84.0)
-  - DcuiSchema (2.4.0)
+  - DcuiSchema (2.7.0)
   - DoubleConversion (1.1.6)
   - fast_float (8.0.0)
   - FBLazyVector (0.81.5)
@@ -2258,7 +2258,7 @@ PODS:
   - RNCCheckbox (0.5.20):
     - BEMCheckBox (~> 1.4)
     - React-Core
-  - rokt-react-native-sdk (5.0.0):
+  - rokt-react-native-sdk (5.1.0):
     - boost
     - DoubleConversion
     - fast_float
@@ -2284,15 +2284,15 @@ PODS:
     - ReactCodegen
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
-    - Rokt-Widget (>= 5.0.0)
+    - Rokt-Widget (>= 5.2.0)
     - SocketRocket
     - Yoga
-  - Rokt-Widget (5.0.0):
-    - RoktContracts (~> 0.1)
-    - RoktUXHelper (~> 0.9)
-  - RoktContracts (0.1.3)
-  - RoktUXHelper (0.9.1):
-    - DcuiSchema (~> 2.4)
+  - Rokt-Widget (5.2.0):
+    - RoktContracts (< 3.0, >= 2.0.1)
+    - RoktUXHelper (< 0.11, >= 0.10.7)
+  - RoktContracts (2.0.1)
+  - RoktUXHelper (0.10.7):
+    - DcuiSchema (~> 2.6)
   - SocketRocket (0.7.1)
   - Yoga (0.0.0)
 
@@ -2534,7 +2534,7 @@ EXTERNAL SOURCES:
 SPEC CHECKSUMS:
   BEMCheckBox: 5ba6e37ade3d3657b36caecc35c8b75c6c2b1a4e
   boost: 7e761d76ca2ce687f7cc98e698152abd03a18f90
-  DcuiSchema: 256beb8da50e3876fabb6285992736be7bf707d7
+  DcuiSchema: e8f860cca03058fa5dab03436ddee9f3406d9914
   DoubleConversion: cb417026b2400c8f53ae97020b2be961b59470cb
   fast_float: b32c788ed9c6a8c584d114d0047beda9664e7cc6
   FBLazyVector: 5beb8028d5a2e75dd9634917f23e23d3a061d2aa
@@ -2605,13 +2605,13 @@ SPEC CHECKSUMS:
   ReactCodegen: 6c26f8c25d0b5ae66f86a1cce1777076ac8bcbd8
   ReactCommon: 5f0e5c09a64a2717215dd84380e1a747810406f2
   RNCCheckbox: 33b44487ca8008394ce658cc32b26eab04f426ef
-  rokt-react-native-sdk: 33c73681f0ffa0b7ad0d435ae4995d14e8670b3a
-  Rokt-Widget: 1d9c99fb85bed9030e195c6fa378e087ebb3b40d
-  RoktContracts: 4817596d6d1e2c21647ed5307430a785eadac6fc
-  RoktUXHelper: 5ad2ac05ff9f328c1af76aff46d3cfcca11e225a
+  rokt-react-native-sdk: 61a4a0e1e8c52bbf0881570a04f9ab2afd8107ef
+  Rokt-Widget: 0073db83e32641395ae51e7e08c13e415bd7bbe6
+  RoktContracts: 040175620a1095a2d7545068af7cb6325f8c9c55
+  RoktUXHelper: 28505fb6131c63a4fd38cf70f529ba10d4f67b94
   SocketRocket: d4aabe649be1e368d1318fdf28a022d714d65748
   Yoga: 728df40394d49f3f471688747cf558158b3a3bd1
 
-PODFILE CHECKSUM: f4c3cc86d9f721ed03af42a42e8a7be29d528797
+PODFILE CHECKSUM: 0e393c57aa4274181ea62b020b0c91b521936b2b
 
 COCOAPODS: 1.16.2

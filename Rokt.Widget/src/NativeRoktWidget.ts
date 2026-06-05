@@ -67,6 +67,13 @@ export interface Spec extends TurboModule {
   // Session management
   setSessionId(sessionId: string): void;
   getSessionId(): string | null;
+
+  // CNAME / first-party domain routing (iOS only)
+  setCustomBaseURL(url: string): void;
+
+  // Payment callback deep-link return (iOS only)
+  setPaymentCallbackURLScheme(scheme: string | null): void;
+  handleURLCallback(url: string): void;
 }
 
 export default TurboModuleRegistry.getEnforcing<Spec>("RNRoktWidget");

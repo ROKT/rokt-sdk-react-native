@@ -215,18 +215,61 @@ Rokt.setEnvironmentToStage(); // For testing
 Rokt.setEnvironmentToProd(); // For production (default)
 ```
 
+### Custom Base URL (CNAME)
+
+Route all Rokt SDK requests through your own first-party domain. Must be called **before** `Rokt.initialize(...)`. iOS only — no-op on Android.
+
+```js
+Rokt.setCustomBaseURL("https://rokt.example.com");
+Rokt.initialize("YOUR_ROKT_TAG_ID", "1.0");
+```
+
+Only the scheme, host, and port of the URL are used. Non-HTTPS URLs and URLs with a missing/empty host are rejected with a warning.
+
+### Payment callback URL scheme (iOS)
+
+Some redirect-based payment methods authenticate in a web view and return to the host app via a custom URL scheme. To enable Rokt to resume those flows:
+
+1. **Register a URL scheme** in your iOS app.
+   - Bare React Native: add an entry under `CFBundleURLTypes` in `ios/<App>/Info.plist`.
+   - Expo: set `expo.scheme` in `app.json` (e.g. `"scheme": "myapp"`) and run `expo prebuild`.
+2. **Tell the SDK the scheme**:
+
+   ```js
+   Rokt.setPaymentCallbackURLScheme("myapp");
+   ```
+
+3. **Forward incoming deep links** to the SDK using React Native's `Linking`:
+
+   ```js
+   import { Linking, Platform } from "react-native";
+
+   useEffect(() => {
+     if (Platform.OS !== "ios") return;
+     const sub = Linking.addEventListener("url", ({ url }) => {
+       Rokt.handleURLCallback(url);
+     });
+     return () => sub.remove();
+   }, []);
+   ```
+
+The SDK uses this scheme when composing return and cancel URLs for supported web-view payment callbacks.
+
 ## API Reference
 
-| Method                                                                 | Description                            |
-| ---------------------------------------------------------------------- | -------------------------------------- |
-| `Rokt.initialize(tagId, appVersion, fontFilesMap?)`                    | Initialize the SDK                     |
-| `Rokt.selectPlacements(identifier, attributes, placeholders, config?)` | Display overlay or embedded placements |
-| `Rokt.selectShoppableAds(identifier, attributes, config?)`             | Display shoppable ads (iOS only)       |
-| `Rokt.purchaseFinalized(placementId, catalogItemId, success)`          | Report purchase completion             |
-| `Rokt.setEnvironmentToStage()`                                         | Set staging environment                |
-| `Rokt.setEnvironmentToProd()`                                          | Set production environment             |
-| `Rokt.setSessionId(sessionId)`                                         | Set a custom session ID                |
-| `Rokt.getSessionId()`                                                  | Get the current session ID             |
+| Method                                                                 | Description                                   |
+| ---------------------------------------------------------------------- | --------------------------------------------- |
+| `Rokt.initialize(tagId, appVersion, fontFilesMap?)`                    | Initialize the SDK                            |
+| `Rokt.selectPlacements(identifier, attributes, placeholders, config?)` | Display overlay or embedded placements        |
+| `Rokt.selectShoppableAds(identifier, attributes, config?)`             | Display shoppable ads (iOS only)              |
+| `Rokt.purchaseFinalized(placementId, catalogItemId, success)`          | Report purchase completion                    |
+| `Rokt.setEnvironmentToStage()`                                         | Set staging environment                       |
+| `Rokt.setEnvironmentToProd()`                                          | Set production environment                    |
+| `Rokt.setSessionId(sessionId)`                                         | Set a custom session ID                       |
+| `Rokt.getSessionId()`                                                  | Get the current session ID                    |
+| `Rokt.setCustomBaseURL(url)`                                           | Route SDK requests through a CNAME (iOS only) |
+| `Rokt.setPaymentCallbackURLScheme(scheme)`                             | Register URL scheme for callbacks (iOS only)  |
+| `Rokt.handleURLCallback(url)`                                          | Forward deep-link URL to the SDK (iOS only)   |
 
 ## Minimum Requirements
 

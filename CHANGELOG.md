@@ -9,6 +9,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.1.0] - 2026-05-08
+
+### Added
+
+- `Rokt.setCustomBaseURL(url)` — route SDK requests through a partner-owned CNAME / first-party domain (iOS only).
+- `Rokt.setPaymentCallbackURLScheme(scheme)` — register the host app's URL scheme for web-view payment callbacks (iOS only).
+- `Rokt.handleURLCallback(url)` — forward incoming deep-link URLs to the SDK so redirect-based payment authentication can resume (iOS only).
+
+### Changed
+
+- Updated native iOS dependency from `Rokt-Widget >= 5.0.0` to `>= 5.2.0`. Pulls in [iOS SDK 5.1.0](https://github.com/ROKT/rokt-sdk-ios/releases/tag/5.1.0) and [5.2.0](https://github.com/ROKT/rokt-sdk-ios/releases/tag/5.2.0), which add CNAME support, web-view payment callbacks, and built-in card forward payment.
+
 ## [5.0.0] - 2026-04-16
 
 ### Changed
@@ -106,7 +118,8 @@ For a full migration guide, see [MIGRATING.md](./MIGRATING.md#migrating-from-v4x
 - Support new response action type `ExternalPaymentTrigger`
 - Sessions are now retained between app restarts
 
-[unreleased]: https://github.com/ROKT/rokt-sdk-react-native/compare/5.0.0...HEAD
+[unreleased]: https://github.com/ROKT/rokt-sdk-react-native/compare/5.1.0...HEAD
+[5.1.0]: https://github.com/ROKT/rokt-sdk-react-native/compare/5.0.0...5.1.0
 [5.0.0]: https://github.com/ROKT/rokt-sdk-react-native/compare/4.12.2...5.0.0
 [4.12.2]: https://github.com/ROKT/rokt-sdk-react-native/compare/4.12.1...4.12.2
 [4.12.1]: https://github.com/ROKT/rokt-sdk-react-native/compare/4.12.0...4.12.1
