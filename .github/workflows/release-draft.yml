@@ -1,16 +1,16 @@
-name: Create draft release
+name: Release – Draft
 
 on:
   workflow_dispatch: # checkov:skip=CKV_GHA_7
     inputs:
       bump-type:
-        description: Specify if the version should be bumped as major, minor, patch
+        description: Specify if the version should be bumped as patch, minor, or major
         required: true
         type: choice
         options:
-          - major
-          - minor
           - patch
+          - minor
+          - major
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -24,7 +24,12 @@ jobs:
   publish-draft-release:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+      - name: Checkout repository
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        with:
+          ref: ${{ github.ref_name }}
+          fetch-depth: 0
+          persist-credentials: false
       - name: Get current version
         id: version-file
         run: |
@@ -39,10 +44,14 @@ jobs:
       - name: Save validated version to file
         run: |
           echo "${{ steps.bump-version.outputs.new_version }}" > VERSION
-      - name: Update changelog
-        uses: thomaseizinger/keep-a-changelog-new-release@f62c3c390716df5af712ba5d94f4f4a8efc1306d # v3.1.0
+      - name: Generate changelog from git history
+        id: changelog
+        uses: ROKT/rokt-workflows/actions/generate-changelog@1859338d7c2c2b873233505c751acbf09fb218d5 # main
+        env:
+          GH_TOKEN: ${{ github.token }}
         with:
-          tag: ${{ steps.bump-version.outputs.new_version }}
+          version: ${{ steps.bump-version.outputs.new_version }}
+          changelog-path: CHANGELOG.md
 
       - name: Setup Node.js
         uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
@@ -80,9 +89,12 @@ jobs:
           commit-message: "Prepare release ${{ steps.bump-version.outputs.new_version }}"
           branch: release/${{ steps.bump-version.outputs.new_version }}
           title: "Prepare release ${{ steps.bump-version.outputs.new_version }}"
-          base: main
+          base: ${{ github.ref_name }}
           body: |
-            Preparing for release ${{ steps.bump-version.outputs.new_version }}
+            Preparing for release ${{ steps.bump-version.outputs.new_version }} from `${{ github.ref_name }}`.
             - Updated package.json to new version
             - Updated CHANGELOG.md
             - Updated VERSION file
+
+            ## Changelog
+            ${{ steps.changelog.outputs.release-notes }}
