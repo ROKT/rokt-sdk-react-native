@@ -40,7 +40,7 @@
     "registry": "https://registry.npmjs.org"
   },
   "peerDependencies": {
-    "react-native": ">= 0.55.4",
+    "react-native": ">=0.71.0",
     "@expo/config-plugins": ">=7.0.0"
   },
   "peerDependenciesMeta": {

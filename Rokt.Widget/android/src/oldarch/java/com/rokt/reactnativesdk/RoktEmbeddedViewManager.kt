@@ -25,10 +25,10 @@ class RoktEmbeddedViewManager : ViewGroupManager<Widget>() {
     override fun getExportedCustomDirectEventTypeConstants(): Map<String, Any>? = MapBuilder
         .builder<String, Any>()
         .put(
-            RoktEmbeddedViewManagerImpl.EVENT_HEIGHT_CHANGED,
+            RoktEmbeddedViewManagerImpl.EVENT_HEIGHT_CHANGED_NATIVE,
             MapBuilder.of("registrationName", RoktEmbeddedViewManagerImpl.EVENT_HEIGHT_CHANGED),
         ).put(
-            RoktEmbeddedViewManagerImpl.EVENT_MARGIN_CHANGED,
+            RoktEmbeddedViewManagerImpl.EVENT_MARGIN_CHANGED_NATIVE,
             MapBuilder.of("registrationName", RoktEmbeddedViewManagerImpl.EVENT_MARGIN_CHANGED),
         ).build()
 
