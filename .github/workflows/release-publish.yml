@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - maintenance/*
     paths:
       - VERSION
 
@@ -163,6 +164,8 @@ jobs:
 
       - name: Publish to npm with OIDC
         shell: bash
+        env:
+          REF_NAME: ${{ github.ref_name }}
         run: |
           cd Rokt.Widget
           TARBALL="rokt-react-native-sdk-${{ needs.setup-and-version.outputs.final_version }}.tgz"
@@ -170,8 +173,16 @@ jobs:
             echo "Error: Expected tarball $TARBALL not found in Rokt.Widget directory"
             exit 1
           fi
-          echo "Publishing tarball: $TARBALL"
-          npm publish "$TARBALL" --access=public --tag=latest
+          # Releases from main own the npm "latest" dist-tag. Maintenance branches
+          # publish under a branch-derived tag (e.g. maintenance/4.x -> 4.x) so a
+          # patch on an older major never moves "latest" away from the current line.
+          if [ "$REF_NAME" = "main" ]; then
+            NPM_TAG="latest"
+          else
+            NPM_TAG="${REF_NAME#maintenance/}"
+          fi
+          echo "Publishing tarball: $TARBALL with dist-tag: $NPM_TAG"
+          npm publish "$TARBALL" --access=public --tag="$NPM_TAG"
 
       - uses: ffurrer2/extract-release-notes@273da39a24fb7db106a35526c8162815faffd31d # v3.1.0
         id: extract-release-notes
@@ -189,7 +200,7 @@ jobs:
       - name: Create Github release
         uses: ncipollo/release-action@339a81892b84b4eeb0f6e744e4574d79d0d9b8dd # v1.21.0
         with:
-          makeLatest: true
+          makeLatest: ${{ github.ref_name == 'main' }}
           tag: ${{ needs.setup-and-version.outputs.final_version }}
           artifacts: Rokt.Widget/*.tgz
           body: |
