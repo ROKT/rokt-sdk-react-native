@@ -54,7 +54,7 @@ Pod::Spec.new do |s|
   if respond_to?(:spm_dependency, true)
     spm_dependency(s,
       url: 'https://github.com/ROKT/rokt-sdk-ios.git',
-      requirement: { kind: 'upToNextMajorVersion', minimumVersion: '4.15.0' },
+      requirement: { kind: 'upToNextMinorVersion', minimumVersion: '4.15.0' },
       products: ['Rokt-Widget']
     )
   end
