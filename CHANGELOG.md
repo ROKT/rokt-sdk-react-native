@@ -13,6 +13,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Updated Rokt native Android SDK to 5.1.1.
 
+## [5.0.2] - 2026-06-22
+
+### Changed
+
+- Bump native Android SDK to 5.1.1 ([#278](https://github.com/ROKT/rokt-sdk-react-native/pull/278))
+- Support maintenance-branch releases without clobbering latest ([#277](https://github.com/ROKT/rokt-sdk-react-native/pull/277))
+- Align release automation naming ([#274](https://github.com/ROKT/rokt-sdk-react-native/pull/274))
+
 ## [5.0.1] - 2026-06-05
 
 ### Fixed
@@ -116,7 +124,8 @@ For a full migration guide, see [MIGRATING.md](./MIGRATING.md#migrating-from-v4x
 - Support new response action type `ExternalPaymentTrigger`
 - Sessions are now retained between app restarts
 
-[unreleased]: https://github.com/ROKT/rokt-sdk-react-native/compare/5.0.1...HEAD
+[unreleased]: https://github.com/ROKT/rokt-sdk-react-native/compare/5.0.2...HEAD
+[5.0.2]: https://github.com/ROKT/rokt-sdk-react-native/compare/5.0.1...5.0.2
 [5.0.1]: https://github.com/ROKT/rokt-sdk-react-native/compare/5.0.0...5.0.1
 [5.0.0]: https://github.com/ROKT/rokt-sdk-react-native/compare/4.12.2...5.0.0
 [4.12.2]: https://github.com/ROKT/rokt-sdk-react-native/compare/4.12.1...4.12.2
