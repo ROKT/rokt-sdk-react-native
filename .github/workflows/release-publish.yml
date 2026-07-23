@@ -158,9 +158,9 @@ jobs:
           cache-dependency-path: Rokt.Widget/package-lock.json
           registry-url: https://registry.npmjs.org
 
-      # Trusted publishing requires npm 11.5.1+
+      # Trusted publishing requires npm 11.5.1+ (npm 12 requires Node 22+)
       - name: Update npm
-        run: npm install -g npm@latest
+        run: npm install -g npm@11
 
       - name: Publish to npm with OIDC
         shell: bash
