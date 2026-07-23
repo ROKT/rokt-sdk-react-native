@@ -14,6 +14,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Updated Rokt native iOS SDK to 5.3.0.
 - Updated Rokt native Android SDK to 6.0.1.
 
+## [5.1.1] - 2026-07-23
+
+### Added
+
+- Update to Latest Rokt SDKs ([#286](https://github.com/ROKT/rokt-sdk-react-native/pull/286))
+
+### Changed
+
+- Fix publishing npm requirements ([#288](https://github.com/ROKT/rokt-sdk-react-native/pull/288))
+
 ## [5.1.0] - 2026-07-22
 
 ### Added
@@ -131,7 +141,8 @@ For a full migration guide, see [MIGRATING.md](./MIGRATING.md#migrating-from-v4x
 - Support new response action type `ExternalPaymentTrigger`
 - Sessions are now retained between app restarts
 
-[unreleased]: https://github.com/ROKT/rokt-sdk-react-native/compare/5.1.0...HEAD
+[unreleased]: https://github.com/ROKT/rokt-sdk-react-native/compare/5.1.1...HEAD
+[5.1.1]: https://github.com/ROKT/rokt-sdk-react-native/compare/5.0.2...5.1.1
 [5.1.0]: https://github.com/ROKT/rokt-sdk-react-native/compare/5.0.2...5.1.0
 [5.0.2]: https://github.com/ROKT/rokt-sdk-react-native/compare/5.0.1...5.0.2
 [5.0.1]: https://github.com/ROKT/rokt-sdk-react-native/compare/5.0.0...5.0.1
