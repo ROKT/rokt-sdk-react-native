@@ -14,6 +14,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Updated Rokt native iOS SDK to 5.3.0.
 - Updated Rokt native Android SDK to 6.0.1.
 
+## [5.1.2] - 2026-07-29
+
+### Fixed
+
+- Configure embedded views on New Architecture ([#291](https://github.com/ROKT/rokt-sdk-react-native/pull/291))
+- Embedded view collapsing to zero height in a column container ([#290](https://github.com/ROKT/rokt-sdk-react-native/pull/290))
+
+### Changed
+
+- Upgrade trunk ([#282](https://github.com/ROKT/rokt-sdk-react-native/pull/282))
+- Bump actions/setup-node from 6.4.0 to 7.0.0 ([#283](https://github.com/ROKT/rokt-sdk-react-native/pull/283))
+- Bump actions/checkout from 6.0.3 to 7.0.1 ([#284](https://github.com/ROKT/rokt-sdk-react-native/pull/284))
+
 ## [5.1.1] - 2026-07-23
 
 ### Added
@@ -141,7 +154,8 @@ For a full migration guide, see [MIGRATING.md](./MIGRATING.md#migrating-from-v4x
 - Support new response action type `ExternalPaymentTrigger`
 - Sessions are now retained between app restarts
 
-[unreleased]: https://github.com/ROKT/rokt-sdk-react-native/compare/5.1.1...HEAD
+[unreleased]: https://github.com/ROKT/rokt-sdk-react-native/compare/5.1.2...HEAD
+[5.1.2]: https://github.com/ROKT/rokt-sdk-react-native/compare/5.1.1...5.1.2
 [5.1.1]: https://github.com/ROKT/rokt-sdk-react-native/compare/5.0.2...5.1.1
 [5.1.0]: https://github.com/ROKT/rokt-sdk-react-native/compare/5.0.2...5.1.0
 [5.0.2]: https://github.com/ROKT/rokt-sdk-react-native/compare/5.0.1...5.0.2
