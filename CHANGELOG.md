@@ -9,11 +9,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Updated
-
-- Updated Rokt native iOS SDK to 5.3.0.
-- Updated Rokt native Android SDK to 6.0.1.
-
 ## [5.1.2] - 2026-07-29
 
 ### Fixed
@@ -32,6 +27,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Update to Latest Rokt SDKs ([#286](https://github.com/ROKT/rokt-sdk-react-native/pull/286))
+- Updated Rokt native iOS SDK to 5.3.0.
+- Updated Rokt native Android SDK to 6.0.1.
 
 ### Changed
 
