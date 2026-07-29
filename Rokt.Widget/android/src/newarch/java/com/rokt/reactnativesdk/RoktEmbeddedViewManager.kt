@@ -2,7 +2,8 @@ package com.rokt.reactnativesdk
 
 import com.facebook.react.uimanager.SimpleViewManager
 import com.facebook.react.uimanager.ThemedReactContext
-import com.facebook.react.uimanager.annotations.ReactProp
+import com.facebook.react.uimanager.ViewManagerDelegate
+import com.facebook.react.viewmanagers.RoktNativeWidgetManagerDelegate
 import com.facebook.react.viewmanagers.RoktNativeWidgetManagerInterface
 import com.rokt.roktsdk.Widget
 
@@ -10,6 +11,12 @@ class RoktEmbeddedViewManager :
     SimpleViewManager<Widget>(),
     RoktNativeWidgetManagerInterface<Widget> {
     private val impl = RoktEmbeddedViewManagerImpl()
+
+    // Fabric routes props through the codegen-generated delegate; without this override the
+    // base ViewManager logs "ViewManager using codegen must override getDelegate method".
+    private val delegate = RoktNativeWidgetManagerDelegate<Widget, RoktEmbeddedViewManager>(this)
+
+    override fun getDelegate(): ViewManagerDelegate<Widget> = delegate
 
     override fun getName(): String = impl.getName()
 
@@ -22,7 +29,6 @@ class RoktEmbeddedViewManager :
             mapOf("registrationName" to RoktEmbeddedViewManagerImpl.EVENT_MARGIN_CHANGED),
     )
 
-    @ReactProp(name = "placeholderName")
     override fun setPlaceholderName(view: Widget?, value: String?) {
         impl.setPlaceholderName(view, value)
     }
