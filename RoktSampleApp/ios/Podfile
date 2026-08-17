@@ -37,7 +37,7 @@ target 'RoktSampleApp' do
   )
 
   # Uncomment to enable Shoppable Ads payment extension:
-  # pod 'RoktStripePaymentExtension'
+  # pod 'RoktPaymentExtension'
 
   target 'RoktSampleAppTests' do
     inherit! :search_paths
