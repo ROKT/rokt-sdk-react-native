@@ -1,160 +1,52 @@
 # @rokt/react-native-sdk
 
-## Overview
+The Rokt React Native SDK lets you integrate Rokt into your React Native apps. It is a
+thin wrapper over the native Rokt iOS and Android SDKs — lightweight, secure, and simple
+to integrate.
 
-This repository contains React Native SDK [Rokt.Widget](Rokt.Widget) as well as the Sample Application [RoktSampleApp](RoktSampleApp) .
+> **Full integration guide:** this page is a quick reference. For the complete guide
+> (iOS `pre_install` setup, Expo, Shoppable Ads, event handling, and config options), see
+> the [repository README](https://github.com/ROKT/rokt-sdk-react-native/blob/main/README.md).
+> Upgrading from v4.x? See the
+> [Migration Guide](https://github.com/ROKT/rokt-sdk-react-native/blob/main/MIGRATING.md).
 
-The React Native SDK enables you to integrate Rokt into your React Native mobile apps to drive more value from—and for—your customers. The SDK is built to be lightweight, secure, and simple to integrate and maintain, resulting in minimal lift for your engineering team. The RoktSampleApp includes bare-minimum UI to demonstrate the usage of React Native SDK for our partners using the [Integration guide](#integration-guide-for-apps)
+## Minimum Requirements
+
+| Platform     | Version |
+| ------------ | ------- |
+| iOS          | 15.0    |
+| Android      | API 21  |
+| React Native | 0.71.0+ |
 
 ## Development Environment
 
-Install ReactNative development environment by following the [React Native environment setup guide](https://reactnative.dev/docs/environment-setup).
+Set up React Native by following the official
+[Set Up Your Environment](https://reactnative.dev/docs/set-up-your-environment) guide.
+For iOS you also need [CocoaPods](https://guides.cocoapods.org/using/getting-started.html) —
+install it via the official instructions (RubyGems is recommended over Homebrew).
 
-For this project, a minimum `Ruby` version `2.7.6` is required. Check by running `ruby -v` on your terminal.
-
-## Integration Guide for Apps
-
-To add this SDK in your Application, Go to the root of your project in your terminal and add run the below commands:
-
-`$ npm install @rokt/react-native-sdk --save`
-
-run `$ npm install`
-
-You would also need to
-
-### Android Configuration
-
-The Rokt SDK is available from Maven Central and will be resolved automatically via React Native autolinking. No manual repository or package configuration is required.
-
-Ensure your app meets the minimum requirements:
-
-```groovy
-android {
-    defaultConfig {
-        minSdkVersion 21
-    }
-}
-```
-
-### iOS Configuration
-
-#### Install the pods
-
-go to ios folder and run command below to install the [pod](https://cocoapods.org/)
+## Installation
 
 ```shell
-pod install
+npm install @rokt/react-native-sdk --save
 ```
 
-Below Configurations are required only if you are using Mac M1 machines:
+- **Android** resolves automatically from Maven Central via React Native autolinking — no
+  extra configuration.
+- **iOS** requires a `pre_install` hook in your Podfile (bare React Native) or the bundled
+  Expo config plugin. See the
+  [repository README](https://github.com/ROKT/rokt-sdk-react-native/blob/main/README.md#ios-configuration)
+  for the exact setup.
 
-1. Make sure cocoa pods are installed using gem not brew(sudo gem install [cocoapods](https://cocoapods.org/).  
-   If it is already installed using brew, use below commands to uninstall them
-
-   ```shell
-   brew uninstall cocoapods
-   brew uninstall --ignore-dependencies ruby
-   ```
-
-2. Install cocoapods with gem
-
-   ```shell
-   Sudo gem install cocoapods
-   ```
-
-3. Replace the post_install in ios/podfile with below code
-
-   ```ruby
-   post_install do |installer|
-     react_native_post_install(installer)
-
-     installer.pods_project.targets.each do |target|
-       target.build_configurations.each do |config|
-         # Disable arm64 builds for the simulator
-         config.build_settings['EXCLUDED_ARCHS[sdk=iphonesimulator*]'] = 'arm64'
-       end
-     end
-   end
-   ```
-
-4. Reinstall the pods:
-
-   ```shell
-   cd ios
-   pod deintegrate
-   sudo arch -x86_64 gem install ffi
-   arch -x86_64 pod install
-   ```
-
-### Expo
-
-This package cannot be used with the "Expo Go" app because it requires custom native code.
-Integration with Expo is supported in both bare workflow and managed workflow.
-
-#### Bare Workflow
-
-No additional configuration is required. React Native autolinking will automatically set up the SDK.
-
-#### Managed Workflow
-
-Since Expo Go does not support custom native code, you need to use a custom development client.
-
-1. Install the required packages:
-
-   ```shell
-   npm install @rokt/react-native-sdk expo-dev-client
-   ```
-
-2. (Optional) Add the config plugin to your `app.json` or `app.config.js`:
-
-   ```json
-   {
-     "expo": {
-       "plugins": ["@rokt/react-native-sdk"]
-     }
-   }
-   ```
-
-   > Note: The config plugin is optional as React Native autolinking handles the native setup automatically.
-
-3. Generate the native projects and build:
-
-   ```shell
-   npx expo prebuild --clean
-   npx expo run:ios   # or npx expo run:android
-   ```
-
-For production builds, you can use [EAS Build](https://docs.expo.dev/build/introduction/) which will handle the native compilation automatically.
-
-### Usage
-
-#### Initialising the SDK
-
-- Rokt Module provides two methods:
-
-1. initialize(string ROKT_TAG_ID, string AppVersion)
-2. execute(string TemplateVersion, object UserAttributes, object placements, function onLoad)
-
-- The Initialize Method will fetch API results that Execute Method would need. so best not to put both calls next to each other.
-
-##### Import
+## Quick Start
 
 ```javascript
 import { Rokt, RoktEmbeddedView } from "@rokt/react-native-sdk";
-```
 
-##### Initialize
+// Initialize once (e.g. on app start)
+Rokt.initialize("YOUR_ROKT_TAG_ID", "1.0");
 
-```javascript
-Rokt.initialize("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx", "1.0");
-```
-
-#### To launch Overlay placement
-
-##### Execute Overlay
-
-```javascript
-attributes = {
+const attributes = {
   email: "j.smith@example.com",
   firstname: "Jenny",
   lastname: "Smith",
@@ -162,51 +54,44 @@ attributes = {
   postcode: "90210",
   country: "US",
 };
-Rokt.execute("RoktExperience", attributes, null, () =>
-  console.log("Placement Loaded"),
-);
 ```
 
-#### To launch Embedded placement
-
-##### Create placeholder
+### Overlay placement
 
 ```javascript
-  constructor(props){
-    super(props);
-    this.placeholder1 = React.createRef();
-  }
-
+Rokt.selectPlacements("RoktExperience", attributes, {});
 ```
 
-in render()
+### Embedded placement
 
 ```tsx
-<RoktEmbeddedView
-  ref={this.placeholder1}
-  placeholderName={"RoktEmbedded1"}
-></RoktEmbeddedView>
-```
+// Create a ref for the embedded view
+const placeholderRef = React.createRef();
 
-##### Execute Embedded
+// In your JSX:
+<RoktEmbeddedView ref={placeholderRef} placeholderName="RoktEmbedded1" />;
 
-```javascript
-placeholders = {
-  RoktEmbedded1: findNodeHandle(this.placeholder1.current),
+// Execute with placeholders:
+const placeholders = {
+  RoktEmbedded1: findNodeHandle(placeholderRef.current),
 };
 
-attributes = {
-  email: "j.smith@example.com",
-  firstname: "Jenny",
-  lastname: "Smith",
-  mobile: "(323) 867-5309",
-  postcode: "90210",
-  country: "US",
-};
-Rokt.execute("RoktEmbeddedExperience", attributes, placeholders, () =>
-  console.log("Placement Loaded"),
-);
+Rokt.selectPlacements("RoktEmbeddedExperience", attributes, placeholders);
 ```
+
+> **Note:** `execute()` was removed in v5.0.0 — use `selectPlacements()` instead. See the
+> [Migration Guide](https://github.com/ROKT/rokt-sdk-react-native/blob/main/MIGRATING.md).
+
+## Development
+
+This directory is the publishable npm package.
+
+1. Make code changes in `src/`.
+2. Build the package: `npm run build`.
+3. Test with the sample apps in the repo root (`RoktSampleApp`, `ExpoTestApp`).
+
+The package is published to npm automatically via GitHub Actions when the repo's `VERSION`
+file is updated on `main`.
 
 ## License
 

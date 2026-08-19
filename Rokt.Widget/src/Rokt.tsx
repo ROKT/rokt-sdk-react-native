@@ -39,6 +39,14 @@ if (!RNRoktWidget) {
 }
 
 export abstract class Rokt {
+  /**
+   * Initialize the Rokt SDK. Call once, early (e.g. on app start), before selecting
+   * placements.
+   *
+   * @param roktTagId - Your Rokt tag/account id
+   * @param appVersion - Your app's version string
+   * @param fontFilesMap - Optional map of font PostScript name to local font file path, to supply your own fonts used in your layouts
+   */
   public static initialize(
     roktTagId: string,
     appVersion: string,
@@ -51,6 +59,14 @@ export abstract class Rokt {
     }
   }
 
+  /**
+   * Select and display Rokt placements (overlay or embedded) for an identifier.
+   *
+   * @param identifier - The placement identifier configured in Rokt
+   * @param attributes - Key-value attributes (e.g. email, country) for targeting
+   * @param placeholders - Map of embedded placeholder name to native node handle; pass `{}` for overlay-only
+   * @param roktConfig - Optional configuration (color mode, caching)
+   */
   public static selectPlacements(
     identifier: string,
     attributes: Record<string, string>,
@@ -95,6 +111,21 @@ export abstract class Rokt {
     }
   }
 
+  /**
+   * Close the loop on a Rokt in-placement instant purchase (Shoppable Ads).
+   *
+   * Call this ONLY in response to a `CartItemInstantPurchase` event, after you have
+   * processed that item's payment. Pass the `placementId` and `catalogItemId` taken
+   * from that event.
+   *
+   * IMPORTANT: This is NOT a generic order-confirmation or checkout hook. Do not call
+   * it on your order-confirmation page after a normal purchase — the native SDK no-ops
+   * unless a Rokt instant purchase is currently open.
+   *
+   * @param placementId - The Rokt placement/layout id from the `CartItemInstantPurchase` event (NOT your order id)
+   * @param catalogItemId - The catalog item id from the `CartItemInstantPurchase` event
+   * @param success - Whether your payment processing for the item succeeded
+   */
   public static purchaseFinalized(
     placementId: string,
     catalogItemId: string,
