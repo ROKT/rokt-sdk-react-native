@@ -9,6 +9,32 @@ permissions:
   pull-requests: read
 
 jobs:
+  classify-changes:
+    name: Classify changes
+    runs-on: ubuntu-latest
+    outputs:
+      selection: ${{ steps.changes.outputs.selection }}
+      build_package: ${{ steps.changes.outputs.build_package }}
+      android: ${{ steps.changes.outputs.android }}
+      ios: ${{ steps.changes.outputs.ios }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Verify change classifier
+        run: bash .github/scripts/select-pr-jobs.spec.sh
+
+      - name: Select required jobs
+        id: changes
+        env:
+          SELECTOR_BASE_REF: ${{ github.event.pull_request.base.sha }}
+          SELECTOR_FORCE_FULL: ${{ github.event_name != 'pull_request' }}
+          SELECTOR_HEAD_BRANCH: ${{ github.head_ref || github.ref_name }}
+        run: bash .github/scripts/select-pr-jobs.sh --github-output
+
   trunk-check:
     name: Trunk code check
     runs-on: ubuntu-latest
@@ -25,7 +51,8 @@ jobs:
 
   build-package:
     name: Build and Package Rokt.Widget
-    needs: trunk-check
+    if: needs.classify-changes.outputs.build_package == 'true'
+    needs: [classify-changes, trunk-check]
     runs-on: ubuntu-latest
     outputs:
       package-filename: ${{ steps.build-and-package.outputs.package-filename }}
@@ -59,7 +86,8 @@ jobs:
 
   build-test-ios:
     name: Build & Test iOS
-    needs: [trunk-check, build-package]
+    if: needs.classify-changes.outputs.ios == 'true'
+    needs: [classify-changes, trunk-check, build-package]
     runs-on: macos-latest
     steps:
       - name: Checkout code
@@ -94,7 +122,8 @@ jobs:
 
   build-test-android:
     name: Build & Test Android
-    needs: [trunk-check, build-package]
+    if: needs.classify-changes.outputs.android == 'true'
+    needs: [classify-changes, trunk-check, build-package]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -126,16 +155,67 @@ jobs:
             Android APK with version and commit hash
             Build metadata file
 
+  pr-gate:
+    name: PR Gate
+    if: always()
+    needs:
+      - classify-changes
+      - trunk-check
+      - build-package
+      - build-test-ios
+      - build-test-android
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify selected jobs
+        env:
+          CLASSIFIER_RESULT: ${{ needs.classify-changes.result }}
+          TRUNK_RESULT: ${{ needs.trunk-check.result }}
+          PACKAGE_SELECTED: ${{ needs.classify-changes.outputs.build_package }}
+          PACKAGE_RESULT: ${{ needs.build-package.result }}
+          IOS_SELECTED: ${{ needs.classify-changes.outputs.ios }}
+          IOS_RESULT: ${{ needs.build-test-ios.result }}
+          ANDROID_SELECTED: ${{ needs.classify-changes.outputs.android }}
+          ANDROID_RESULT: ${{ needs.build-test-android.result }}
+        run: |
+          check_result() {
+            local job_name="$1"
+            local is_selected="$2"
+            local result="$3"
+            local expected_result='skipped'
+
+            if [ "${is_selected}" = 'true' ]; then
+              expected_result='success'
+            fi
+
+            if [ "${result}" != "${expected_result}" ]; then
+              printf '%s: expected %s, got %s\n' "${job_name}" "${expected_result}" "${result}" >&2
+              return 1
+            fi
+          }
+
+          [ "${CLASSIFIER_RESULT}" = 'success' ]
+          [ "${TRUNK_RESULT}" = 'success' ]
+          check_result 'Build and Package Rokt.Widget' "${PACKAGE_SELECTED}" "${PACKAGE_RESULT}"
+          check_result 'Build & Test iOS' "${IOS_SELECTED}" "${IOS_RESULT}"
+          check_result 'Build & Test Android' "${ANDROID_SELECTED}" "${ANDROID_RESULT}"
+
   pr-notify:
     if: >
+      needs.pr-gate.result == 'success' &&
       github.event_name == 'pull_request' &&
-      github.event.pull_request.draft == false
-    needs: [build-test-ios, build-test-android]
+      github.event.pull_request.draft == false &&
+      github.actor != 'dependabot[bot]'
+    needs: pr-gate
     name: Notify GChat
+    runs-on: ubuntu-latest
     permissions:
       contents: read
-      pull-requests: read
-      id-token: write
-    uses: ROKT/rokt-workflows/.github/workflows/oss_pr_opened_notification.yml@1859338d7c2c2b873233505c751acbf09fb218d5 # main
-    secrets:
-      gchat_webhook: ${{ secrets.GCHAT_PRS_WEBHOOK }}
+    steps:
+      - name: Send Google Chat notification
+        continue-on-error: true
+        uses: SimonScholz/google-chat-action@3b3519e5102dba8aa5046fd711c4b553586409bb # v1.1.0
+        with:
+          webhookUrl: ${{ secrets.GCHAT_PRS_WEBHOOK }}
+          title: PR Created - ${{ github.event.pull_request.title }}
+          imageUrl: ${{ github.event.pull_request.user.avatar_url }}
+          threadKey: ${{ github.repository }}-${{ github.event.pull_request.number }}
