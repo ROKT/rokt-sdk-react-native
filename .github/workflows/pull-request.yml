@@ -181,11 +181,16 @@ jobs:
             local job_name="$1"
             local is_selected="$2"
             local result="$3"
-            local expected_result='skipped'
+            local expected_result
 
-            if [ "${is_selected}" = 'true' ]; then
-              expected_result='success'
-            fi
+            case "${is_selected}" in
+              true) expected_result='success' ;;
+              false) expected_result='skipped' ;;
+              *)
+                printf '%s: invalid selector output %s\n' "${job_name}" "${is_selected:-<empty>}" >&2
+                return 1
+                ;;
+            esac
 
             if [ "${result}" != "${expected_result}" ]; then
               printf '%s: expected %s, got %s\n' "${job_name}" "${expected_result}" "${result}" >&2

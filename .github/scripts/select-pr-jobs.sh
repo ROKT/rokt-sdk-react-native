@@ -47,31 +47,37 @@ decide_selection() {
 		[[ -n ${status} ]] || continue
 		has_changes=1
 
-		if [[ ${status} == R* || ${status} == C* ]]; then
+		case "${status}" in
+		A | M | D) ;;
+		*)
 			printf 'full\n'
 			return
-		fi
+			;;
+		esac
 
 		scope="$(path_scope "${path}")"
 		case "${scope}" in
 		docs) ;;
-		full | shared)
-			printf '%s\n' "${scope}"
+		full)
+			printf 'full\n'
 			return
 			;;
+		shared)
+			selection='shared'
+			;;
 		android)
-			if [[ ${selection} == 'ios' ]]; then
-				printf 'shared\n'
-				return
+			if [[ ${selection} == 'ios' || ${selection} == 'shared' ]]; then
+				selection='shared'
+			else
+				selection='android'
 			fi
-			selection='android'
 			;;
 		ios)
-			if [[ ${selection} == 'android' ]]; then
-				printf 'shared\n'
-				return
+			if [[ ${selection} == 'android' || ${selection} == 'shared' ]]; then
+				selection='shared'
+			else
+				selection='ios'
 			fi
-			selection='ios'
 			;;
 		*)
 			printf 'full\n'

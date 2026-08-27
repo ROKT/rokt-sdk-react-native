@@ -12,6 +12,7 @@
 /CLAUDE.md @ROKT/sdk-engineering
 /SECURITY.md @ROKT/sdk-engineering
 /RELEASING.md @ROKT/sdk-engineering
+/CHANGELOG.md @ROKT/sdk-engineering
 /LICENSE @ROKT/sdk-engineering
 /VERSION @ROKT/sdk-engineering
 /.github/CODEOWNERS @ROKT/sdk-engineering
@@ -25,7 +26,9 @@
 /Rokt.Widget/app.plugin.js @ROKT/sdk-engineering
 /Rokt.Widget/rokt-react-native-sdk.podspec @ROKT/sdk-engineering
 /RoktSampleApp/package.json @ROKT/sdk-engineering
+/RoktSampleApp/package-lock.json @ROKT/sdk-engineering
 /RoktSampleApp/Gemfile @ROKT/sdk-engineering
+/RoktSampleApp/Gemfile.lock @ROKT/sdk-engineering
 /RoktSampleApp/ios/Podfile.lock @ROKT/sdk-engineering
 /ExpoTestApp/package.json @ROKT/sdk-engineering
 /ExpoTestApp/package-lock.json @ROKT/sdk-engineering
