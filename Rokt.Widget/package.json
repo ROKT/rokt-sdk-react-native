@@ -1,6 +1,6 @@
 {
   "name": "@rokt/react-native-sdk",
-  "version": "5.1.0",
+  "version": "5.2.0",
   "description": "Rokt Mobile SDK to integrate ROKT Api into ReactNative application",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -40,7 +40,7 @@
     "registry": "https://registry.npmjs.org"
   },
   "peerDependencies": {
-    "react-native": ">= 0.55.4",
+    "react-native": ">=0.71.0",
     "@expo/config-plugins": ">=7.0.0"
   },
   "peerDependenciesMeta": {

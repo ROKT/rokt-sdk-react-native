@@ -9,8 +9,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [5.1.0] - 2026-05-08
-
 ### Added
 
 - `Rokt.setCustomBaseURL(url)` — route SDK requests through a partner-owned CNAME / first-party domain (iOS only).
@@ -19,7 +17,52 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- Updated native iOS dependency from `Rokt-Widget >= 5.0.0` to `>= 5.2.0`. Pulls in [iOS SDK 5.1.0](https://github.com/ROKT/rokt-sdk-ios/releases/tag/5.1.0) and [5.2.0](https://github.com/ROKT/rokt-sdk-ios/releases/tag/5.2.0), which add CNAME support, web-view payment callbacks, and built-in card forward payment.
+- Native iOS dependency requirement (`Rokt-Widget >= 5.3.0, < 6.0.0`, set in [#286](https://github.com/ROKT/rokt-sdk-react-native/pull/286)) already covers the CNAME support, web-view payment callbacks, and built-in card forward payment added in [iOS SDK 5.2.0](https://github.com/ROKT/rokt-sdk-ios/releases/tag/5.2.0); no podspec change needed here.
+
+## [5.1.2] - 2026-07-29
+
+### Fixed
+
+- Configure embedded views on New Architecture ([#291](https://github.com/ROKT/rokt-sdk-react-native/pull/291))
+- Embedded view collapsing to zero height in a column container ([#290](https://github.com/ROKT/rokt-sdk-react-native/pull/290))
+
+### Changed
+
+- Upgrade trunk ([#282](https://github.com/ROKT/rokt-sdk-react-native/pull/282))
+- Bump actions/setup-node from 6.4.0 to 7.0.0 ([#283](https://github.com/ROKT/rokt-sdk-react-native/pull/283))
+- Bump actions/checkout from 6.0.3 to 7.0.1 ([#284](https://github.com/ROKT/rokt-sdk-react-native/pull/284))
+
+## [5.1.1] - 2026-07-23
+
+### Added
+
+- Update to Latest Rokt SDKs ([#286](https://github.com/ROKT/rokt-sdk-react-native/pull/286))
+- Updated Rokt native iOS SDK to 5.3.0.
+- Updated Rokt native Android SDK to 6.0.1.
+
+### Changed
+
+- Fix publishing npm requirements ([#288](https://github.com/ROKT/rokt-sdk-react-native/pull/288))
+
+## [5.1.0] - 2026-07-22
+
+### Added
+
+- Update to Latest Rokt SDKs ([#286](https://github.com/ROKT/rokt-sdk-react-native/pull/286))
+
+## [5.0.2] - 2026-06-22
+
+### Changed
+
+- Bump native Android SDK to 5.1.1 ([#278](https://github.com/ROKT/rokt-sdk-react-native/pull/278))
+- Support maintenance-branch releases without clobbering latest ([#277](https://github.com/ROKT/rokt-sdk-react-native/pull/277))
+- Align release automation naming ([#274](https://github.com/ROKT/rokt-sdk-react-native/pull/274))
+
+## [5.0.1] - 2026-06-05
+
+### Fixed
+
+- fix(android): render embedded placements on New Architecture via EventDispatcher
 
 ## [5.0.0] - 2026-04-16
 
@@ -118,8 +161,12 @@ For a full migration guide, see [MIGRATING.md](./MIGRATING.md#migrating-from-v4x
 - Support new response action type `ExternalPaymentTrigger`
 - Sessions are now retained between app restarts
 
-[unreleased]: https://github.com/ROKT/rokt-sdk-react-native/compare/5.1.0...HEAD
-[5.1.0]: https://github.com/ROKT/rokt-sdk-react-native/compare/5.0.0...5.1.0
+[unreleased]: https://github.com/ROKT/rokt-sdk-react-native/compare/5.1.2...HEAD
+[5.1.2]: https://github.com/ROKT/rokt-sdk-react-native/compare/5.1.1...5.1.2
+[5.1.1]: https://github.com/ROKT/rokt-sdk-react-native/compare/5.0.2...5.1.1
+[5.1.0]: https://github.com/ROKT/rokt-sdk-react-native/compare/5.0.2...5.1.0
+[5.0.2]: https://github.com/ROKT/rokt-sdk-react-native/compare/5.0.1...5.0.2
+[5.0.1]: https://github.com/ROKT/rokt-sdk-react-native/compare/5.0.0...5.0.1
 [5.0.0]: https://github.com/ROKT/rokt-sdk-react-native/compare/4.12.2...5.0.0
 [4.12.2]: https://github.com/ROKT/rokt-sdk-react-native/compare/4.12.1...4.12.2
 [4.12.1]: https://github.com/ROKT/rokt-sdk-react-native/compare/4.12.0...4.12.1

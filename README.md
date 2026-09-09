@@ -28,7 +28,7 @@ The Rokt SDK is available from Maven Central and will be resolved automatically 
 
 #### Bare React Native
 
-Add the following `pre_install` block to your `ios/Podfile` before the `target` block. This is required because Rokt SDK 5.0 ships as source-based Swift pods that need dynamic framework linking:
+Add the following `pre_install` block to your `ios/Podfile` before the `target` block. This is required because the Rokt iOS SDK (5.x) ships as source-based Swift pods that need dynamic framework linking:
 
 ```ruby
 pre_install do |installer|
@@ -153,30 +153,42 @@ Rokt.selectShoppableAds("ConfirmationPage", {
 
 #### Payment Extension (iOS)
 
-Shoppable Ads requires a payment extension registered in your native iOS AppDelegate:
+Shoppable Ads requires a payment extension registered in your native iOS AppDelegate. This is done in native Swift — it cannot be called from JavaScript. The extension (`RoktPaymentExtension`) is Stripe-backed and presents Apple Pay, card, and Afterpay/Clearpay:
 
 ```swift
 // AppDelegate.swift
 import Rokt_Widget
-import RoktStripePaymentExtension
+import RoktPaymentExtension
 
 // After SDK initialization:
-if let stripeExt = RoktStripePaymentExtension(
+if let paymentExt = RoktPaymentExtension(
     applePayMerchantId: "merchant.com.yourapp"
 ) {
-    Rokt.registerPaymentExtension(stripeExt, config: [
-        "stripeKey": "pk_live_your_stripe_key"
+    Rokt.registerPaymentExtension(paymentExt, config: [
+        "stripeKey": "YOUR_STRIPE_PUBLISHABLE_KEY"
     ])
 }
 ```
 
-### Purchase Finalized
+> The `RoktPaymentExtension` pod must be added to your Podfile. If it is not yet available in your SDK version, contact your Rokt account team.
 
-After a shoppable ads purchase completes:
+### Purchase Finalized (Shoppable Ads only)
+
+`purchaseFinalized` is **not** a generic order-confirmation or checkout hook. It exists solely to close the loop on a **Rokt in-placement instant purchase** — an item the user buys directly inside a Shoppable Ads placement.
+
+Call it **only** in response to a `CartItemInstantPurchase` event, after you have processed that item's payment. Pass the `placementId` and `catalogItemId` **from the event** (the `placementId` is the Rokt placement/layout id, not your order id), and `true`/`false` for whether your payment processing succeeded:
 
 ```js
-Rokt.purchaseFinalized("placementId", "catalogItemId", true);
+eventEmitter.addListener("RoktEvents", (event) => {
+  if (event.event === "CartItemInstantPurchase") {
+    // ...process payment for event.catalogItemId...
+    const success = true; // or false if your payment step failed
+    Rokt.purchaseFinalized(event.placementId, event.catalogItemId, success);
+  }
+});
 ```
+
+> **Do not** call `purchaseFinalized` on your own order-confirmation page after a normal checkout. The native SDK no-ops unless a Rokt instant purchase is currently open.
 
 ### Event Handling
 
@@ -257,19 +269,19 @@ The SDK uses this scheme when composing return and cancel URLs for supported web
 
 ## API Reference
 
-| Method                                                                 | Description                                   |
-| ---------------------------------------------------------------------- | --------------------------------------------- |
-| `Rokt.initialize(tagId, appVersion, fontFilesMap?)`                    | Initialize the SDK                            |
-| `Rokt.selectPlacements(identifier, attributes, placeholders, config?)` | Display overlay or embedded placements        |
-| `Rokt.selectShoppableAds(identifier, attributes, config?)`             | Display shoppable ads (iOS only)              |
-| `Rokt.purchaseFinalized(placementId, catalogItemId, success)`          | Report purchase completion                    |
-| `Rokt.setEnvironmentToStage()`                                         | Set staging environment                       |
-| `Rokt.setEnvironmentToProd()`                                          | Set production environment                    |
-| `Rokt.setSessionId(sessionId)`                                         | Set a custom session ID                       |
-| `Rokt.getSessionId()`                                                  | Get the current session ID                    |
-| `Rokt.setCustomBaseURL(url)`                                           | Route SDK requests through a CNAME (iOS only) |
-| `Rokt.setPaymentCallbackURLScheme(scheme)`                             | Register URL scheme for callbacks (iOS only)  |
-| `Rokt.handleURLCallback(url)`                                          | Forward deep-link URL to the SDK (iOS only)   |
+| Method                                                                 | Description                                                                                                                                            |
+| ---------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `Rokt.initialize(tagId, appVersion, fontFilesMap?)`                    | Initialize the SDK                                                                                                                                     |
+| `Rokt.selectPlacements(identifier, attributes, placeholders, config?)` | Display overlay or embedded placements                                                                                                                 |
+| `Rokt.selectShoppableAds(identifier, attributes, config?)`             | Display shoppable ads (iOS only)                                                                                                                       |
+| `Rokt.purchaseFinalized(placementId, catalogItemId, success)`          | Close the loop on a Rokt in-placement instant purchase (Shoppable Ads) — call from the `CartItemInstantPurchase` event handler, not on normal checkout |
+| `Rokt.setEnvironmentToStage()`                                         | Set staging environment                                                                                                                                |
+| `Rokt.setEnvironmentToProd()`                                          | Set production environment                                                                                                                             |
+| `Rokt.setSessionId(sessionId)`                                         | Set a custom session ID                                                                                                                                |
+| `Rokt.getSessionId()`                                                  | Get the current session ID                                                                                                                             |
+| `Rokt.setCustomBaseURL(url)`                                           | Route SDK requests through a CNAME (iOS only)                                                                                                          |
+| `Rokt.setPaymentCallbackURLScheme(scheme)`                             | Register URL scheme for callbacks (iOS only)                                                                                                           |
+| `Rokt.handleURLCallback(url)`                                          | Forward deep-link URL to the SDK (iOS only)                                                                                                            |
 
 ## Minimum Requirements
 
