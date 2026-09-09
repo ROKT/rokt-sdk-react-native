@@ -9,6 +9,13 @@ updates:
       - dependabot
     commit-message:
       prefix: chore
+    groups:
+      github-actions-patch-minor:
+        patterns:
+          - "*"
+        update-types:
+          - patch
+          - minor
 
   - package-ecosystem: gradle
     directory: /Rokt.Widget/android
@@ -19,6 +26,13 @@ updates:
       - dependabot
     commit-message:
       prefix: chore
+    groups:
+      gradle-patch-minor:
+        patterns:
+          - "*"
+        update-types:
+          - patch
+          - minor
     ignore:
       - dependency-name: com.android.tools.build:gradle
       - dependency-name: org.jetbrains.kotlin:kotlin-gradle-plugin
