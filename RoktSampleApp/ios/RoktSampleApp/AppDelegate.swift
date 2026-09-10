@@ -1,6 +1,7 @@
 import UIKit
 import React
 import React_RCTAppDelegate
+import React_RCTLinking
 import ReactAppDependencyProvider
 import Rokt_Widget
 // Uncomment to enable Shoppable Ads payment extension:
@@ -37,6 +38,17 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     // Rokt.registerPaymentExtension(paymentExtension, config: ["stripeKey": "pk_test_placeholder"])
 
     return true
+  }
+
+  // Forwards incoming deep links (e.g. the built-in PayPal redirect scheme
+  // registered in Info.plist) to React Native's `Linking` module, so JS-side
+  // listeners such as `Rokt.handleURLCallback` fire.
+  func application(
+    _ app: UIApplication,
+    open url: URL,
+    options: [UIApplication.OpenURLOptionsKey: Any] = [:]
+  ) -> Bool {
+    RCTLinkingManager.application(app, open: url, options: options)
   }
 }
 
