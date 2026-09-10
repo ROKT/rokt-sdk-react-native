@@ -46,11 +46,17 @@ export default function App() {
     useState("expotestapp");
 
   // Forward incoming deep-link URLs to the Rokt SDK so built-in PayPal
-  // device-pay can resume. iOS only.
+  // device-pay can resume. iOS only. Covers both a cold start (the app was
+  // launched by the callback URL) and a warm return (the app was already running).
   useEffect(() => {
     if (Platform.OS !== "ios") {
       return;
     }
+    Linking.getInitialURL().then((url) => {
+      if (url) {
+        Rokt.handleURLCallback(url);
+      }
+    });
     const subscription = Linking.addEventListener("url", ({ url }) => {
       Rokt.handleURLCallback(url);
     });
