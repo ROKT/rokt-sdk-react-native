@@ -15,9 +15,9 @@
     #import <RoktContracts/RoktContracts-Swift.h>
 #endif
 #import <Rokt_Widget/Rokt_Widget-Swift.h>
+#import <React/RCTLog.h>
+#import <React/RCTUtils.h>
 #import <React/RCTViewManager.h>
-#import <React/RCTUIManager.h>
-#import <React/RCTBridge.h>
 #import "RoktEventManager.h"
 
 #ifdef RCT_NEW_ARCH_ENABLED
@@ -35,17 +35,19 @@
 
 @implementation RNRoktWidget
 
-@synthesize bridge = _bridge;
+// Maps React tags to UIViews in both bridge and bridgeless modes.
+@synthesize viewRegistry_DEPRECATED = _viewRegistry_DEPRECATED;
 
 - (dispatch_queue_t)methodQueue
 {
-    return self.bridge.uiManager.methodQueue;
+    // Placement selection mutates the embedded view hierarchy and must run on main.
+    return dispatch_get_main_queue();
 }
 
 - (void)setMethodQueue:(dispatch_queue_t)methodQueue
 {
     // No-op setter to satisfy TurboModule requirements
-    // We always return the UI manager's method queue
+    // We always return the main queue
 }
 
 
@@ -91,9 +93,11 @@ RCT_EXPORT_METHOD(selectPlacements:(NSString *)identifier
     }
     NSMutableDictionary *finalAttributes = [self convertToMutableDictionaryOfStrings:attributes];
 
-    [self.bridge.uiManager addUIBlock:^(RCTUIManager *uiManager, NSDictionary<NSNumber *,UIView *> *viewRegistry) {
-
-        NSMutableDictionary *nativePlaceholders = [self getNativePlaceholders:placeholders viewRegistry:viewRegistry];
+    // Legacy UI-manager blocks are unreliable in bridgeless mode and become no-ops
+    // when React Native removes the legacy architecture. Resolve through the registry
+    // React Native injects into bridge modules instead.
+    RCTExecuteOnMainQueue(^{
+        NSMutableDictionary *nativePlaceholders = [self resolvePlaceholders:placeholders];
 
         [self subscribeViewEvents:identifier];
 
@@ -102,7 +106,7 @@ RCT_EXPORT_METHOD(selectPlacements:(NSString *)identifier
             placements:nativePlaceholders
             onEvent:nil
         ];
-    }];
+    });
 }
 
 #ifdef RCT_NEW_ARCH_ENABLED
@@ -302,12 +306,12 @@ RCT_EXPORT_METHOD(purchaseFinalized:(NSString *)placementId
 
 #ifdef RCT_NEW_ARCH_ENABLED
 - (std::shared_ptr<facebook::react::TurboModule>)getTurboModule:(const facebook::react::ObjCTurboModule::InitParams &)params {
-    self.bridge = params.instance.bridge;
     return std::make_shared<facebook::react::NativeRoktWidgetSpecJSI>(params);
 }
 #endif
 
-- (NSMutableDictionary *)getNativePlaceholders:(NSDictionary *)placeholders viewRegistry:(NSDictionary<NSNumber *, UIView *> *)viewRegistry
+// Main thread only: RCTViewRegistry reads the mounted native view hierarchy.
+- (NSMutableDictionary *)resolvePlaceholders:(NSDictionary *)placeholders
 {
     NSMutableDictionary *nativePlaceholders = [[NSMutableDictionary alloc]initWithCapacity:placeholders.count];
 
@@ -316,12 +320,21 @@ RCT_EXPORT_METHOD(purchaseFinalized:(NSString *)placementId
 #endif
 
     for(id key in placeholders){
+        id reactTagValue = [placeholders objectForKey:key];
+        if (![reactTagValue isKindOfClass:[NSNumber class]]) {
+            RCTLogError(@"Invalid react tag for placeholder %@ (reactTag %@). Found: %@",
+                        key,
+                        reactTagValue,
+                        NSStringFromClass([reactTagValue class]));
+            continue;
+        }
+
+        NSNumber *reactTag = (NSNumber *)reactTagValue;
+        UIView *view = [_viewRegistry_DEPRECATED viewForReactTag:reactTag];
 #ifdef RCT_NEW_ARCH_ENABLED
         // In New Arch, we may get either:
         // 1. RoktNativeWidgetComponentView (full Fabric mode - RN 0.81+)
         // 2. RoktEmbeddedView (interop mode - RN 0.77 and similar)
-        UIView *view = viewRegistry[[placeholders objectForKey:key]];
-
         if (componentViewClass && [view isKindOfClass:componentViewClass]) {
             // Full Fabric mode - extract the embedded view from the wrapper
             RoktNativeWidgetComponentView *wrapperView = (RoktNativeWidgetComponentView *)view;
@@ -330,17 +343,22 @@ RCT_EXPORT_METHOD(purchaseFinalized:(NSString *)placementId
             // Interop mode - use the view directly
             nativePlaceholders[key] = (RoktEmbeddedView *)view;
         } else {
-            RCTLogError(@"Cannot find RoktNativeWidget view with tag #%@. Found: %@", key, view ? NSStringFromClass([view class]) : @"nil");
+            RCTLogError(@"Cannot find RoktNativeWidget for placeholder %@ (reactTag %@). Found: %@",
+                        key,
+                        reactTag,
+                        view ? NSStringFromClass([view class]) : @"nil");
             continue;
         }
 #else
-        RoktEmbeddedView *view = viewRegistry[[placeholders objectForKey:key]];
-        if (!view || ![view isKindOfClass:[RoktEmbeddedView class]]) {
-            RCTLogError(@"Cannot find RoktEmbeddedView with tag #%@", key);
+        if (![view isKindOfClass:[RoktEmbeddedView class]]) {
+            RCTLogError(@"Cannot find RoktEmbeddedView for placeholder %@ (reactTag %@). Found: %@",
+                        key,
+                        reactTag,
+                        view ? NSStringFromClass([view class]) : @"nil");
             continue;
         }
 
-        nativePlaceholders[key] = view;
+        nativePlaceholders[key] = (RoktEmbeddedView *)view;
 #endif // RCT_NEW_ARCH_ENABLED
     }
 
@@ -349,8 +367,8 @@ RCT_EXPORT_METHOD(purchaseFinalized:(NSString *)placementId
 
 - (void)selectPlacementsWithIdentifier:(NSString *)identifier attributes:(NSDictionary *)attributes placeholders:(NSDictionary *)placeholders config:(RoktConfig *)config
 {
-    [self.bridge.uiManager addUIBlock:^(RCTUIManager *uiManager, NSDictionary<NSNumber *,UIView *> *viewRegistry) {
-        NSMutableDictionary *nativePlaceholders = [self getNativePlaceholders:placeholders viewRegistry:viewRegistry];
+    RCTExecuteOnMainQueue(^{
+        NSMutableDictionary *nativePlaceholders = [self resolvePlaceholders:placeholders];
 
         [self subscribeViewEvents:identifier];
 
@@ -363,7 +381,7 @@ RCT_EXPORT_METHOD(purchaseFinalized:(NSString *)placementId
                 [self.eventManager onRoktEvents:event identifier:identifier];
             }
         ];
-    }];
+    });
 }
 
 #ifdef RCT_NEW_ARCH_ENABLED

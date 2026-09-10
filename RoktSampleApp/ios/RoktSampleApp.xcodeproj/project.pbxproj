@@ -10,11 +10,9 @@
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		2A3819AAEF22EDF8C350C99D /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
-		B3685BB22E36F99800F0BC24 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3685BB12E36F99800F0BC24 /* AppDelegate.swift */; };
 		B3685BB32E36F99800F0BC24 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3685BB12E36F99800F0BC24 /* AppDelegate.swift */; };
-		B3685BB62E36FB7700F0BC24 /* RoktSampleAppUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3685BB42E36FB7700F0BC24 /* RoktSampleAppUITests.swift */; };
-		B3685BB72E36FB7700F0BC24 /* RoktSampleAppUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3685BB52E36FB7700F0BC24 /* RoktSampleAppUITestsLaunchTests.swift */; };
 		BE79B83326AE8868D7D41694 /* libPods-RoktSampleAppTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EC79AD418A11B5011DF32785 /* libPods-RoktSampleAppTests.a */; };
+		C0D3A0022F50100100000002 /* RNRoktWidgetPlaceholderTests.m in Sources */ = {isa = PBXBuildFile; fileRef = C0D3A0012F50100100000001 /* RNRoktWidgetPlaceholderTests.m */; };
 		ED3F467A5B566504E7C400E2 /* libPods-RoktSampleApp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C511286B7AF0F576FF8BEC31 /* libPods-RoktSampleApp.a */; };
 /* End PBXBuildFile section */
 
@@ -41,6 +39,7 @@
 		B3685BB12E36F99800F0BC24 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		B3685BB42E36FB7700F0BC24 /* RoktSampleAppUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoktSampleAppUITests.swift; sourceTree = "<group>"; };
 		B3685BB52E36FB7700F0BC24 /* RoktSampleAppUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoktSampleAppUITestsLaunchTests.swift; sourceTree = "<group>"; };
+		C0D3A0012F50100100000001 /* RNRoktWidgetPlaceholderTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RNRoktWidgetPlaceholderTests.m; sourceTree = "<group>"; };
 		C511286B7AF0F576FF8BEC31 /* libPods-RoktSampleApp.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-RoktSampleApp.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		D6EF2E19964A769AA6849FC8 /* Pods-RoktSampleAppTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RoktSampleAppTests.release.xcconfig"; path = "Target Support Files/Pods-RoktSampleAppTests/Pods-RoktSampleAppTests.release.xcconfig"; sourceTree = "<group>"; };
 		EC79AD418A11B5011DF32785 /* libPods-RoktSampleAppTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-RoktSampleAppTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -100,6 +99,7 @@
 			isa = PBXGroup;
 			children = (
 				13B07FAE1A68108700A75B9A /* RoktSampleApp */,
+				C0D3A0032F50100100000003 /* RoktSampleAppTests */,
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
 				83CBBA001A601CBA00E9B192 /* Products */,
 				2D16E6871FA4F8E400B85C8A /* Frameworks */,
@@ -129,6 +129,14 @@
 				D6EF2E19964A769AA6849FC8 /* Pods-RoktSampleAppTests.release.xcconfig */,
 			);
 			path = Pods;
+			sourceTree = "<group>";
+		};
+		C0D3A0032F50100100000003 /* RoktSampleAppTests */ = {
+			isa = PBXGroup;
+			children = (
+				C0D3A0012F50100100000001 /* RNRoktWidgetPlaceholderTests.m */,
+			);
+			path = RoktSampleAppTests;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -333,9 +341,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				B3685BB22E36F99800F0BC24 /* AppDelegate.swift in Sources */,
-				B3685BB62E36FB7700F0BC24 /* RoktSampleAppUITests.swift in Sources */,
-				B3685BB72E36FB7700F0BC24 /* RoktSampleAppUITestsLaunchTests.swift in Sources */,
+				C0D3A0022F50100100000002 /* RNRoktWidgetPlaceholderTests.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

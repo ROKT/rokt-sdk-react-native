@@ -12,10 +12,8 @@
 
 #ifdef RCT_NEW_ARCH_ENABLED
 #import <RNRoktWidgetSpec/RNRoktWidgetSpec.h>
-#import <React/RCTBridge.h>
 
 @interface RNRoktWidget : NSObject <NativeRoktWidgetSpec>
-@property (nonatomic, weak, nullable) RCTBridge *bridge;
 #else
 #import <React/RCTBridgeModule.h>
 @interface RNRoktWidget : NSObject <RCTBridgeModule>
