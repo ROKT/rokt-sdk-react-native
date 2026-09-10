@@ -79,31 +79,6 @@ const placeholders = {
 Rokt.selectPlacements("RoktEmbeddedExperience", attributes, placeholders);
 ```
 
-#### Custom Base URL (CNAME)
-
-Route SDK requests through a partner-owned CNAME. Must be called **before** `Rokt.initialize(...)`. Supported on iOS and Android.
-
-```javascript
-Rokt.setCustomBaseURL("https://rokt.example.com");
-Rokt.initialize("xxxxxxxx", "1.0");
-```
-
-#### Built-in PayPal redirect callback (iOS)
-
-Register the host app's URL scheme and forward incoming deep-link URLs to the SDK so built-in PayPal device-pay can resume after authenticating in a web view. iOS only — on Android the SDK self-registers its own redirect activity via manifest merging, so no host-app wiring is needed.
-
-```javascript
-import { Linking } from "react-native";
-
-Rokt.setPaymentCallbackURLScheme("myapp");
-
-Linking.addEventListener("url", ({ url }) => {
-  Rokt.handleURLCallback(url);
-});
-```
-
-The scheme must also be declared under `CFBundleURLTypes`/`CFBundleURLSchemes` in `Info.plist` (or `expo.scheme` in `app.json` for Expo).
-
 > **Note:** `execute()` was removed in v5.0.0 — use `selectPlacements()` instead. See the
 > [Migration Guide](https://github.com/ROKT/rokt-sdk-react-native/blob/main/MIGRATING.md).
 
