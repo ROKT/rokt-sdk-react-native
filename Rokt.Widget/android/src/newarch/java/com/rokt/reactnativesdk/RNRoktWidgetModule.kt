@@ -190,4 +190,19 @@ class RNRoktWidgetModule internal constructor(private val reactContext: ReactApp
 
     @ReactMethod(isBlockingSynchronousMethod = true)
     override fun getSessionId(): String? = impl.getSessionId()
+
+    @ReactMethod
+    override fun setCustomBaseURL(url: String) {
+        impl.setCustomBaseURL(url)
+    }
+
+    @ReactMethod
+    override fun setPaymentCallbackURLScheme(scheme: String?) {
+        impl.setPaymentCallbackURLScheme(scheme)
+    }
+
+    @ReactMethod
+    override fun handleURLCallback(url: String) {
+        impl.handleURLCallback(url)
+    }
 }

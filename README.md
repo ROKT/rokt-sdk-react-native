@@ -227,6 +227,44 @@ Rokt.setEnvironmentToStage(); // For testing
 Rokt.setEnvironmentToProd(); // For production (default)
 ```
 
+### Custom Base URL (CNAME)
+
+Route all Rokt SDK requests through your own first-party domain. Must be called **before** `Rokt.initialize(...)`. Supported on iOS and Android.
+
+```js
+Rokt.setCustomBaseURL("https://rokt.example.com");
+Rokt.initialize("YOUR_ROKT_TAG_ID", "1.0");
+```
+
+Only the scheme, host, and port of the URL are used. Non-HTTPS URLs and URLs with a missing/empty host are rejected with a warning.
+
+### Built-in PayPal redirect callback (iOS)
+
+Built-in PayPal device-pay authenticates in a web view and returns to the host app via a custom URL scheme. This is **iOS only** — on Android the SDK self-registers its own redirect activity (scoped to your app's package name) via manifest merging, so none of the steps below are needed there.
+
+1. **Register a URL scheme** in your iOS app.
+   - Bare React Native: add an entry under `CFBundleURLTypes` in `ios/<App>/Info.plist`.
+   - Expo: set `expo.scheme` in `app.json` (e.g. `"scheme": "myapp"`) and run `expo prebuild`.
+2. **Tell the SDK the scheme**:
+
+   ```js
+   Rokt.setPaymentCallbackURLScheme("myapp");
+   ```
+
+3. **Forward incoming deep links** to the SDK using React Native's `Linking`:
+
+   ```js
+   import { Linking, Platform } from "react-native";
+
+   useEffect(() => {
+     if (Platform.OS !== "ios") return;
+     const sub = Linking.addEventListener("url", ({ url }) => {
+       Rokt.handleURLCallback(url);
+     });
+     return () => sub.remove();
+   }, []);
+   ```
+
 ## API Reference
 
 | Method                                                                 | Description                                                                                                                                            |
@@ -239,6 +277,9 @@ Rokt.setEnvironmentToProd(); // For production (default)
 | `Rokt.setEnvironmentToProd()`                                          | Set production environment                                                                                                                             |
 | `Rokt.setSessionId(sessionId)`                                         | Set a custom session ID                                                                                                                                |
 | `Rokt.getSessionId()`                                                  | Get the current session ID                                                                                                                             |
+| `Rokt.setCustomBaseURL(url)`                                           | Route SDK requests through a CNAME (iOS and Android)                                                                                                   |
+| `Rokt.setPaymentCallbackURLScheme(scheme)`                             | Register URL scheme for built-in PayPal redirects (iOS only)                                                                                           |
+| `Rokt.handleURLCallback(url)`                                          | Forward deep-link URL to the SDK (iOS only)                                                                                                            |
 
 ## Minimum Requirements
 

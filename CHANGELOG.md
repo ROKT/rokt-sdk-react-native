@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- `Rokt.setCustomBaseURL(url)` — route SDK requests through a partner-owned CNAME / first-party domain. Supported on **iOS and Android**.
+- `Rokt.setPaymentCallbackURLScheme(scheme)` — register the host app's URL scheme for built-in PayPal device-pay redirects (**iOS only** — no-op on Android, where the SDK self-registers its own redirect activity via manifest merging, scoped to the host app's package name, so no host-app wiring is needed).
+- `Rokt.handleURLCallback(url)` — forward incoming deep-link URLs to the SDK so built-in PayPal (or a registered payment extension) can resume (**iOS only**, same reasoning as above).
+
 ## [5.1.2] - 2026-07-29
 
 ### Fixed

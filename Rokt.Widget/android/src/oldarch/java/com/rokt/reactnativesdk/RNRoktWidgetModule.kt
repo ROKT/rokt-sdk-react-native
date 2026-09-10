@@ -120,6 +120,21 @@ class RNRoktWidgetModule internal constructor(private val reactContext: ReactApp
     @ReactMethod(isBlockingSynchronousMethod = true)
     fun getSessionId(): String? = impl.getSessionId()
 
+    @ReactMethod
+    fun setCustomBaseURL(url: String) {
+        impl.setCustomBaseURL(url)
+    }
+
+    @ReactMethod
+    fun setPaymentCallbackURLScheme(scheme: String?) {
+        impl.setPaymentCallbackURLScheme(scheme)
+    }
+
+    @ReactMethod
+    fun handleURLCallback(url: String) {
+        impl.handleURLCallback(url)
+    }
+
     private fun safeUnwrapPlaceholders(
         placeholders: ReadableMap?,
         nativeViewHierarchyManager: NativeViewHierarchyManager,

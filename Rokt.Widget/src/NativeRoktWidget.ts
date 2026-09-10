@@ -67,6 +67,14 @@ export interface Spec extends TurboModule {
   // Session management
   setSessionId(sessionId: string): void;
   getSessionId(): string | null;
+
+  // CNAME / first-party domain routing
+  setCustomBaseURL(url: string): void;
+
+  // Built-in PayPal redirect callback (iOS only — no-op on Android, where the
+  // SDK self-registers its own redirect activity via manifest merging)
+  setPaymentCallbackURLScheme(scheme: string | null): void;
+  handleURLCallback(url: string): void;
 }
 
 export default TurboModuleRegistry.getEnforcing<Spec>("RNRoktWidget");

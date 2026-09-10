@@ -18,6 +18,8 @@ import com.rokt.roktsdk.RoktEvent
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
+import java.net.MalformedURLException
+import java.net.URL
 
 /**
  * Copyright 2024 Rokt Pte Ltd
@@ -93,6 +95,26 @@ class RNRoktWidgetModuleImpl(private val reactContext: ReactApplicationContext) 
     }
 
     fun getSessionId(): String? = Rokt.getSessionId()
+
+    fun setCustomBaseURL(url: String) {
+        try {
+            Rokt.setCustomBaseURL(URL(url))
+        } catch (e: MalformedURLException) {
+            Log.w("Rokt", "setCustomBaseURL failed. url is not a valid URL: $url", e)
+        }
+    }
+
+    fun setPaymentCallbackURLScheme(scheme: String?) {
+        // Backs the built-in PayPal device-pay redirect flow on iOS, where the host
+        // app must register a URL scheme and forward deep links manually. Android's
+        // SDK self-registers its own redirect activity (scoped to the host app's
+        // package name) via manifest merging, so no host-app wiring is needed here.
+        Log.w("Rokt", "setPaymentCallbackURLScheme is iOS only and is a no-op on Android")
+    }
+
+    fun handleURLCallback(url: String) {
+        Log.w("Rokt", "handleURLCallback is iOS only and is a no-op on Android")
+    }
 
     fun sendEvent(reactContext: ReactContext?, eventName: String, params: WritableMap?) {
         reactContext?.getJSModule(RCTDeviceEventEmitter::class.java)?.emit(eventName, params)
