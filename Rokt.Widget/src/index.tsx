@@ -1,5 +1,5 @@
 import "react-native";
-import { NativeModules } from "react-native";
+import { RoktEventManager } from "./rokt-event-manager";
 import { RoktEmbeddedView } from "./rokt-embedded-view";
 import {
   Rokt,
@@ -7,9 +7,9 @@ import {
   RoktConfigBuilder,
   ColorMode,
   CacheConfig,
+  RoktPlaceholders,
+  RoktAttributeValue,
 } from "./Rokt";
-
-const { RoktEventManager } = NativeModules;
 
 export {
   RoktEmbeddedView,
@@ -18,4 +18,4 @@ export {
   RoktConfigBuilder,
   CacheConfig,
 };
-export type { IRoktConfig, ColorMode };
+export type { IRoktConfig, ColorMode, RoktPlaceholders, RoktAttributeValue };

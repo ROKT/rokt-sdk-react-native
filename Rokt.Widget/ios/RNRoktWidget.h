@@ -9,14 +9,15 @@
 //  You may obtain a copy of the License at https://rokt.com/sdk-license-2-0/
 
 #import "RoktEventManager.h"
+#import <React/RCTInvalidating.h>
 
 #ifdef RCT_NEW_ARCH_ENABLED
 #import <RNRoktWidgetSpec/RNRoktWidgetSpec.h>
 
-@interface RNRoktWidget : NSObject <NativeRoktWidgetSpec>
+@interface RNRoktWidget : NSObject <NativeRoktWidgetSpec, RCTInvalidating>
 #else
 #import <React/RCTBridgeModule.h>
-@interface RNRoktWidget : NSObject <RCTBridgeModule>
+@interface RNRoktWidget : NSObject <RCTBridgeModule, RCTInvalidating>
 #endif
 
 @end

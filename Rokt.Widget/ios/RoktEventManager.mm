@@ -9,7 +9,7 @@
 //  You may obtain a copy of the License at https://rokt.com/sdk-license-2-0/
 
 #import "RoktEventManager.h"
-@import RoktContracts;
+#import <RoktContracts/RoktContracts-Swift.h>
 #import <Rokt_Widget/Rokt_Widget-Swift.h>
 
 @implementation RoktEventManager
@@ -198,5 +198,11 @@ RCT_EXPORT_MODULE(RoktEventManager);
          [self sendEventWithName:@"RoktEvents" body:payload];
      }
 }
+
+#ifdef RCT_NEW_ARCH_ENABLED
+- (std::shared_ptr<facebook::react::TurboModule>)getTurboModule:(const facebook::react::ObjCTurboModule::InitParams &)params {
+    return std::make_shared<facebook::react::NativeRoktEventManagerSpecJSI>(params);
+}
+#endif
 
 @end

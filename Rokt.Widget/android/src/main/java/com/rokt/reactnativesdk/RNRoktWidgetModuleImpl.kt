@@ -9,17 +9,21 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.facebook.react.bridge.*
 import com.facebook.react.modules.core.DeviceEventManagerModule.RCTDeviceEventEmitter
+import com.facebook.react.uimanager.UIManagerHelper
 import com.rokt.roktsdk.CacheConfig
 import com.rokt.roktsdk.Rokt
 import com.rokt.roktsdk.Rokt.Environment.Prod
 import com.rokt.roktsdk.Rokt.SdkFrameworkType.ReactNative
 import com.rokt.roktsdk.RoktConfig
 import com.rokt.roktsdk.RoktEvent
+import com.rokt.roktsdk.Widget
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
+import java.lang.ref.WeakReference
 import java.net.MalformedURLException
 import java.net.URL
+import java.util.UUID
 
 /**
  * Copyright 2024 Rokt Pte Ltd
@@ -33,6 +37,82 @@ import java.net.URL
  */
 class RNRoktWidgetModuleImpl(private val reactContext: ReactApplicationContext) {
     private var debug = false
+
+    @Volatile private var invalidated = false
+    private val waitPrefix = UUID.randomUUID().toString()
+    private val waitKeys = mutableSetOf<String>()
+
+    fun selectPlacements(
+        identifier: String?,
+        attributes: ReadableMap?,
+        placeholders: ReadableMap?,
+        roktConfig: ReadableMap?,
+    ) {
+        if (identifier == null) {
+            logDebug("Select placements failed. Identifier cannot be null")
+            return
+        }
+        val values = placeholders?.toHashMap().orEmpty()
+        val nativeAttributes = readableMapToMapOfStrings(attributes)
+        val config = roktConfig?.let { buildRoktConfig(it) }
+        UiThreadUtil.runOnUiThread {
+            whenPlaceholdersMounted(identifier, values) {
+                startRoktEventListener(Rokt.events(identifier), reactContext.currentActivity, identifier)
+                Rokt.selectPlacements(
+                    identifier = identifier,
+                    attributes = nativeAttributes,
+                    placeholders = resolvePlaceholders(values),
+                    config = config,
+                )
+            }
+        }
+    }
+
+    // UI thread only. The callback is always deferred beyond the native mount transaction.
+    internal fun whenPlaceholdersMounted(identifier: String, placeholders: Map<String, Any?>, onReady: () -> Unit) {
+        if (invalidated) return
+        val names = placeholders.filterValues { it !is Number || it.toDouble() <= 0 }.keys
+        val key = "$waitPrefix:$identifier"
+        waitKeys.add(key)
+        RoktPlaceholderRegistry.awaitNames(key, names, 2000, onDiscard = {
+            logDebug("Pending selectPlacements dropped for: $identifier")
+        }) {
+            waitKeys.remove(key)
+            if (!invalidated) onReady()
+        }
+    }
+
+    internal fun resolvePlaceholders(placeholders: Map<String, Any?>): Map<String, WeakReference<Widget>> {
+        val resolved = mutableMapOf<String, WeakReference<Widget>>()
+        for ((name, value) in placeholders) {
+            var widget: Widget? = null
+            if (value is Number && value.toDouble() > 0) {
+                try {
+                    val tag = value.toInt()
+                    widget = UIManagerHelper.getUIManagerForReactTag(reactContext, tag)?.resolveView(tag) as? Widget
+                } catch (e: RuntimeException) {
+                    logDebug("Cannot resolve React tag $value: ${e.message}")
+                }
+            }
+            widget = widget ?: RoktPlaceholderRegistry.lookup(name) as? Widget
+            if (widget != null) {
+                resolved[name] = WeakReference(widget)
+            } else {
+                Log.w("Rokt", "Cannot resolve placeholder $name (reactTag $value)")
+            }
+        }
+        return resolved
+    }
+
+    fun invalidate() {
+        invalidated = true
+        UiThreadUtil.runOnUiThread {
+            for (key in waitKeys) RoktPlaceholderRegistry.cancelWait(key)
+            waitKeys.clear()
+            for (job in eventSubscriptions.values) job?.cancel()
+            eventSubscriptions.clear()
+        }
+    }
 
     private val eventSubscriptions = mutableMapOf<String, Job?>()
 
