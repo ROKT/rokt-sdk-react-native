@@ -82,6 +82,7 @@ runs:
       run: |
         cd RoktSampleApp
 
+        set -o pipefail
         # Run tests and generate test results
         xcodebuild -workspace ios/RoktSampleApp.xcworkspace \
           -scheme RoktSampleApp \
@@ -89,7 +90,7 @@ runs:
           -destination "platform=iOS Simulator,id=${{ steps.find-simulator.outputs.device-id }}" \
           -derivedDataPath ios/build \
           -UseModernBuildSystem=YES \
-          test | xcpretty -r junit -o ios/build/test-results.xml || true
+          test | xcpretty -r junit -o ios/build/test-results.xml
 
     - name: Create artifact metadata
       shell: bash

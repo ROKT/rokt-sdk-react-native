@@ -16,8 +16,23 @@
 
 #import <Foundation/Foundation.h>
 #import <React/RCTViewManager.h>
+#import <React/RCTInvalidating.h>
+#import "RoktPlaceholderRegistry.h"
 @import RoktContracts;
 #import <Rokt_Widget/Rokt_Widget-Swift.h>
+
+#ifndef RCT_NEW_ARCH_ENABLED
+// RoktEmbeddedView is closed to Objective-C subclassing. Paper invalidates removed
+// views conforming to RCTInvalidating, even if an in-flight SDK request retains them.
+@interface RoktEmbeddedView (RNPlaceholderRegistration) <RCTInvalidating>
+@end
+@implementation RoktEmbeddedView (RNPlaceholderRegistration)
+- (void)invalidate
+{
+  [RoktPlaceholderRegistry unregisterView:self];
+}
+@end
+#endif
 
 @interface RoktNativeWidgetManager : RCTViewManager
 @end
@@ -25,6 +40,16 @@
 @implementation RoktNativeWidgetManager
 
 RCT_EXPORT_MODULE(RoktNativeWidget)
+
+RCT_CUSTOM_VIEW_PROPERTY(placeholderName, NSString, RoktEmbeddedView)
+{
+  [RoktPlaceholderRegistry registerView:view name:json ? [RCTConvert NSString:json] : nil];
+}
+
++ (BOOL)requiresMainQueueSetup
+{
+  return YES;
+}
 
 - (UIView *)view
 {

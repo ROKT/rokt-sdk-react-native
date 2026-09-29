@@ -15,7 +15,6 @@
 import React, {Component} from 'react';
 import {
   EmitterSubscription,
-  findNodeHandle,
   Linking,
   NativeEventEmitter,
   Platform,
@@ -48,9 +47,9 @@ const Colors = {
   black: '#000000',
 };
 
-const eventManagerEmitter = new NativeEventEmitter(RoktEventManager);
-
-type RoktEmbeddedViewRef = React.ComponentRef<typeof RoktEmbeddedView>;
+const eventManagerEmitter = new NativeEventEmitter(
+  RoktEventManager ?? undefined,
+);
 
 interface Props {}
 
@@ -67,9 +66,6 @@ interface State {
 }
 
 export default class App extends Component<Props, State> {
-  private placeholder1 = React.createRef<RoktEmbeddedViewRef>();
-  private placeholder2 = React.createRef<RoktEmbeddedViewRef>();
-
   private eventSubscription: EmitterSubscription;
   private linkingSubscription?: {remove: () => void};
 
@@ -190,19 +186,14 @@ export default class App extends Component<Props, State> {
 
     attributes.country = this.state.country;
 
-    // invalid attributes should be ignored by SDK
+    // Null is ignored; numbers and booleans are converted to strings.
     attributes.testNullValue = null;
     attributes.testNotStringValue = 13;
 
-    const placeholders: {[key: string]: number} = {};
-    const nodeHandle1 = findNodeHandle(this.placeholder1.current);
-    if (nodeHandle1 !== null) {
-      placeholders[this.state.targetElement1] = nodeHandle1;
-    }
-    const nodeHandle2 = findNodeHandle(this.placeholder2.current);
-    if (nodeHandle2 !== null) {
-      placeholders[this.state.targetElement2] = nodeHandle2;
-    }
+    const placeholders = [
+      this.state.targetElement1,
+      this.state.targetElement2,
+    ].filter(Boolean);
 
     if (isEmpty(this.state.viewName)) {
       this.showToast('View Name cannot be empty');
@@ -392,14 +383,8 @@ export default class App extends Component<Props, State> {
               </View>
             </View>
 
-            <RoktEmbeddedView
-              ref={this.placeholder1}
-              placeholderName={this.state.targetElement1}
-            />
-            <RoktEmbeddedView
-              ref={this.placeholder2}
-              placeholderName={this.state.targetElement2}
-            />
+            <RoktEmbeddedView placeholderName={this.state.targetElement1} />
+            <RoktEmbeddedView placeholderName={this.state.targetElement2} />
           </ScrollView>
           <Toast />
         </SafeAreaView>

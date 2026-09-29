@@ -38,6 +38,52 @@ if (!RNRoktWidget) {
   );
 }
 
+/** Names are preferred; numeric React tags remain supported for existing integrations. */
+export type RoktPlaceholders = string[] | Record<string, number | null>;
+export type RoktAttributeValue = string | number | boolean;
+
+function toNativePlaceholders(
+  placeholders: RoktPlaceholders,
+): Record<string, number> {
+  const result: Record<string, number> = {};
+  if (placeholders == null) return result;
+  const names = Array.isArray(placeholders)
+    ? placeholders
+    : Object.keys(placeholders);
+  for (const name of names) {
+    // iOS codegen drops null-valued dictionary entries; React tags are always positive.
+    Object.defineProperty(result, name, {
+      value: Array.isArray(placeholders) ? 0 : (placeholders[name] ?? 0),
+      enumerable: true,
+      configurable: true,
+      writable: true,
+    });
+  }
+  return result;
+}
+
+function toNativeAttributes(
+  attributes: Record<string, RoktAttributeValue>,
+): Record<string, string> {
+  const result: Record<string, string> = {};
+  for (const name of Object.keys(attributes ?? {})) {
+    const value = attributes[name];
+    if (
+      typeof value === "string" ||
+      typeof value === "number" ||
+      typeof value === "boolean"
+    ) {
+      Object.defineProperty(result, name, {
+        value: String(value),
+        enumerable: true,
+        configurable: true,
+        writable: true,
+      });
+    }
+  }
+  return result;
+}
+
 export abstract class Rokt {
   /**
    * Initialize the Rokt SDK. Call once, early (e.g. on app start), before selecting
@@ -64,24 +110,30 @@ export abstract class Rokt {
    *
    * @param identifier - The placement identifier configured in Rokt
    * @param attributes - Key-value attributes (e.g. email, country) for targeting
-   * @param placeholders - Map of embedded placeholder name to native node handle; pass `{}` for overlay-only
+   * @param placeholders - Embedded placeholder names (preferred) or legacy React tags. Names wait up to two seconds for mounting. Omit for overlay-only.
    * @param roktConfig - Optional configuration (color mode, caching)
    */
   public static selectPlacements(
     identifier: string,
-    attributes: Record<string, string>,
-    placeholders: Record<string, number | null>,
+    attributes: Record<string, RoktAttributeValue>,
+    placeholders: RoktPlaceholders = [],
     roktConfig?: IRoktConfig,
   ): void {
+    const nativeAttributes = toNativeAttributes(attributes);
+    const nativePlaceholders = toNativePlaceholders(placeholders);
     if (roktConfig) {
       RNRoktWidget.selectPlacementsWithConfig(
         identifier,
-        attributes,
-        placeholders,
+        nativeAttributes,
+        nativePlaceholders,
         roktConfig,
       );
     } else {
-      RNRoktWidget.selectPlacements(identifier, attributes, placeholders);
+      RNRoktWidget.selectPlacements(
+        identifier,
+        nativeAttributes,
+        nativePlaceholders,
+      );
     }
   }
 
@@ -97,17 +149,18 @@ export abstract class Rokt {
    */
   public static selectShoppableAds(
     identifier: string,
-    attributes: Record<string, string>,
+    attributes: Record<string, RoktAttributeValue>,
     roktConfig?: IRoktConfig,
   ): void {
+    const nativeAttributes = toNativeAttributes(attributes);
     if (roktConfig) {
       RNRoktWidget.selectShoppableAdsWithConfig(
         identifier,
-        attributes,
+        nativeAttributes,
         roktConfig,
       );
     } else {
-      RNRoktWidget.selectShoppableAds(identifier, attributes);
+      RNRoktWidget.selectShoppableAds(identifier, nativeAttributes);
     }
   }
 

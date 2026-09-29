@@ -19,6 +19,11 @@ runs:
       run: npm run lint
       working-directory: Rokt.Widget
 
+    - name: Run SDK regression tests
+      shell: bash
+      run: npm test
+      working-directory: Rokt.Widget
+
     - name: Build TypeScript
       shell: bash
       run: npm run build
