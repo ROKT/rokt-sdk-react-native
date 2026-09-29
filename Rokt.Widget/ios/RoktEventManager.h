@@ -12,9 +12,17 @@
 #import <React/RCTEventEmitter.h>
 #import <Rokt_Widget/Rokt_Widget-Swift.h>
 
+#ifdef RCT_NEW_ARCH_ENABLED
+#import <RNRoktWidgetSpec/RNRoktWidgetSpec.h>
+#endif
+
 NS_ASSUME_NONNULL_BEGIN
 
+#ifdef RCT_NEW_ARCH_ENABLED
+@interface RoktEventManager : RCTEventEmitter <NativeRoktEventManagerSpec>
+#else
 @interface RoktEventManager : RCTEventEmitter <RCTBridgeModule>
+#endif
 + (instancetype _Nonnull)allocWithZone:(NSZone * _Nullable)zone;
 - (void)onWidgetHeightChanges:(CGFloat)widgetHeight placement:(NSString * _Nonnull)selectedPlacement;
 - (void)onRoktEvents:(RoktEvent * _Nonnull)event identifier:(NSString * _Nullable)identifier;

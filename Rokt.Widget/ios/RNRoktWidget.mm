@@ -19,6 +19,7 @@
 #import <React/RCTUtils.h>
 #import <React/RCTViewManager.h>
 #import "RoktEventManager.h"
+#import "RoktPlaceholderRegistry.h"
 
 #ifdef RCT_NEW_ARCH_ENABLED
 #import "RoktNativeWidgetComponentView.h"
@@ -28,12 +29,35 @@
 @interface RNRoktWidget ()
 
 @property (nonatomic, nullable) RoktEventManager *eventManager;
+@property (atomic) BOOL invalidated;
+@property (nonatomic, strong) NSMutableSet<NSString *> *placeholderWaitKeys;
+@property (nonatomic, copy) NSString *placeholderWaitPrefix;
 
 - (void)selectPlacementsWithIdentifier:(NSString *)identifier attributes:(NSDictionary *)attributes placeholders:(NSDictionary *)placeholders config:(RoktConfig *)config;
 
 @end
 
 @implementation RNRoktWidget
+
+- (instancetype)init
+{
+    if ((self = [super init])) {
+        _placeholderWaitKeys = [NSMutableSet new];
+        _placeholderWaitPrefix = [NSUUID UUID].UUIDString;
+    }
+    return self;
+}
+
+- (void)invalidate
+{
+    self.invalidated = YES;
+    RCTExecuteOnMainQueue(^{
+        for (NSString *key in self.placeholderWaitKeys) {
+            [RoktPlaceholderRegistry cancelWaitForKey:key];
+        }
+        [self.placeholderWaitKeys removeAllObjects];
+    });
+}
 
 // Maps React tags to UIViews in both bridge and bridgeless modes.
 @synthesize viewRegistry_DEPRECATED = _viewRegistry_DEPRECATED;
@@ -93,20 +117,7 @@ RCT_EXPORT_METHOD(selectPlacements:(NSString *)identifier
     }
     NSMutableDictionary *finalAttributes = [self convertToMutableDictionaryOfStrings:attributes];
 
-    // Legacy UI-manager blocks are unreliable in bridgeless mode and become no-ops
-    // when React Native removes the legacy architecture. Resolve through the registry
-    // React Native injects into bridge modules instead.
-    RCTExecuteOnMainQueue(^{
-        NSMutableDictionary *nativePlaceholders = [self resolvePlaceholders:placeholders];
-
-        [self subscribeViewEvents:identifier];
-
-        [Rokt selectPlacementsWithIdentifier:identifier
-            attributes:finalAttributes
-            placements:nativePlaceholders
-            onEvent:nil
-        ];
-    });
+    [self selectPlacementsWithIdentifier:identifier attributes:finalAttributes placeholders:placeholders config:nil];
 }
 
 #ifdef RCT_NEW_ARCH_ENABLED
@@ -310,77 +321,69 @@ RCT_EXPORT_METHOD(purchaseFinalized:(NSString *)placementId
 }
 #endif
 
-// Main thread only: RCTViewRegistry reads the mounted native view hierarchy.
+// Main thread only. Positive tags preserve legacy lookup; names bypass React tag APIs.
 - (NSMutableDictionary *)resolvePlaceholders:(NSDictionary *)placeholders
 {
-    NSMutableDictionary *nativePlaceholders = [[NSMutableDictionary alloc]initWithCapacity:placeholders.count];
-
+    NSMutableDictionary *resolved = [NSMutableDictionary new];
+    for (NSString *name in placeholders) {
+        id value = placeholders[name];
+        UIView *view = nil;
+        if ([value isKindOfClass:[NSNumber class]] && [value doubleValue] > 0) {
+            view = [_viewRegistry_DEPRECATED viewForReactTag:value];
 #ifdef RCT_NEW_ARCH_ENABLED
-    Class componentViewClass = NSClassFromString(@"RoktNativeWidgetComponentView");
+            if ([view isKindOfClass:[RoktNativeWidgetComponentView class]]) {
+                view = ((RoktNativeWidgetComponentView *)view).roktEmbeddedView;
+            }
 #endif
-
-    for(id key in placeholders){
-        id reactTagValue = [placeholders objectForKey:key];
-        if (![reactTagValue isKindOfClass:[NSNumber class]]) {
-            RCTLogError(@"Invalid react tag for placeholder %@ (reactTag %@). Found: %@",
-                        key,
-                        reactTagValue,
-                        NSStringFromClass([reactTagValue class]));
-            continue;
         }
-
-        NSNumber *reactTag = (NSNumber *)reactTagValue;
-        UIView *view = [_viewRegistry_DEPRECATED viewForReactTag:reactTag];
-#ifdef RCT_NEW_ARCH_ENABLED
-        // In New Arch, we may get either:
-        // 1. RoktNativeWidgetComponentView (full Fabric mode - RN 0.81+)
-        // 2. RoktEmbeddedView (interop mode - RN 0.77 and similar)
-        if (componentViewClass && [view isKindOfClass:componentViewClass]) {
-            // Full Fabric mode - extract the embedded view from the wrapper
-            RoktNativeWidgetComponentView *wrapperView = (RoktNativeWidgetComponentView *)view;
-            nativePlaceholders[key] = wrapperView.roktEmbeddedView;
-        } else if ([view isKindOfClass:[RoktEmbeddedView class]]) {
-            // Interop mode - use the view directly
-            nativePlaceholders[key] = (RoktEmbeddedView *)view;
-        } else {
-            RCTLogError(@"Cannot find RoktNativeWidget for placeholder %@ (reactTag %@). Found: %@",
-                        key,
-                        reactTag,
-                        view ? NSStringFromClass([view class]) : @"nil");
-            continue;
-        }
-#else
         if (![view isKindOfClass:[RoktEmbeddedView class]]) {
-            RCTLogError(@"Cannot find RoktEmbeddedView for placeholder %@ (reactTag %@). Found: %@",
-                        key,
-                        reactTag,
-                        view ? NSStringFromClass([view class]) : @"nil");
-            continue;
+            view = [RoktPlaceholderRegistry viewForName:name];
         }
-
-        nativePlaceholders[key] = (RoktEmbeddedView *)view;
-#endif // RCT_NEW_ARCH_ENABLED
+        if ([view isKindOfClass:[RoktEmbeddedView class]]) {
+            resolved[name] = view;
+        } else {
+            RCTLogWarn(@"Cannot resolve placeholder %@ (reactTag %@)", name, value);
+        }
     }
-
-    return nativePlaceholders;
+    return resolved;
 }
 
 - (void)selectPlacementsWithIdentifier:(NSString *)identifier attributes:(NSDictionary *)attributes placeholders:(NSDictionary *)placeholders config:(RoktConfig *)config
 {
     RCTExecuteOnMainQueue(^{
-        NSMutableDictionary *nativePlaceholders = [self resolvePlaceholders:placeholders];
-
-        [self subscribeViewEvents:identifier];
-
-        [Rokt selectPlacementsWithIdentifier:identifier
-            attributes:attributes
-            placements:nativePlaceholders
-            config:config
-            placementOptions:nil
-            onEvent:^(RoktEvent * _Nonnull event) {
-                [self.eventManager onRoktEvents:event identifier:identifier];
+        if (self.invalidated) {
+            return;
+        }
+        NSMutableArray<NSString *> *names = [NSMutableArray new];
+        for (NSString *name in placeholders) {
+            id value = placeholders[name];
+            if (![value isKindOfClass:[NSNumber class]] || [value doubleValue] <= 0) {
+                [names addObject:name];
             }
-        ];
+        }
+        NSString *key = [self.placeholderWaitPrefix stringByAppendingFormat:@":%@", identifier];
+        [self.placeholderWaitKeys addObject:key];
+        __weak __typeof__(self) weakSelf = self;
+        [RoktPlaceholderRegistry waitForNames:names key:key timeout:2.0 completion:^{
+            __strong __typeof__(weakSelf) strongSelf = weakSelf;
+            if (!strongSelf || strongSelf.invalidated) {
+                return;
+            }
+            [strongSelf.placeholderWaitKeys removeObject:key];
+            NSMutableDictionary *nativePlaceholders = [strongSelf resolvePlaceholders:placeholders];
+            [strongSelf subscribeViewEvents:identifier];
+            if (config == nil) {
+                [Rokt selectPlacementsWithIdentifier:identifier attributes:attributes
+                    placements:nativePlaceholders onEvent:nil];
+            } else {
+                [Rokt selectPlacementsWithIdentifier:identifier attributes:attributes
+                    placements:nativePlaceholders config:config placementOptions:nil
+                    onEvent:nil];
+            }
+        } discarded:^{
+            // A newer request owns this key after replacement. Invalidation clears all keys.
+            RCTLogInfo(@"Pending selectPlacements dropped for %@", identifier);
+        }];
     });
 }
 

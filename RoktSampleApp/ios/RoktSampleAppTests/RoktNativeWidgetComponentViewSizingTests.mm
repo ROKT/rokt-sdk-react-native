@@ -1,11 +1,12 @@
 #import <XCTest/XCTest.h>
+#import "../../../Rokt.Widget/ios/RoktPlaceholderRegistry.h"
 #import "../../../Rokt.Widget/ios/RoktNativeWidgetComponentView.h"
 #if __has_include(<RoktContracts/RoktContracts-Swift.h>)
     #import <RoktContracts/RoktContracts-Swift.h>
 #endif
 
-// Deliberately not wrapped in #ifdef RCT_NEW_ARCH_ENABLED: the header is, so a build
-// without New Architecture fails here instead of silently compiling zero tests.
+// Fabric sizing is covered in New Architecture builds. Paper uses the SDK view directly.
+#ifdef RCT_NEW_ARCH_ENABLED
 
 /**
  * Guards how the Fabric wrapper sizes the `RoktEmbeddedView` it hosts.
@@ -74,4 +75,15 @@
     XCTAssertEqualWithAccuracy(_componentView.roktEmbeddedView.frame.size.width, 390, 0.5);
 }
 
+- (void)testRecyclingUnregistersRetainedEmbeddedView
+{
+    UIView *embedded = _componentView.roktEmbeddedView;
+    [RoktPlaceholderRegistry registerView:embedded name:@"TestLocation1"];
+    [_componentView prepareForRecycle];
+    XCTAssertNil([RoktPlaceholderRegistry viewForName:@"TestLocation1"]);
+    XCTAssertNotNil(embedded);
+}
+
 @end
+
+#endif // RCT_NEW_ARCH_ENABLED

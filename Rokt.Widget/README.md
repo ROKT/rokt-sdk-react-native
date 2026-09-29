@@ -65,18 +65,11 @@ Rokt.selectPlacements("RoktExperience", attributes, {});
 ### Embedded placement
 
 ```tsx
-// Create a ref for the embedded view
-const placeholderRef = React.createRef();
+// Mount the named placeholder in your screen:
+<RoktEmbeddedView placeholderName="RoktEmbedded1" />;
 
-// In your JSX:
-<RoktEmbeddedView ref={placeholderRef} placeholderName="RoktEmbedded1" />;
-
-// Execute with placeholders:
-const placeholders = {
-  RoktEmbedded1: findNodeHandle(placeholderRef.current),
-};
-
-Rokt.selectPlacements("RoktEmbeddedExperience", attributes, placeholders);
+// Select by name, including from the effect that renders the view:
+Rokt.selectPlacements("RoktEmbeddedExperience", attributes, ["RoktEmbedded1"]);
 ```
 
 > **Note:** `execute()` was removed in v5.0.0 — use `selectPlacements()` instead. See the
