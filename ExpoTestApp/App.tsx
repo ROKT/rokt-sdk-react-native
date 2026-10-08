@@ -5,9 +5,8 @@
  * It demonstrates SDK initialization and embedded view placement.
  */
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
-  findNodeHandle,
   Linking,
   Platform,
   SafeAreaView,
@@ -30,12 +29,11 @@ const DEFAULT_TAG_ID = "2754655826098840951";
 const DEFAULT_IDENTIFIER = "MSDKEmbeddedLayout";
 const DEFAULT_PLACEHOLDER = "Location1";
 
-const eventManagerEmitter = new NativeEventEmitter(RoktEventManager);
+const eventManagerEmitter = new NativeEventEmitter(
+  RoktEventManager ?? undefined,
+);
 
 export default function App() {
-  const placeholderRef =
-    useRef<React.ComponentRef<typeof RoktEmbeddedView>>(null);
-
   const [tagId, setTagId] = useState(DEFAULT_TAG_ID);
   const [identifier, setIdentifier] = useState(DEFAULT_IDENTIFIER);
   const [placeholderName, setPlaceholderName] = useState(DEFAULT_PLACEHOLDER);
@@ -130,11 +128,7 @@ export default function App() {
       country: "US",
     };
 
-    const placeholders: { [key: string]: number } = {};
-    const nodeHandle = findNodeHandle(placeholderRef.current);
-    if (nodeHandle !== null) {
-      placeholders[placeholderName] = nodeHandle;
-    }
+    const placeholders = [placeholderName];
 
     Rokt.selectPlacements(identifier, attributes, placeholders);
     setStatus("Selecting placements...");
@@ -271,10 +265,7 @@ export default function App() {
 
         <View style={styles.placeholderContainer}>
           <Text style={styles.label}>Embedded Placement Area:</Text>
-          <RoktEmbeddedView
-            ref={placeholderRef}
-            placeholderName={placeholderName}
-          />
+          <RoktEmbeddedView placeholderName={placeholderName} />
         </View>
       </ScrollView>
     </SafeAreaView>

@@ -3,6 +3,7 @@ package com.rokt.reactnativesdk
 import com.facebook.react.common.MapBuilder
 import com.facebook.react.uimanager.ThemedReactContext
 import com.facebook.react.uimanager.ViewGroupManager
+import com.facebook.react.uimanager.annotations.ReactProp
 import com.rokt.roktsdk.Widget
 
 /**
@@ -17,6 +18,11 @@ import com.rokt.roktsdk.Widget
  */
 class RoktEmbeddedViewManager : ViewGroupManager<Widget>() {
     private val impl = RoktEmbeddedViewManagerImpl()
+
+    override fun onDropViewInstance(view: Widget) {
+        RoktPlaceholderRegistry.unregister(view)
+        super.onDropViewInstance(view)
+    }
 
     override fun getName(): String = impl.getName()
 
@@ -34,6 +40,7 @@ class RoktEmbeddedViewManager : ViewGroupManager<Widget>() {
 
     override fun needsCustomLayoutForChildren(): Boolean = false
 
+    @ReactProp(name = "placeholderName")
     fun setPlaceholderName(view: Widget?, value: String?) {
         impl.setPlaceholderName(view, value)
     }
