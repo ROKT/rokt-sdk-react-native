@@ -16,7 +16,8 @@ runs:
       shell: bash
       run: |
         echo "Installing CocoaPods..."
-        sudo gem install cocoapods
+        # Keep in step with the version recorded in RoktSampleApp/ios/Podfile.lock
+        sudo gem install cocoapods -v 1.16.2
         pod --version
 
     - name: Install iOS dependencies

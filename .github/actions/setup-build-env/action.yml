@@ -16,5 +16,6 @@ runs:
         cd RoktSampleApp
         npm cache clean --force
         rm -f package-lock.json
-        npm install
+        # No lockfile here, so skip dependency lifecycle scripts
+        npm install --ignore-scripts
         echo "Build environment setup completed successfully"
