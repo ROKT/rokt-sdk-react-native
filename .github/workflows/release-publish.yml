@@ -166,9 +166,10 @@ jobs:
         shell: bash
         env:
           REF_NAME: ${{ github.ref_name }}
+          FINAL_VERSION: ${{ needs.setup-and-version.outputs.final_version }}
         run: |
           cd Rokt.Widget
-          TARBALL="rokt-react-native-sdk-${{ needs.setup-and-version.outputs.final_version }}.tgz"
+          TARBALL="rokt-react-native-sdk-${FINAL_VERSION}.tgz"
           if [ ! -f "$TARBALL" ]; then
             echo "Error: Expected tarball $TARBALL not found in Rokt.Widget directory"
             exit 1
@@ -190,7 +191,9 @@ jobs:
           changelog_file: CHANGELOG.md
           release_notes_file: ${{ needs.setup-and-version.outputs.final_version }}.md
       - name: Changelog
-        run: echo "${{ steps.extract-release-notes.outputs.release_notes }}"
+        env:
+          RELEASE_NOTES: ${{ steps.extract-release-notes.outputs.release_notes }}
+        run: printf '%s\n' "$RELEASE_NOTES"
       - name: Upload release notes
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a #v7.0.1
         with:
