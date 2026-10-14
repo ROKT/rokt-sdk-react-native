@@ -5,6 +5,12 @@ outputs:
   package-filename:
     description: The name of the created package tarball file
     value: ${{ steps.package-tarball.outputs.filename }}
+  artifact-name:
+    description: The name of the uploaded package artifact
+    value: ${{ steps.package-tarball.outputs.artifact-name }}
+  sha256:
+    description: SHA-256 digest of the package tarball
+    value: ${{ steps.package-tarball.outputs.sha256 }}
 
 runs:
   using: composite
@@ -36,6 +42,7 @@ runs:
         npm pack
         PACKAGE_FILE=$(ls *.tgz | head -1)
         echo "filename=$PACKAGE_FILE" >> $GITHUB_OUTPUT
+        echo "sha256=$(sha256sum "$PACKAGE_FILE" | cut -d' ' -f1)" >> $GITHUB_OUTPUT
 
         # Extract version from package.json for artifact naming
         VERSION=$(node -p "require('./package.json').version")
