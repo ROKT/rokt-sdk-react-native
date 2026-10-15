@@ -21,6 +21,8 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       package-filename: ${{ steps.build-and-package.outputs.package-filename }}
+      artifact-name: ${{ steps.build-and-package.outputs.artifact-name }}
+      package-sha256: ${{ steps.build-and-package.outputs.sha256 }}
     steps:
       - name: Checkout code
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -123,42 +125,63 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       final_version: ${{ steps.version-file.outputs.release-version }}
+      npm_tag: ${{ steps.version-file.outputs.npm-tag }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - name: Get current version
+      - name: Get current version and npm dist-tag
         id: version-file
+        env:
+          REF_NAME: ${{ github.ref_name }}
         run: |
           version_from_file=$(head -n 1 VERSION)
+          if [[ ! $version_from_file =~ ^([0-9]+)\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?$ ]]; then
+            echo "Error: VERSION is not a semantic version: $version_from_file"
+            exit 1
+          fi
+          major="${BASH_REMATCH[1]}"
+          prerelease="${BASH_REMATCH[2]}"
+          # main owns "latest"; maintenance/<major>.x publishes only its own major, under
+          # maintenance-<major>.x, since npm rejects range-like dist-tags such as "4.x".
+          if [ "$REF_NAME" = "main" ]; then
+            npm_tag="latest"
+          elif [ "$REF_NAME" = "maintenance/${major}.x" ]; then
+            npm_tag="maintenance-${major}.x"
+          else
+            echo "Error: $REF_NAME cannot publish version $version_from_file"
+            exit 1
+          fi
+          # A prerelease never moves a stable dist-tag: next on main, <tag>-next elsewhere.
+          if [ -n "$prerelease" ] && [ "$npm_tag" = "latest" ]; then
+            npm_tag="next"
+          elif [ -n "$prerelease" ]; then
+            npm_tag="${npm_tag}-next"
+          fi
           echo "release-version=$version_from_file" >> $GITHUB_OUTPUT
+          echo "npm-tag=$npm_tag" >> $GITHUB_OUTPUT
 
-  release-and-tag:
-    needs: [setup-and-version, build-package]
+  publish-npm:
+    needs: [build-package, setup-and-version]
     runs-on: ubuntu-latest
+    environment: npm-publish
     permissions:
-      contents: write # Create the GitHub release
+      contents: read
       id-token: write # Required for npm OIDC trusted publishing
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Download package artifact
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         with:
-          persist-credentials: false
-
-      - name: Download and flatten package artifacts
-        uses: ./.github/actions/download-and-flatten
-        with:
-          pattern: rokt-widget-v*-*
+          name: ${{ needs.build-package.outputs.artifact-name }}
           path: Rokt.Widget/
 
       - name: Setup Node.js
         uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: 20
-          cache: npm
-          cache-dependency-path: Rokt.Widget/package-lock.json
           registry-url: https://registry.npmjs.org
+          package-manager-cache: false
 
       # Trusted publishing requires npm 11.5.1+ (npm 12 requires Node 22+)
       - name: Update npm
@@ -167,25 +190,39 @@ jobs:
       - name: Publish to npm with OIDC
         shell: bash
         env:
-          REF_NAME: ${{ github.ref_name }}
           FINAL_VERSION: ${{ needs.setup-and-version.outputs.final_version }}
+          NPM_TAG: ${{ needs.setup-and-version.outputs.npm_tag }}
+          PACKAGE_SHA256: ${{ needs.build-package.outputs.package-sha256 }}
         run: |
           cd Rokt.Widget
           TARBALL="rokt-react-native-sdk-${FINAL_VERSION}.tgz"
-          if [ ! -f "$TARBALL" ]; then
-            echo "Error: Expected tarball $TARBALL not found in Rokt.Widget directory"
-            exit 1
-          fi
-          # Releases from main own the npm "latest" dist-tag. Maintenance branches
-          # publish under a branch-derived tag (e.g. maintenance/4.x -> 4.x) so a
-          # patch on an older major never moves "latest" away from the current line.
-          if [ "$REF_NAME" = "main" ]; then
-            NPM_TAG="latest"
-          else
-            NPM_TAG="${REF_NAME#maintenance/}"
-          fi
+          # Publish only the tarball build-package produced in this run.
+          echo "${PACKAGE_SHA256}  ${TARBALL}" | sha256sum --check --strict -
           echo "Publishing tarball: $TARBALL with dist-tag: $NPM_TAG"
           npm publish "$TARBALL" --access=public --tag="$NPM_TAG"
+
+  github-release:
+    needs: [build-package, setup-and-version, publish-npm]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # Create the GitHub release
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Download package artifact
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: ${{ needs.build-package.outputs.artifact-name }}
+          path: Rokt.Widget/
+
+      - name: Verify package tarball
+        env:
+          FINAL_VERSION: ${{ needs.setup-and-version.outputs.final_version }}
+          PACKAGE_SHA256: ${{ needs.build-package.outputs.package-sha256 }}
+        run: echo "${PACKAGE_SHA256}  Rokt.Widget/rokt-react-native-sdk-${FINAL_VERSION}.tgz" | sha256sum --check --strict -
 
       - uses: ffurrer2/extract-release-notes@273da39a24fb7db106a35526c8162815faffd31d # v3.1.0
         id: extract-release-notes
@@ -205,9 +242,10 @@ jobs:
       - name: Create Github release
         uses: ncipollo/release-action@339a81892b84b4eeb0f6e744e4574d79d0d9b8dd # v1.21.0
         with:
-          makeLatest: ${{ github.ref_name == 'main' }}
+          makeLatest: ${{ needs.setup-and-version.outputs.npm_tag == 'latest' }}
           tag: ${{ needs.setup-and-version.outputs.final_version }}
-          artifacts: Rokt.Widget/*.tgz
+          commit: ${{ github.sha }}
+          artifacts: Rokt.Widget/rokt-react-native-sdk-${{ needs.setup-and-version.outputs.final_version }}.tgz
           body: |
             ## Release notes:
             ${{ steps.extract-release-notes.outputs.release_notes }}
