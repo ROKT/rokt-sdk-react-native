@@ -87,6 +87,15 @@ function toNativeAttributes(
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === "object" && value !== null && !Array.isArray(value);
 
+// Earlier versions read numeric strings such as "60" on iOS, so keep accepting them.
+function toDuration(value: unknown): number | undefined {
+  const duration =
+    typeof value === "string" && value.trim() !== "" ? Number(value) : value;
+  return typeof duration === "number" && Number.isFinite(duration)
+    ? duration
+    : undefined;
+}
+
 // Untyped callers can pass any shape, and the generated New Architecture accessors
 // do not type-check in release builds, so only fields of the expected type reach
 // native code. Cache attributes get the same conversion as placement attributes.
@@ -103,9 +112,7 @@ function toNativeConfig(config: IRoktConfig): IRoktConfig {
   if (isRecord(cache)) {
     const { cacheDurationInSeconds, cacheAttributes } = cache;
     nativeConfig.cacheConfig = new CacheConfig(
-      typeof cacheDurationInSeconds === "number"
-        ? cacheDurationInSeconds
-        : undefined,
+      toDuration(cacheDurationInSeconds),
       isRecord(cacheAttributes)
         ? toNativeAttributes(
             cacheAttributes as Record<string, RoktAttributeValue>,

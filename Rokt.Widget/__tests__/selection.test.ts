@@ -120,6 +120,13 @@ test.each([
       },
     },
   ],
+  [
+    { cacheConfig: { cacheDurationInSeconds: "60" } },
+    { cacheConfig: { cacheDurationInSeconds: 60 } },
+  ],
+  [{ cacheConfig: { cacheDurationInSeconds: " " } }, { cacheConfig: {} }],
+  [{ cacheConfig: { cacheDurationInSeconds: "soon" } }, { cacheConfig: {} }],
+  [{ cacheConfig: { cacheDurationInSeconds: NaN } }, { cacheConfig: {} }],
   ["dark", {}],
 ])(
   "only correctly typed config fields reach native (%p)",
