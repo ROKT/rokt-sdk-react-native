@@ -18,6 +18,11 @@ class RoktEmbeddedViewManager :
 
     override fun getDelegate(): ViewManagerDelegate<Widget> = delegate
 
+    override fun onDropViewInstance(view: Widget) {
+        RoktPlaceholderRegistry.unregister(view)
+        super.onDropViewInstance(view)
+    }
+
     override fun getName(): String = impl.getName()
 
     override fun createViewInstance(reactContext: ThemedReactContext): Widget = impl.createViewInstance(reactContext)

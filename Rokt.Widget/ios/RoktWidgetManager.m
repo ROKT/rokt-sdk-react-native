@@ -16,8 +16,46 @@
 
 #import <Foundation/Foundation.h>
 #import <React/RCTViewManager.h>
+#import "RoktLegacyEmbeddedView.h"
+#import "RoktPlaceholderRegistry.h"
 @import RoktContracts;
 #import <Rokt_Widget/Rokt_Widget-Swift.h>
+
+@implementation RoktLegacyEmbeddedView
+
+- (instancetype)initWithFrame:(CGRect)frame
+{
+  if ((self = [super initWithFrame:frame])) {
+    _roktEmbeddedView = [[RoktEmbeddedView alloc] initWithFrame:self.bounds];
+    // As with Fabric, only the SDK changes the embedded view's measured height.
+    _roktEmbeddedView.autoresizingMask = UIViewAutoresizingFlexibleWidth;
+    [self addSubview:_roktEmbeddedView];
+  }
+  return self;
+}
+
+- (void)setPlaceholderName:(NSString *)name
+{
+  if (_placeholderName == name || [_placeholderName isEqualToString:name]) {
+    return;
+  }
+  _placeholderName = [name copy];
+  [RoktPlaceholderRegistry registerView:_roktEmbeddedView name:_placeholderName];
+}
+
+- (void)invalidate
+{
+  [RoktPlaceholderRegistry unregisterView:_roktEmbeddedView];
+  _placeholderName = nil;
+}
+
+- (void)dealloc
+{
+  // Interop teardown releases this React-owned wrapper without calling invalidate.
+  // Temporary detachment (e.g. Paper clipping) must keep its name registered.
+  [RoktPlaceholderRegistry unregisterView:_roktEmbeddedView];
+}
+@end
 
 @interface RoktNativeWidgetManager : RCTViewManager
 @end
@@ -26,9 +64,19 @@
 
 RCT_EXPORT_MODULE(RoktNativeWidget)
 
+RCT_CUSTOM_VIEW_PROPERTY(placeholderName, NSString, RoktLegacyEmbeddedView)
+{
+  view.placeholderName = json ? [RCTConvert NSString:json] : nil;
+}
+
++ (BOOL)requiresMainQueueSetup
+{
+  return YES;
+}
+
 - (UIView *)view
 {
-  return [[RoktEmbeddedView alloc] init];
+  return [[RoktLegacyEmbeddedView alloc] init];
 }
 
 @end

@@ -1,11 +1,6 @@
 package com.rokt.reactnativesdk
 
 import com.facebook.react.bridge.*
-import com.facebook.react.uimanager.UIManagerHelper
-import com.rokt.roktsdk.Rokt
-import com.rokt.roktsdk.Widget
-import java.lang.ref.WeakReference
-import java.util.concurrent.CountDownLatch
 
 /**
  * Copyright 2024 Rokt Pte Ltd
@@ -54,24 +49,12 @@ class RNRoktWidgetModule internal constructor(private val reactContext: ReactApp
         placeholders: ReadableMap?,
         roktConfig: ReadableMap? = null,
     ) {
-        if (identifier == null) {
-            impl.logDebug("Execute failed. Identifier cannot be null")
-            return
-        }
+        impl.selectPlacements(identifier, attributes, placeholders, roktConfig)
+    }
 
-        impl.startRoktEventListener(Rokt.events(identifier), reactContext.currentActivity, identifier)
-        val config = roktConfig?.let { impl.buildRoktConfig(it) }
-
-        // Process placeholders for Fabric
-        val placeholdersMap = processPlaceholders(placeholders)
-
-        // Select placements with the placeholders we gathered
-        Rokt.selectPlacements(
-            identifier = identifier,
-            attributes = impl.readableMapToMapOfStrings(attributes),
-            placeholders = placeholdersMap,
-            config = config,
-        )
+    override fun invalidate() {
+        impl.invalidate()
+        super.invalidate()
     }
 
     @ReactMethod
@@ -98,72 +81,6 @@ class RNRoktWidgetModule internal constructor(private val reactContext: ReactApp
             return
         }
         impl.selectShoppableAds(identifier, attributes, reactContext.currentActivity)
-    }
-
-    /**
-     * Process placeholders from ReadableMap to a map of Widgets for use with Rokt.
-     * This method handles the Fabric-specific view resolution.
-     */
-    private fun processPlaceholders(placeholders: ReadableMap?): Map<String, WeakReference<Widget>> {
-        val placeholdersMap = HashMap<String, WeakReference<Widget>>()
-
-        if (placeholders != null) {
-            // Use CountDownLatch to wait for UI thread processing
-            val latch = CountDownLatch(1)
-
-            // Run view resolution on UI thread
-            UiThreadUtil.runOnUiThread {
-                try {
-                    val iterator = placeholders.keySetIterator()
-                    while (iterator.hasNextKey()) {
-                        val key = iterator.nextKey()
-                        try {
-                            // Get the tag value as an integer
-                            val reactTag =
-                                when {
-                                    placeholders.getType(key) == ReadableType.Number ->
-                                        placeholders.getDouble(key).toInt()
-
-                                    else -> {
-                                        impl.logDebug("Invalid view tag for key: $key")
-                                        continue
-                                    }
-                                }
-
-                            // Get the UIManager for this specific tag
-                            val uiManager = UIManagerHelper.getUIManagerForReactTag(reactContext, reactTag)
-                            if (uiManager == null) {
-                                impl.logDebug("UIManager not found for tag: $reactTag")
-                                continue
-                            }
-
-                            // Resolve the view using the manager (now on UI thread)
-                            val view = uiManager.resolveView(reactTag)
-                            if (view is Widget) {
-                                placeholdersMap[key] = WeakReference(view)
-                                impl.logDebug("Successfully found Widget for key: $key with tag: $reactTag")
-                            } else {
-                                impl.logDebug("View with tag $reactTag is not a Widget: ${view?.javaClass?.simpleName}")
-                            }
-                        } catch (e: Exception) {
-                            impl.logDebug("Error processing placeholder for key $key: ${e.message}")
-                            e.printStackTrace()
-                        }
-                    }
-                } finally {
-                    latch.countDown()
-                }
-            }
-
-            try {
-                // Wait for UI thread to finish processing
-                latch.await()
-            } catch (e: InterruptedException) {
-                impl.logDebug("Interrupted while waiting for UI thread: ${e.message}")
-            }
-        }
-
-        return placeholdersMap
     }
 
     override fun getName(): String = impl.getName()

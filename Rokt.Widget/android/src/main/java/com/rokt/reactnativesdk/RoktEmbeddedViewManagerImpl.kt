@@ -43,7 +43,10 @@ class RoktEmbeddedViewManagerImpl {
     }
 
     fun setPlaceholderName(view: Widget?, value: String?) {
-        view?.tag = value
+        view?.let {
+            it.tag = value
+            RoktPlaceholderRegistry.register(it, value)
+        }
     }
 
     private fun setUpWidgetListeners(widget: Widget) {

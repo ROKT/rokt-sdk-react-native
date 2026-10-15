@@ -12,15 +12,14 @@
 import {
   StyleSheet,
   NativeEventEmitter,
-  NativeModules,
   HostComponent,
   ViewProps,
-  NativeModule,
+  EmitterSubscription,
 } from "react-native";
 import React, { Component } from "react";
 import RoktNativeWidgetNativeComponent from "./RoktNativeWidgetNativeComponent";
 
-const RoktEventManager = NativeModules.RoktEventManager as NativeModule;
+import { RoktEventManager } from "./rokt-event-manager";
 
 export interface HeightChangedEvent extends Event {
   height: string;
@@ -64,20 +63,28 @@ interface RoktNativeWidgetProps extends ViewProps {
 const WidgetNativeComponent =
   RoktNativeWidgetNativeComponent as HostComponent<RoktNativeWidgetProps>;
 
-const eventManagerEmitter = new NativeEventEmitter(RoktEventManager);
-
 export class RoktEmbeddedView extends Component<
   RoktEmbeddedViewProps,
   RoktEmbeddedViewState
 > {
-  subscription = eventManagerEmitter.addListener(
-    "WidgetHeightChanges",
-    (widgetChanges: WidgetChangeEvent) => {
-      if (widgetChanges.selectedPlacement == this.state.placeholderName) {
-        this.setState({ height: parseInt(widgetChanges.height) });
-      }
-    },
-  );
+  private subscription?: EmitterSubscription;
+
+  override componentDidMount() {
+    if (!RoktEventManager) {
+      console.warn(
+        "[ROKT] RoktEventManager is unavailable; embedded height events cannot be received.",
+      );
+      return;
+    }
+    this.subscription = new NativeEventEmitter(RoktEventManager).addListener(
+      "WidgetHeightChanges",
+      (event: WidgetChangeEvent) => {
+        if (event.selectedPlacement === this.props.placeholderName) {
+          this.setState({ height: Number(event.height) });
+        }
+      },
+    );
+  }
 
   constructor(props: RoktEmbeddedViewProps) {
     super(props);
@@ -96,7 +103,7 @@ export class RoktEmbeddedView extends Component<
     return (
       <WidgetNativeComponent
         style={[styles.widget, { height: this.state.height }]}
-        placeholderName={this.state.placeholderName}
+        placeholderName={this.props.placeholderName}
         onWidgetHeightChanged={(event) => {
           if (event.height) {
             this.setState({ height: parseInt(event.height) });
@@ -115,7 +122,7 @@ export class RoktEmbeddedView extends Component<
   }
 
   override componentWillUnmount() {
-    this.subscription.remove();
+    this.subscription?.remove();
   }
 }
 

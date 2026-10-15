@@ -109,19 +109,26 @@ Rokt.selectPlacements("RoktExperience", attributes, {});
 ### Select Placements (Embedded)
 
 ```js
-// Create a ref for the embedded view
-const placeholderRef = React.createRef();
+// Mount the named placeholder in your screen:
+<RoktEmbeddedView placeholderName="RoktEmbedded1" />;
 
-// In your JSX:
-<RoktEmbeddedView ref={placeholderRef} placeholderName="RoktEmbedded1" />;
-
-// Execute with placeholders:
-const placeholders = {
-  RoktEmbedded1: findNodeHandle(placeholderRef.current),
-};
-
-Rokt.selectPlacements("RoktEmbeddedExperience", attributes, placeholders);
+// Select by name, including from the effect that renders the view:
+Rokt.selectPlacements("RoktEmbeddedExperience", attributes, ["RoktEmbedded1"]);
 ```
+
+Named placeholders wait up to two seconds for their native views to mount. After
+that deadline, selection proceeds with available views and logs unresolved names.
+A newer selection with the same identifier replaces a pending selection. Omit
+placeholders, or pass `[]` or `{}`, for overlay-only requests.
+
+Existing `{ name: findNodeHandle(ref.current) }` maps remain supported. Positive
+tags retain their existing lookup behavior; `null` values resolve by name.
+For stacked screens, the newest attached view with a matching name is selected.
+Use distinct names across simultaneously mounted independent React Native hosts.
+
+Placement attributes accept strings, numbers, and booleans. Numbers and booleans
+are converted to strings consistently on both platforms; null and unsupported
+values are omitted. Font and cache attribute maps still require strings.
 
 ### Select Placements with Config
 
@@ -195,9 +202,10 @@ eventEmitter.addListener("RoktEvents", (event) => {
 Listen for SDK events via `NativeEventEmitter`:
 
 ```js
-import { NativeEventEmitter, NativeModules } from "react-native";
+import { NativeEventEmitter } from "react-native";
+import { RoktEventManager } from "@rokt/react-native-sdk";
 
-const eventEmitter = new NativeEventEmitter(NativeModules.RoktEventManager);
+const eventEmitter = new NativeEventEmitter(RoktEventManager ?? undefined);
 
 const subscription = eventEmitter.addListener("RoktEvents", (event) => {
   switch (event.event) {
@@ -273,19 +281,19 @@ Built-in PayPal device-pay authenticates in a web view and returns to the host a
 
 ## API Reference
 
-| Method                                                                 | Description                                                                                                                                            |
-| ---------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `Rokt.initialize(tagId, appVersion, fontFilesMap?)`                    | Initialize the SDK                                                                                                                                     |
-| `Rokt.selectPlacements(identifier, attributes, placeholders, config?)` | Display overlay or embedded placements                                                                                                                 |
-| `Rokt.selectShoppableAds(identifier, attributes, config?)`             | Display shoppable ads (iOS only)                                                                                                                       |
-| `Rokt.purchaseFinalized(placementId, catalogItemId, success)`          | Close the loop on a Rokt in-placement instant purchase (Shoppable Ads) — call from the `CartItemInstantPurchase` event handler, not on normal checkout |
-| `Rokt.setEnvironmentToStage()`                                         | Set staging environment                                                                                                                                |
-| `Rokt.setEnvironmentToProd()`                                          | Set production environment                                                                                                                             |
-| `Rokt.setSessionId(sessionId)`                                         | Set a custom session ID                                                                                                                                |
-| `Rokt.getSessionId()`                                                  | Get the current session ID                                                                                                                             |
-| `Rokt.setCustomBaseURL(url)`                                           | Route SDK requests through a CNAME                                                                                                                     |
-| `Rokt.setPaymentCallbackURLScheme(scheme)`                             | Register URL scheme for built-in PayPal redirects                                                                                                      |
-| `Rokt.handleURLCallback(url)`                                          | Forward deep-link URL to the SDK                                                                                                                       |
+| Method                                                                  | Description                                                                                                                                            |
+| ----------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `Rokt.initialize(tagId, appVersion, fontFilesMap?)`                     | Initialize the SDK                                                                                                                                     |
+| `Rokt.selectPlacements(identifier, attributes, placeholders?, config?)` | Display overlay or embedded placements                                                                                                                 |
+| `Rokt.selectShoppableAds(identifier, attributes, config?)`              | Display shoppable ads (iOS only)                                                                                                                       |
+| `Rokt.purchaseFinalized(placementId, catalogItemId, success)`           | Close the loop on a Rokt in-placement instant purchase (Shoppable Ads) — call from the `CartItemInstantPurchase` event handler, not on normal checkout |
+| `Rokt.setEnvironmentToStage()`                                          | Set staging environment                                                                                                                                |
+| `Rokt.setEnvironmentToProd()`                                           | Set production environment                                                                                                                             |
+| `Rokt.setSessionId(sessionId)`                                          | Set a custom session ID                                                                                                                                |
+| `Rokt.getSessionId()`                                                   | Get the current session ID                                                                                                                             |
+| `Rokt.setCustomBaseURL(url)`                                            | Route SDK requests through a CNAME                                                                                                                     |
+| `Rokt.setPaymentCallbackURLScheme(scheme)`                              | Register URL scheme for built-in PayPal redirects                                                                                                      |
+| `Rokt.handleURLCallback(url)`                                           | Forward deep-link URL to the SDK                                                                                                                       |
 
 ## Minimum Requirements
 

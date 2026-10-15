@@ -35,12 +35,12 @@ export interface Spec extends TurboModule {
   selectPlacements(
     identifier: string,
     attributes: { [key: string]: string },
-    placeholders: { [key: string]: number | null },
+    placeholders: { [key: string]: number },
   ): void;
   selectPlacementsWithConfig(
     identifier: string,
     attributes: { [key: string]: string },
-    placeholders: { [key: string]: number | null },
+    placeholders: { [key: string]: number },
     roktConfig: RoktConfigType,
   ): void;
 

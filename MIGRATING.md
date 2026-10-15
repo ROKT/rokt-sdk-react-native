@@ -191,3 +191,33 @@ Then run `npx expo prebuild --clean` to regenerate native projects.
 | iOS          | 10.0    | 15.0    |
 | Android      | 21      | 21      |
 | React Native | 0.55.4+ | 0.71.0+ |
+
+## Selecting embedded placements by name
+
+Existing numeric placeholder maps continue to work. New integrations can remove
+view refs and `findNodeHandle`:
+
+```tsx
+<RoktEmbeddedView placeholderName="Location1" />;
+Rokt.selectPlacements("MSDKEmbeddedLayout", attributes, ["Location1"]);
+```
+
+The SDK waits up to two seconds for requested names to register, then proceeds
+with the available views. This supports selection from the same effect that
+renders a placeholder. A newer call for the same identifier replaces a pending
+call. An old map entry with `null` now resolves by its key, which must match a
+view's `placeholderName`. It has the same two-second wait if no matching view
+mounts. Positive tags keep legacy lookup without a mount wait. Overlay-only
+calls can omit placeholders.
+
+Import `RoktEventManager` from `@rokt/react-native-sdk` when constructing a
+`NativeEventEmitter`. The exported manager supports iOS bridgeless hosts with
+legacy module interop disabled. Event names and payloads remain unchanged.
+
+Placement attributes now accept `string | number | boolean`. Both platforms
+receive numbers and booleans as strings, including `0` and `false`. Null and
+unsupported values are ignored; font and cache attribute types are unchanged.
+
+Names are global across React Native hosts. Use distinct names when independent
+hosts mount placeholders simultaneously. Within a navigation stack, the newest
+attached matching view takes precedence.

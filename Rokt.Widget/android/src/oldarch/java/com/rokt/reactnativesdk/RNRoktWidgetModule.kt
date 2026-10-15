@@ -1,11 +1,6 @@
 package com.rokt.reactnativesdk
 
 import com.facebook.react.bridge.*
-import com.facebook.react.uimanager.NativeViewHierarchyManager
-import com.facebook.react.uimanager.UIManagerModule
-import com.rokt.roktsdk.Rokt
-import com.rokt.roktsdk.Widget
-import java.lang.ref.WeakReference
 
 /**
  * Copyright 2024 Rokt Pte Ltd
@@ -54,23 +49,12 @@ class RNRoktWidgetModule internal constructor(private val reactContext: ReactApp
         placeholders: ReadableMap?,
         roktConfig: ReadableMap? = null,
     ) {
-        if (identifier == null) {
-            impl.logDebug("Execute failed. Identifier cannot be null")
-            return
-        }
+        impl.selectPlacements(identifier, attributes, placeholders, roktConfig)
+    }
 
-        val uiManager = reactContext.getNativeModule(UIManagerModule::class.java)
-        impl.startRoktEventListener(Rokt.events(identifier), reactContext.currentActivity, identifier)
-
-        val config = roktConfig?.let { impl.buildRoktConfig(it) }
-        uiManager?.addUIBlock { nativeViewHierarchyManager ->
-            Rokt.selectPlacements(
-                identifier = identifier,
-                attributes = impl.readableMapToMapOfStrings(attributes),
-                placeholders = safeUnwrapPlaceholders(placeholders, nativeViewHierarchyManager),
-                config = config,
-            )
-        }
+    override fun invalidate() {
+        impl.invalidate()
+        super.invalidate()
     }
 
     @ReactMethod
@@ -133,25 +117,5 @@ class RNRoktWidgetModule internal constructor(private val reactContext: ReactApp
     @ReactMethod
     fun handleURLCallback(url: String) {
         impl.handleURLCallback(url)
-    }
-
-    private fun safeUnwrapPlaceholders(
-        placeholders: ReadableMap?,
-        nativeViewHierarchyManager: NativeViewHierarchyManager,
-    ): Map<String, WeakReference<Widget>> {
-        val placeholderMap: MutableMap<String, WeakReference<Widget>> = HashMap()
-
-        if (placeholders != null) {
-            placeholderMap.putAll(
-                placeholders
-                    .toHashMap()
-                    .filterValues { value -> value is Double }
-                    .mapValues { pair -> (pair.value as Double).toInt() }
-                    .mapValues { pair -> nativeViewHierarchyManager.resolveView(pair.value) as? Widget }
-                    .filterValues { value -> value != null }
-                    .mapValues { WeakReference(it.value as Widget) },
-            )
-        }
-        return placeholderMap
     }
 }
