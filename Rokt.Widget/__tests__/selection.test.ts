@@ -94,9 +94,54 @@ test.each([
 ])("explicit config is forwarded unchanged (%p)", (config) => {
   Rokt.selectPlacements("embedded", {}, ["Location1"], config);
   Rokt.selectShoppableAds("shop", {}, config);
-  expect(native.selectPlacementsWithConfig.mock.calls[0][3]).toBe(config);
-  expect(native.selectShoppableAdsWithConfig.mock.calls[0][2]).toBe(config);
+  expect(native.selectPlacementsWithConfig.mock.calls[0][3]).toEqual(config);
+  expect(native.selectShoppableAdsWithConfig.mock.calls[0][2]).toEqual(config);
 });
+
+test.each([
+  [{ colorMode: 1, cacheConfig: "60" }, {}],
+  [{ colorMode: "dark", cacheConfig: null }, { colorMode: "dark" }],
+  [{ cacheConfig: [] }, {}],
+  [
+    { cacheConfig: { cacheDurationInSeconds: {}, cacheAttributes: "email" } },
+    { cacheConfig: {} },
+  ],
+  [
+    {
+      cacheConfig: {
+        cacheDurationInSeconds: 30,
+        cacheAttributes: { email: "a@example.com", age: 30, missing: null },
+      },
+    },
+    {
+      cacheConfig: {
+        cacheDurationInSeconds: 30,
+        cacheAttributes: { email: "a@example.com", age: "30" },
+      },
+    },
+  ],
+  [
+    { cacheConfig: { cacheDurationInSeconds: "60" } },
+    { cacheConfig: { cacheDurationInSeconds: 60 } },
+  ],
+  [{ cacheConfig: { cacheDurationInSeconds: " " } }, { cacheConfig: {} }],
+  [{ cacheConfig: { cacheDurationInSeconds: "soon" } }, { cacheConfig: {} }],
+  [{ cacheConfig: { cacheDurationInSeconds: NaN } }, { cacheConfig: {} }],
+  ["dark", {}],
+])(
+  "only correctly typed config fields reach native (%p)",
+  (config, expected) => {
+    // JS integrations may supply values outside the public TypeScript contract.
+    Rokt.selectPlacements("embedded", {}, ["Location1"], config as never);
+    Rokt.selectShoppableAds("shop", {}, config as never);
+    expect(native.selectPlacementsWithConfig.mock.calls[0][3]).toEqual(
+      expected,
+    );
+    expect(native.selectShoppableAdsWithConfig.mock.calls[0][2]).toEqual(
+      expected,
+    );
+  },
+);
 
 test("untyped null dictionaries retain overlay compatibility", () => {
   Rokt.selectPlacements("overlay", null as never, null as never);

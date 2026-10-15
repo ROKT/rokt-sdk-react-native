@@ -224,6 +224,12 @@ RCT_EXPORT_METHOD(selectShoppableAdsWithConfig:(NSString *)identifier
 
 }
 
+// The SDK expects [String: String]; JS can send any shape, and a non-string value traps.
+- (NSDictionary *)dictionaryOfStringsOrNil:(id)value
+{
+    return [value isKindOfClass:[NSDictionary class]] ? [self convertToMutableDictionaryOfStrings:value] : nil;
+}
+
 - (RoktColorMode)stringToColorMode:(NSString*)colorString
 {
     if ([colorString isEqualToString:@"light"]) {
@@ -411,7 +417,7 @@ RCT_EXPORT_METHOD(purchaseFinalized:(NSString *)placementId
     std::optional<JS::NativeRoktWidget::CacheConfig> cacheConfigSpec = roktConfigSpec.cacheConfig();
     if (cacheConfigSpec.has_value()) {
         auto cacheConfigValue = cacheConfigSpec.value();
-        NSDictionary *cacheAttributes = (NSDictionary *)cacheConfigValue.cacheAttributes();
+        NSDictionary *cacheAttributes = [self dictionaryOfStringsOrNil:cacheConfigValue.cacheAttributes()];
         std::optional<double> duration = cacheConfigValue.cacheDurationInSeconds();
 
         NSTimeInterval cacheDurationInSeconds = duration.has_value() ? duration.value() : RoktCacheConfig.maxCacheDuration;
@@ -426,18 +432,18 @@ RCT_EXPORT_METHOD(purchaseFinalized:(NSString *)placementId
 - (RoktConfig*)buildRoktConfigFromDict:(NSDictionary *)roktConfigDict
 {
     RoktConfigBuilder *builder = [[RoktConfigBuilder alloc] init];
-    NSString *colorMode = roktConfigDict[@"colorMode"];
-    if (colorMode != nil) {
+    id colorMode = roktConfigDict[@"colorMode"];
+    if ([colorMode isKindOfClass:[NSString class]]) {
         RoktColorMode value = [self stringToColorMode:colorMode];
         [builder colorMode:value];
     }
 
     NSDictionary *cacheConfigDict = roktConfigDict[@"cacheConfig"];
-    if (cacheConfigDict != nil) {
-        NSDictionary *cacheAttributes = cacheConfigDict[@"cacheAttributes"];
-        NSNumber *duration = cacheConfigDict[@"cacheDurationInSeconds"];
+    if ([cacheConfigDict isKindOfClass:[NSDictionary class]]) {
+        NSDictionary *cacheAttributes = [self dictionaryOfStringsOrNil:cacheConfigDict[@"cacheAttributes"]];
+        id duration = cacheConfigDict[@"cacheDurationInSeconds"];
 
-        NSTimeInterval cacheDurationInSeconds = duration != nil ? [duration doubleValue] : RoktCacheConfig.maxCacheDuration;
+        NSTimeInterval cacheDurationInSeconds = [duration isKindOfClass:[NSNumber class]] ? [duration doubleValue] : RoktCacheConfig.maxCacheDuration;
 
         RoktCacheConfig *cacheConfig = [[RoktCacheConfig alloc] initWithCacheDuration:cacheDurationInSeconds cacheAttributes:cacheAttributes];
         [builder cacheConfig:(cacheConfig)];

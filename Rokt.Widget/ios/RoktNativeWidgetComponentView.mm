@@ -41,15 +41,21 @@ using namespace facebook::react;
 - (instancetype)initWithFrame:(CGRect)frame
 {
   if (self = [super initWithFrame:frame]) {
-    _roktEmbeddedView = [[RoktEmbeddedView alloc] initWithFrame:self.bounds];
-    // Width only: the Rokt SDK owns the height (updateEmbeddedSize sets it before JS
-    // resizes this view), so flexible height would re-apply that delta once React Native
-    // caught up, doubling the embedded view and centring the layout below blank space.
-    _roktEmbeddedView.autoresizingMask = UIViewAutoresizingFlexibleWidth;
-    [self addSubview:_roktEmbeddedView];
+    [self installEmbeddedView];
     NSLog(@"[ROKT] iOS Fabric: RoktFabricWrapperView initialized");
   }
   return self;
+}
+
+- (void)installEmbeddedView
+{
+  // Zero height: a recycled wrapper still has the previous mount's size.
+  _roktEmbeddedView = [[RoktEmbeddedView alloc] initWithFrame:CGRectMake(0, 0, CGRectGetWidth(self.bounds), 0)];
+  // Width only: the Rokt SDK owns the height (updateEmbeddedSize sets it before JS
+  // resizes this view), so flexible height would re-apply that delta once React Native
+  // caught up, doubling the embedded view and centring the layout below blank space.
+  _roktEmbeddedView.autoresizingMask = UIViewAutoresizingFlexibleWidth;
+  [self addSubview:_roktEmbeddedView];
 }
 
 - (void)updateProps:(Props::Shared const &)props oldProps:(Props::Shared const &)oldProps
@@ -67,6 +73,10 @@ using namespace facebook::react;
 {
   [RoktPlaceholderRegistry unregisterView:_roktEmbeddedView];
   _placeholderName = nil;
+  // Fabric reuses this wrapper for later mounts; the next one must not inherit the
+  // placement the SDK rendered into the current embedded view.
+  [_roktEmbeddedView removeFromSuperview];
+  [self installEmbeddedView];
   [super prepareForRecycle];
 }
 
