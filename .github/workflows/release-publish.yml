@@ -142,6 +142,7 @@ jobs:
             exit 1
           fi
           major="${BASH_REMATCH[1]}"
+          prerelease="${BASH_REMATCH[2]}"
           # main owns "latest"; maintenance/<major>.x publishes only its own major, under
           # maintenance-<major>.x, since npm rejects range-like dist-tags such as "4.x".
           if [ "$REF_NAME" = "main" ]; then
@@ -151,6 +152,10 @@ jobs:
           else
             echo "Error: $REF_NAME cannot publish version $version_from_file"
             exit 1
+          fi
+          # A prerelease never moves a stable dist-tag.
+          if [ -n "$prerelease" ]; then
+            npm_tag="next"
           fi
           echo "release-version=$version_from_file" >> $GITHUB_OUTPUT
           echo "npm-tag=$npm_tag" >> $GITHUB_OUTPUT
@@ -235,7 +240,7 @@ jobs:
       - name: Create Github release
         uses: ncipollo/release-action@339a81892b84b4eeb0f6e744e4574d79d0d9b8dd # v1.21.0
         with:
-          makeLatest: ${{ github.ref_name == 'main' }}
+          makeLatest: ${{ needs.setup-and-version.outputs.npm_tag == 'latest' }}
           tag: ${{ needs.setup-and-version.outputs.final_version }}
           commit: ${{ github.sha }}
           artifacts: Rokt.Widget/rokt-react-native-sdk-${{ needs.setup-and-version.outputs.final_version }}.tgz
