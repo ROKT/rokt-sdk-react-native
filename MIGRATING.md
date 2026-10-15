@@ -205,8 +205,10 @@ Rokt.selectPlacements("MSDKEmbeddedLayout", attributes, ["Location1"]);
 The SDK waits up to two seconds for requested names to register, then proceeds
 with the available views. This supports selection from the same effect that
 renders a placeholder. A newer call for the same identifier replaces a pending
-call. An old map entry with `null` now resolves by its name; positive tags keep
-legacy behavior. Overlay-only calls can omit placeholders.
+call. An old map entry with `null` now resolves by its key, which must match a
+view's `placeholderName`. It has the same two-second wait if no matching view
+mounts. Positive tags keep legacy lookup without a mount wait. Overlay-only
+calls can omit placeholders.
 
 Import `RoktEventManager` from `@rokt/react-native-sdk` when constructing a
 `NativeEventEmitter`. The exported manager supports iOS bridgeless hosts with

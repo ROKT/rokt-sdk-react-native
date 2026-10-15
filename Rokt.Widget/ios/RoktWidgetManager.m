@@ -16,23 +16,56 @@
 
 #import <Foundation/Foundation.h>
 #import <React/RCTViewManager.h>
-#import <React/RCTInvalidating.h>
+#import "RoktLegacyEmbeddedView.h"
 #import "RoktPlaceholderRegistry.h"
 @import RoktContracts;
 #import <Rokt_Widget/Rokt_Widget-Swift.h>
 
-#ifndef RCT_NEW_ARCH_ENABLED
-// RoktEmbeddedView is closed to Objective-C subclassing. Paper invalidates removed
-// views conforming to RCTInvalidating, even if an in-flight SDK request retains them.
-@interface RoktEmbeddedView (RNPlaceholderRegistration) <RCTInvalidating>
-@end
-@implementation RoktEmbeddedView (RNPlaceholderRegistration)
+@implementation RoktLegacyEmbeddedView
+
+- (instancetype)initWithFrame:(CGRect)frame
+{
+  if ((self = [super initWithFrame:frame])) {
+    _roktEmbeddedView = [[RoktEmbeddedView alloc] initWithFrame:self.bounds];
+    // As with Fabric, only the SDK changes the embedded view's measured height.
+    _roktEmbeddedView.autoresizingMask = UIViewAutoresizingFlexibleWidth;
+    [self addSubview:_roktEmbeddedView];
+  }
+  return self;
+}
+
+- (void)setPlaceholderName:(NSString *)name
+{
+  if (_placeholderName == name || [_placeholderName isEqualToString:name]) {
+    return;
+  }
+  _placeholderName = [name copy];
+  [RoktPlaceholderRegistry registerView:_roktEmbeddedView name:_placeholderName];
+}
+
+- (void)didMoveToSuperview
+{
+  [super didMoveToSuperview];
+  // Fabric's legacy-view interop adapter removes its view without calling invalidate.
+  // Reattachment restores registration for a still-mounted screen.
+  if (self.superview != nil) {
+    [RoktPlaceholderRegistry registerView:_roktEmbeddedView name:_placeholderName];
+  } else {
+    [RoktPlaceholderRegistry unregisterView:_roktEmbeddedView];
+  }
+}
+
 - (void)invalidate
 {
-  [RoktPlaceholderRegistry unregisterView:self];
+  [RoktPlaceholderRegistry unregisterView:_roktEmbeddedView];
+  _placeholderName = nil;
+}
+
+- (void)dealloc
+{
+  [RoktPlaceholderRegistry unregisterView:_roktEmbeddedView];
 }
 @end
-#endif
 
 @interface RoktNativeWidgetManager : RCTViewManager
 @end
@@ -41,9 +74,9 @@
 
 RCT_EXPORT_MODULE(RoktNativeWidget)
 
-RCT_CUSTOM_VIEW_PROPERTY(placeholderName, NSString, RoktEmbeddedView)
+RCT_CUSTOM_VIEW_PROPERTY(placeholderName, NSString, RoktLegacyEmbeddedView)
 {
-  [RoktPlaceholderRegistry registerView:view name:json ? [RCTConvert NSString:json] : nil];
+  view.placeholderName = json ? [RCTConvert NSString:json] : nil;
 }
 
 + (BOOL)requiresMainQueueSetup
@@ -53,7 +86,7 @@ RCT_CUSTOM_VIEW_PROPERTY(placeholderName, NSString, RoktEmbeddedView)
 
 - (UIView *)view
 {
-  return [[RoktEmbeddedView alloc] init];
+  return [[RoktLegacyEmbeddedView alloc] init];
 }
 
 @end

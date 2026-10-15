@@ -5,7 +5,7 @@
     #import <RoktContracts/RoktContracts-Swift.h>
 #endif
 
-// Fabric sizing is covered in New Architecture builds. Paper uses the SDK view directly.
+// Fabric sizing is covered in New Architecture builds; legacy wrapper sizing is tested separately.
 #ifdef RCT_NEW_ARCH_ENABLED
 
 /**

@@ -5,6 +5,7 @@
 #import <Rokt_Widget/Rokt_Widget-Swift.h>
 #import <objc/runtime.h>
 #import "../../../Rokt.Widget/ios/RoktPlaceholderRegistry.h"
+#import "../../../Rokt.Widget/ios/RoktLegacyEmbeddedView.h"
 #import "../../../Rokt.Widget/ios/RNRoktWidget.h"
 
 // Implemented in RNRoktWidget.mm.
@@ -234,14 +235,83 @@
 
 - (void)testPaperRemovalUnregistersRetainedView
 {
-    // React Native sets its architecture flag on C++ compilation, not this Objective-C target.
-    XCTSkipIf(NSClassFromString(@"RoktNativeWidgetComponentView") != Nil,
-              @"Paper lifecycle is verified in the Legacy Architecture build");
-    RoktEmbeddedView *view = [RoktEmbeddedView new];
-    [RoktPlaceholderRegistry registerView:view name:@"TestLocation1"];
-    XCTAssertTrue([view conformsToProtocol:@protocol(RCTInvalidating)]);
-    [(id<RCTInvalidating>)view invalidate];
+    RoktLegacyEmbeddedView *wrapper = [RoktLegacyEmbeddedView new];
+    wrapper.placeholderName = @"TestLocation1";
+    RoktEmbeddedView *retained = wrapper.roktEmbeddedView;
+    [wrapper invalidate];
     XCTAssertNil([RoktPlaceholderRegistry viewForName:@"TestLocation1"]);
+    XCTAssertNotNil(retained);
+}
+
+- (void)testInteropRemovalWaitsForReplacementEvenWhenSDKRetainsView
+{
+    UIView *parent = [UIView new];
+    RoktLegacyEmbeddedView *wrapper = [RoktLegacyEmbeddedView new];
+    wrapper.placeholderName = @"TestLocation1";
+    [parent addSubview:wrapper];
+    RoktEmbeddedView *retained = wrapper.roktEmbeddedView;
+    // Mirrors RCTLegacyViewManagerInteropCoordinatorAdapter: no invalidate call.
+    [wrapper removeFromSuperview];
+    XCTAssertNil([RoktPlaceholderRegistry viewForName:@"TestLocation1"]);
+
+    RoktLegacyEmbeddedView *replacement = [RoktLegacyEmbeddedView new];
+    XCTestExpectation *ready = [self expectationWithDescription:@"replacement mounted"];
+    [RoktPlaceholderRegistry waitForNames:@[@"TestLocation1"] key:@"page" timeout:1 completion:^{
+        XCTAssertEqual([RoktPlaceholderRegistry viewForName:@"TestLocation1"], replacement.roktEmbeddedView);
+        [ready fulfill];
+    } discarded:^{ XCTFail(@"Unexpected discard"); }];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        replacement.placeholderName = @"TestLocation1";
+        [parent addSubview:replacement];
+    });
+    [self waitForExpectations:@[ready] timeout:1];
+    [replacement invalidate];
+    XCTAssertNotNil(retained);
+}
+
+- (void)testLegacyWrapperRestoresEarlierViewAndSupportsReattachment
+{
+    UIView *parent = [UIView new];
+    RoktLegacyEmbeddedView *lower = [RoktLegacyEmbeddedView new];
+    RoktLegacyEmbeddedView *upper = [RoktLegacyEmbeddedView new];
+    lower.placeholderName = upper.placeholderName = @"TestLocation1";
+    [parent addSubview:lower];
+    [parent addSubview:upper];
+    XCTAssertEqual([RoktPlaceholderRegistry viewForName:@"TestLocation1"], upper.roktEmbeddedView);
+    [upper removeFromSuperview];
+    XCTAssertEqual([RoktPlaceholderRegistry viewForName:@"TestLocation1"], lower.roktEmbeddedView);
+    [parent addSubview:upper];
+    XCTAssertEqual([RoktPlaceholderRegistry viewForName:@"TestLocation1"], upper.roktEmbeddedView);
+    [lower invalidate];
+    [upper invalidate];
+}
+
+- (void)testDiscardingUnattachedWrapperUnregistersRetainedSDKView
+{
+    RoktEmbeddedView *retained;
+    @autoreleasepool {
+        RoktLegacyEmbeddedView *wrapper = [RoktLegacyEmbeddedView new];
+        wrapper.placeholderName = @"TestLocation1";
+        retained = wrapper.roktEmbeddedView;
+    }
+    XCTAssertNil([RoktPlaceholderRegistry viewForName:@"TestLocation1"]);
+    XCTAssertNotNil(retained);
+}
+
+- (void)testLegacyWrapperResolvesNumericTagsAndPreservesSDKHeight
+{
+    RoktLegacyEmbeddedView *wrapper = [[RoktLegacyEmbeddedView alloc] initWithFrame:CGRectMake(0, 0, 330, 0)];
+    _views[@101] = wrapper;
+    XCTAssertEqual([_rokt resolvePlaceholders:@{@"TestLocation1": @101}][@"TestLocation1"], wrapper.roktEmbeddedView);
+    wrapper.roktEmbeddedView.frame = CGRectMake(0, 0, 330, 415);
+    wrapper.frame = CGRectMake(0, 0, 390, 415);
+    [wrapper layoutIfNeeded];
+    XCTAssertEqualWithAccuracy(wrapper.roktEmbeddedView.frame.size.height, 415, 0.5);
+    XCTAssertEqualWithAccuracy(wrapper.roktEmbeddedView.frame.size.width, 390, 0.5);
+    wrapper.roktEmbeddedView.frame = CGRectMake(0, 0, 390, 533);
+    wrapper.frame = CGRectMake(0, 0, 390, 533);
+    [wrapper layoutIfNeeded];
+    XCTAssertEqualWithAccuracy(wrapper.roktEmbeddedView.frame.size.height, 533, 0.5);
 }
 
 - (void)testInvalidatingModuleCancelsQueuedSelection

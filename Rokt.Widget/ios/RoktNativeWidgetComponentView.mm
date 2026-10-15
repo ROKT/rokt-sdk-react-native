@@ -56,7 +56,7 @@ using namespace facebook::react;
 {
   const auto &newProps = *std::static_pointer_cast<const RoktNativeWidgetProps>(props);
   NSString *name = RCTNSStringFromStringNilIfEmpty(newProps.placeholderName);
-  if (![name isEqualToString:_placeholderName]) {
+  if (name != _placeholderName && ![name isEqualToString:_placeholderName]) {
     _placeholderName = name;
     [RoktPlaceholderRegistry registerView:_roktEmbeddedView name:name];
   }

@@ -20,6 +20,7 @@
 #import <React/RCTViewManager.h>
 #import "RoktEventManager.h"
 #import "RoktPlaceholderRegistry.h"
+#import "RoktLegacyEmbeddedView.h"
 
 #ifdef RCT_NEW_ARCH_ENABLED
 #import "RoktNativeWidgetComponentView.h"
@@ -330,6 +331,9 @@ RCT_EXPORT_METHOD(purchaseFinalized:(NSString *)placementId
         UIView *view = nil;
         if ([value isKindOfClass:[NSNumber class]] && [value doubleValue] > 0) {
             view = [_viewRegistry_DEPRECATED viewForReactTag:value];
+            if ([view isKindOfClass:[RoktLegacyEmbeddedView class]]) {
+                view = ((RoktLegacyEmbeddedView *)view).roktEmbeddedView;
+            }
 #ifdef RCT_NEW_ARCH_ENABLED
             if ([view isKindOfClass:[RoktNativeWidgetComponentView class]]) {
                 view = ((RoktNativeWidgetComponentView *)view).roktEmbeddedView;
