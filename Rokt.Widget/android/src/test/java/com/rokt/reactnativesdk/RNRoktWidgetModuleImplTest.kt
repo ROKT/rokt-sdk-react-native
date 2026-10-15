@@ -1,9 +1,12 @@
 package com.rokt.reactnativesdk
 
+import com.facebook.react.bridge.JavaOnlyArray
+import com.facebook.react.bridge.JavaOnlyMap
 import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.bridge.UiThreadUtil
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Test
 import org.mockito.ArgumentMatchers.any
@@ -93,5 +96,35 @@ class RNRoktWidgetModuleImplTest {
             drain()
             assertEquals(0, runs)
         }
+    }
+
+    @Test
+    fun `cache config keeps only string attributes`() {
+        val attributes =
+            JavaOnlyMap.of(
+                "email", "a@example.com",
+                "missing", null,
+                "count", 3.0,
+                "flag", true,
+                "nested", JavaOnlyMap.of("key", "value"),
+                "list", JavaOnlyArray.of("value"),
+            )
+        val config = impl.buildCacheConfig(JavaOnlyMap.of("cacheDurationInSeconds", 60.0, "cacheAttributes", attributes))
+        assertEquals(60L, config.cacheDurationInSeconds)
+        assertEquals(mapOf("email" to "a@example.com"), config.cacheAttributes)
+    }
+
+    @Test
+    fun `wrongly typed cache config values are skipped`() {
+        val config = impl.buildCacheConfig(JavaOnlyMap.of("cacheDurationInSeconds", null, "cacheAttributes", "a@example.com"))
+        assertEquals(0L, config.cacheDurationInSeconds)
+        assertNull(config.cacheAttributes)
+    }
+
+    @Test
+    fun `a cacheConfig that is not an object is skipped`() {
+        val config = impl.buildRoktConfig(JavaOnlyMap.of("cacheConfig", "60", "colorMode", 1.0))
+        assertNull(config.cacheConfig)
+        assertNull(config.colorMode)
     }
 }

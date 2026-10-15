@@ -204,6 +204,13 @@ class RNRoktWidgetModuleImpl(private val reactContext: ReactApplicationContext) 
         attributes?.toHashMap()?.filter { it.value is String }?.mapValues { it.value as String }
             ?: emptyMap()
 
+    // JS can send any shape, so read a key only when it has the type the SDK expects.
+    private fun ReadableMap?.mapOrNull(key: String): ReadableMap? =
+        if (this != null && hasKey(key) && getType(key) == ReadableType.Map) getMap(key) else null
+
+    private fun ReadableMap?.doubleOrNull(key: String): Double? =
+        if (this != null && hasKey(key) && getType(key) == ReadableType.Number) getDouble(key) else null
+
     fun logDebug(message: String) {
         if (debug) {
             Log.d("Rokt", message)
@@ -222,25 +229,15 @@ class RNRoktWidgetModuleImpl(private val reactContext: ReactApplicationContext) 
         configMap["colorMode"]?.let {
             builder.colorMode(it.toColorMode())
         }
-        roktConfig?.getMap("cacheConfig")?.let {
+        roktConfig.mapOrNull("cacheConfig")?.let {
             builder.cacheConfig(buildCacheConfig(it))
         }
         return builder.build()
     }
 
     fun buildCacheConfig(cacheConfigMap: ReadableMap?): CacheConfig {
-        val cacheDurationInSeconds =
-            if (cacheConfigMap?.hasKey("cacheDurationInSeconds") == true) {
-                cacheConfigMap.getDouble("cacheDurationInSeconds").toLong()
-            } else {
-                0L
-            }
-        val cacheAttributes =
-            if (cacheConfigMap?.hasKey("cacheAttributes") == true) {
-                cacheConfigMap.getMap("cacheAttributes")?.toHashMap()?.mapValues { it.value as String }
-            } else {
-                null
-            }
+        val cacheDurationInSeconds = cacheConfigMap.doubleOrNull("cacheDurationInSeconds")?.toLong() ?: 0L
+        val cacheAttributes = cacheConfigMap.mapOrNull("cacheAttributes")?.let { readableMapToMapOfStrings(it) }
         return CacheConfig(
             cacheDurationInSeconds = cacheDurationInSeconds,
             cacheAttributes = cacheAttributes,

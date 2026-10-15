@@ -84,6 +84,20 @@
     XCTAssertNotNil(embedded);
 }
 
+- (void)testRecyclingReplacesEmbeddedView
+{
+    [self simulateSDKResize:415];
+    [self simulateReactNativeResize:415];
+    RoktEmbeddedView *embedded = _componentView.roktEmbeddedView;
+
+    [_componentView prepareForRecycle];
+
+    XCTAssertNotEqual(_componentView.roktEmbeddedView, embedded);
+    XCTAssertNil(embedded.superview);
+    XCTAssertEqual(_componentView.roktEmbeddedView.superview, _componentView);
+    XCTAssertEqualWithAccuracy(_componentView.roktEmbeddedView.frame.size.height, 0, 0.5);
+}
+
 @end
 
 #endif // RCT_NEW_ARCH_ENABLED

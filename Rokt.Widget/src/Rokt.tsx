@@ -84,6 +84,38 @@ function toNativeAttributes(
   return result;
 }
 
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === "object" && value !== null && !Array.isArray(value);
+
+// Untyped callers can pass any shape, and the generated New Architecture accessors
+// do not type-check in release builds, so only fields of the expected type reach
+// native code. Cache attributes get the same conversion as placement attributes.
+function toNativeConfig(config: IRoktConfig): IRoktConfig {
+  if (!isRecord(config)) {
+    return {};
+  }
+  const { colorMode, cacheConfig }: IRoktConfig = config;
+  const nativeConfig: { colorMode?: ColorMode; cacheConfig?: CacheConfig } = {};
+  if (typeof colorMode === "string") {
+    nativeConfig.colorMode = colorMode;
+  }
+  const cache: unknown = cacheConfig;
+  if (isRecord(cache)) {
+    const { cacheDurationInSeconds, cacheAttributes } = cache;
+    nativeConfig.cacheConfig = new CacheConfig(
+      typeof cacheDurationInSeconds === "number"
+        ? cacheDurationInSeconds
+        : undefined,
+      isRecord(cacheAttributes)
+        ? toNativeAttributes(
+            cacheAttributes as Record<string, RoktAttributeValue>,
+          )
+        : undefined,
+    );
+  }
+  return nativeConfig;
+}
+
 export abstract class Rokt {
   /**
    * Initialize the Rokt SDK. Call once, early (e.g. on app start), before selecting
@@ -126,7 +158,7 @@ export abstract class Rokt {
         identifier,
         nativeAttributes,
         nativePlaceholders,
-        roktConfig,
+        toNativeConfig(roktConfig),
       );
     } else {
       RNRoktWidget.selectPlacements(
@@ -157,7 +189,7 @@ export abstract class Rokt {
       RNRoktWidget.selectShoppableAdsWithConfig(
         identifier,
         nativeAttributes,
-        roktConfig,
+        toNativeConfig(roktConfig),
       );
     } else {
       RNRoktWidget.selectShoppableAds(identifier, nativeAttributes);
