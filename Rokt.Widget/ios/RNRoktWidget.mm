@@ -346,7 +346,14 @@ RCT_EXPORT_METHOD(purchaseFinalized:(NSString *)placementId
         if ([view isKindOfClass:[RoktEmbeddedView class]]) {
             resolved[name] = view;
         } else {
-            RCTLogWarn(@"Cannot resolve placeholder %@ (reactTag %@)", name, value);
+            BOOL isNameLookup = value == nil || value == [NSNull null] ||
+                ([value isKindOfClass:[NSNumber class]] && [value doubleValue] <= 0);
+            if (isNameLookup) {
+                RCTLogWarn(@"Cannot resolve placeholder %@ (reactTag %@)", name, value);
+            } else {
+                // Preserve error visibility for invalid legacy tags and malformed values.
+                RCTLogError(@"Cannot resolve placeholder %@ (reactTag %@)", name, value);
+            }
         }
     }
     return resolved;

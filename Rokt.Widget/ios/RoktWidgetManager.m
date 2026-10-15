@@ -43,18 +43,6 @@
   [RoktPlaceholderRegistry registerView:_roktEmbeddedView name:_placeholderName];
 }
 
-- (void)didMoveToSuperview
-{
-  [super didMoveToSuperview];
-  // Fabric's legacy-view interop adapter removes its view without calling invalidate.
-  // Reattachment restores registration for a still-mounted screen.
-  if (self.superview != nil) {
-    [RoktPlaceholderRegistry registerView:_roktEmbeddedView name:_placeholderName];
-  } else {
-    [RoktPlaceholderRegistry unregisterView:_roktEmbeddedView];
-  }
-}
-
 - (void)invalidate
 {
   [RoktPlaceholderRegistry unregisterView:_roktEmbeddedView];
@@ -63,6 +51,8 @@
 
 - (void)dealloc
 {
+  // Interop teardown releases this React-owned wrapper without calling invalidate.
+  // Temporary detachment (e.g. Paper clipping) must keep its name registered.
   [RoktPlaceholderRegistry unregisterView:_roktEmbeddedView];
 }
 @end

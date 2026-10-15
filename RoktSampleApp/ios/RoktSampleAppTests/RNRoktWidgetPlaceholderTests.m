@@ -1,6 +1,8 @@
 #import <XCTest/XCTest.h>
 #import <React/RCTBridgeModule.h>
 #import <React/RCTLog.h>
+#import <React/RCTView.h>
+#import <React/UIView+React.h>
 #import <RoktContracts/RoktContracts-Swift.h>
 #import <Rokt_Widget/Rokt_Widget-Swift.h>
 #import <objc/runtime.h>
@@ -40,6 +42,7 @@
     NSMutableDictionary<NSNumber *, UIView *> *_views;
     NSInteger _loggedErrorCount;
     NSMutableArray<NSString *> *_loggedErrors;
+    NSMutableArray<NSNumber *> *_loggedLevels;
     RCTLogFunction _originalLogFunction;
 }
 
@@ -59,6 +62,7 @@
 
     _loggedErrorCount = 0;
     _loggedErrors = [NSMutableArray new];
+    _loggedLevels = [NSMutableArray new];
     _originalLogFunction = RCTGetLogFunction();
     RCTSetLogFunction(^(RCTLogLevel level,
                         __unused RCTLogSource source,
@@ -69,6 +73,7 @@
         if (strongSelf && level >= RCTLogLevelWarning) {
             strongSelf->_loggedErrorCount++;
             [strongSelf->_loggedErrors addObject:message ?: @""];
+            [strongSelf->_loggedLevels addObject:@(level)];
         }
     });
 }
@@ -105,6 +110,7 @@
 
     XCTAssertEqual(resolved.count, 0u);
     XCTAssertEqual(_loggedErrorCount, 1, @"errors: %@", _loggedErrors);
+    XCTAssertEqual(_loggedLevels.firstObject.integerValue, RCTLogLevelError);
 }
 
 - (void)testSkipsTagResolvingToUnexpectedViewClass
@@ -115,6 +121,7 @@
 
     XCTAssertEqual(resolved.count, 0u);
     XCTAssertEqual(_loggedErrorCount, 1, @"errors: %@", _loggedErrors);
+    XCTAssertEqual(_loggedLevels.firstObject.integerValue, RCTLogLevelError);
 }
 
 - (void)testSkipsNonNumericTagsWithoutThrowing
@@ -126,6 +133,16 @@
     XCTAssertEqual(_loggedErrorCount, 2, @"errors: %@", _loggedErrors);
     XCTAssertTrue([_loggedErrors.firstObject hasPrefix:@"Cannot resolve placeholder"],
                   @"errors: %@", _loggedErrors);
+    XCTAssertTrue([_loggedLevels containsObject:@(RCTLogLevelError)]);
+    XCTAssertTrue([_loggedLevels containsObject:@(RCTLogLevelWarning)]);
+}
+
+- (void)testMissingNameLogsWarning
+{
+    NSDictionary *resolved = [_rokt resolvePlaceholders:@{@"TestMissingName": @0}];
+    XCTAssertEqual(resolved.count, 0u);
+    XCTAssertEqual(_loggedErrorCount, 1);
+    XCTAssertEqual(_loggedLevels.firstObject.integerValue, RCTLogLevelWarning);
 }
 
 - (void)testEmptyPlaceholdersResolveToEmptyDictionary
@@ -146,6 +163,7 @@
     XCTAssertEqual([_rokt resolvePlaceholders:@{@"TestLocation1": @0}][@"TestLocation1"], named);
     XCTAssertEqual([_rokt resolvePlaceholders:@{@"TestLocation1": @101}][@"TestLocation1"], tagged);
     XCTAssertEqual([_rokt resolvePlaceholders:@{@"TestLocation1": @999}][@"TestLocation1"], named);
+    XCTAssertEqual(_loggedErrorCount, 0, @"A successful name fallback must not report a tag error");
     [RoktPlaceholderRegistry unregisterView:named];
 }
 
@@ -246,12 +264,18 @@
 - (void)testInteropRemovalWaitsForReplacementEvenWhenSDKRetainsView
 {
     UIView *parent = [UIView new];
-    RoktLegacyEmbeddedView *wrapper = [RoktLegacyEmbeddedView new];
-    wrapper.placeholderName = @"TestLocation1";
-    [parent addSubview:wrapper];
-    RoktEmbeddedView *retained = wrapper.roktEmbeddedView;
-    // Mirrors RCTLegacyViewManagerInteropCoordinatorAdapter: no invalidate call.
-    [wrapper removeFromSuperview];
+    RoktEmbeddedView *retained;
+    __weak RoktLegacyEmbeddedView *releasedWrapper;
+    @autoreleasepool {
+        RoktLegacyEmbeddedView *wrapper = [RoktLegacyEmbeddedView new];
+        wrapper.placeholderName = @"TestLocation1";
+        [parent addSubview:wrapper];
+        retained = wrapper.roktEmbeddedView;
+        releasedWrapper = wrapper;
+        // Interop teardown removes and releases its wrapper without calling invalidate.
+        [wrapper removeFromSuperview];
+    }
+    XCTAssertNil(releasedWrapper);
     XCTAssertNil([RoktPlaceholderRegistry viewForName:@"TestLocation1"]);
 
     RoktLegacyEmbeddedView *replacement = [RoktLegacyEmbeddedView new];
@@ -271,10 +295,11 @@
 
 - (void)testLegacyWrapperRestoresEarlierViewAndSupportsReattachment
 {
-    UIView *parent = [UIView new];
+    UIWindow *parent = [[UIWindow alloc] initWithFrame:CGRectMake(0, 0, 330, 600)];
     RoktLegacyEmbeddedView *lower = [RoktLegacyEmbeddedView new];
     RoktLegacyEmbeddedView *upper = [RoktLegacyEmbeddedView new];
-    lower.placeholderName = upper.placeholderName = @"TestLocation1";
+    lower.placeholderName = @"TestLocation1";
+    upper.placeholderName = @"TestLocation1";
     [parent addSubview:lower];
     [parent addSubview:upper];
     XCTAssertEqual([RoktPlaceholderRegistry viewForName:@"TestLocation1"], upper.roktEmbeddedView);
@@ -282,8 +307,40 @@
     XCTAssertEqual([RoktPlaceholderRegistry viewForName:@"TestLocation1"], lower.roktEmbeddedView);
     [parent addSubview:upper];
     XCTAssertEqual([RoktPlaceholderRegistry viewForName:@"TestLocation1"], upper.roktEmbeddedView);
+    [lower removeFromSuperview];
+    [parent addSubview:lower];
+    XCTAssertEqual([RoktPlaceholderRegistry viewForName:@"TestLocation1"], upper.roktEmbeddedView,
+                   @"Reattaching an older clipped view must not change registration order");
     [lower invalidate];
     [upper invalidate];
+}
+
+- (void)testClippedMountedPlaceholderRemainsResolvableWithoutWaiting
+{
+    RCTView *parent = [[RCTView alloc] initWithFrame:CGRectMake(0, 0, 330, 300)];
+    RoktLegacyEmbeddedView *wrapper = [[RoktLegacyEmbeddedView alloc] initWithFrame:CGRectMake(0, 500, 330, 100)];
+    wrapper.placeholderName = @"TestClippedLocation";
+    [parent insertReactSubview:wrapper atIndex:0];
+    [parent addSubview:wrapper];
+    parent.clipsToBounds = YES;
+    parent.removeClippedSubviews = YES;
+    [parent updateClippedSubviews];
+
+    XCTAssertNil(wrapper.superview);
+    XCTAssertTrue([parent.reactSubviews containsObject:wrapper], @"Clipping must retain the mounted React child");
+    XCTAssertEqual([_rokt resolvePlaceholders:@{@"TestClippedLocation": @0}][@"TestClippedLocation"], wrapper.roktEmbeddedView);
+    XCTestExpectation *ready = [self expectationWithDescription:@"clipped view already registered"];
+    [RoktPlaceholderRegistry waitForNames:@[@"TestClippedLocation"] key:@"clipped" timeout:10 completion:^{
+        [ready fulfill];
+    } discarded:^{ XCTFail(@"Unexpected discard"); }];
+    [self waitForExpectations:@[ready] timeout:1];
+
+    wrapper.frame = CGRectMake(0, 0, 330, 100);
+    [parent updateClippedSubviews];
+    XCTAssertEqual(wrapper.superview, parent);
+    XCTAssertEqual([RoktPlaceholderRegistry viewForName:@"TestClippedLocation"], wrapper.roktEmbeddedView);
+    [wrapper invalidate];
+    XCTAssertNil([RoktPlaceholderRegistry viewForName:@"TestClippedLocation"]);
 }
 
 - (void)testDiscardingUnattachedWrapperUnregistersRetainedSDKView
