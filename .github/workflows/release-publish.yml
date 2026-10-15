@@ -153,9 +153,11 @@ jobs:
             echo "Error: $REF_NAME cannot publish version $version_from_file"
             exit 1
           fi
-          # A prerelease never moves a stable dist-tag.
-          if [ -n "$prerelease" ]; then
+          # A prerelease never moves a stable dist-tag: next on main, <tag>-next elsewhere.
+          if [ -n "$prerelease" ] && [ "$npm_tag" = "latest" ]; then
             npm_tag="next"
+          elif [ -n "$prerelease" ]; then
+            npm_tag="${npm_tag}-next"
           fi
           echo "release-version=$version_from_file" >> $GITHUB_OUTPUT
           echo "npm-tag=$npm_tag" >> $GITHUB_OUTPUT
