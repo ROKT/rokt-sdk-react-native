@@ -100,7 +100,31 @@ This package cannot be used with "Expo Go" because it requires custom native cod
    }
    ```
 
-   > The config plugin automatically configures the iOS Podfile for Rokt SDK compatibility. This is required for Expo projects.
+   > The config plugin writes the Rokt settings into the generated iOS Podfile. `pod install`, which `expo prebuild` runs, then links the Rokt iOS SDK into the app as a Swift package ([Swift Package Manager](#swift-package-manager)).
+
+   Plugin options, all optional:
+
+   ```json
+   {
+     "expo": {
+       "plugins": [
+         [
+           "@rokt/react-native-sdk",
+           {
+             "iosSdkVersion": "5.5.5",
+             "iosSpmPackages": ["RoktPaymentExtension"]
+           }
+         ]
+       ]
+     }
+   }
+   ```
+
+   - `iosSdkVersion`: the exact Rokt iOS SDK version. Defaults to the version this package's release was tested with, which can change when you upgrade the package.
+   - `iosSpmPackages`: optional Rokt packages, such as `RoktPaymentExtension`.
+   - `iosDependencyManager`: `"spm"` (the default), or `"cocoapods"` to take the SDK from CocoaPods instead, which is deprecated. `iosSdkVersion` and `iosSpmPackages` apply only to `"spm"`.
+
+   Run `npx expo prebuild --clean` after changing an option.
 
 3. Generate the native projects and build:
 
@@ -209,7 +233,7 @@ if let paymentExt = RoktPaymentExtension(
 }
 ```
 
-> Add `RoktPaymentExtension` to `$RNRoktSPMPackages` in your Podfile ([Swift Package Manager](#swift-package-manager)), or with CocoaPods add the `RoktPaymentExtension` pod. If it is not yet available in your SDK version, contact your Rokt account team.
+> Add `RoktPaymentExtension` to `$RNRoktSPMPackages` in your Podfile ([Swift Package Manager](#swift-package-manager)), or to the `iosSpmPackages` option of the Expo config plugin. With CocoaPods, add the `RoktPaymentExtension` pod. If it is not yet available in your SDK version, contact your Rokt account team.
 
 ### Purchase Finalized (Shoppable Ads only)
 
