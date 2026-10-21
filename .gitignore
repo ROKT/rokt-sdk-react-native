@@ -8,3 +8,6 @@ Pods/
 Rokt.Widget/rokt-react-native-sdk-*.tgz
 RoktSampleApp/package-lock.json
 RoktSampleApp/android/app/src/main/assets/*.bundle
+
+# Swift Package Manager mode resolves the Rokt iOS SDK at pod install (README › Swift Package Manager)
+RoktSampleApp/ios/RoktSampleApp.xcworkspace/xcshareddata/swiftpm/

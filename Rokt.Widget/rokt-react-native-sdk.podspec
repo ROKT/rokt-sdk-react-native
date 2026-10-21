@@ -1,4 +1,5 @@
 require "json"
+require_relative "ios/rokt_spm"
 
 package = JSON.parse(File.read(File.join(__dir__, "package.json")))
 folly_compiler_flags = '-DFOLLY_NO_CONFIG -DFOLLY_MOBILE=1 -DFOLLY_USE_LIBCPP=1 -Wno-comma -Wno-shorten-64-to-32'
@@ -46,5 +47,41 @@ Pod::Spec.new do |s|
     end
   end
 
-  s.dependency "Rokt-Widget", ">= 5.3.0", "< 6.0.0"
+  # Swift Package Manager mode is the default: ios/rokt_spm.rb links the Rokt iOS SDK into the app
+  # target on each `pod install`. `$RNRoktDisableSPM = true` at the top of the Podfile takes it from
+  # CocoaPods instead.
+  if RNRoktSPM.enabled?
+    # The app target links the Rokt iOS SDK as a Swift package. This pod only compiles against its
+    # generated headers and never links it, so it is a static framework even under
+    # `use_frameworks! :linkage => :dynamic`.
+    s.static_framework = true
+    # Xcode writes the packages' generated Objective-C headers here, for build and archive alike.
+    maps = "$(OBJROOT)/GeneratedModuleMaps-$(PLATFORM_NAME)"
+    xcconfig = s.attributes_hash["pod_target_xcconfig"] || {}
+    s.pod_target_xcconfig = xcconfig.merge(
+      "HEADER_SEARCH_PATHS" => "#{xcconfig["HEADER_SEARCH_PATHS"]} \"#{maps}\"".strip
+    )
+    # Declaring the headers as inputs orders this phase, and so this pod's compile, after the
+    # packages that generate them.
+    s.script_phase = {
+      :name => "[Rokt] Check the Rokt Swift package headers",
+      :execution_position => :before_compile,
+      :input_files => ["${OBJROOT}/GeneratedModuleMaps-${PLATFORM_NAME}/RoktContracts-Swift.h",
+                       "${OBJROOT}/GeneratedModuleMaps-${PLATFORM_NAME}/Rokt_Widget-Swift.h"],
+      :output_files => ["${DERIVED_FILE_DIR}/rokt-spm-headers.stamp"],
+      :script => <<~'SH'
+        set -eu
+        for header in RoktContracts-Swift.h Rokt_Widget-Swift.h; do
+          if [ ! -f "${OBJROOT}/GeneratedModuleMaps-${PLATFORM_NAME}/${header}" ]; then
+            echo "error: [Rokt] Swift Package Manager mode is on, but the Rokt-Widget Swift package is not linked into the app target. Run pod install again, or set \$RNRoktDisableSPM = true at the top of the Podfile to take the SDK from CocoaPods."
+            exit 1
+          fi
+        done
+        mkdir -p "${DERIVED_FILE_DIR}"
+        touch "${DERIVED_FILE_DIR}/rokt-spm-headers.stamp"
+      SH
+    }
+  else
+    s.dependency "Rokt-Widget", ">= 5.3.0", "< 6.0.0"
+  end
 end

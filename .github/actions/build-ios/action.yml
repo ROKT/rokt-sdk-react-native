@@ -1,6 +1,12 @@
 name: Build iOS
 description: Builds the iOS app
 
+inputs:
+  ios-deps:
+    description: How the sample app gets the Rokt iOS SDK, spm (the default) or cocoapods
+    required: false
+    default: spm
+
 outputs:
   app-filename:
     description: The name of the created iOS app bundle
@@ -20,8 +26,16 @@ runs:
         sudo gem install cocoapods -v 1.16.2
         pod --version
 
+    - name: Test how pod install links the Swift packages
+      if: inputs.ios-deps == 'spm'
+      shell: bash
+      run: ruby .github/scripts/rokt_spm_test.rb
+
     - name: Install iOS dependencies
       shell: bash
+      env:
+        # RoktSampleApp/ios/Podfile takes the Rokt iOS SDK from Swift Package Manager unless this is 1.
+        ROKT_USE_COCOAPODS: ${{ inputs.ios-deps == 'cocoapods' && '1' || '0' }}
       run: |
         echo "Installing iOS dependencies..."
         cd RoktSampleApp/ios
@@ -48,6 +62,8 @@ runs:
     - name: Build iOS for Simulator
       id: build-ios
       shell: bash
+      env:
+        IOS_DEPS: ${{ inputs.ios-deps }}
       run: |
         cd RoktSampleApp
 
@@ -69,8 +85,11 @@ runs:
         VERSION=$(plutil -extract CFBundleShortVersionString raw "$APP_BUNDLE/Info.plist" 2>/dev/null || echo "1.0.0")
         echo "version=$VERSION" >> $GITHUB_OUTPUT
 
-        # Create a more descriptive artifact name
+        # Create a more descriptive artifact name, one per dependency manager
         ARTIFACT_NAME="rokt-ios-v${VERSION}-${GITHUB_SHA::8}"
+        if [ "${IOS_DEPS}" != "cocoapods" ]; then
+          ARTIFACT_NAME="${ARTIFACT_NAME}-${IOS_DEPS}"
+        fi
         echo "artifact-name=$ARTIFACT_NAME" >> $GITHUB_OUTPUT
 
         # Create a zip archive of the app bundle for easier handling
@@ -92,6 +111,23 @@ runs:
           -derivedDataPath ios/build \
           -UseModernBuildSystem=YES \
           test | xcpretty -r junit -o ios/build/test-results.xml
+
+    # Mixing CocoaPods and Swift Package Manager links a second copy of the SDK that builds silently,
+    # so check the archived app, as a release build would ship it.
+    - name: Archive iOS app and check for a single copy of the SDK
+      shell: bash
+      run: |
+        cd RoktSampleApp
+        set -o pipefail
+        xcodebuild -workspace ios/RoktSampleApp.xcworkspace \
+          -scheme RoktSampleApp \
+          -configuration Release \
+          -destination 'generic/platform=iOS' \
+          -derivedDataPath ios/build \
+          -archivePath ios/build/RoktSampleApp.xcarchive \
+          CODE_SIGNING_ALLOWED=NO \
+          archive | xcpretty
+        ../.github/scripts/check-single-copy.sh ios/build/RoktSampleApp.xcarchive/Products/Applications/RoktSampleApp.app
 
     - name: Create artifact metadata
       shell: bash
