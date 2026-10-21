@@ -14,10 +14,7 @@
 #import "RoktPlaceholderRegistry.h"
 #import <React/RCTConversions.h>
 
-#if __has_include(<RoktContracts/RoktContracts-Swift.h>)
-    #import <RoktContracts/RoktContracts-Swift.h>
-#endif
-#import <Rokt_Widget/Rokt_Widget-Swift.h>
+#import "RNRoktSDKImports.h"
 #import <React/renderer/components/RNRoktWidgetSpec/ComponentDescriptors.h>
 #import <react/renderer/components/RNRoktWidgetSpec/Props.h>
 #import <React/renderer/components/RNRoktWidgetSpec/RCTComponentViewHelpers.h>

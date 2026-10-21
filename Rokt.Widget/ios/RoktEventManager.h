@@ -10,7 +10,7 @@
 
 #import <React/RCTBridgeModule.h>
 #import <React/RCTEventEmitter.h>
-#import <Rokt_Widget/Rokt_Widget-Swift.h>
+#import "RNRoktSDKImports.h"
 
 #ifdef RCT_NEW_ARCH_ENABLED
 #import <RNRoktWidgetSpec/RNRoktWidgetSpec.h>

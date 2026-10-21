@@ -12,7 +12,7 @@
 #import <SafariServices/SafariServices.h>
 #import <React/RCTViewComponentView.h>
 #import <UIKit/UIKit.h>
-#import <Rokt_Widget/Rokt_Widget-Swift.h>
+#import "RNRoktSDKImports.h"
 
 #ifndef RoktNativeWidgetComponentView_h
 #define RoktNativeWidgetComponentView_h

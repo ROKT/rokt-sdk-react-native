@@ -11,10 +11,7 @@
 #import <SafariServices/SafariServices.h>
 #import "RNRoktWidget.h"
 #import <UIKit/UIKit.h>
-#if __has_include(<RoktContracts/RoktContracts-Swift.h>)
-    #import <RoktContracts/RoktContracts-Swift.h>
-#endif
-#import <Rokt_Widget/Rokt_Widget-Swift.h>
+#import "RNRoktSDKImports.h"
 #import <React/RCTLog.h>
 #import <React/RCTUtils.h>
 #import <React/RCTViewManager.h>
