@@ -22,7 +22,7 @@ Native code is unchanged: `import Rokt_Widget` and `import RoktPaymentExtension`
 
 If your app also uses `react-native-mparticle` with its Rokt kit, use its Swift Package Manager mode too. Installed with CocoaPods, that kit adds the Rokt iOS SDK as a pod, and `pod install` stops.
 
-Expo apps: run `npx expo prebuild --clean`.
+Expo apps: run `npx expo prebuild --clean`. If you added `RoktPaymentExtension` through a Podfile hook or another config plugin, set the plugin option `"iosSpmPackages": ["RoktPaymentExtension"]` instead. To stay on CocoaPods, set `"iosDependencyManager": "cocoapods"`.
 
 To keep taking the SDK from CocoaPods for now, set `$RNRoktDisableSPM = true` at the top of the Podfile and keep the `pre_install` block. This mode is deprecated: new versions of the Rokt iOS SDK may not be published to CocoaPods after 2 December 2026.
 
