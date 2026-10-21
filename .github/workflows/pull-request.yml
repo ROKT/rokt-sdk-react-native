@@ -134,6 +134,58 @@ jobs:
             Test results (JUnit XML)
             Build metadata file
 
+  build-expo-ios:
+    name: Build iOS Expo App (SPM)
+    if: needs.classify-changes.outputs.ios == 'true'
+    needs: [classify-changes, trunk-check, build-package]
+    runs-on: macos-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Download and flatten artifacts
+        uses: ./.github/actions/download-and-flatten
+        with:
+          pattern: rokt-widget-v*-*
+          path: Rokt.Widget/
+
+      - name: Setup Node.js
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 20
+
+      - name: Install CocoaPods
+        run: sudo gem install cocoapods -v 1.16.2
+
+      # The lockfile pins the tarball's integrity, which changes with every build of the package.
+      - name: Install Expo app dependencies
+        working-directory: ExpoTestApp
+        run: |
+          rm -f package-lock.json
+          npm install --ignore-scripts
+
+      # The config plugin writes the Rokt settings, and prebuild's pod install links the Rokt iOS SDK
+      # into the app as a Swift package.
+      - name: Generate the iOS project
+        working-directory: ExpoTestApp
+        run: npx expo prebuild --clean --platform ios
+
+      - name: Archive and check for a single copy of the SDK
+        working-directory: ExpoTestApp/ios
+        run: |
+          set -o pipefail
+          xcodebuild -workspace ExpoTestApp.xcworkspace \
+            -scheme ExpoTestApp \
+            -configuration Release \
+            -destination 'generic/platform=iOS' \
+            -derivedDataPath build \
+            -archivePath build/ExpoTestApp.xcarchive \
+            CODE_SIGNING_ALLOWED=NO \
+            archive | xcpretty
+          ../../.github/scripts/check-single-copy.sh build/ExpoTestApp.xcarchive/Products/Applications/ExpoTestApp.app
+
   build-test-android:
     name: Build & Test Android
     if: needs.classify-changes.outputs.android == 'true'
@@ -177,6 +229,7 @@ jobs:
       - trunk-check
       - build-package
       - build-test-ios
+      - build-expo-ios
       - build-test-android
     runs-on: ubuntu-latest
     steps:
@@ -188,6 +241,7 @@ jobs:
           PACKAGE_RESULT: ${{ needs.build-package.result }}
           IOS_SELECTED: ${{ needs.classify-changes.outputs.ios }}
           IOS_RESULT: ${{ needs.build-test-ios.result }}
+          EXPO_IOS_RESULT: ${{ needs.build-expo-ios.result }}
           ANDROID_SELECTED: ${{ needs.classify-changes.outputs.android }}
           ANDROID_RESULT: ${{ needs.build-test-android.result }}
         run: |
@@ -216,6 +270,7 @@ jobs:
           [ "${TRUNK_RESULT}" = 'success' ]
           check_result 'Build and Package Rokt.Widget' "${PACKAGE_SELECTED}" "${PACKAGE_RESULT}"
           check_result 'Build & Test iOS' "${IOS_SELECTED}" "${IOS_RESULT}"
+          check_result 'Build iOS Expo App (SPM)' "${IOS_SELECTED}" "${EXPO_IOS_RESULT}"
           check_result 'Build & Test Android' "${ANDROID_SELECTED}" "${ANDROID_RESULT}"
 
   pr-notify:
