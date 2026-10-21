@@ -3,8 +3,7 @@
 #import <React/RCTLog.h>
 #import <React/RCTView.h>
 #import <React/UIView+React.h>
-#import <RoktContracts/RoktContracts-Swift.h>
-#import <Rokt_Widget/Rokt_Widget-Swift.h>
+#import "../../../Rokt.Widget/ios/RNRoktSDKImports.h"
 #import <objc/runtime.h>
 #import "../../../Rokt.Widget/ios/RoktPlaceholderRegistry.h"
 #import "../../../Rokt.Widget/ios/RoktLegacyEmbeddedView.h"

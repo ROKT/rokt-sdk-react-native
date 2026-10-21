@@ -1,9 +1,6 @@
 #import <XCTest/XCTest.h>
 #import "../../../Rokt.Widget/ios/RNRoktWidget.h"
-#if __has_include(<RoktContracts/RoktContracts-Swift.h>)
-    #import <RoktContracts/RoktContracts-Swift.h>
-#endif
-#import <Rokt_Widget/Rokt_Widget-Swift.h>
+#import "../../../Rokt.Widget/ios/RNRoktSDKImports.h"
 
 // Implemented in RNRoktWidget.mm.
 @interface RNRoktWidget (ConfigTests)
