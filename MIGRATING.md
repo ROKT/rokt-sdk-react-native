@@ -105,6 +105,10 @@ Rokt.execute2Step("RoktExperience", attributes, placeholders, () =>
 
 #### After (v5.0.0)
 
+This is the v5.0.0 form. Later releases take placeholder names instead of the
+`findNodeHandle` map, and the next major version accepts only names: see
+[Selecting embedded placements by name](#selecting-embedded-placements-by-name).
+
 ```js
 import { Rokt, RoktEmbeddedView } from "@rokt/react-native-sdk";
 
@@ -218,8 +222,13 @@ Then run `npx expo prebuild --clean` to regenerate native projects.
 
 ## Selecting embedded placements by name
 
-Existing numeric placeholder maps continue to work. New integrations can remove
-view refs and `findNodeHandle`:
+`selectPlacements` takes an array of placeholder names. The earlier map of names
+to `findNodeHandle` tags is no longer accepted: TypeScript reports it, and at
+runtime the SDK logs an error and selects the placement without embedded views.
+Remove the view refs and `findNodeHandle`, and pass the names instead. The last
+releases of the previous major version accept both forms, so you can switch before
+you upgrade. For overlay-only calls, omit placeholders or pass `[]`; an empty
+object still works at runtime, but TypeScript no longer accepts it:
 
 ```tsx
 <RoktEmbeddedView placeholderName="Location1" />;
@@ -229,10 +238,7 @@ Rokt.selectPlacements("MSDKEmbeddedLayout", attributes, ["Location1"]);
 The SDK waits up to two seconds for requested names to register, then proceeds
 with the available views. This supports selection from the same effect that
 renders a placeholder. A newer call for the same identifier replaces a pending
-call. An old map entry with `null` now resolves by its key, which must match a
-view's `placeholderName`. It has the same two-second wait if no matching view
-mounts. Positive tags keep legacy lookup without a mount wait. Overlay-only
-calls can omit placeholders.
+call. Overlay-only calls can omit placeholders.
 
 Import `RoktEventManager` from `@rokt/react-native-sdk` when constructing a
 `NativeEventEmitter`. The exported manager supports iOS bridgeless hosts with

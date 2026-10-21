@@ -159,7 +159,7 @@ const attributes = {
   country: "US",
 };
 
-Rokt.selectPlacements("RoktExperience", attributes, {});
+Rokt.selectPlacements("RoktExperience", attributes);
 ```
 
 ### Select Placements (Embedded)
@@ -175,10 +175,12 @@ Rokt.selectPlacements("RoktEmbeddedExperience", attributes, ["RoktEmbedded1"]);
 Named placeholders wait up to two seconds for their native views to mount. After
 that deadline, selection proceeds with available views and logs unresolved names.
 A newer selection with the same identifier replaces a pending selection. Omit
-placeholders, or pass `[]` or `{}`, for overlay-only requests.
+placeholders, or pass `[]`, for overlay-only requests.
 
-Existing `{ name: findNodeHandle(ref.current) }` maps remain supported. Positive
-tags retain their existing lookup behavior; `null` values resolve by name.
+Placeholders are names only. The earlier `{ name: findNodeHandle(ref.current) }`
+map is no longer accepted: TypeScript reports it, and at runtime the SDK logs an
+error and selects the placement without embedded views
+([MIGRATING](MIGRATING.md#selecting-embedded-placements-by-name)).
 For stacked screens, the newest attached view with a matching name is selected.
 Use distinct names across simultaneously mounted independent React Native hosts.
 
