@@ -8,6 +8,7 @@ on:
   push:
     branches:
       - main
+      - maintenance/*
     paths:
       - .github/workflows/**
       - .github/actions/**

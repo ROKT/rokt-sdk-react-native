@@ -27,6 +27,9 @@ jobs:
       - name: Verify change classifier
         run: bash .github/scripts/select-pr-jobs.spec.sh
 
+      - name: Verify release dist-tag rules
+        run: bash .github/scripts/npm-dist-tag.spec.sh
+
       - name: Select required jobs
         id: changes
         env:

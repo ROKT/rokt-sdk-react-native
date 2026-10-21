@@ -315,7 +315,7 @@ Built-in PayPal device-pay authenticates in a web view and returns to the host a
 
 ### Publishing
 
-The SDK is published to NPM automatically via GitHub Actions when the `VERSION` file is updated on `main`.
+The SDK is published to NPM automatically via GitHub Actions when the `VERSION` file is updated on `main` or on a `maintenance/<major>.x` branch. See [RELEASING.md](RELEASING.md).
 
 ## License
 
