@@ -24,6 +24,24 @@ jobs:
   publish-draft-release:
     runs-on: ubuntu-latest
     steps:
+      # Release Publish runs only on main and maintenance/<major>.x, and a major bump off main would
+      # publish the next major from maintenance code.
+      - name: Check the branch can draft this release
+        env:
+          REF_NAME: ${{ github.ref_name }}
+          BUMP_TYPE: ${{ github.event.inputs.bump-type }}
+        run: |
+          if [ "$REF_NAME" = "main" ]; then
+            exit 0
+          fi
+          if [[ ! $REF_NAME =~ ^maintenance/[0-9]+\.x$ ]]; then
+            echo "::error::Draft releases from main or maintenance/<major>.x, not $REF_NAME"
+            exit 1
+          fi
+          if [ "$BUMP_TYPE" = "major" ]; then
+            echo "::error::Major releases can only be drafted from main"
+            exit 1
+          fi
       - name: Checkout repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:

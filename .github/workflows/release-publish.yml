@@ -144,7 +144,8 @@ jobs:
           major="${BASH_REMATCH[1]}"
           prerelease="${BASH_REMATCH[2]}"
           # main owns "latest"; maintenance/<major>.x publishes only its own major, under
-          # maintenance-<major>.x, since npm rejects range-like dist-tags such as "4.x".
+          # maintenance-<major>.x, since npm rejects range-like dist-tags such as "4.x". publish-npm
+          # settles the final tag against npm's current latest (.github/scripts/npm-dist-tag.sh).
           if [ "$REF_NAME" = "main" ]; then
             npm_tag="latest"
           elif [ "$REF_NAME" = "maintenance/${major}.x" ]; then
@@ -166,10 +167,23 @@ jobs:
     needs: [build-package, setup-and-version]
     runs-on: ubuntu-latest
     environment: npm-publish
+    # Publishes from different branches run one at a time, so each reads npm's latest only after the
+    # one before it has published.
+    concurrency:
+      group: npm-publish
+      cancel-in-progress: false
     permissions:
       contents: read
       id-token: write # Required for npm OIDC trusted publishing
+    outputs:
+      npm_tag: ${{ steps.dist-tag.outputs.npm-tag }}
     steps:
+      - name: Checkout release scripts
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          sparse-checkout: .github/scripts
+
       - name: Download package artifact
         uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
@@ -187,11 +201,18 @@ jobs:
       - name: Update npm
         run: npm install -g npm@11.21.0
 
+      - name: Resolve npm dist-tag
+        id: dist-tag
+        env:
+          FINAL_VERSION: ${{ needs.setup-and-version.outputs.final_version }}
+          NPM_TAG: ${{ needs.setup-and-version.outputs.npm_tag }}
+        run: bash .github/scripts/npm-dist-tag.sh
+
       - name: Publish to npm with OIDC
         shell: bash
         env:
           FINAL_VERSION: ${{ needs.setup-and-version.outputs.final_version }}
-          NPM_TAG: ${{ needs.setup-and-version.outputs.npm_tag }}
+          NPM_TAG: ${{ steps.dist-tag.outputs.npm-tag }}
           PACKAGE_SHA256: ${{ needs.build-package.outputs.package-sha256 }}
         run: |
           cd Rokt.Widget
@@ -242,7 +263,7 @@ jobs:
       - name: Create Github release
         uses: ncipollo/release-action@339a81892b84b4eeb0f6e744e4574d79d0d9b8dd # v1.21.0
         with:
-          makeLatest: ${{ needs.setup-and-version.outputs.npm_tag == 'latest' }}
+          makeLatest: ${{ needs.publish-npm.outputs.npm_tag == 'latest' }}
           tag: ${{ needs.setup-and-version.outputs.final_version }}
           commit: ${{ github.sha }}
           artifacts: Rokt.Widget/rokt-react-native-sdk-${{ needs.setup-and-version.outputs.final_version }}.tgz
