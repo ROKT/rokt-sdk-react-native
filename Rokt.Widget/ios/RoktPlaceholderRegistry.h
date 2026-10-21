@@ -4,7 +4,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Maps a `RoktEmbeddedView`'s `placeholderName` to its mounted `RoktEmbeddedView`, so
- * `selectPlacements` can resolve placeholders by name instead of a `findNodeHandle` react tag.
+ * `selectPlacements` resolves placeholders by name.
  *
  * Main thread only. Plain Objective-C so the legacy `.m` view manager can import it.
  */
