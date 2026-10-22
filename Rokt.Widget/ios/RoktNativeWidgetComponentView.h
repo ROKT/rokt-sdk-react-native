@@ -12,7 +12,6 @@
 #import <SafariServices/SafariServices.h>
 #import <React/RCTViewComponentView.h>
 #import <UIKit/UIKit.h>
-#import "RNRoktSDKImports.h"
 
 #ifndef RoktNativeWidgetComponentView_h
 #define RoktNativeWidgetComponentView_h
@@ -20,7 +19,8 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @interface RoktNativeWidgetComponentView : RCTViewComponentView
-@property (nonatomic, readonly) RoktEmbeddedView *roktEmbeddedView;
+// The Rokt SDK's RoktEmbeddedView.
+@property (nonatomic, readonly) UIView *roktEmbeddedView;
 @end
 
 NS_ASSUME_NONNULL_END

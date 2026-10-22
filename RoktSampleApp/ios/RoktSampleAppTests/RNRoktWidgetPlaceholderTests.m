@@ -7,6 +7,7 @@
 #import "../../../Rokt.Widget/ios/RoktPlaceholderRegistry.h"
 #import "../../../Rokt.Widget/ios/RoktLegacyEmbeddedView.h"
 #import "../../../Rokt.Widget/ios/RNRoktWidget.h"
+#import "../../../Rokt.Widget/ios/RNRoktSwift.h"
 
 // Implemented in RNRoktWidget.mm.
 @interface RNRoktWidget (PlaceholderTests)
@@ -205,7 +206,7 @@
 {
     RoktLegacyEmbeddedView *wrapper = [RoktLegacyEmbeddedView new];
     wrapper.placeholderName = @"TestLocation1";
-    RoktEmbeddedView *retained = wrapper.roktEmbeddedView;
+    UIView *retained = wrapper.roktEmbeddedView;
     [wrapper invalidate];
     XCTAssertNil([RoktPlaceholderRegistry viewForName:@"TestLocation1"]);
     XCTAssertNotNil(retained);
@@ -214,7 +215,7 @@
 - (void)testInteropRemovalWaitsForReplacementEvenWhenSDKRetainsView
 {
     UIView *parent = [UIView new];
-    RoktEmbeddedView *retained;
+    UIView *retained;
     __weak RoktLegacyEmbeddedView *releasedWrapper;
     @autoreleasepool {
         RoktLegacyEmbeddedView *wrapper = [RoktLegacyEmbeddedView new];
@@ -295,7 +296,7 @@
 
 - (void)testDiscardingUnattachedWrapperUnregistersRetainedSDKView
 {
-    RoktEmbeddedView *retained;
+    UIView *retained;
     @autoreleasepool {
         RoktLegacyEmbeddedView *wrapper = [RoktLegacyEmbeddedView new];
         wrapper.placeholderName = @"TestLocation1";
@@ -347,21 +348,21 @@
     XCTAssertEqual(module.resolutions, 0);
 }
 
-- (void)testConfiguredSelectionUsesOnlyTheViewEventSubscription
+- (void)testConfiguredSelectionSubscribesThenPassesTheConfig
 {
-    Method method = class_getClassMethod([Rokt class],
-        @selector(selectPlacementsWithIdentifier:attributes:placements:config:placementOptions:onEvent:));
+    // Events reach JavaScript through the view subscription; RNRoktSDK passes the SDK no onEvent.
+    Method method = class_getClassMethod([RNRoktSDK class],
+        @selector(selectPlacementsWithIdentifier:attributes:placements:config:));
     XCTAssertNotEqual(method, NULL);
     if (method == NULL) return;
     RoktSelectionProbe *module = [RoktSelectionProbe new];
     RoktConfig *config = [[[RoktConfigBuilder alloc] init] build];
     XCTestExpectation *selected = [self expectationWithDescription:@"configured selection"];
     IMP probe = imp_implementationWithBlock(^(id receiver, NSString *identifier, NSDictionary *attributes,
-        NSDictionary *placements, RoktConfig *nativeConfig, id options, id onEvent) {
+        NSDictionary *placements, NSObject *nativeConfig) {
         XCTAssertTrue([NSThread isMainThread]);
         XCTAssertEqual(nativeConfig, config);
         XCTAssertEqual(module.subscriptions, 1);
-        XCTAssertNil(onEvent, @"Forwarding onEvent as well as the view subscription duplicates callbacks");
         [selected fulfill];
     });
     IMP original = method_setImplementation(method, probe);

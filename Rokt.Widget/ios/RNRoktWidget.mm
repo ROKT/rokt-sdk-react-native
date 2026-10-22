@@ -11,7 +11,7 @@
 #import <SafariServices/SafariServices.h>
 #import "RNRoktWidget.h"
 #import <UIKit/UIKit.h>
-#import "RNRoktSDKImports.h"
+#import "RNRoktSwift.h"
 #import <React/RCTLog.h>
 #import <React/RCTUtils.h>
 #import <React/RCTViewManager.h>
@@ -32,7 +32,7 @@
 @property (nonatomic, strong) NSMutableSet<NSString *> *placeholderWaitKeys;
 @property (nonatomic, copy) NSString *placeholderWaitPrefix;
 
-- (void)selectPlacementsWithIdentifier:(NSString *)identifier attributes:(NSDictionary *)attributes placeholders:(NSDictionary *)placeholders config:(RoktConfig *)config;
+- (void)selectPlacementsWithIdentifier:(NSString *)identifier attributes:(NSDictionary *)attributes placeholders:(NSDictionary *)placeholders config:(nullable NSObject *)config;
 
 @end
 
@@ -140,9 +140,9 @@ RCT_EXPORT_METHOD(initialize:(NSString *)roktTagId appVersion: (NSString *)fakeA
         RCTLog(@"roktTagId cannot be null");
         return;
     }
-    [Rokt setFrameworkTypeWithFrameworkType: RoktFrameworkTypeReactNative];
+    [RNRoktSDK setReactNativeFrameworkType];
     [self subscribeGlobalEvents];
-    [Rokt initWithRoktTagId:roktTagId];
+    [RNRoktSDK initializeWithTagId:roktTagId];
 }
 
 RCT_EXPORT_METHOD(initializeWithFonts:(NSString *)roktTagId appVersion: (NSString * _Nullable)fakeApp fontPostScriptNames: (NSArray *)fontPostScriptNames)
@@ -152,7 +152,7 @@ RCT_EXPORT_METHOD(initializeWithFonts:(NSString *)roktTagId appVersion: (NSStrin
         return;
     }
     [self subscribeGlobalEvents];
-    [Rokt initWithRoktTagId:roktTagId];
+    [RNRoktSDK initializeWithTagId:roktTagId];
 }
 
 - (void)initializeWithFontFiles:(NSString *)roktTagId appVersion:(NSString *)appVersion fontsMap:(NSDictionary *)fontsMap {
@@ -161,7 +161,7 @@ RCT_EXPORT_METHOD(initializeWithFonts:(NSString *)roktTagId appVersion: (NSStrin
         return;
     }
     [self subscribeGlobalEvents];
-    [Rokt initWithRoktTagId:roktTagId ];
+    [RNRoktSDK initializeWithTagId:roktTagId];
 }
 
 RCT_EXPORT_METHOD(selectPlacements:(NSString *)identifier
@@ -191,7 +191,7 @@ RCT_EXPORT_METHOD(selectPlacementsWithConfig:(NSString *)identifier
     }
     NSMutableDictionary *finalAttributes = [self convertToMutableDictionaryOfStrings:attributes];
 
-    RoktConfig *config = [self buildRoktConfigFromSpec:roktConfig];
+    NSObject *config = [self buildRoktConfigFromSpec:roktConfig];
     [self selectPlacementsWithIdentifier:identifier attributes:finalAttributes placeholders:placeholders config:config];
 }
 #else
@@ -207,7 +207,7 @@ RCT_EXPORT_METHOD(selectPlacementsWithConfig:(NSString *)identifier
     }
     NSMutableDictionary *finalAttributes = [self convertToMutableDictionaryOfStrings:attributes];
 
-    RoktConfig *config = [self buildRoktConfigFromDict:roktConfig];
+    NSObject *config = [self buildRoktConfigFromDict:roktConfig];
     [self selectPlacementsWithIdentifier:identifier attributes:finalAttributes placeholders:placeholders config:config];
 }
 #endif
@@ -221,11 +221,7 @@ RCT_EXPORT_METHOD(selectShoppableAds:(NSString *)identifier
     }
     NSMutableDictionary *finalAttributes = [self convertToMutableDictionaryOfStrings:attributes];
     [self subscribeViewEvents:identifier];
-    [Rokt selectShoppableAdsWithIdentifier:identifier
-        attributes:finalAttributes
-        config:nil
-        onEvent:nil
-    ];
+    [RNRoktSDK selectShoppableAdsWithIdentifier:identifier attributes:finalAttributes config:nil];
 }
 
 #ifdef RCT_NEW_ARCH_ENABLED
@@ -238,13 +234,9 @@ RCT_EXPORT_METHOD(selectShoppableAdsWithConfig:(NSString *)identifier
         return;
     }
     NSMutableDictionary *finalAttributes = [self convertToMutableDictionaryOfStrings:attributes];
-    RoktConfig *config = [self buildRoktConfigFromSpec:roktConfig];
+    NSObject *config = [self buildRoktConfigFromSpec:roktConfig];
     [self subscribeViewEvents:identifier];
-    [Rokt selectShoppableAdsWithIdentifier:identifier
-        attributes:finalAttributes
-        config:config
-        onEvent:nil
-    ];
+    [RNRoktSDK selectShoppableAdsWithIdentifier:identifier attributes:finalAttributes config:config];
 }
 #else
 RCT_EXPORT_METHOD(selectShoppableAdsWithConfig:(NSString *)identifier
@@ -256,13 +248,9 @@ RCT_EXPORT_METHOD(selectShoppableAdsWithConfig:(NSString *)identifier
         return;
     }
     NSMutableDictionary *finalAttributes = [self convertToMutableDictionaryOfStrings:attributes];
-    RoktConfig *config = [self buildRoktConfigFromDict:roktConfig];
+    NSObject *config = [self buildRoktConfigFromDict:roktConfig];
     [self subscribeViewEvents:identifier];
-    [Rokt selectShoppableAdsWithIdentifier:identifier
-        attributes:finalAttributes
-        config:config
-        onEvent:nil
-    ];
+    [RNRoktSDK selectShoppableAdsWithIdentifier:identifier attributes:finalAttributes config:config];
 }
 #endif
 
@@ -287,23 +275,10 @@ RCT_EXPORT_METHOD(selectShoppableAdsWithConfig:(NSString *)identifier
     return [value isKindOfClass:[NSDictionary class]] ? [self convertToMutableDictionaryOfStrings:value] : nil;
 }
 
-- (RoktColorMode)stringToColorMode:(NSString*)colorString
-{
-    if ([colorString isEqualToString:@"light"]) {
-        return RoktColorModeLight;
-    }
-    else if ([colorString isEqualToString:@"dark"]) {
-        return RoktColorModeDark;
-    }
-    else {
-        return RoktColorModeSystem;
-    }
-}
-
 - (void)subscribeGlobalEvents
 {
     self.eventManager = [RoktEventManager allocWithZone: nil];
-    [Rokt globalEventsOnEvent:^(RoktEvent * _Nonnull roktEvent) {
+    [RNRoktSDK subscribeToGlobalEvents:^(NSObject *roktEvent) {
         [self.eventManager onRoktEvents:roktEvent identifier:nil];
     }];
 }
@@ -313,24 +288,24 @@ RCT_EXPORT_METHOD(selectShoppableAdsWithConfig:(NSString *)identifier
     if (self.eventManager == nil) {
         self.eventManager = [RoktEventManager allocWithZone: nil];
     }
-    [Rokt eventsWithIdentifier:identifier onEvent:^(RoktEvent * _Nonnull roktEvent) {
+    [RNRoktSDK subscribeToEventsWithIdentifier:identifier handler:^(NSObject *roktEvent) {
         [self.eventManager onRoktEvents:roktEvent identifier:identifier];
     }];
 }
 
 RCT_EXPORT_METHOD(setEnvironmentToStage) {
-    [Rokt setEnvironmentWithEnvironment: RoktEnvironmentStage];
+    [RNRoktSDK setStageEnvironment:YES];
 }
 RCT_EXPORT_METHOD(setEnvironmentToProd){
-    [Rokt setEnvironmentWithEnvironment: RoktEnvironmentProd];
+    [RNRoktSDK setStageEnvironment:NO];
 }
 
 RCT_EXPORT_METHOD(setSessionId:(NSString *)sessionId) {
-    [Rokt setSessionIdWithSessionId:sessionId];
+    [RNRoktSDK setSessionId:sessionId];
 }
 
 RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(getSessionId) {
-    return [Rokt getSessionId];
+    return [RNRoktSDK sessionId];
 }
 
 RCT_EXPORT_METHOD(setCustomBaseURL:(NSString *)urlString) {
@@ -343,13 +318,13 @@ RCT_EXPORT_METHOD(setCustomBaseURL:(NSString *)urlString) {
         RCTLog(@"setCustomBaseURL failed. urlString is not a valid URL: %@", urlString);
         return;
     }
-    [Rokt setCustomBaseURL:url];
+    [RNRoktSDK setCustomBaseURL:url];
 }
 
 RCT_EXPORT_METHOD(setPaymentCallbackURLScheme:(NSString *)scheme) {
     // Backs the built-in PayPal device-pay redirect flow. See
     // Rokt.setBuiltInPayPalRedirectURLScheme in the native SDK for details.
-    [Rokt setBuiltInPayPalRedirectURLScheme:scheme];
+    [RNRoktSDK setBuiltInPayPalRedirectURLScheme:scheme];
 }
 
 RCT_EXPORT_METHOD(handleURLCallback:(NSString *)urlString) {
@@ -362,7 +337,7 @@ RCT_EXPORT_METHOD(handleURLCallback:(NSString *)urlString) {
         RCTLog(@"handleURLCallback failed. urlString is not a valid URL: %@", urlString);
         return;
     }
-    [Rokt handleURLCallbackWith:url];
+    [RNRoktSDK handleURLCallback:url];
 }
 
 RCT_EXPORT_METHOD(purchaseFinalized:(NSString *)placementId
@@ -374,9 +349,7 @@ RCT_EXPORT_METHOD(purchaseFinalized:(NSString *)placementId
         return;
     }
     // Call the native iOS implementation
-    [Rokt purchaseFinalizedWithIdentifier:placementId
-                            catalogItemId:catalogItemId
-                                success:success];
+    [RNRoktSDK purchaseFinalizedWithIdentifier:placementId catalogItemId:catalogItemId success:success];
 }
 
 #ifdef RCT_NEW_ARCH_ENABLED
@@ -391,7 +364,7 @@ RCT_EXPORT_METHOD(purchaseFinalized:(NSString *)placementId
     NSMutableDictionary *resolved = [NSMutableDictionary new];
     for (NSString *name in placeholders) {
         UIView *view = [RoktPlaceholderRegistry viewForName:name];
-        if ([view isKindOfClass:[RoktEmbeddedView class]]) {
+        if ([RNRoktViews isEmbeddedView:view]) {
             resolved[name] = view;
         } else {
             RCTLogWarn(@"Cannot resolve placeholder %@", name);
@@ -400,7 +373,7 @@ RCT_EXPORT_METHOD(purchaseFinalized:(NSString *)placementId
     return resolved;
 }
 
-- (void)selectPlacementsWithIdentifier:(NSString *)identifier attributes:(NSDictionary *)attributes placeholders:(NSDictionary *)placeholders config:(RoktConfig *)config
+- (void)selectPlacementsWithIdentifier:(NSString *)identifier attributes:(NSDictionary *)attributes placeholders:(NSDictionary *)placeholders config:(NSObject *)config
 {
     RCTExecuteOnMainQueue(^{
         if (self.invalidated) {
@@ -418,14 +391,8 @@ RCT_EXPORT_METHOD(purchaseFinalized:(NSString *)placementId
             [strongSelf.placeholderWaitKeys removeObject:key];
             NSMutableDictionary *nativePlaceholders = [strongSelf resolvePlaceholders:placeholders];
             [strongSelf subscribeViewEvents:identifier];
-            if (config == nil) {
-                [Rokt selectPlacementsWithIdentifier:identifier attributes:attributes
-                    placements:nativePlaceholders onEvent:nil];
-            } else {
-                [Rokt selectPlacementsWithIdentifier:identifier attributes:attributes
-                    placements:nativePlaceholders config:config placementOptions:nil
-                    onEvent:nil];
-            }
+            [RNRoktSDK selectPlacementsWithIdentifier:identifier attributes:attributes
+                placements:nativePlaceholders config:config];
         } discarded:^{
             // A newer request owns this key after replacement. Invalidation clears all keys.
             RCTLogInfo(@"Pending selectPlacements dropped for %@", identifier);
@@ -434,51 +401,33 @@ RCT_EXPORT_METHOD(purchaseFinalized:(NSString *)placementId
 }
 
 #ifdef RCT_NEW_ARCH_ENABLED
-- (RoktConfig*)buildRoktConfigFromSpec:(JS::NativeRoktWidget::RoktConfigType &)roktConfigSpec
+- (NSObject *)buildRoktConfigFromSpec:(JS::NativeRoktWidget::RoktConfigType &)roktConfigSpec
 {
-    RoktConfigBuilder *builder = [[RoktConfigBuilder alloc] init];
-    NSString *colorMode = roktConfigSpec.colorMode();
-    if (colorMode != nil) {
-        RoktColorMode value = [self stringToColorMode:colorMode];
-        [builder colorMode:value];
-    }
-
     std::optional<JS::NativeRoktWidget::CacheConfig> cacheConfigSpec = roktConfigSpec.cacheConfig();
+    NSNumber *cacheDuration = nil;
+    NSDictionary *cacheAttributes = nil;
     if (cacheConfigSpec.has_value()) {
         auto cacheConfigValue = cacheConfigSpec.value();
-        NSDictionary *cacheAttributes = [self dictionaryOfStringsOrNil:cacheConfigValue.cacheAttributes()];
+        cacheAttributes = [self dictionaryOfStringsOrNil:cacheConfigValue.cacheAttributes()];
         std::optional<double> duration = cacheConfigValue.cacheDurationInSeconds();
-
-        NSTimeInterval cacheDurationInSeconds = duration.has_value() ? duration.value() : RoktCacheConfig.maxCacheDuration;
-
-        RoktCacheConfig *cacheConfig = [[RoktCacheConfig alloc] initWithCacheDuration:cacheDurationInSeconds cacheAttributes:cacheAttributes];
-        [builder cacheConfig:(cacheConfig)];
+        cacheDuration = duration.has_value() ? @(duration.value()) : nil;
     }
-
-    return [builder build];
+    return [RNRoktConfigFactory configWithColorMode:roktConfigSpec.colorMode()
+                                              cache:cacheConfigSpec.has_value()
+                                      cacheDuration:cacheDuration
+                                    cacheAttributes:cacheAttributes];
 }
 #else
-- (RoktConfig*)buildRoktConfigFromDict:(NSDictionary *)roktConfigDict
+- (NSObject *)buildRoktConfigFromDict:(NSDictionary *)roktConfigDict
 {
-    RoktConfigBuilder *builder = [[RoktConfigBuilder alloc] init];
     id colorMode = roktConfigDict[@"colorMode"];
-    if ([colorMode isKindOfClass:[NSString class]]) {
-        RoktColorMode value = [self stringToColorMode:colorMode];
-        [builder colorMode:value];
-    }
-
     NSDictionary *cacheConfigDict = roktConfigDict[@"cacheConfig"];
-    if ([cacheConfigDict isKindOfClass:[NSDictionary class]]) {
-        NSDictionary *cacheAttributes = [self dictionaryOfStringsOrNil:cacheConfigDict[@"cacheAttributes"]];
-        id duration = cacheConfigDict[@"cacheDurationInSeconds"];
-
-        NSTimeInterval cacheDurationInSeconds = [duration isKindOfClass:[NSNumber class]] ? [duration doubleValue] : RoktCacheConfig.maxCacheDuration;
-
-        RoktCacheConfig *cacheConfig = [[RoktCacheConfig alloc] initWithCacheDuration:cacheDurationInSeconds cacheAttributes:cacheAttributes];
-        [builder cacheConfig:(cacheConfig)];
-    }
-
-    return [builder build];
+    BOOL cache = [cacheConfigDict isKindOfClass:[NSDictionary class]];
+    id duration = cache ? cacheConfigDict[@"cacheDurationInSeconds"] : nil;
+    return [RNRoktConfigFactory configWithColorMode:[colorMode isKindOfClass:[NSString class]] ? colorMode : nil
+                                              cache:cache
+                                      cacheDuration:[duration isKindOfClass:[NSNumber class]] ? duration : nil
+                                    cacheAttributes:cache ? [self dictionaryOfStringsOrNil:cacheConfigDict[@"cacheAttributes"]] : nil];
 }
 #endif
 
