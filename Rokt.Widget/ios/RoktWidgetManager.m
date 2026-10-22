@@ -18,14 +18,14 @@
 #import <React/RCTViewManager.h>
 #import "RoktLegacyEmbeddedView.h"
 #import "RoktPlaceholderRegistry.h"
-#import "RNRoktSDKImports.h"
+#import "RNRoktSwift.h"
 
 @implementation RoktLegacyEmbeddedView
 
 - (instancetype)initWithFrame:(CGRect)frame
 {
   if ((self = [super initWithFrame:frame])) {
-    _roktEmbeddedView = [[RoktEmbeddedView alloc] initWithFrame:self.bounds];
+    _roktEmbeddedView = [RNRoktViews makeEmbeddedViewWithFrame:self.bounds];
     // As with Fabric, only the SDK changes the embedded view's measured height.
     _roktEmbeddedView.autoresizingMask = UIViewAutoresizingFlexibleWidth;
     [self addSubview:_roktEmbeddedView];

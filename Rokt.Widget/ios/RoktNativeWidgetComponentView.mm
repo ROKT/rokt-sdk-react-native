@@ -14,7 +14,7 @@
 #import "RoktPlaceholderRegistry.h"
 #import <React/RCTConversions.h>
 
-#import "RNRoktSDKImports.h"
+#import "RNRoktSwift.h"
 #import <React/renderer/components/RNRoktWidgetSpec/ComponentDescriptors.h>
 #import <react/renderer/components/RNRoktWidgetSpec/Props.h>
 #import <React/renderer/components/RNRoktWidgetSpec/RCTComponentViewHelpers.h>
@@ -22,7 +22,7 @@
 using namespace facebook::react;
 
 @interface RoktNativeWidgetComponentView () <RCTRoktNativeWidgetViewProtocol>
-@property (nonatomic, nullable) RoktEmbeddedView *roktEmbeddedView;
+@property (nonatomic, nullable) UIView *roktEmbeddedView;
 @property (nonatomic, nullable) NSString *placeholderName;
 @end
 
@@ -47,7 +47,7 @@ using namespace facebook::react;
 - (void)installEmbeddedView
 {
   // Zero height: a recycled wrapper still has the previous mount's size.
-  _roktEmbeddedView = [[RoktEmbeddedView alloc] initWithFrame:CGRectMake(0, 0, CGRectGetWidth(self.bounds), 0)];
+  _roktEmbeddedView = [RNRoktViews makeEmbeddedViewWithFrame:CGRectMake(0, 0, CGRectGetWidth(self.bounds), 0)];
   // Width only: the Rokt SDK owns the height (updateEmbeddedSize sets it before JS
   // resizes this view), so flexible height would re-apply that delta once React Native
   // caught up, doubling the embedded view and centring the layout below blank space.

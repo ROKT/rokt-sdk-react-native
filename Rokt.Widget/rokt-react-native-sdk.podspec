@@ -18,6 +18,12 @@ Pod::Spec.new do |s|
   s.source       = { :git => "https://github.com/ROKT/rokt-sdk-react-native", :tag => "#{s.version}" }
 
   s.source_files = "ios/**/*.{h,m,swift,mm}"
+  # The Rokt-typed code is Swift (ios/Swift); Objective-C++ reaches it through the hand-written
+  # RNRoktSwift.h. Private headers keep C++ and React headers out of the module's umbrella header,
+  # which the Swift code's module would otherwise fail to build.
+  s.swift_version = "5.0"
+  s.private_header_files = "ios/**/*.h"
+  s.pod_target_xcconfig = { "DEFINES_MODULE" => "YES" }
 
   # Use install_modules_dependencies helper to install the dependencies if React Native version >=0.71.0.
   # See https://github.com/facebook/react-native/blob/febf6b7f33fdb4904669f99d795eba4c0f95d7bf/scripts/cocoapods/new_architecture.rb#L79.
@@ -30,6 +36,7 @@ Pod::Spec.new do |s|
 
     # Simplified configuration for older React Native versions
     s.pod_target_xcconfig = {
+      "DEFINES_MODULE" => "YES",
       "HEADER_SEARCH_PATHS" => "\"$(PODS_ROOT)/boost\"",
       "OTHER_CPLUSPLUSFLAGS" => "-DFOLLY_NO_CONFIG -DFOLLY_MOBILE=1 -DFOLLY_USE_LIBCPP=1",
       "CLANG_CXX_LANGUAGE_STANDARD" => "c++17"
@@ -51,15 +58,18 @@ Pod::Spec.new do |s|
   # target on each `pod install`. `$RNRoktDisableSPM = true` at the top of the Podfile takes it from
   # CocoaPods instead.
   if RNRoktSPM.enabled?
-    # The app target links the Rokt iOS SDK as a Swift package. This pod only compiles against its
-    # generated headers and never links it, so it is a static framework even under
-    # `use_frameworks! :linkage => :dynamic`.
+    # The app target links the Rokt iOS SDK as a Swift package. This pod only compiles against it and
+    # never links it, so it is a static framework even under `use_frameworks! :linkage => :dynamic`.
     s.static_framework = true
     # Xcode writes the packages' generated Objective-C headers here, for build and archive alike.
     maps = "$(OBJROOT)/GeneratedModuleMaps-$(PLATFORM_NAME)"
     xcconfig = s.attributes_hash["pod_target_xcconfig"] || {}
+    # React Native's install_modules_dependencies may leave the search paths as a string or an array.
+    header_search_paths = Array(xcconfig["HEADER_SEARCH_PATHS"]) + ["\"#{maps}\""]
     s.pod_target_xcconfig = xcconfig.merge(
-      "HEADER_SEARCH_PATHS" => "#{xcconfig["HEADER_SEARCH_PATHS"]} \"#{maps}\"".strip
+      "HEADER_SEARCH_PATHS" => header_search_paths.join(" "),
+      # Where Xcode puts the Swift packages' .swiftmodule files, for build and archive alike.
+      "SWIFT_INCLUDE_PATHS" => "$(inherited) \"$(PODS_CONFIGURATION_BUILD_DIR)\""
     )
     # Declaring the headers as inputs orders this phase, and so this pod's compile, after the
     # packages that generate them.
