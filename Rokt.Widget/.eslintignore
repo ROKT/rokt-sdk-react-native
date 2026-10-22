@@ -1,6 +1,7 @@
 node_modules/
 dist/
 app.plugin.js
+react-native.config.js
 plugin/build
 __tests__/
 jest.config.cjs

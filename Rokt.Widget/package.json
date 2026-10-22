@@ -26,7 +26,9 @@
     "rokt-react-native-sdk.podspec",
     "package.json",
     "app.plugin.js",
-    "plugin"
+    "plugin",
+    "Package.swift",
+    "react-native.config.js"
   ],
   "author": "",
   "license": "Copyright 2020 Rokt Pte Ltd",
