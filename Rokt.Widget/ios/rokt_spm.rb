@@ -14,8 +14,8 @@
 #      the Rokt SDK. Mixing pods and Swift packages builds and archives silently, then misbehaves at
 #      runtime.
 #   2. After the Podfile's post_install hook, it links the Rokt iOS SDK and each listed package, pinned
-#      to an exact version, into every iOS application target that uses this pod. The app target owns
-#      the only copy. It unlinks the optional packages the Podfile does not list.
+#      to an exact version, into every iOS app, App Clip and app extension target that uses this pod.
+#      The target owns the only copy. It unlinks the optional packages the Podfile does not list.
 # With the opt-out, it only warns when an app target still links the Rokt Swift packages.
 require 'xcodeproj'
 
@@ -34,6 +34,8 @@ module RNRoktSPM
   # The packages this file links, and unlinks when the Podfile no longer lists them.
   MANAGED_URLS = [SDK_URL, *PACKAGES.values.map { |pkg| pkg[:url] }].freeze
   CONFLICTING_PODS = /\A(Rokt-Widget|RoktContracts|RoktUXHelper|DcuiSchema|RoktPaymentExtension)\z/.freeze
+  # Apps, App Clips and app extensions (widgets included) link this pod's code, so each needs the SDK.
+  SDK_PRODUCT_TYPES = %w[com.apple.product-type.application com.apple.product-type.app-extension].freeze
 
   def self.enabled?
     !(defined?($RNRoktDisableSPM) && $RNRoktDisableSPM)
@@ -56,10 +58,14 @@ module RNRoktSPM
       names.map { |name| PACKAGES[name].merge(version: version) }
   end
 
-  # Package URLs that differ only by case, a trailing slash or a `.git` suffix are the same package to
-  # SwiftPM, so a reference added by hand as rokt-sdk-ios.git is reused rather than added twice.
+  # Package URLs that differ only by case, scheme (https, http, ssh, git@host:), a trailing slash or a
+  # `.git` suffix are the same package, so a hand-added reference is reused rather than added twice. A
+  # repository under another owner, such as a fork, is a different package.
   def self.same_url?(left, right)
-    normalize = ->(url) { url.to_s.downcase.chomp('/').delete_suffix('.git') }
+    normalize = lambda do |url|
+      url.to_s.downcase.chomp('/').delete_suffix('.git')
+         .sub(%r{\A[a-z+]+://}, '').sub(%r{\A[^/@]+@}, '').sub(%r{\A([^/:]+):(?!\d)}, '\\1/')
+    end
     normalize.call(left) == normalize.call(right)
   end
 
@@ -80,14 +86,14 @@ module RNRoktSPM
           'these pods too: move it to Swift Package Manager as well, or opt out here.'
   end
 
-  # Only iOS apps that use this pod: other apps in the same Podfile must not get the SDK.
-  def self.application_targets(installer)
+  # Only iOS targets that use this pod: other targets in the same Podfile must not get the SDK.
+  def self.sdk_targets(installer)
     aggregates = installer.aggregate_targets.select do |aggregate|
       aggregate.platform.name == :ios && aggregate.pod_targets.any? { |pod| pod.pod_name == POD_NAME }
     end
     aggregates.flat_map do |aggregate|
       aggregate.user_targets
-               .select { |t| t.product_type == 'com.apple.product-type.application' }
+               .select { |t| t.product_type.to_s.start_with?(*SDK_PRODUCT_TYPES) }
                .map { |t| [aggregate.user_project, t] }
     end.uniq { |project, target| [project.path.to_s, target.uuid] }
   end
@@ -157,7 +163,7 @@ module RNRoktSPM
   def self.link_packages(installer)
     packages = self.packages
     touched = {}
-    application_targets(installer).each do |project, target|
+    sdk_targets(installer).each do |project, target|
       packages.each do |pkg|
         added = add_package(project, target, **pkg)
         Pod::UI.puts "[Rokt] #{target.name} <- #{pkg[:product]} #{pkg[:version]}".green if added
@@ -174,7 +180,7 @@ module RNRoktSPM
   # With the opt-out, the CocoaPods SDK and any leftover Swift package would both be linked.
   def self.warn_leftover_packages(installer)
     products = [SDK_PRODUCT, *PACKAGES.values.map { |pkg| pkg[:product] }]
-    application_targets(installer).each do |_, target|
+    sdk_targets(installer).each do |_, target|
       leftover = target.package_product_dependencies.map(&:product_name) & products
       next if leftover.empty?
 
