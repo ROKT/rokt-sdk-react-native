@@ -11,3 +11,7 @@ RoktSampleApp/android/app/src/main/assets/*.bundle
 
 # Swift Package Manager mode resolves the Rokt iOS SDK at pod install (README › Swift Package Manager)
 RoktSampleApp/ios/RoktSampleApp.xcworkspace/xcshareddata/swiftpm/
+
+# Created by Swift Package Manager or Xcode when Rokt.Widget/Package.swift is opened or resolved
+Rokt.Widget/.build/
+Rokt.Widget/.swiftpm/
