@@ -9,7 +9,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.facebook.react.bridge.*
 import com.facebook.react.modules.core.DeviceEventManagerModule.RCTDeviceEventEmitter
-import com.facebook.react.uimanager.UIManagerHelper
 import com.rokt.roktsdk.CacheConfig
 import com.rokt.roktsdk.Rokt
 import com.rokt.roktsdk.Rokt.Environment.Prod
@@ -71,7 +70,7 @@ class RNRoktWidgetModuleImpl(private val reactContext: ReactApplicationContext) 
     // UI thread only. The callback is always deferred beyond the native mount transaction.
     internal fun whenPlaceholdersMounted(identifier: String, placeholders: Map<String, Any?>, onReady: () -> Unit) {
         if (invalidated) return
-        val names = placeholders.filterValues { it !is Number || it.toDouble() <= 0 }.keys
+        val names = placeholders.keys
         val key = "$waitPrefix:$identifier"
         waitKeys.add(key)
         RoktPlaceholderRegistry.awaitNames(key, names, 2000, onDiscard = {
@@ -82,23 +81,15 @@ class RNRoktWidgetModuleImpl(private val reactContext: ReactApplicationContext) 
         }
     }
 
+    // Placeholders are looked up by name; the map's values are not used.
     internal fun resolvePlaceholders(placeholders: Map<String, Any?>): Map<String, WeakReference<Widget>> {
         val resolved = mutableMapOf<String, WeakReference<Widget>>()
-        for ((name, value) in placeholders) {
-            var widget: Widget? = null
-            if (value is Number && value.toDouble() > 0) {
-                try {
-                    val tag = value.toInt()
-                    widget = UIManagerHelper.getUIManagerForReactTag(reactContext, tag)?.resolveView(tag) as? Widget
-                } catch (e: RuntimeException) {
-                    logDebug("Cannot resolve React tag $value: ${e.message}")
-                }
-            }
-            widget = widget ?: RoktPlaceholderRegistry.lookup(name) as? Widget
+        for (name in placeholders.keys) {
+            val widget = RoktPlaceholderRegistry.lookup(name) as? Widget
             if (widget != null) {
                 resolved[name] = WeakReference(widget)
             } else {
-                Log.w("Rokt", "Cannot resolve placeholder $name (reactTag $value)")
+                Log.w("Rokt", "Cannot resolve placeholder $name")
             }
         }
         return resolved

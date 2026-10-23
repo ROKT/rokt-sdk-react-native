@@ -21,17 +21,34 @@ test("name arrays become zero sentinels, without requiring refs", () => {
     { Location1: 0, Location2: 0 },
   );
 });
-test("preserves positive tags and resolves legacy nulls by name without mutating input", () => {
+test("the removed map of names to tags logs an error and selects without embedded views", () => {
+  const error = jest.spyOn(console, "error").mockImplementation(() => {});
   const placeholders = { Location1: 42, Location2: null };
-  Rokt.selectPlacements("embedded", {}, placeholders);
+  // JavaScript callers can still pass the removed form.
+  Rokt.selectPlacements("embedded", {}, placeholders as never);
+  expect(native.selectPlacements).toHaveBeenCalledWith("embedded", {}, {});
+  expect(error).toHaveBeenCalledWith(
+    expect.stringContaining("must be an array of placeholder names"),
+  );
+  expect(placeholders).toEqual({ Location1: 42, Location2: null });
+  error.mockRestore();
+});
+test("entries that are not names are skipped", () => {
+  Rokt.selectPlacements("embedded", {}, ["Location1", 42, null] as never);
   expect(native.selectPlacements).toHaveBeenCalledWith(
     "embedded",
     {},
-    { Location1: 42, Location2: 0 },
+    { Location1: 0 },
   );
-  expect(placeholders).toEqual({ Location1: 42, Location2: null });
 });
-test.each([undefined, [], {}])(
+test("an empty object, the earlier overlay-only form, selects without an error", () => {
+  const error = jest.spyOn(console, "error").mockImplementation(() => {});
+  Rokt.selectPlacements("overlay", {}, {} as never);
+  expect(native.selectPlacements).toHaveBeenCalledWith("overlay", {}, {});
+  expect(error).not.toHaveBeenCalled();
+  error.mockRestore();
+});
+test.each([undefined, []])(
   "overlay-only calls send an empty dictionary (%p)",
   (placeholders) => {
     expect(Rokt.selectPlacements("overlay", {}, placeholders)).toBeUndefined();

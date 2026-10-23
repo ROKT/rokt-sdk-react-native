@@ -50,20 +50,11 @@ class RNRoktWidgetModuleImplTest {
     }
 
     @Test
-    fun `legacy positive tags never wait for mounting`() {
-        var runs = 0
-        impl.whenPlaceholdersMounted("page", mapOf("Location1" to 42.0)) { runs++ }
-        assertEquals(0, delayed.size)
-        assertEquals(0, runs)
-        drain()
-        assertEquals(1, runs)
-    }
-
-    @Test
-    fun `names and legacy nulls wait while overlays do not`() {
+    fun `every placeholder waits for its view by name, whatever its value`() {
         impl.whenPlaceholdersMounted("first", mapOf("Location1" to 0.0)) {}
         impl.whenPlaceholdersMounted("second", mapOf("Location2" to null)) {}
-        assertEquals(2, delayed.size)
+        impl.whenPlaceholdersMounted("third", mapOf("Location3" to 42.0)) {}
+        assertEquals(3, delayed.size)
         var runs = 0
         impl.whenPlaceholdersMounted("overlay", emptyMap()) { runs++ }
         drain()

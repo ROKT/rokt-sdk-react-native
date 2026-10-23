@@ -59,7 +59,7 @@ const attributes = {
 ### Overlay placement
 
 ```javascript
-Rokt.selectPlacements("RoktExperience", attributes, {});
+Rokt.selectPlacements("RoktExperience", attributes);
 ```
 
 ### Embedded placement

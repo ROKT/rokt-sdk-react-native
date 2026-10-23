@@ -1,5 +1,4 @@
 #import <XCTest/XCTest.h>
-#import <React/RCTBridgeModule.h>
 #import <React/RCTLog.h>
 #import <React/RCTView.h>
 #import <React/UIView+React.h>
@@ -37,8 +36,6 @@
 
 @implementation RNRoktWidgetPlaceholderTests {
     RNRoktWidget *_rokt;
-    RCTViewRegistry *_viewRegistry;
-    NSMutableDictionary<NSNumber *, UIView *> *_views;
     NSInteger _loggedErrorCount;
     NSMutableArray<NSString *> *_loggedErrors;
     NSMutableArray<NSNumber *> *_loggedLevels;
@@ -49,15 +46,7 @@
 {
     [super setUp];
     _rokt = [RNRoktWidget new];
-    _views = [NSMutableDictionary new];
-
-    _viewRegistry = [RCTViewRegistry new];
     __weak __typeof__(self) weakSelf = self;
-    [_viewRegistry setBridgelessComponentViewProvider:^UIView *(NSNumber *reactTag) {
-        __strong __typeof__(weakSelf) strongSelf = weakSelf;
-        return strongSelf ? strongSelf->_views[reactTag] : nil;
-    }];
-    ((id<RCTBridgeModule>)_rokt).viewRegistry_DEPRECATED = _viewRegistry;
 
     _loggedErrorCount = 0;
     _loggedErrors = [NSMutableArray new];
@@ -82,8 +71,6 @@
     [RoktPlaceholderRegistry cancelAllWaits];
     RCTSetLogFunction(_originalLogFunction);
     _rokt = nil;
-    _viewRegistry = nil;
-    _views = nil;
     [super tearDown];
 }
 
@@ -92,48 +79,26 @@
     XCTAssertEqual(_rokt.methodQueue, dispatch_get_main_queue());
 }
 
-- (void)testModuleRegistryResolvesMountedViews
+- (void)testResolvesByNameWhateverTheValue
 {
-    UIView *mountedView = [[UIView alloc] init];
-    _views[@101] = mountedView;
-
-    id<RCTBridgeModule> module = (id<RCTBridgeModule>)_rokt;
-    XCTAssertNotNil(module.viewRegistry_DEPRECATED);
-    XCTAssertEqualObjects([module.viewRegistry_DEPRECATED viewForReactTag:@101], mountedView);
-    XCTAssertNil([module.viewRegistry_DEPRECATED viewForReactTag:@999]);
+    RoktEmbeddedView *named = [RoktEmbeddedView new];
+    [RoktPlaceholderRegistry registerView:named name:@"TestLocation1"];
+    for (id value in @[ @0, @101, [NSNull null], @"101" ]) {
+        XCTAssertEqual([_rokt resolvePlaceholders:@{@"TestLocation1": value}][@"TestLocation1"], named, @"%@", value);
+    }
+    XCTAssertEqual(_loggedErrorCount, 0, @"errors: %@", _loggedErrors);
+    [RoktPlaceholderRegistry unregisterView:named];
 }
 
-- (void)testSkipsTagThatIsNotMounted
+- (void)testSkipsRegisteredViewOfUnexpectedClass
 {
-    NSDictionary *resolved = [_rokt resolvePlaceholders:@{@"TestLocation1" : @999}];
-
+    UIView *plain = [UIView new];
+    [RoktPlaceholderRegistry registerView:plain name:@"TestLocation1"];
+    NSDictionary *resolved = [_rokt resolvePlaceholders:@{@"TestLocation1": @0}];
     XCTAssertEqual(resolved.count, 0u);
     XCTAssertEqual(_loggedErrorCount, 1, @"errors: %@", _loggedErrors);
-    XCTAssertEqual(_loggedLevels.firstObject.integerValue, RCTLogLevelError);
-}
-
-- (void)testSkipsTagResolvingToUnexpectedViewClass
-{
-    _views[@101] = [[UIView alloc] init];
-
-    NSDictionary *resolved = [_rokt resolvePlaceholders:@{@"TestLocation1" : @101}];
-
-    XCTAssertEqual(resolved.count, 0u);
-    XCTAssertEqual(_loggedErrorCount, 1, @"errors: %@", _loggedErrors);
-    XCTAssertEqual(_loggedLevels.firstObject.integerValue, RCTLogLevelError);
-}
-
-- (void)testSkipsNonNumericTagsWithoutThrowing
-{
-    NSDictionary *resolved =
-        [_rokt resolvePlaceholders:@{@"TestLocation1" : [NSNull null], @"TestLocation2" : @"101"}];
-
-    XCTAssertEqual(resolved.count, 0u);
-    XCTAssertEqual(_loggedErrorCount, 2, @"errors: %@", _loggedErrors);
-    XCTAssertTrue([_loggedErrors.firstObject hasPrefix:@"Cannot resolve placeholder"],
-                  @"errors: %@", _loggedErrors);
-    XCTAssertTrue([_loggedLevels containsObject:@(RCTLogLevelError)]);
-    XCTAssertTrue([_loggedLevels containsObject:@(RCTLogLevelWarning)]);
+    XCTAssertEqual(_loggedLevels.firstObject.integerValue, RCTLogLevelWarning);
+    [RoktPlaceholderRegistry unregisterView:plain];
 }
 
 - (void)testMissingNameLogsWarning
@@ -150,20 +115,6 @@
 
     XCTAssertEqual(resolved.count, 0u);
     XCTAssertEqual(_loggedErrorCount, 0, @"errors: %@", _loggedErrors);
-}
-
-
-- (void)testNameResolutionAndPositiveTagPrecedence
-{
-    RoktEmbeddedView *named = [RoktEmbeddedView new];
-    RoktEmbeddedView *tagged = [RoktEmbeddedView new];
-    [RoktPlaceholderRegistry registerView:named name:@"TestLocation1"];
-    _views[@101] = tagged;
-    XCTAssertEqual([_rokt resolvePlaceholders:@{@"TestLocation1": @0}][@"TestLocation1"], named);
-    XCTAssertEqual([_rokt resolvePlaceholders:@{@"TestLocation1": @101}][@"TestLocation1"], tagged);
-    XCTAssertEqual([_rokt resolvePlaceholders:@{@"TestLocation1": @999}][@"TestLocation1"], named);
-    XCTAssertEqual(_loggedErrorCount, 0, @"A successful name fallback must not report a tag error");
-    [RoktPlaceholderRegistry unregisterView:named];
 }
 
 - (void)testDuplicateNamesAndRename
@@ -354,11 +305,11 @@
     XCTAssertNotNil(retained);
 }
 
-- (void)testLegacyWrapperResolvesNumericTagsAndPreservesSDKHeight
+- (void)testLegacyWrapperResolvesByNameAndPreservesSDKHeight
 {
     RoktLegacyEmbeddedView *wrapper = [[RoktLegacyEmbeddedView alloc] initWithFrame:CGRectMake(0, 0, 330, 0)];
-    _views[@101] = wrapper;
-    XCTAssertEqual([_rokt resolvePlaceholders:@{@"TestLocation1": @101}][@"TestLocation1"], wrapper.roktEmbeddedView);
+    wrapper.placeholderName = @"TestLocation1";
+    XCTAssertEqual([_rokt resolvePlaceholders:@{@"TestLocation1": @0}][@"TestLocation1"], wrapper.roktEmbeddedView);
     wrapper.roktEmbeddedView.frame = CGRectMake(0, 0, 330, 415);
     wrapper.frame = CGRectMake(0, 0, 390, 415);
     [wrapper layoutIfNeeded];
@@ -368,6 +319,21 @@
     wrapper.frame = CGRectMake(0, 0, 390, 533);
     [wrapper layoutIfNeeded];
     XCTAssertEqualWithAccuracy(wrapper.roktEmbeddedView.frame.size.height, 533, 0.5);
+    [wrapper invalidate];
+}
+
+- (void)testSelectionWaitsForEveryNameWhateverTheValue
+{
+    // A positive value was a view tag, which skipped the wait. Every key is a name now.
+    RoktSelectionProbe *module = [RoktSelectionProbe new];
+    [module selectPlacementsWithIdentifier:@"page" attributes:@{} placeholders:@{@"TestLocation1": @101} config:nil];
+    XCTestExpectation *drained = [self expectationWithDescription:@"main queue drained"];
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        [drained fulfill];
+    });
+    [self waitForExpectations:@[drained] timeout:1];
+    XCTAssertEqual(module.resolutions, 0, @"Selection must wait for the named view to mount");
+    [module invalidate];
 }
 
 - (void)testInvalidatingModuleCancelsQueuedSelection

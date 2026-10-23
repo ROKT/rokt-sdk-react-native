@@ -38,8 +38,8 @@ if (!RNRoktWidget) {
   );
 }
 
-/** Names are preferred; numeric React tags remain supported for existing integrations. */
-export type RoktPlaceholders = string[] | Record<string, number | null>;
+/** Embedded placeholder names: the `placeholderName` of each `RoktEmbeddedView`. */
+export type RoktPlaceholders = string[];
 export type RoktAttributeValue = string | number | boolean;
 
 function toNativePlaceholders(
@@ -47,13 +47,26 @@ function toNativePlaceholders(
 ): Record<string, number> {
   const result: Record<string, number> = {};
   if (placeholders == null) return result;
-  const names = Array.isArray(placeholders)
-    ? placeholders
-    : Object.keys(placeholders);
-  for (const name of names) {
-    // iOS codegen drops null-valued dictionary entries; React tags are always positive.
+  if (!Array.isArray(placeholders)) {
+    // An empty object meant overlay-only before; nothing is lost, so it is not an error.
+    if (
+      typeof placeholders === "object" &&
+      Object.keys(placeholders).length === 0
+    ) {
+      return result;
+    }
+    // JavaScript callers can still pass the removed map of names to findNodeHandle tags.
+    console.error(
+      "[Rokt] selectPlacements: placeholders must be an array of placeholder names, such as ['Location1']. " +
+        "The map of names to view tags is no longer supported, so the placement is selected without embedded views.",
+    );
+    return result;
+  }
+  for (const name of placeholders) {
+    if (typeof name !== "string") continue;
+    // The native modules take a map of names to 0, the format the removed tag map used.
     Object.defineProperty(result, name, {
-      value: Array.isArray(placeholders) ? 0 : (placeholders[name] ?? 0),
+      value: 0,
       enumerable: true,
       configurable: true,
       writable: true,
@@ -149,7 +162,7 @@ export abstract class Rokt {
    *
    * @param identifier - The placement identifier configured in Rokt
    * @param attributes - Key-value attributes (e.g. email, country) for targeting
-   * @param placeholders - Embedded placeholder names (preferred) or legacy React tags. Names wait up to two seconds for mounting. Omit for overlay-only.
+   * @param placeholders - Embedded placeholder names, the `placeholderName` of each `RoktEmbeddedView`. Each name waits up to two seconds for its view to mount. Omit for overlay-only.
    * @param roktConfig - Optional configuration (color mode, caching)
    */
   public static selectPlacements(

@@ -17,13 +17,11 @@
 #import <React/RCTViewManager.h>
 #import "RoktEventManager.h"
 #import "RoktPlaceholderRegistry.h"
-#import "RoktLegacyEmbeddedView.h"
 #if DEBUG
 #import <objc/runtime.h>
 #endif
 
 #ifdef RCT_NEW_ARCH_ENABLED
-#import "RoktNativeWidgetComponentView.h"
 #import <RNRoktWidgetSpec/RNRoktWidgetSpec.h>
 #endif // RCT_NEW_ARCH_ENABLED
 
@@ -121,9 +119,6 @@
         [self.placeholderWaitKeys removeAllObjects];
     });
 }
-
-// Maps React tags to UIViews in both bridge and bridgeless modes.
-@synthesize viewRegistry_DEPRECATED = _viewRegistry_DEPRECATED;
 
 - (dispatch_queue_t)methodQueue
 {
@@ -390,38 +385,16 @@ RCT_EXPORT_METHOD(purchaseFinalized:(NSString *)placementId
 }
 #endif
 
-// Main thread only. Positive tags preserve legacy lookup; names bypass React tag APIs.
+// Main thread only. Placeholders are looked up by name; the dictionary's values are not used.
 - (NSMutableDictionary *)resolvePlaceholders:(NSDictionary *)placeholders
 {
     NSMutableDictionary *resolved = [NSMutableDictionary new];
     for (NSString *name in placeholders) {
-        id value = placeholders[name];
-        UIView *view = nil;
-        if ([value isKindOfClass:[NSNumber class]] && [value doubleValue] > 0) {
-            view = [_viewRegistry_DEPRECATED viewForReactTag:value];
-            if ([view isKindOfClass:[RoktLegacyEmbeddedView class]]) {
-                view = ((RoktLegacyEmbeddedView *)view).roktEmbeddedView;
-            }
-#ifdef RCT_NEW_ARCH_ENABLED
-            if ([view isKindOfClass:[RoktNativeWidgetComponentView class]]) {
-                view = ((RoktNativeWidgetComponentView *)view).roktEmbeddedView;
-            }
-#endif
-        }
-        if (![view isKindOfClass:[RoktEmbeddedView class]]) {
-            view = [RoktPlaceholderRegistry viewForName:name];
-        }
+        UIView *view = [RoktPlaceholderRegistry viewForName:name];
         if ([view isKindOfClass:[RoktEmbeddedView class]]) {
             resolved[name] = view;
         } else {
-            BOOL isNameLookup = value == nil || value == [NSNull null] ||
-                ([value isKindOfClass:[NSNumber class]] && [value doubleValue] <= 0);
-            if (isNameLookup) {
-                RCTLogWarn(@"Cannot resolve placeholder %@ (reactTag %@)", name, value);
-            } else {
-                // Preserve error visibility for invalid legacy tags and malformed values.
-                RCTLogError(@"Cannot resolve placeholder %@ (reactTag %@)", name, value);
-            }
+            RCTLogWarn(@"Cannot resolve placeholder %@", name);
         }
     }
     return resolved;
@@ -433,13 +406,7 @@ RCT_EXPORT_METHOD(purchaseFinalized:(NSString *)placementId
         if (self.invalidated) {
             return;
         }
-        NSMutableArray<NSString *> *names = [NSMutableArray new];
-        for (NSString *name in placeholders) {
-            id value = placeholders[name];
-            if (![value isKindOfClass:[NSNumber class]] || [value doubleValue] <= 0) {
-                [names addObject:name];
-            }
-        }
+        NSArray<NSString *> *names = placeholders.allKeys ?: @[];
         NSString *key = [self.placeholderWaitPrefix stringByAppendingFormat:@":%@", identifier];
         [self.placeholderWaitKeys addObject:key];
         __weak __typeof__(self) weakSelf = self;
