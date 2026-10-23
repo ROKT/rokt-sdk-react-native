@@ -1,6 +1,5 @@
 #import <XCTest/XCTest.h>
-#import <RoktContracts/RoktContracts-Swift.h>
-#import <Rokt_Widget/Rokt_Widget-Swift.h>
+#import "../../../Rokt.Widget/ios/RNRoktSDKImports.h"
 #import "../../../Rokt.Widget/ios/RNRoktWidget.h"
 
 // Implemented in RNRoktWidget.mm, Debug builds only.

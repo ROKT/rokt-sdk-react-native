@@ -18,8 +18,7 @@
 #import <React/RCTViewManager.h>
 #import "RoktLegacyEmbeddedView.h"
 #import "RoktPlaceholderRegistry.h"
-@import RoktContracts;
-#import <Rokt_Widget/Rokt_Widget-Swift.h>
+#import "RNRoktSDKImports.h"
 
 @implementation RoktLegacyEmbeddedView
 
