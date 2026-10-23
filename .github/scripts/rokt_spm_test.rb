@@ -34,12 +34,12 @@ class RNRoktSPMTest < Minitest::Test
   end
 
   # Runs the helper as `pod install` would, then reopens the saved project.
-  def install(packages, version: nil)
+  def install(packages, version: nil, targets: %w[App])
     $RNRoktSPMPackages = packages
     $RNRoktSPMVersion = version
     project = Xcodeproj::Project.open(@path)
-    app = project.targets.find { |target| target.name == 'App' }
-    aggregate = Aggregate.new(Platform.new(:ios), [PodTarget.new(RNRoktSPM::POD_NAME)], [app], project)
+    user_targets = project.targets.select { |target| targets.include?(target.name) }
+    aggregate = Aggregate.new(Platform.new(:ios), [PodTarget.new(RNRoktSPM::POD_NAME)], user_targets, project)
     RNRoktSPM.link_packages(Installer.new([aggregate], []))
     Xcodeproj::Project.open(@path)
   end
@@ -87,6 +87,19 @@ class RNRoktSPMTest < Minitest::Test
     assert_empty linked(project, 'Other')
   end
 
+  def test_links_app_clips_and_app_extensions_that_use_this_pod
+    project = Xcodeproj::Project.open(@path)
+    project.new_target(:application, 'Clip', :ios).product_type =
+      'com.apple.product-type.application.on-demand-install-capable'
+    project.new_target(:app_extension, 'Widget', :ios)
+    project.new_target(:unit_test_bundle, 'Tests', :ios)
+    project.save
+    project = install(nil, targets: %w[App Clip Widget Tests])
+    %w[App Clip Widget].each { |name| assert_equal [SDK], linked(project, name), name }
+    assert_empty linked(project, 'Tests')
+    assert_empty linked(project, 'Other')
+  end
+
   def test_installing_again_changes_nothing
     install(['RoktPaymentExtension'])
     before = pbxproj
@@ -118,6 +131,21 @@ class RNRoktSPMTest < Minitest::Test
     assert_equal ["#{RNRoktSPM::SDK_URL}.git"], references(project)
     assert_equal [["#{RNRoktSPM::SDK_URL}.git", 'Rokt-Widget']], linked(project, 'App')
     assert_equal RNRoktSPM::DEFAULT_VERSION, versions(project)["#{RNRoktSPM::SDK_URL}.git"]
+  end
+
+  def test_reuses_a_reference_added_by_hand_over_ssh
+    ssh = 'git@github.com:ROKT/rokt-sdk-ios.git'
+    link_by_hand('App', [ssh, 'Rokt-Widget'])
+    project = install(nil)
+    assert_equal [ssh], references(project)
+    assert_equal [[ssh, 'Rokt-Widget']], linked(project, 'App')
+  end
+
+  def test_matches_other_spellings_of_the_sdk_url_but_not_another_owner
+    %w[ssh://git@github.com/ROKT/rokt-sdk-ios http://github.com/rokt/rokt-sdk-ios/].each do |url|
+      assert RNRoktSPM.same_url?(RNRoktSPM::SDK_URL, url), url
+    end
+    refute RNRoktSPM.same_url?(RNRoktSPM::SDK_URL, 'https://github.com/example/rokt-sdk-ios')
   end
 
   def test_keeps_hand_added_packages_and_references_other_targets_use

@@ -45,7 +45,7 @@ $RNRoktSPMVersion = '5.5.5'                    # exact Rokt iOS SDK version; def
 $RNRoktSPMPackages = ['RoktPaymentExtension']  # optional Rokt packages, at the same version
 ```
 
-**What `pod install` changes.** It adds the `rokt-sdk-ios` Swift package, product `Rokt-Widget`, to each iOS application target that uses this package, pinned to an exact version, plus any packages in `$RNRoktSPMPackages`. It unlinks the optional Rokt packages the Podfile does not list, including one added by hand, prints each change, and changes nothing when run again. Commit the `.xcodeproj` change and the `Package.resolved` file Xcode creates.
+**What `pod install` changes.** It adds the `rokt-sdk-ios` Swift package, product `Rokt-Widget`, to each iOS app, App Clip and app extension target that uses this package, pinned to an exact version, plus any packages in `$RNRoktSPMPackages`. It unlinks the optional Rokt packages the Podfile does not list, including one added by hand, prints each change, and changes nothing when run again. Commit the `.xcodeproj` change and the `Package.resolved` file Xcode creates.
 
 **Linkage.** Static libraries (the React Native default), `use_frameworks! :linkage => :static` and `use_frameworks! :linkage => :dynamic` all work. This package's own pod is always built as a static framework, so it never links a second copy of the SDK.
 
