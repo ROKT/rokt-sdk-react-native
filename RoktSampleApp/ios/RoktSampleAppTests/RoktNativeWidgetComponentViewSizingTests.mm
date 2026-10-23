@@ -86,7 +86,7 @@
 {
     [self simulateSDKResize:415];
     [self simulateReactNativeResize:415];
-    RoktEmbeddedView *embedded = _componentView.roktEmbeddedView;
+    UIView *embedded = _componentView.roktEmbeddedView;
 
     [_componentView prepareForRecycle];
 

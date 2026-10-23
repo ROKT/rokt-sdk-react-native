@@ -8,8 +8,8 @@
 //  You may not use this file except in compliance with the License.
 //  You may obtain a copy of the License at https://rokt.com/sdk-license-2-0/
 
-// For this package's sources only: the Rokt SDK's Objective-C headers, for every way an app can
-// supply the SDK.
+// The Rokt SDK's Objective-C headers, for every way an app can supply the SDK. The package's sources
+// reach the SDK through the Swift layer (RNRoktSwift.h); the sample app's tests use this header.
 //  - CocoaPods: <RoktContracts/RoktContracts-Swift.h> and <Rokt_Widget/Rokt_Widget-Swift.h>.
 //  - Swift Package Manager: Xcode generates the same headers outside any framework, so they are
 //    found by name on the header search path.

@@ -45,6 +45,30 @@
     XCTAssertEqualObjects(config.cacheConfig.cacheAttributes, @{@"email" : @"a@example.com"});
 }
 
+- (void)testColorModeStringsSelectTheColorMode
+{
+    XCTAssertEqual([self buildConfig:@{@"colorMode" : @"light"}].colorMode, RoktColorModeLight);
+    XCTAssertEqual([self buildConfig:@{@"colorMode" : @"dark"}].colorMode, RoktColorModeDark);
+    XCTAssertEqual([self buildConfig:@{@"colorMode" : @"system"}].colorMode, RoktColorModeSystem);
+}
+
+- (void)testWithoutCacheConfigCachingIsOff
+{
+    RoktConfig *config = [self buildConfig:@{}];
+
+    XCTAssertEqual(config.colorMode, RoktColorModeSystem);
+    XCTAssertFalse([config.cacheConfig isCacheEnabled]);
+}
+
+- (void)testCacheDurationIsKeptOrDefaultsToTheMaximum
+{
+    RoktConfig *config = [self buildConfig:@{@"cacheConfig" : @{@"cacheDurationInSeconds" : @60}}];
+
+    XCTAssertTrue([config.cacheConfig isCacheEnabled]);
+    XCTAssertEqual(config.cacheConfig.cacheDuration, 60);
+    XCTAssertEqual([self buildConfig:@{@"cacheConfig" : @{}}].cacheConfig.cacheDuration, RoktCacheConfig.maxCacheDuration);
+}
+
 - (void)testIgnoresCacheAttributesThatAreNotAnObject
 {
     RoktConfig *config = [self buildConfig:@{@"cacheConfig" : @{@"cacheAttributes" : @"a@example.com"}}];
