@@ -45,6 +45,11 @@ target 'RoktSampleApp' do
     :app_path => "#{Pod::Config.instance.installation_root}/.."
   )
 
+  # CocoaPods mode builds against the oldest Rokt iOS SDK the podspec accepts: keep this in step with its
+  # Rokt-Widget lower bound. The committed Podfile.lock is the Swift Package Manager one, which has no Rokt
+  # pods to pin it.
+  pod 'Rokt-Widget', '5.3.0' if $RNRoktDisableSPM
+
   # Uncomment to enable Shoppable Ads payment extension. With Swift Package Manager, set
   # $RNRoktSPMPackages = ['RoktPaymentExtension'] above instead.
   # pod 'RoktPaymentExtension' if $RNRoktDisableSPM
