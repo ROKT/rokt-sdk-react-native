@@ -88,10 +88,19 @@ jobs:
             Build metadata file
 
   build-test-ios:
-    name: Build & Test iOS
+    # The CocoaPods leg keeps the job's original name.
+    name: ${{ matrix.check_name }}
     if: needs.classify-changes.outputs.ios == 'true'
     needs: [classify-changes, trunk-check, build-package]
     runs-on: macos-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - ios_deps: cocoapods
+            check_name: Build & Test iOS
+          - ios_deps: spm
+            check_name: Build & Test iOS (SPM)
     steps:
       - name: Checkout code
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -110,6 +119,8 @@ jobs:
       - name: Build and Test iOS
         id: build-ios
         uses: ./.github/actions/build-ios
+        with:
+          ios-deps: ${{ matrix.ios_deps }}
 
       - name: Display artifact summary
         uses: ./.github/actions/display-artifacts

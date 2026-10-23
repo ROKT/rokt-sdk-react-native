@@ -28,9 +28,45 @@ The Rokt SDK is available from Maven Central and will be resolved automatically 
 
 #### Bare React Native
 
-Add the following `pre_install` block to your `ios/Podfile` before the `target` block. This is required because the Rokt iOS SDK (5.x) ships as source-based Swift pods that need dynamic framework linking:
+The Rokt iOS SDK comes from Swift Package Manager. React Native and this package still install with CocoaPods, and `pod install` links the Rokt iOS SDK into your app target as a Swift package. No Podfile change is needed:
+
+```shell
+cd ios && pod install
+```
+
+#### Swift Package Manager
+
+CocoaPods stops accepting new versions of pods on 2 December 2026 ([announcement](https://blog.cocoapods.org/CocoaPods-Specs-Repo/)), and the Rokt iOS SDK is published as a Swift package. Swift Package Manager mode is iOS only; Android is unchanged.
+
+**Podfile settings.** All are optional. Set them at the top of the Podfile, before the first `target` block:
 
 ```ruby
+$RNRoktSPMVersion = '5.5.5'                    # exact Rokt iOS SDK version; defaults to the version this release was tested with
+$RNRoktSPMPackages = ['RoktPaymentExtension']  # optional Rokt packages, at the same version
+```
+
+**What `pod install` changes.** It adds the `rokt-sdk-ios` Swift package, product `Rokt-Widget`, to each iOS app, App Clip and app extension target that uses this package, pinned to an exact version, plus any packages in `$RNRoktSPMPackages`. It unlinks the optional Rokt packages the Podfile does not list, including one added by hand, prints each change, and changes nothing when run again. Commit the `.xcodeproj` change and the `Package.resolved` file Xcode creates.
+
+**Linkage.** Static libraries (the React Native default), `use_frameworks! :linkage => :static` and `use_frameworks! :linkage => :dynamic` all work. This package's own pod is always built as a static framework, so it never links a second copy of the SDK.
+
+**One copy only.** Take every Rokt SDK from Swift Package Manager or every one from CocoaPods, never both. An app that has both builds without a warning and misbehaves at runtime, so `pod install` stops if a pod would add a second copy, and Debug builds show an error on launch if one is loaded. If your app also uses `react-native-mparticle` with its Rokt kit, use Swift Package Manager there too, so that both packages take the Rokt iOS SDK from the same Swift package.
+
+##### Troubleshooting
+
+- `[Rokt] This package takes the Rokt iOS SDK from Swift Package Manager, but these pods would add a second copy`: remove those pods from the Podfile, and their names from any `pre_install` dynamic-framework hook. Put `RoktPaymentExtension` in `$RNRoktSPMPackages` instead. If another package adds them, move it to Swift Package Manager too, or use CocoaPods (below).
+- `[Rokt] $RNRoktSPMPackages: unknown package`: use a name from the list in the error.
+- `[Rokt] ... already links Rokt-Widget from ...`: the app target links the SDK from another package. Remove it from the target in Xcode, then run `pod install` again.
+- `[Rokt] Swift Package Manager mode is on, but the Rokt-Widget Swift package is not linked into the app target` (a build error): run `pod install` again, and keep the package in the app target.
+- `[Rokt] The Rokt SDK is loaded more than once` (Debug builds): the app links the SDK from both CocoaPods and Swift Package Manager. Remove one of them.
+- These checks run from hooks on CocoaPods' own install steps, tested with CocoaPods 1.16.2. If a later CocoaPods version breaks them, use CocoaPods mode and report it in this repository's issues.
+
+#### CocoaPods (deprecated)
+
+To keep taking the Rokt iOS SDK from CocoaPods, set this at the top of the Podfile, remove the `rokt-sdk-ios` package from your app target if it is there, and add the `pre_install` block before the `target` block. The Rokt iOS SDK (5.x) ships as source-based Swift pods that need dynamic framework linking:
+
+```ruby
+$RNRoktDisableSPM = true
+
 pre_install do |installer|
   installer.pod_targets.each do |pod|
     if ['Rokt-Widget', 'RoktContracts', 'RoktUXHelper', 'DcuiSchema'].include?(pod.name)
@@ -42,11 +78,7 @@ pre_install do |installer|
 end
 ```
 
-Then install pods:
-
-```shell
-cd ios && pod install
-```
+New versions of the Rokt iOS SDK may not be published to CocoaPods after 2 December 2026.
 
 #### Expo
 
@@ -177,7 +209,7 @@ if let paymentExt = RoktPaymentExtension(
 }
 ```
 
-> The `RoktPaymentExtension` pod must be added to your Podfile. If it is not yet available in your SDK version, contact your Rokt account team.
+> Add `RoktPaymentExtension` to `$RNRoktSPMPackages` in your Podfile ([Swift Package Manager](#swift-package-manager)), or with CocoaPods add the `RoktPaymentExtension` pod. If it is not yet available in your SDK version, contact your Rokt account team.
 
 ### Purchase Finalized (Shoppable Ads only)
 

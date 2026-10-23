@@ -1,7 +1,6 @@
 PODS:
   - BEMCheckBox (1.4.1)
   - boost (1.84.0)
-  - DcuiSchema (2.8.1)
   - DoubleConversion (1.1.6)
   - fast_float (8.0.0)
   - FBLazyVector (0.81.5)
@@ -2284,15 +2283,8 @@ PODS:
     - ReactCodegen
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
-    - Rokt-Widget (< 6.0.0, >= 5.3.0)
     - SocketRocket
     - Yoga
-  - Rokt-Widget (5.3.0):
-    - RoktContracts (< 3.0, >= 2.0.2)
-    - RoktUXHelper (< 2.0, >= 1.0.0)
-  - RoktContracts (2.0.2)
-  - RoktUXHelper (1.0.0):
-    - DcuiSchema (= 2.8.1)
   - SocketRocket (0.7.1)
   - Yoga (0.0.0)
 
@@ -2376,10 +2368,6 @@ DEPENDENCIES:
 SPEC REPOS:
   trunk:
     - BEMCheckBox
-    - DcuiSchema
-    - Rokt-Widget
-    - RoktContracts
-    - RoktUXHelper
     - SocketRocket
 
 EXTERNAL SOURCES:
@@ -2534,7 +2522,6 @@ EXTERNAL SOURCES:
 SPEC CHECKSUMS:
   BEMCheckBox: 5ba6e37ade3d3657b36caecc35c8b75c6c2b1a4e
   boost: 7e761d76ca2ce687f7cc98e698152abd03a18f90
-  DcuiSchema: d179af68d7459ad6a4976bf04e1652b6ad1dd851
   DoubleConversion: cb417026b2400c8f53ae97020b2be961b59470cb
   fast_float: b32c788ed9c6a8c584d114d0047beda9664e7cc6
   FBLazyVector: 5beb8028d5a2e75dd9634917f23e23d3a061d2aa
@@ -2605,13 +2592,10 @@ SPEC CHECKSUMS:
   ReactCodegen: 6c26f8c25d0b5ae66f86a1cce1777076ac8bcbd8
   ReactCommon: 5f0e5c09a64a2717215dd84380e1a747810406f2
   RNCCheckbox: 33b44487ca8008394ce658cc32b26eab04f426ef
-  rokt-react-native-sdk: 4e38dff6b88173a9aff357c672b8c1f7bcfcd081
-  Rokt-Widget: 972ffce3e745ea2bbc42307810980fa92bd1afe3
-  RoktContracts: 0aba38d14cf6cbc09d6f6274a9c10ad5971149c1
-  RoktUXHelper: d337b72f355bb744c7fb3640834bcb60597b3855
+  rokt-react-native-sdk: 43e94b29f19a8311cad4904f4d1d61a2cc28a07e
   SocketRocket: d4aabe649be1e368d1318fdf28a022d714d65748
   Yoga: 728df40394d49f3f471688747cf558158b3a3bd1
 
-PODFILE CHECKSUM: 260a83b5cd2b199068573767fe688a0edde59eda
+PODFILE CHECKSUM: d97fa4783c9fada349660d99b8b3f008b46f9b74
 
 COCOAPODS: 1.16.2

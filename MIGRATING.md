@@ -2,6 +2,30 @@
 
 This document provides guidance on migrating to newer versions of the Rokt React Native SDK.
 
+## iOS: the Rokt SDK now comes from Swift Package Manager
+
+`pod install` now links the Rokt iOS SDK into your app target as a Swift package instead of installing it as a pod. React Native and this package still install with CocoaPods. See [README › Swift Package Manager](README.md#swift-package-manager) for the settings and troubleshooting.
+
+Bare React Native apps:
+
+1. In `ios/Podfile`, remove the `pre_install` block that sets dynamic framework linking for `Rokt-Widget`, `RoktContracts`, `RoktUXHelper` and `DcuiSchema`. Keep the block if it lists other pods; just remove those four names.
+2. If the Podfile has `pod 'RoktPaymentExtension'`, remove it and add this at the top of the Podfile instead:
+
+   ```ruby
+   $RNRoktSPMPackages = ['RoktPaymentExtension']
+   ```
+
+3. Run `cd ios && pod install`. It prints `[Rokt] <your app target> <- Rokt-Widget <version>`.
+4. Commit the change to your `.xcodeproj` and the `Package.resolved` file that Xcode creates.
+
+Native code is unchanged: `import Rokt_Widget` and `import RoktPaymentExtension` work as before. If you had already added the Rokt iOS SDK to the app target as a Swift package, `pod install` keeps that package and pins its version.
+
+If your app also uses `react-native-mparticle` with its Rokt kit, use its Swift Package Manager mode too. Installed with CocoaPods, that kit adds the Rokt iOS SDK as a pod, and `pod install` stops.
+
+Expo apps: run `npx expo prebuild --clean`.
+
+To keep taking the SDK from CocoaPods for now, set `$RNRoktDisableSPM = true` at the top of the Podfile and keep the `pre_install` block. This mode is deprecated: new versions of the Rokt iOS SDK may not be published to CocoaPods after 2 December 2026.
+
 ## Migrating from v4.x to v5.0.0
 
 v5.0.0 is a major release that aligns the React Native SDK with native iOS SDK 5.0 and Android SDK 5.0. This includes API renames, removal of deprecated methods, and new Shoppable Ads support.
