@@ -9,6 +9,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [6.0.0] - 2026-10-26
+
+### Breaking Changes
+
+- Accept only placeholder names in selectPlacements ([#329](https://github.com/ROKT/rokt-sdk-react-native/pull/329))
+- Take the Rokt iOS SDK from Swift Package Manager by default ([#326](https://github.com/ROKT/rokt-sdk-react-native/pull/326))
+
+### Added
+
+- Add experimental Package.swift for React Native SPM mode ([#331](https://github.com/ROKT/rokt-sdk-react-native/pull/331))
+- Set up Swift Package Manager in the Expo config plugin ([#327](https://github.com/ROKT/rokt-sdk-react-native/pull/327))
+- Warn in debug builds when two Rokt SDK copies are loaded ([#324](https://github.com/ROKT/rokt-sdk-react-native/pull/324))
+
+### Changed
+
+- Move Rokt SDK calls into a Swift layer ([#330](https://github.com/ROKT/rokt-sdk-react-native/pull/330))
+- Resolve Rokt SDK headers through one private header ([#325](https://github.com/ROKT/rokt-sdk-react-native/pull/325))
+
 ## [5.1.2] - 2026-07-29
 
 ### Fixed
@@ -151,7 +169,8 @@ For a full migration guide, see [MIGRATING.md](./MIGRATING.md#migrating-from-v4x
 - Support new response action type `ExternalPaymentTrigger`
 - Sessions are now retained between app restarts
 
-[unreleased]: https://github.com/ROKT/rokt-sdk-react-native/compare/5.1.2...HEAD
+[unreleased]: https://github.com/ROKT/rokt-sdk-react-native/compare/6.0.0...HEAD
+[6.0.0]: https://github.com/ROKT/rokt-sdk-react-native/compare/5.2.0...6.0.0
 [5.1.2]: https://github.com/ROKT/rokt-sdk-react-native/compare/5.1.1...5.1.2
 [5.1.1]: https://github.com/ROKT/rokt-sdk-react-native/compare/5.0.2...5.1.1
 [5.1.0]: https://github.com/ROKT/rokt-sdk-react-native/compare/5.0.2...5.1.0
