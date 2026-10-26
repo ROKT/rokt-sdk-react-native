@@ -1,9 +1,7 @@
 #import <XCTest/XCTest.h>
 #import "../../../Rokt.Widget/ios/RoktPlaceholderRegistry.h"
 #import "../../../Rokt.Widget/ios/RoktNativeWidgetComponentView.h"
-#if __has_include(<RoktContracts/RoktContracts-Swift.h>)
-    #import <RoktContracts/RoktContracts-Swift.h>
-#endif
+#import "../../../Rokt.Widget/ios/RNRoktSDKImports.h"
 
 // Fabric sizing is covered in New Architecture builds; legacy wrapper sizing is tested separately.
 #ifdef RCT_NEW_ARCH_ENABLED

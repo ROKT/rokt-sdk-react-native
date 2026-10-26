@@ -9,8 +9,7 @@
 //  You may obtain a copy of the License at https://rokt.com/sdk-license-2-0/
 
 #import "RoktEventManager.h"
-#import <RoktContracts/RoktContracts-Swift.h>
-#import <Rokt_Widget/Rokt_Widget-Swift.h>
+#import "RNRoktSDKImports.h"
 
 @implementation RoktEventManager
 {
