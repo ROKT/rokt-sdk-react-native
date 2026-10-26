@@ -21,8 +21,8 @@ require 'xcodeproj'
 
 module RNRoktSPM
   POD_NAME = 'rokt-react-native-sdk'.freeze
-  # Keep this URL byte-identical to the one the mParticle Rokt kit uses, so an app with both gets one
-  # package identity (rokt-sdk-ios), not two. No `.git` suffix.
+  # Apps commit this package reference to their Xcode project. A different owner or host would leave
+  # that reference unmanaged (see same_url?).
   SDK_URL = 'https://github.com/ROKT/rokt-sdk-ios'.freeze
   SDK_PRODUCT = 'Rokt-Widget'.freeze
   # Default version when the Podfile sets none. Bump with each tested native release.
@@ -79,11 +79,10 @@ module RNRoktSPM
 
     raise Pod::Informative,
           '[Rokt] This package takes the Rokt iOS SDK from Swift Package Manager, but these pods would ' \
-          "add a second copy: #{conflicts.sort.join(', ')}. Either remove them (and their entries in any " \
-          'pre_install dynamic-framework hook), listing RoktPaymentExtension in $RNRoktSPMPackages instead, ' \
-          'or set $RNRoktDisableSPM = true at the top of the Podfile to stay on CocoaPods. Another package ' \
-          'that installs the Rokt SDK with CocoaPods, such as react-native-mparticle on CocoaPods, adds ' \
-          'these pods too: move it to Swift Package Manager as well, or opt out here.'
+          "add a second copy: #{conflicts.sort.join(', ')}. Either remove them (and their names in any " \
+          'pre_install dynamic-framework hook) and any pod that depends on them, listing RoktPaymentExtension ' \
+          'in $RNRoktSPMPackages instead, or set $RNRoktDisableSPM = true at the top of the Podfile to stay ' \
+          'on CocoaPods.'
   end
 
   # Only iOS targets that use this pod: other targets in the same Podfile must not get the SDK.

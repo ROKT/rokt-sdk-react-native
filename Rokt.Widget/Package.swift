@@ -16,8 +16,8 @@ let package = Package(
     dependencies: [
         .package(name: "ReactNative", path: "../../../../xcframeworks"),
         .package(name: "React-GeneratedCode", path: "../../../ios"),
-        // Same URLs as the mParticle Rokt kit uses, so an app with both resolves one package identity.
         .package(url: "https://github.com/ROKT/rokt-sdk-ios", "5.3.0"..<"6.0.0"),
+        // The exact URL rokt-sdk-ios itself depends on, `.git` included, so SwiftPM sees one location.
         .package(url: "https://github.com/ROKT/rokt-contracts-apple.git", "2.0.0"..<"3.0.0")
     ],
     targets: [
