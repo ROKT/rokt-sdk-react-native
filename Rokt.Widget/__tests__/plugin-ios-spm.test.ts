@@ -54,6 +54,46 @@ describe("applyRoktPodfileMods", () => {
     );
   });
 
+  describe.each(["spm", "cocoapods"] as const)(
+    "%s with custom targets",
+    (iosDependencyManager) => {
+      test.each([
+        ["space-indented", "  target 'ExpoTestApp' do\n  end\n"],
+        ["tab-indented", "\ttarget 'ExpoTestApp' do\n\tend\n"],
+        [
+          "abstract",
+          "abstract_target 'Common' do\n  use_expo_modules!\n  target 'ExpoTestApp' do\n  end\nend\n",
+        ],
+      ])(
+        "writes settings before %s targets and preserves reruns",
+        (_, targets) => {
+          const props = {
+            iosDependencyManager,
+            ...(iosDependencyManager === "spm"
+              ? {
+                  iosSdkVersion: "5.5.5",
+                  iosSpmPackages: ["RoktPaymentExtension"],
+                }
+              : {}),
+          };
+          const podfile = `platform :ios, '15.1'\n\n${targets}`;
+          const modified = applyRoktPodfileMods(podfile, props);
+          const block =
+            iosDependencyManager === "spm"
+              ? settings(
+                  "$RNRoktSPMVersion = '5.5.5'",
+                  "$RNRoktSPMPackages = ['RoktPaymentExtension']",
+                )
+              : settings("$RNRoktDisableSPM = true");
+
+          expect(modified).toContain(`${block}\n\n${targets}`);
+          expect(modified.match(/# Rokt settings/g)).toHaveLength(1);
+          expect(applyRoktPodfileMods(modified, props)).toBe(modified);
+        },
+      );
+    },
+  );
+
   test("running again gives the same Podfile, and a rerun replaces the settings", () => {
     const once = applyRoktPodfileMods(PODFILE, { iosSdkVersion: "5.5.5" });
     expect(applyRoktPodfileMods(once, { iosSdkVersion: "5.5.5" })).toBe(once);

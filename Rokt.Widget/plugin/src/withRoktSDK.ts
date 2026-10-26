@@ -70,8 +70,8 @@ function settingsLines(props: RoktPluginProps): string[] {
 }
 
 /**
- * Writes the settings block before the first `target`, which evaluates the podspec, or replaces the
- * block a previous run wrote, so a re-run picks up changed options.
+ * Writes the settings block before the first `target` or `abstract_target`, so settings are available
+ * when the podspec is evaluated, or replaces a previous block so a re-run picks up changed options.
  */
 function setSettings(podfile: string, lines: string[]): string {
   const block = [SETTINGS_START, ...lines, SETTINGS_END].join("\n");
@@ -85,7 +85,7 @@ function setSettings(podfile: string, lines: string[]): string {
     }
     return `${podfile.slice(0, start)}${block}${podfile.slice(end + SETTINGS_END.length)}`;
   }
-  const target = /^target /m.exec(podfile);
+  const target = /^[ \t]*(?:abstract_)?target\b/m.exec(podfile);
   if (!target) {
     throw new Error("[Rokt] ios/Podfile has no target block");
   }
