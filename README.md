@@ -49,11 +49,11 @@ $RNRoktSPMPackages = ['RoktPaymentExtension']  # optional Rokt packages, at the 
 
 **Linkage.** Static libraries (the React Native default), `use_frameworks! :linkage => :static` and `use_frameworks! :linkage => :dynamic` all work. This package's own pod is always built as a static framework, so it never links a second copy of the SDK.
 
-**One copy only.** Take every Rokt SDK from Swift Package Manager or every one from CocoaPods, never both. An app that has both builds without a warning and misbehaves at runtime, so `pod install` stops if a pod would add a second copy, and Debug builds show an error on launch if one is loaded. If your app also uses `react-native-mparticle` with its Rokt kit, use Swift Package Manager there too, so that both packages take the Rokt iOS SDK from the same Swift package.
+**One copy only.** Take every Rokt SDK from Swift Package Manager or every one from CocoaPods, never both. An app that has both builds without a warning and misbehaves at runtime, so `pod install` stops if a pod would add a second copy, and Debug builds show an error on launch if one is loaded.
 
 ##### Troubleshooting
 
-- `[Rokt] This package takes the Rokt iOS SDK from Swift Package Manager, but these pods would add a second copy`: remove those pods from the Podfile, and their names from any `pre_install` dynamic-framework hook. Put `RoktPaymentExtension` in `$RNRoktSPMPackages` instead. If another package adds them, move it to Swift Package Manager too, or use CocoaPods (below).
+- `[Rokt] This package takes the Rokt iOS SDK from Swift Package Manager, but these pods would add a second copy`: remove those pods from the Podfile, and their names from any `pre_install` dynamic-framework hook. Put `RoktPaymentExtension` in `$RNRoktSPMPackages` instead. If another pod depends on them, remove it too, or use CocoaPods (below).
 - `[Rokt] $RNRoktSPMPackages: unknown package`: use a name from the list in the error.
 - `[Rokt] ... already links Rokt-Widget from ...`: the app target links the SDK from another package. Remove it from the target in Xcode, then run `pod install` again.
 - `[Rokt] Swift Package Manager mode is on, but the Rokt-Widget Swift package is not linked into the app target` (a build error): run `pod install` again, and keep the package in the app target.
