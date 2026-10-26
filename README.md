@@ -80,6 +80,10 @@ end
 
 New versions of the Rokt iOS SDK may not be published to CocoaPods after 2 December 2026.
 
+#### Experimental: React Native Swift Package Manager mode
+
+React Native 0.87 can build an app with Swift Package Manager instead of CocoaPods (`npx react-native spm add`). This package's support for that mode is experimental and not for production use; it was tested with React Native 0.87.1. In that mode this package is the Swift package `RoktReactNativeSdk`, which brings the Rokt iOS SDK (`rokt-sdk-ios`) with it. `RoktPaymentExtension` is not included: if you use it, add `https://github.com/ROKT/rokt-payment-extension-ios` to the app target yourself, at the same version as the `rokt-sdk-ios` package resolves to. The Podfile settings above do not apply in this mode.
+
 #### Expo
 
 This package cannot be used with "Expo Go" because it requires custom native code. Use a custom development client instead.
