@@ -33,10 +33,10 @@ npm install @rokt/react-native-sdk --save
 
 - **Android** resolves automatically from Maven Central via React Native autolinking — no
   extra configuration.
-- **iOS** requires a `pre_install` hook in your Podfile (bare React Native) or the bundled
-  Expo config plugin. See the
+- **iOS** takes the Rokt iOS SDK from Swift Package Manager: `pod install` links it into your
+  app target, with no Podfile change. Expo apps also add the bundled config plugin. See the
   [repository README](https://github.com/ROKT/rokt-sdk-react-native/blob/main/README.md#ios-configuration)
-  for the exact setup.
+  for the settings and the deprecated CocoaPods mode.
 
 ## Quick Start
 

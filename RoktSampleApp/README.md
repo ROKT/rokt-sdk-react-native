@@ -66,6 +66,10 @@ pod install --repo-update
 bundle exec pod install --repo-update
 ```
 
+`pod install` links the Rokt iOS SDK into `RoktSampleApp.xcodeproj` as a Swift package, the
+default. Don't commit that change to the project. To build with the SDK from CocoaPods instead,
+discard it and run `ROKT_USE_COCOAPODS=1 pod install`.
+
 Then return to the RoktSampleApp directory:
 
 ```bash

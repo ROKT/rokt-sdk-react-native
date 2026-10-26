@@ -15,13 +15,22 @@ if linkage != nil
   use_frameworks! :linkage => linkage.to_sym
 end
 
-# Rokt SDK 5.0 source-based pods need dynamic framework linking
-# to avoid module map redefinition errors with React Native's module system
-pre_install do |installer|
-  installer.pod_targets.each do |pod|
-    if ['Rokt-Widget', 'RoktContracts', 'RoktUXHelper', 'DcuiSchema'].include?(pod.name)
-      def pod.build_type;
-        Pod::BuildType.new(:linkage => :dynamic, :packaging => :framework)
+# The Rokt iOS SDK comes from Swift Package Manager by default (README › Swift Package Manager);
+# ROKT_USE_COCOAPODS=1 takes it from CocoaPods instead. The setting must come before `target`, which
+# evaluates the podspec. Swift Package Manager mode adds the package to RoktSampleApp.xcodeproj: discard
+# that change before switching to CocoaPods, or the app links both copies (Debug builds then show an
+# error on launch).
+$RNRoktDisableSPM = ENV['ROKT_USE_COCOAPODS'] == '1'
+
+if $RNRoktDisableSPM
+  # Rokt SDK 5.0 source-based pods need dynamic framework linking
+  # to avoid module map redefinition errors with React Native's module system
+  pre_install do |installer|
+    installer.pod_targets.each do |pod|
+      if ['Rokt-Widget', 'RoktContracts', 'RoktUXHelper', 'DcuiSchema'].include?(pod.name)
+        def pod.build_type;
+          Pod::BuildType.new(:linkage => :dynamic, :packaging => :framework)
+        end
       end
     end
   end
@@ -36,8 +45,14 @@ target 'RoktSampleApp' do
     :app_path => "#{Pod::Config.instance.installation_root}/.."
   )
 
-  # Uncomment to enable Shoppable Ads payment extension:
-  # pod 'RoktPaymentExtension'
+  # CocoaPods mode builds against the oldest Rokt iOS SDK the podspec accepts: keep this in step with its
+  # Rokt-Widget lower bound. The committed Podfile.lock is the Swift Package Manager one, which has no Rokt
+  # pods to pin it.
+  pod 'Rokt-Widget', '5.3.0' if $RNRoktDisableSPM
+
+  # Uncomment to enable Shoppable Ads payment extension. With Swift Package Manager, set
+  # $RNRoktSPMPackages = ['RoktPaymentExtension'] above instead.
+  # pod 'RoktPaymentExtension' if $RNRoktDisableSPM
 
   target 'RoktSampleAppTests' do
     inherit! :search_paths
@@ -61,6 +76,18 @@ target 'RoktSampleApp' do
 
       target.build_configurations.each do |build_config|
         build_config.build_settings['CLANG_CXX_LANGUAGE_STANDARD'] = 'c++17'
+      end
+    end
+
+    unless $RNRoktDisableSPM
+      # The unit tests compile against the SDK's generated headers but never link the SDK: the host
+      # app does. Point them at the directory where Xcode writes those headers.
+      spm_headers = '"$(OBJROOT)/GeneratedModuleMaps-$(PLATFORM_NAME)"'
+      installer.aggregate_targets.select { |t| t.name.end_with?('-RoktSampleAppTests') }.each do |t|
+        t.xcconfigs.each do |build_config, xcconfig|
+          xcconfig.attributes['HEADER_SEARCH_PATHS'] = "#{xcconfig.attributes['HEADER_SEARCH_PATHS']} #{spm_headers}"
+          xcconfig.save_as(t.xcconfig_path(build_config))
+        end
       end
     end
   end
