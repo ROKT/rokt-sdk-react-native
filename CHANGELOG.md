@@ -9,6 +9,44 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.2.0] - 2026-10-26
+
+### Added
+
+- Support named embedded placements and reliable native events ([#308](https://github.com/ROKT/rokt-sdk-react-native/pull/308))
+- Add CNAME and built-in PayPal redirect callback APIs ([#303](https://github.com/ROKT/rokt-sdk-react-native/pull/303))
+
+### Fixed
+
+- Ignore wrongly typed config values and reset recycled embedded views ([#318](https://github.com/ROKT/rokt-sdk-react-native/pull/318))
+- Keep embedded Rokt view at SDK-reported height on New Architecture ([#307](https://github.com/ROKT/rokt-sdk-react-native/pull/307))
+- Render iOS embedded layouts in bridgeless apps ([#296](https://github.com/ROKT/rokt-sdk-react-native/pull/296))
+- Skip explicit Kotlin plugin when AGP registers the kotlin extension ([#301](https://github.com/ROKT/rokt-sdk-react-native/pull/301))
+
+### Changed
+
+- Harden releases from maintenance branches ([#323](https://github.com/ROKT/rokt-sdk-react-native/pull/323))
+- Bump actions/download-artifact from 4.3.0 to 8.0.2 ([#322](https://github.com/ROKT/rokt-sdk-react-native/pull/322))
+- Bump actions/create-github-app-token from 3.2.0 to 3.3.0 in the github-actions-patch-minor group ([#321](https://github.com/ROKT/rokt-sdk-react-native/pull/321))
+- Bump the gradle-patch-minor group in /Rokt.Widget/android with 2 updates ([#320](https://github.com/ROKT/rokt-sdk-react-native/pull/320))
+- Bump com.rokt:roktsdk from 6.1.4 to 6.2.1 in /Rokt.Widget/android in the gradle-patch-minor group ([#314](https://github.com/ROKT/rokt-sdk-react-native/pull/314))
+- Publish only the verified release tarball and split the GitHub release job ([#317](https://github.com/ROKT/rokt-sdk-react-native/pull/317))
+- Bump the github-actions-patch-minor group with 2 updates ([#315](https://github.com/ROKT/rokt-sdk-react-native/pull/315))
+- Upgrade trunk ([#310](https://github.com/ROKT/rokt-sdk-react-native/pull/310))
+- Bump com.rokt:roktsdk from 6.1.3 to 6.1.4 in /Rokt.Widget/android in the gradle-patch-minor group ([#309](https://github.com/ROKT/rokt-sdk-react-native/pull/309))
+- Read release version and notes from step env in publish workflow ([#312](https://github.com/ROKT/rokt-sdk-react-native/pull/312))
+- Scope release publish permissions to the release job ([#313](https://github.com/ROKT/rokt-sdk-react-native/pull/313))
+- Add agent instructions with public repository confidentiality rules ([#311](https://github.com/ROKT/rokt-sdk-react-native/pull/311))
+- Bump com.rokt:roktsdk from 6.1.1 to 6.1.3 in /Rokt.Widget/android in the gradle-patch-minor group ([#306](https://github.com/ROKT/rokt-sdk-react-native/pull/306))
+- Inherit org default PR template ([#305](https://github.com/ROKT/rokt-sdk-react-native/pull/305))
+- Add a path-aware React Native PR gate ([#299](https://github.com/ROKT/rokt-sdk-react-native/pull/299))
+- Bump com.rokt:roktsdk from 6.0.2 to 6.1.1 in /Rokt.Widget/android ([#302](https://github.com/ROKT/rokt-sdk-react-native/pull/302))
+- Bump trunk-io/trunk-action from 1.3.1 to 2.0.0 ([#298](https://github.com/ROKT/rokt-sdk-react-native/pull/298))
+- Upgrade trunk ([#300](https://github.com/ROKT/rokt-sdk-react-native/pull/300))
+- Fix misleading Rokt SDK README integration guides ([#295](https://github.com/ROKT/rokt-sdk-react-native/pull/295))
+- Bump com.rokt:roktsdk from 6.0.1 to 6.0.2 in /Rokt.Widget/android ([#294](https://github.com/ROKT/rokt-sdk-react-native/pull/294))
+- Upgrade trunk ([#293](https://github.com/ROKT/rokt-sdk-react-native/pull/293))
+
 ## [5.1.2] - 2026-07-29
 
 ### Fixed
@@ -151,7 +189,8 @@ For a full migration guide, see [MIGRATING.md](./MIGRATING.md#migrating-from-v4x
 - Support new response action type `ExternalPaymentTrigger`
 - Sessions are now retained between app restarts
 
-[unreleased]: https://github.com/ROKT/rokt-sdk-react-native/compare/5.1.2...HEAD
+[unreleased]: https://github.com/ROKT/rokt-sdk-react-native/compare/5.2.0...HEAD
+[5.2.0]: https://github.com/ROKT/rokt-sdk-react-native/compare/5.1.2...5.2.0
 [5.1.2]: https://github.com/ROKT/rokt-sdk-react-native/compare/5.1.1...5.1.2
 [5.1.1]: https://github.com/ROKT/rokt-sdk-react-native/compare/5.0.2...5.1.1
 [5.1.0]: https://github.com/ROKT/rokt-sdk-react-native/compare/5.0.2...5.1.0
