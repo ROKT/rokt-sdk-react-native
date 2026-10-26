@@ -60,7 +60,7 @@ The Rokt SDK integrates seamlessly with Expo through standard React Native autol
 ### iOS Integration
 
 - **Autolinking**: The SDK's podspec is automatically discovered
-- **Dependencies**: `Rokt-Widget` pod is resolved via CocoaPods
+- **Dependencies**: `pod install`, which `expo prebuild` runs, links the Rokt iOS SDK into the app as the `rokt-sdk-ios` Swift package. With the plugin option `"iosDependencyManager": "cocoapods"` it is a `Rokt-Widget` pod instead
 
 ## Verifying the Integration
 
@@ -72,9 +72,8 @@ After running `npm run prebuild`, you can verify the SDK is properly linked:
 
 ### iOS Verification
 
-- Check `ios/Podfile.lock` should include:
-  - `rokt-react-native-sdk`
-  - `Rokt-Widget`
+- `ios/Podfile.lock` should include `rokt-react-native-sdk`
+- The `ExpoTestApp` target should list the `Rokt-Widget` package under Frameworks, Libraries, and Embedded Content. With `CI=1` or `EXPO_DEBUG=1`, the prebuild output also shows `[Rokt] ExpoTestApp <- Rokt-Widget <version>`
 
 ## Important Notes
 
