@@ -2592,7 +2592,7 @@ SPEC CHECKSUMS:
   ReactCodegen: 6c26f8c25d0b5ae66f86a1cce1777076ac8bcbd8
   ReactCommon: 5f0e5c09a64a2717215dd84380e1a747810406f2
   RNCCheckbox: 33b44487ca8008394ce658cc32b26eab04f426ef
-  rokt-react-native-sdk: 43e94b29f19a8311cad4904f4d1d61a2cc28a07e
+  rokt-react-native-sdk: 3a7e0c69dd7bf6fe5e0dc7a5b181074ee845a713
   SocketRocket: d4aabe649be1e368d1318fdf28a022d714d65748
   Yoga: 728df40394d49f3f471688747cf558158b3a3bd1
 

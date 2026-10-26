@@ -16,6 +16,8 @@
 		C0D3A0062F50100100000006 /* RoktNativeWidgetComponentViewSizingTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = C0D3A0052F50100100000005 /* RoktNativeWidgetComponentViewSizingTests.mm */; };
 		C0D3A0082F50100100000008 /* RNRoktWidgetConfigTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = C0D3A0072F50100100000007 /* RNRoktWidgetConfigTests.mm */; };
 		C0D3A00A2F5010010000000A /* RNRoktDuplicateSDKTests.m in Sources */ = {isa = PBXBuildFile; fileRef = C0D3A0092F50100100000009 /* RNRoktDuplicateSDKTests.m */; };
+		C0D3A00C2F5010010000000C /* RoktEventManagerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = C0D3A00B2F5010010000000B /* RoktEventManagerTests.m */; };
+		C0D3A00E2F5010010000000E /* RNRoktSwiftTests.m in Sources */ = {isa = PBXBuildFile; fileRef = C0D3A00D2F5010010000000D /* RNRoktSwiftTests.m */; };
 		ED3F467A5B566504E7C400E2 /* libPods-RoktSampleApp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C511286B7AF0F576FF8BEC31 /* libPods-RoktSampleApp.a */; };
 /* End PBXBuildFile section */
 
@@ -46,6 +48,8 @@
 		C0D3A0052F50100100000005 /* RoktNativeWidgetComponentViewSizingTests.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = RoktNativeWidgetComponentViewSizingTests.mm; sourceTree = "<group>"; };
 		C0D3A0072F50100100000007 /* RNRoktWidgetConfigTests.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = RNRoktWidgetConfigTests.mm; sourceTree = "<group>"; };
 		C0D3A0092F50100100000009 /* RNRoktDuplicateSDKTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RNRoktDuplicateSDKTests.m; sourceTree = "<group>"; };
+		C0D3A00B2F5010010000000B /* RoktEventManagerTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RoktEventManagerTests.m; sourceTree = "<group>"; };
+		C0D3A00D2F5010010000000D /* RNRoktSwiftTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RNRoktSwiftTests.m; sourceTree = "<group>"; };
 		C511286B7AF0F576FF8BEC31 /* libPods-RoktSampleApp.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-RoktSampleApp.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		D6EF2E19964A769AA6849FC8 /* Pods-RoktSampleAppTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RoktSampleAppTests.release.xcconfig"; path = "Target Support Files/Pods-RoktSampleAppTests/Pods-RoktSampleAppTests.release.xcconfig"; sourceTree = "<group>"; };
 		EC79AD418A11B5011DF32785 /* libPods-RoktSampleAppTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-RoktSampleAppTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -144,6 +148,8 @@
 				C0D3A0052F50100100000005 /* RoktNativeWidgetComponentViewSizingTests.mm */,
 				C0D3A0072F50100100000007 /* RNRoktWidgetConfigTests.mm */,
 				C0D3A0092F50100100000009 /* RNRoktDuplicateSDKTests.m */,
+				C0D3A00B2F5010010000000B /* RoktEventManagerTests.m */,
+				C0D3A00D2F5010010000000D /* RNRoktSwiftTests.m */,
 			);
 			path = RoktSampleAppTests;
 			sourceTree = "<group>";
@@ -354,6 +360,8 @@
 				C0D3A0062F50100100000006 /* RoktNativeWidgetComponentViewSizingTests.mm in Sources */,
 				C0D3A0082F50100100000008 /* RNRoktWidgetConfigTests.mm in Sources */,
 				C0D3A00A2F5010010000000A /* RNRoktDuplicateSDKTests.m in Sources */,
+				C0D3A00C2F5010010000000C /* RoktEventManagerTests.m in Sources */,
+				C0D3A00E2F5010010000000E /* RNRoktSwiftTests.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

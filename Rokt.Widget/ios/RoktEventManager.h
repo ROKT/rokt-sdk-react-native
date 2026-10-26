@@ -10,7 +10,6 @@
 
 #import <React/RCTBridgeModule.h>
 #import <React/RCTEventEmitter.h>
-#import "RNRoktSDKImports.h"
 
 #ifdef RCT_NEW_ARCH_ENABLED
 #import <RNRoktWidgetSpec/RNRoktWidgetSpec.h>
@@ -25,7 +24,8 @@ NS_ASSUME_NONNULL_BEGIN
 #endif
 + (instancetype _Nonnull)allocWithZone:(NSZone * _Nullable)zone;
 - (void)onWidgetHeightChanges:(CGFloat)widgetHeight placement:(NSString * _Nonnull)selectedPlacement;
-- (void)onRoktEvents:(RoktEvent * _Nonnull)event identifier:(NSString * _Nullable)identifier;
+// event is a RoktEvent from the Rokt SDK.
+- (void)onRoktEvents:(NSObject * _Nonnull)event identifier:(NSString * _Nullable)identifier;
 
 @end
 
