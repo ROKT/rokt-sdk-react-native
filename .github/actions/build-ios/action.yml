@@ -32,6 +32,11 @@ runs:
       run: ruby .github/scripts/rokt_spm_test.rb
 
     - name: Install iOS dependencies
+      id: install-ios-deps
+      # CocoaPods trunk is going read-only, so with ios-deps cocoapods pod install can fail on a version that
+      # only Swift Package Manager has. Only that resolution is allowed to fail; the steps below still gate
+      # the code. Swift Package Manager mode needs pod install for React Native's own pods, so it stays hard.
+      continue-on-error: ${{ inputs.ios-deps == 'cocoapods' }}
       shell: bash
       env:
         # RoktSampleApp/ios/Podfile takes the Rokt iOS SDK from Swift Package Manager unless this is 1.
@@ -41,6 +46,16 @@ runs:
         cd RoktSampleApp/ios
         pod install
         echo "iOS dependencies installed successfully"
+
+    - name: Warn when CocoaPods could not resolve
+      if: steps.install-ios-deps.outcome == 'failure'
+      shell: bash
+      run: |
+        echo "::warning::CocoaPods could not resolve the sample app's dependencies, so the CocoaPods build and tests were skipped. Check the log above for the cause."
+        {
+          echo "### CocoaPods dependencies did not resolve"
+          echo "The CocoaPods build and tests of the sample app were skipped. Check the job log for the cause."
+        } >> "$GITHUB_STEP_SUMMARY"
 
     - name: Find available iPhone simulator
       id: find-simulator
@@ -61,6 +76,7 @@ runs:
 
     - name: Build iOS for Simulator
       id: build-ios
+      if: steps.install-ios-deps.outcome == 'success'
       shell: bash
       env:
         IOS_DEPS: ${{ inputs.ios-deps }}
@@ -98,6 +114,7 @@ runs:
         echo "app-archive=$APP_BASENAME.zip" >> $GITHUB_OUTPUT
 
     - name: Run iOS Tests
+      if: steps.install-ios-deps.outcome == 'success'
       shell: bash
       run: |
         cd RoktSampleApp
@@ -115,6 +132,7 @@ runs:
     # Mixing CocoaPods and Swift Package Manager links a second copy of the SDK that builds silently,
     # so check the archived app, as a release build would ship it.
     - name: Archive iOS app and check for a single copy of the SDK
+      if: steps.install-ios-deps.outcome == 'success'
       shell: bash
       run: |
         cd RoktSampleApp
@@ -130,6 +148,7 @@ runs:
         ../.github/scripts/check-single-copy.sh ios/build/RoktSampleApp.xcarchive/Products/Applications/RoktSampleApp.app
 
     - name: Create artifact metadata
+      if: steps.install-ios-deps.outcome == 'success'
       shell: bash
       run: |
         cd RoktSampleApp
@@ -147,6 +166,7 @@ runs:
         EOF
 
     - name: Upload iOS artifacts
+      if: steps.install-ios-deps.outcome == 'success'
       uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 #v4.6.2
       with:
         name: ${{ steps.build-ios.outputs.artifact-name }}
@@ -156,6 +176,7 @@ runs:
           RoktSampleApp/ios-artifact-info.txt
 
     - name: Create artifact summary
+      if: steps.install-ios-deps.outcome == 'success'
       shell: bash
       run: |
         echo "## 📱 iOS App Artifact Created" >> $GITHUB_STEP_SUMMARY
