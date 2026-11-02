@@ -31,8 +31,9 @@ fails instead of publishing. A prerelease never moves a stable tag: it is publis
 ## Maintenance branches
 
 - **Cutting one.** Before the first breaking change for the next major merges into `main`:
-  1. Allow `maintenance/*` to deploy to the `npm-publish` environment (Settings › Environments ›
-     `npm-publish` › Deployment branches). Without it, publishing from the branch fails.
+  1. Add `maintenance/<N>.x` by its exact name to the deployment branches of the `npm-publish` and
+     `release` environments (Settings › Environments). Without it, drafting and publishing from the
+     branch fail. Do not add a pattern such as `maintenance/*`: any branch it matches could publish.
   2. Create `maintenance/<N>.x` from `main`, where `<N>` is the current major, and protect it like
      `main`.
 - **Fixes.** Open a pull request against the branch the fix is for. A fix that applies to both lines

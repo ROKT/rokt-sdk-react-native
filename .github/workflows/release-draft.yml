@@ -23,6 +23,7 @@ permissions:
 jobs:
   publish-draft-release:
     runs-on: ubuntu-latest
+    environment: release
     steps:
       # Release Publish runs only on main and maintenance/<major>.x, and a major bump off main would
       # publish the next major from maintenance code.
