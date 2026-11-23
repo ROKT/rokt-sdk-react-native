@@ -12,6 +12,12 @@ outputs:
 runs:
   using: composite
   steps:
+    - name: Set up Java
+      uses: actions/setup-java@be666c2fcd27ec809703dec50e508c2fdc7f6654 # v5.2.0
+      with:
+        distribution: temurin
+        java-version: '17'
+
     - name: Build Android
       id: build-android
       shell: bash
